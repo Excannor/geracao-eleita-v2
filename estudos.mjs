@@ -63,6 +63,13 @@ export const MENSAGENS = {
   estudoDoRegistro: 'escolha um estudo desta célula preparado até o dia do encontro',
   soMembros: 'quem está conhecendo a célula vê só o estudo atual',
   naoAberto: 'esse estudo não está aberto para você',
+  // os próximos estudos (docs/a-mesa-fila.md, seção 2.1)
+  filaCheia: 'a fila tem no máximo 12 estudos',
+  dataDaFila: 'escolha uma data de hoje até um ano para a frente',
+  foraDaFila: 'esse estudo já não está nos próximos estudos',
+  filaMudou: 'os próximos estudos mudaram em outro aparelho. Veja como ficaram',
+  estudoMudou: 'esse estudo mudou em outro aparelho. Abra de novo para ver a versão salva',
+  confirmarUsar: 'o estudo atual ainda não foi usado num encontro',
 };
 // O cartão de um versículo que a Bíblia do app não tem (a prévia mostra o mesmo aviso).
 export const semVersiculo = (ref) => 'não achamos ' + ref + ' na Bíblia do app. Confira a referência';
@@ -305,6 +312,13 @@ export function encontrosAteOCorte(encontros, { corte = '', corteEm = '' } = {})
 //   - usarComoBase (que cria um estudo novo): só o líder, só num anterior de p.
 export function acessoAoEstudo(e, p, { papel = '', ativo = false, conduz = false, lidera = false, corte = '', corteEm = '', noDono = null, diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
   const nao = (codigo) => ({ ler: false, codigo, atual: false, daMae: false, presenca: false, usarComoBase: false });
+  // um estudo da fila (docs/a-mesa-fila.md, F2): só quem conduz a própria célula o lê; para todos os
+  // outros ele não existe (404, nunca 403: nem a visitante, nem o membro, nem a filha descobrem que
+  // ele está lá)
+  if (e && e.agendadoPara) {
+    if (p && ativo && conduz && e.proposito === p.id) return { ler: true, codigo: 0, atual: false, daMae: false, presenca: false, usarComoBase: false, fila: true };
+    return nao(404);
+  }
   if (!e || !p || !ativo) return nao(404);
   const visitante = papel === 'visitante';
   // quem estava na célula do estudo enquanto ele era o atual (até fim, 'AAAA-MM-DD' ou '')
@@ -371,6 +385,9 @@ export function estudoDaLinha(l) {
     combinado: l.combinado || '',
     // guardado antes de o histórico existir (v21): fica para quem o via enquanto era o atual
     antesDoHistorico: !!Number(l.antes_do_historico),
+    // na fila (v23): o dia do encontro a que ele se destina; e, depois de promovido, o instante em
+    // que foi escrito (criadoEm passa a ser o instante em que ele entrou na célula)
+    agendadoPara: l.agendado_para || '', preparadoEm: l.preparado_em || '',
   };
   if (e.tipo === 'trecho' && e.ref) {
     if (!e.titulo) e.titulo = e.ref;
@@ -427,4 +444,152 @@ export function resumoDoEstudo(e) {
 export function estudoDoRegistro(e, diaDe) {
   if (!e) return null;
   return { id: e.id, tipo: e.tipo, titulo: tituloDaLista(e), refs: e.refs, em: e.criadoEm, dia: e.criadoEm ? diaDe(e.criadoEm) || '' : '' };
+}
+
+// ---------- Próximos estudos: a fila (docs/a-mesa-fila.md, seções 2 e 4) ----------
+// Um estudo da fila é uma linha de celula_estudos com agendadoPara ('AAAA-MM-DD', o dia do encontro a
+// que ele se destina). A ordem da fila é a ordem das datas, uma data por estudo. As datas contam em
+// dias de calendário, sem fuso: quem chama passa o "hoje" no fuso do líder (Contas.diaNaCelula).
+export const FILA_MAX = 12;
+const numDia = (iso) => Math.floor(Date.parse(iso + 'T12:00:00Z') / 86400000);
+const isoDe = (n) => new Date(n * 86400000 + 43200000).toISOString().slice(0, 10);
+const somarDias = (iso, n) => isoDe(numDia(iso) + n);
+const semanaDe = (iso) => new Date(iso + 'T12:00:00Z').getUTCDay();
+const temDiaDeEncontro = (encontro) => Number.isInteger(encontro) && encontro >= 0 && encontro <= 6;
+const porData = (a, b) => (a.data < b.data ? -1 : a.data > b.data ? 1 : a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+const dataDe = (x) => (x && (x.data || x.agendadoPara)) || '';
+
+// O primeiro dia de encontro depois de d (d fora): o dia da semana da célula (0 a 6); sem dia
+// marcado (-1), uma semana depois.
+export function encontroDepois(d, encontro) {
+  if (!ehDia(d)) return '';
+  if (!temDiaDeEncontro(encontro)) return somarDias(d, 7);
+  for (let i = 1; i <= 7; i++) {
+    const x = somarDias(d, i);
+    if (semanaDe(x) === encontro) return x;
+  }
+  return '';
+}
+
+// O limite da promoção: o primeiro encontro depois de hoje. O primeiro da fila só entra na célula se
+// a data dele chega até aqui, isto é, se ele é do próximo encontro (ou de um que já passou).
+export const limiteDaFila = ({ hoje, encontro = -1 } = {}) => encontroDepois(hoje, encontro);
+
+// A primeira data livre para a fila: o primeiro encontro de hoje em diante que ainda não aconteceu
+// (depois do último encontro registrado, "Não houve encontro" incluído) e, se o estudo atual ainda
+// espera o encontro dele (atualEspera), o seguinte, que esse já é do atual. Sem dia de encontro
+// marcado: uma semana depois de hoje.
+export function primeiraDataDaFila({ hoje, encontro = -1, ultimoEncontro = '', atualEspera = false } = {}) {
+  if (!ehDia(hoje)) return '';
+  if (!temDiaDeEncontro(encontro)) return somarDias(hoje, 7);
+  const ontem = somarDias(hoje, -1);
+  const s = encontroDepois(ehDia(ultimoEncontro) && ultimoEncontro > ontem ? ultimoEncontro : ontem, encontro);
+  return atualEspera ? encontroDepois(s, encontro) : s;
+}
+
+// A data que um estudo novo na fila recebe quando o líder não escolhe: o encontro depois do último
+// da fila, ou a primeira data livre (a fila vazia, ou só com datas que já passaram).
+export function proximaDataDaFila(fila, contexto = {}) {
+  const primeira = primeiraDataDaFila(contexto);
+  const ultima = (fila || []).map(dataDe).filter(ehDia).sort().pop() || '';
+  const depois = ultima ? encontroDepois(ultima, contexto.encontro) : '';
+  return depois > primeira ? depois : primeira;
+}
+
+// Põe um estudo (novo ou já da fila) numa data. Se a data já tem um estudo, ele e os seguintes
+// passam, cada um, para o primeiro encontro depois do anterior (a fila empurra); um estudo cuja data
+// já fica depois do anterior não muda. Devolve a fila nova, em ordem: [{ id, data }].
+export function encaixarNaFila(fila, { id, data }, encontro = -1) {
+  const outros = (fila || []).filter((x) => x && x.id !== id).map((x) => ({ id: x.id, data: dataDe(x) })).sort(porData);
+  const saida = outros.filter((x) => x.data < data).concat([{ id, data }]);
+  let anterior = data;
+  for (const x of outros.filter((y) => y.data >= data)) {
+    const nova = x.data > anterior ? x.data : encontroDepois(anterior, encontro);
+    saida.push({ id: x.id, data: nova });
+    anterior = nova;
+  }
+  return saida;
+}
+
+// Reordenar: ordem é a lista dos ids na ordem nova. As datas ficam nos lugares (o primeiro da ordem
+// nova fica com a data mais cedo): "passar para antes" é usar num encontro mais cedo. A lista que não
+// é a fila de agora (faltou, sobrou ou repetiu um estudo) dá null: a fila mudou em outro aparelho.
+export function reordenarFila(fila, ordem) {
+  const atual = (fila || []).map((x) => ({ id: x.id, data: dataDe(x) })).sort(porData);
+  const ids = Array.isArray(ordem) ? ordem.map((x) => String(x)) : [];
+  if (ids.length !== atual.length || new Set(ids).size !== ids.length || !ids.every((id) => atual.some((x) => x.id === id))) return null;
+  return ids.map((id, i) => ({ id, data: atual[i].data }));
+}
+
+// "Ajustar as datas": a fila inteira, na mesma ordem, um estudo em cada encontro a partir da
+// primeira data livre.
+export function ajustarDatasDaFila(fila, primeira, encontro = -1) {
+  let data = primeira;
+  return (fila || []).map((x) => ({ id: x.id, data: dataDe(x) })).sort(porData).map((x, i) => {
+    if (i) data = encontroDepois(data, encontro);
+    return { id: x.id, data };
+  });
+}
+
+// O estudo atual já teve o encontro dele (docs/a-mesa-fila.md, F6)? É mais estrito que estudoUsado,
+// porque a promoção é automática: na semana sem encontro, ela não pode gastar o estudo da semana.
+//   - um encontro registrado ligado a ele: sim;
+//   - um registro sem estudo ligado (de antes da v20) feito depois que ele entrou, com a data entre o
+//     dia em que ele entrou e hoje: sim (a regra da Fase 1);
+//   - desde o dia em que ele entrou (sem contar hoje), passou um dia de encontro da célula em que
+//     ninguém registrou "Não houve encontro" nem um encontro com outro estudo ('-' incluído): sim
+//     (quem conduz esqueceu de registrar).
+// Na dúvida (sem data que se leia), não: a fila espera.
+//   id, criadoEm: o estudo; nasceu, hoje: 'AAAA-MM-DD' no fuso do líder; encontro: o dia da semana
+//   (0 a 6, ou -1); encontros: os registrados ({ data, em, semEncontro, estudo }).
+export function jaTeveEncontro({ id = '', criadoEm = '', nasceu, hoje, encontro = -1, encontros = [] } = {}) {
+  if (!ehDia(nasceu) || !ehDia(hoje)) return false;
+  const doDia = new Map();
+  for (const x of encontros || []) {
+    if (!x || !ehDia(x.data)) continue;
+    doDia.set(x.data, x);
+    if (x.semEncontro) continue;
+    const ligado = x.estudo || '';
+    if (ligado && id && ligado === id) return true;
+    if (!ligado && x.em && x.em > criadoEm && x.data >= nasceu && x.data <= hoje) return true;
+  }
+  if (!temDiaDeEncontro(encontro)) return false;
+  const ate = Math.min(numDia(hoje), numDia(nasceu) + 400);
+  for (let d = numDia(nasceu); d < ate; d++) {
+    const iso = isoDe(d);
+    if (semanaDe(iso) !== encontro) continue;
+    const r = doDia.get(iso);
+    if (r && (r.semEncontro || (r.estudo && r.estudo !== id))) continue;
+    return true;
+  }
+  return false;
+}
+
+// A promoção (docs/a-mesa-fila.md, seção 4.1): o primeiro da fila (cabeca) entra na célula agora?
+// Quando o estudo atual já teve o encontro dele (ou não há estudo atual) e o primeiro da fila é do
+// próximo encontro (a data dele até limiteDaFila). Nunca passa por cima de um atual que a célula
+// ainda não viveu: isso só o líder faz, confirmando ("Usar agora").
+//   atual: o estudo atual (estudoDaLinha) ou null; cabeca: o primeiro da fila (com agendadoPara ou
+//   data); hoje: 'AAAA-MM-DD' no fuso do líder; diaDe(iso): o dia local de um instante.
+export function devePromover({ atual = null, cabeca = null, hoje, encontro = -1, encontros = [], diaDe = (iso) => String(iso || '').slice(0, 10) } = {}) {
+  const data = dataDe(cabeca);
+  if (!ehDia(data) || !ehDia(hoje) || data > limiteDaFila({ hoje, encontro })) return false;
+  if (!atual) return true;
+  return jaTeveEncontro({ id: atual.id, criadoEm: atual.criadoEm, nasceu: diaDe(atual.criadoEm), hoje, encontro, encontros });
+}
+
+// A data que veio num pedido: um dia que existe, de hoje até um ano para a frente.
+export function limparDataDaFila(data, hoje) {
+  const d = String(data == null ? '' : data).trim();
+  if (!ehDia(d) || isoDe(numDia(d)) !== d || !ehDia(hoje) || d < hoje || d > somarDias(hoje, 366)) throw erro(MENSAGENS.dataDaFila);
+  return d;
+}
+
+// O estudo da fila como quem conduz o recebe, no retrato e nas respostas das ações da fila: só o que
+// a lista mostra. O texto inteiro vem pela leitura (GET /api/estudos?estudo=).
+export function itemDaFila(e, { nomeDe = (u) => '@' + u } = {}) {
+  return {
+    id: e.id, tipo: e.tipo, titulo: tituloDaLista(e), refs: e.refs, data: e.agendadoPara,
+    criadoPor: e.criadoPor, criadoPorNome: e.criadoPor ? nomeDe(e.criadoPor, e.criadoEm) : '', editadoEm: e.editadoEm || '',
+  };
 }

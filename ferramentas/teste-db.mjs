@@ -232,10 +232,19 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
     ok(dbV7.prepare("SELECT antes_do_historico FROM celula_estudos WHERE id = 'enovo'").get().antes_do_historico === 0,
       'o estudo gravado depois da migração nasce sem a marca');
     dbV7.prepare("DELETE FROM celula_estudos WHERE id = 'enovo'").run();
+    // v23: os próximos estudos (docs/a-mesa-fila.md): agendado_para e preparado_em, vazios no que
+    // já estava (fora da fila, com o criado_em de sempre)
+    ok(B.versaoDoEsquema() >= 23 && colunas('celula_estudos').includes('agendado_para') && colunas('celula_estudos').includes('preparado_em')
+      && dbV7.prepare("SELECT agendado_para || '|' || preparado_em AS x FROM celula_estudos WHERE id = 'lp2'").get().x === '|',
+    'a migração v23 acrescenta celula_estudos.agendado_para e preparado_em, vazios no estudo que já estava');
+    dbV7.prepare("INSERT INTO celula_estudos (id, proposito, tipo, criado_por, criado_em, agendado_para) VALUES ('efila', 'p2', 'blocos', 'lider', '2026-01-09T12:00:00.000Z', '2026-01-15')").run();
+    dbV7.prepare("INSERT INTO celula_estudos (id, proposito, tipo, criado_por, criado_em, agendado_para) VALUES ('eoutro', 'p2', 'blocos', 'outro', '2026-01-09T12:00:00.000Z', '2026-01-22')").run();
   }
   B.apagarPessoaDoBanco(dbV7, 'lider');
   ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,
     'apagar a pessoa do banco (e dos backups) não apaga os estudos da célula: eles ficam com o @ de quem preparou');
+  ok(dbV7.prepare("SELECT group_concat(id) x FROM celula_estudos WHERE id IN ('efila', 'eoutro')").get().x === 'eoutro',
+    'os estudos que a pessoa deixou na fila (v23) saem com ela; os da fila de outra pessoa ficam');
   ok(dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === 'lp2'
     && dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 0,
   'e não mexe no estudo ligado ao encontro: só a presença da pessoa sai');

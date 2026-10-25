@@ -318,6 +318,17 @@ const ESQUEMA = [
   ALTER TABLE celula_estudos ADD COLUMN antes_do_historico INTEGER NOT NULL DEFAULT 0;
   UPDATE celula_estudos SET antes_do_historico = 1;
   `,
+  // v23: os próximos estudos da célula (docs/a-mesa-fila.md). Um estudo agendado é uma linha de
+  // celula_estudos com agendado_para = o dia do encontro a que ele se destina ('AAAA-MM-DD'); vazio
+  // no atual e nos anteriores. Ao entrar na célula (a promoção, Contas.promoverDaFila), agendado_para
+  // volta a '', criado_em passa a ser o instante em que ele entrou (é como todas as regras leem
+  // criado_em: o instante em que o estudo passou a valer na célula) e preparado_em guarda o instante
+  // em que ele foi escrito. As linhas que já existem ficam fora da fila, e o criado_em delas continua.
+  // Sem índice novo: a fila de uma célula usa o prefixo proposito do índice da v19.
+  `
+  ALTER TABLE celula_estudos ADD COLUMN agendado_para TEXT NOT NULL DEFAULT '';
+  ALTER TABLE celula_estudos ADD COLUMN preparado_em TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -490,7 +501,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     // o histórico do encontro fica (quem registrou, quantas pessoas), só a presença da pessoa some
     ['celula_presencas', 'DELETE FROM celula_presencas WHERE usuario = ?', [u]],
     // celula_estudos (v19) não entra aqui, de propósito: os estudos que a pessoa preparou ficam na
-    // célula com o @ dela (decisão do dono, 17/10; a política de privacidade diz isso)
+    // célula com o @ dela (decisão do dono, 17/10; a política de privacidade diz isso). Só os da
+    // fila saem, logo abaixo
     // discipulado dos dois lados, e os encontros dele, saem inteiros: não é um grupo que
     // sobrevive sem a pessoa, é uma relação de duas pontas só
     ['discipulado_encontros', "DELETE FROM discipulado_encontros WHERE discipulado IN (SELECT id FROM discipulados WHERE discipulador = ? OR discipulo = ?)", [u, u]],
@@ -518,8 +530,12 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['checkins', 'DELETE FROM checkins WHERE usuario = ?', [u]],
     ['leitura_dias', 'DELETE FROM leitura_dias WHERE usuario = ?', [u]],
   ];
+  // os estudos da célula ficam com o @ de quem preparou, mas os da fila (v23), que a célula nunca
+  // recebeu, saem com a pessoa (docs/a-mesa-fila.md, F9). Um backup de antes da v23 não tem a coluna.
+  const temFila = existe('celula_estudos') && db.prepare('PRAGMA table_info(celula_estudos)').all().some((c) => c.name === 'agendado_para');
   transacao(db, () => {
     for (const [tabela, sql, params] of passos) if (existe(tabela)) db.prepare(sql).run(...params);
+    if (temFila) db.prepare("DELETE FROM celula_estudos WHERE criado_por = ? AND agendado_para != ''").run(u);
   });
 }
 

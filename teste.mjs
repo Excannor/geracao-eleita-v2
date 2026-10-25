@@ -18,6 +18,8 @@ import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, ESTUDOS_POR_CELULA, estudoUsado, TRADUCOES, MENSAGENS as MSG_ESTUDO, limparPerguntas, validarLeitura, estudoDaLinha, estudoNoRetrato,
   COMBINADO_MAX, JANELA_COMBINADO, limparCombinado, estudoDoDia, dataNoHistorico, encontrosDoEstudo, combinadoDoAnterior, acessoAoEstudo, quemFaltou,
   itemDoHistorico, estudoDoRegistro, cursorDe, lerCursor, daMaeAteOCorte, encontrosAteOCorte,
+  FILA_MAX, encontroDepois, limiteDaFila, primeiraDataDaFila, proximaDataDaFila, encaixarNaFila, reordenarFila, ajustarDatasDaFila,
+  jaTeveEncontro, devePromover, limparDataDaFila, itemDaFila,
 } from './estudos.mjs';
 import { montarPainel } from './painel.mjs';
 import { lerCatalogo, validarCatalogo, esqueletoDoCatalogo, todasLancadas, desenhosDaArte, LIMIARES_SEMEADORES as LIMIARES_CATALOGO } from './ferramentas/cartas-catalogo.mjs';
@@ -2641,6 +2643,94 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
     && /mensagem pronta pelo WhatsApp do próprio celular\. O app não manda nada sozinho\./.test(pol) && /Acolhida, adoração e testemunho não ficam guardados nos estudos anteriores/.test(pol),
   'a política diz o lugar da anotação sem cifra, o estudo junto da presença, a mensagem a quem faltou e o que não vai para o histórico');
   checar(!/[\u2013\u2014]/.test(pol), 'a política não tem travessão nem meia-risca');
+}
+
+// =========================================================================
+secao('próximos estudos: as regras da fila (estudos.mjs, docs/a-mesa-fila.md)');
+// =========================================================================
+// Uma célula de quinta (encontro = 4). Outubro de 2026: 22 e 29 são quintas, 25 é domingo.
+{
+  const Q = 4;
+  const erroDe = (f) => { try { f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  const ids = (l) => (l || []).map((x) => x.id + '@' + x.data).join(' ');
+  checar(FILA_MAX === 12, 'a fila tem até 12 estudos');
+  // --- as datas ---
+  checar(encontroDepois('2026-10-22', Q) === '2026-10-29' && encontroDepois('2026-10-25', Q) === '2026-10-29' && encontroDepois('2026-10-28', Q) === '2026-10-29'
+    && encontroDepois('2026-10-29', Q) === '2026-11-05', 'encontroDepois(): a quinta seguinte, sem contar o próprio dia');
+  checar(encontroDepois('2026-10-25', -1) === '2026-11-01' && encontroDepois('2026-12-28', 4) === '2026-12-31' && encontroDepois('2026-12-31', 4) === '2027-01-07' && encontroDepois('x', Q) === '',
+    'encontroDepois(): sem dia marcado, uma semana depois; atravessa o ano; data inválida dá vazio');
+  checar(limiteDaFila({ hoje: '2026-10-25', encontro: Q }) === '2026-10-29' && limiteDaFila({ hoje: '2026-10-29', encontro: Q }) === '2026-11-05'
+    && limiteDaFila({ hoje: '2026-10-25', encontro: -1 }) === '2026-11-01', 'limiteDaFila(): o primeiro encontro depois de hoje (na própria quinta, já a seguinte)');
+  checar(primeiraDataDaFila({ hoje: '2026-10-25', encontro: Q }) === '2026-10-29' && primeiraDataDaFila({ hoje: '2026-10-25', encontro: Q, atualEspera: true }) === '2026-11-05',
+    'primeiraDataDaFila(): o próximo encontro; com o atual esperando o dele, o seguinte');
+  checar(primeiraDataDaFila({ hoje: '2026-10-29', encontro: Q }) === '2026-10-29' && primeiraDataDaFila({ hoje: '2026-10-29', encontro: Q, ultimoEncontro: '2026-10-29' }) === '2026-11-05'
+    && primeiraDataDaFila({ hoje: '2026-10-29', encontro: Q, ultimoEncontro: '2026-10-22' }) === '2026-10-29',
+  'primeiraDataDaFila(): na quinta, a própria quinta, a não ser que o encontro de hoje já esteja registrado ("Não houve encontro" incluído)');
+  checar(primeiraDataDaFila({ hoje: '2026-10-25', encontro: -1, atualEspera: true }) === '2026-11-01' && primeiraDataDaFila({ hoje: 'x', encontro: Q }) === '',
+    'primeiraDataDaFila(): sem dia marcado, uma semana depois de hoje');
+  const ctx = { hoje: '2026-10-25', encontro: Q, atualEspera: true };
+  checar(proximaDataDaFila([], ctx) === '2026-11-05' && proximaDataDaFila([{ id: 'a', data: '2026-11-05' }], ctx) === '2026-11-12'
+    && proximaDataDaFila([{ id: 'a', data: '2026-11-19' }, { id: 'b', data: '2026-11-05' }], ctx) === '2026-11-26'
+    && proximaDataDaFila([{ id: 'a', data: '2026-10-15' }], ctx) === '2026-11-05', 'proximaDataDaFila(): depois do último da fila; com a fila vazia ou só com datas passadas, a primeira data livre');
+  // --- encaixar, reordenar, ajustar ---
+  const fila = [{ id: 'b', data: '2026-11-12' }, { id: 'a', data: '2026-11-05' }, { id: 'c', data: '2026-12-03' }];
+  checar(ids(encaixarNaFila(fila, { id: 'n', data: '2026-11-19' }, Q)) === 'a@2026-11-05 b@2026-11-12 n@2026-11-19 c@2026-12-03', 'encaixarNaFila(): numa data livre, o estudo entra no meio, e nada muda');
+  checar(ids(encaixarNaFila(fila, { id: 'n', data: '2026-11-05' }, Q)) === 'n@2026-11-05 a@2026-11-12 b@2026-11-19 c@2026-12-03',
+    'encaixarNaFila(): numa data ocupada, ela e as seguintes passam para os encontros seguintes; a que já fica depois (3/12) não muda');
+  checar(ids(encaixarNaFila(fila, { id: 'c', data: '2026-11-05' }, Q)) === 'c@2026-11-05 a@2026-11-12 b@2026-11-19' && ids(encaixarNaFila(fila, { id: 'a', data: '2026-11-26' }, Q)) === 'b@2026-11-12 a@2026-11-26 c@2026-12-03',
+    'encaixarNaFila(): mudar a data de um da fila tira ele do lugar antigo');
+  checar(ids(reordenarFila(fila, ['b', 'c', 'a'])) === 'b@2026-11-05 c@2026-11-12 a@2026-12-03', 'reordenarFila(): os estudos trocam de lugar e as datas ficam onde estavam');
+  checar(reordenarFila(fila, ['a', 'b']) === null && reordenarFila(fila, ['a', 'b', 'b']) === null && reordenarFila(fila, ['a', 'b', 'x']) === null && reordenarFila(fila, 'abc') === null,
+    'reordenarFila(): a lista que não é a fila de agora (faltou, repetiu ou sobrou) dá null');
+  checar(ids(ajustarDatasDaFila(fila, '2026-10-29', Q)) === 'a@2026-10-29 b@2026-11-05 c@2026-11-12' && ajustarDatasDaFila([], '2026-10-29', Q).length === 0,
+    'ajustarDatasDaFila(): a fila inteira, na mesma ordem, um estudo por encontro');
+  checar(limparDataDaFila(' 2026-10-25 ', '2026-10-25') === '2026-10-25' && limparDataDaFila('2027-10-26', '2026-10-25') === '2027-10-26'
+    && erroDe(() => limparDataDaFila('2026-10-24', '2026-10-25')) === MSG_ESTUDO.dataDaFila + '|400' && erroDe(() => limparDataDaFila('2027-10-27', '2026-10-25')) === MSG_ESTUDO.dataDaFila + '|400'
+    && erroDe(() => limparDataDaFila('2026-02-30', '2026-01-01')) === MSG_ESTUDO.dataDaFila + '|400' && erroDe(() => limparDataDaFila(undefined, '2026-10-25')) === MSG_ESTUDO.dataDaFila + '|400',
+  'limparDataDaFila(): de hoje até um ano à frente, só dia que existe; "' + MSG_ESTUDO.dataDaFila + '"');
+  // --- já teve o encontro dele, contra estudoUsado ---
+  const A = { id: 'eA', criadoEm: '2026-10-20T12:00:00.000Z' };
+  const teve = (hoje, encontros, encontro = Q) => jaTeveEncontro({ id: A.id, criadoEm: A.criadoEm, nasceu: '2026-10-20', hoje, encontro, encontros });
+  const usado = (hoje, encontros, encontro = Q) => estudoUsado({ id: A.id, criadoEm: A.criadoEm, nasceu: '2026-10-20', hoje, encontro, encontros });
+  checar(!teve('2026-10-22', []) && teve('2026-10-23', []) && usado('2026-10-23', []), 'jaTeveEncontro(): a quinta que passou sem registro conta (quem conduz esqueceu de registrar), como em estudoUsado; a própria quinta ainda não');
+  checar(teve('2026-10-22', [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T23:00:00Z' }]), 'jaTeveEncontro(): o encontro ligado a ele conta na hora');
+  const sem = [{ data: '2026-10-22', semEncontro: true, estudo: '' }];
+  checar(!teve('2026-10-23', sem) && usado('2026-10-23', sem) && teve('2026-10-30', sem), 'jaTeveEncontro(): a quinta com "Não houve encontro" não conta (estudoUsado conta); a quinta seguinte, sem registro, conta');
+  const outro = [{ data: '2026-10-22', estudo: '-', em: '2026-10-22T23:00:00Z' }];
+  checar(!teve('2026-10-23', outro) && !teve('2026-10-23', [{ data: '2026-10-22', estudo: 'eZ', em: '2026-10-22T23:00:00Z' }]), 'jaTeveEncontro(): a quinta feita com outro estudo (de fora do app ou outro id) não conta');
+  checar(teve('2026-10-23', [{ data: '2026-10-21', estudo: '', em: '2026-10-21T23:00:00Z' }]) && !teve('2026-10-21', [{ data: '2026-10-19', estudo: '', em: '2026-10-19T23:00:00Z' }]),
+    'jaTeveEncontro(): o registro sem estudo de um app antigo, feito depois que ele entrou, conta; o de antes, não');
+  checar(!teve('2026-10-30', [], -1) && teve('2026-10-23', [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T23:00:00Z' }], -1) && !jaTeveEncontro({ id: 'eA', nasceu: '', hoje: '2026-10-30' }),
+    'jaTeveEncontro(): sem dia marcado, só o encontro registrado; sem data que se leia, não');
+  // --- devePromover ---
+  const diaSP = (iso) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date(iso));
+  const B = { id: 'eB', agendadoPara: '2026-10-29' };
+  const pode = (hoje, extra = {}) => devePromover({ atual: A, cabeca: B, hoje, encontro: Q, encontros: [], diaDe: diaSP, ...extra });
+  checar(!pode('2026-10-21') && !pode('2026-10-22') && pode('2026-10-23'), 'devePromover(): o atual de 22/10 ainda espera o encontro dele; na sexta, com a quinta passada, B (29/10) entra');
+  checar(pode('2026-10-22', { encontros: [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T23:00:00Z' }] }), 'devePromover(): registrado o encontro com o atual, B entra na hora');
+  checar(!pode('2026-10-29', { encontros: sem }) && !pode('2026-10-23', { encontros: outro }) && pode('2026-10-30', { encontros: sem }),
+    'devePromover(): a semana sem encontro e a feita com outro estudo seguram a fila; passada a quinta seguinte, a fila segue');
+  checar(!pode('2026-10-23', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }) && pode('2026-10-30', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }),
+    'devePromover(): o primeiro da fila só entra se for do próximo encontro (5/11 espera até a sexta, 30/10)');
+  checar(pode('2026-10-23', { atual: null }) && !pode('2026-10-21', { atual: null }) && !pode('2026-10-23', { atual: null, cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }) && !pode('2026-10-23', { cabeca: null }),
+    'devePromover(): sem estudo atual, o primeiro do próximo encontro entra logo; sem fila, nada');
+  checar(pode('2026-11-06', { cabeca: { id: 'eB', agendadoPara: '2026-10-29' } }), 'devePromover(): a data que já passou também serve');
+  // --- quem lê um estudo da fila ---
+  const P = { id: 'P', estudoId: 'eA' };
+  const naFila = { id: 'eF', proposito: 'P', agendadoPara: '2026-10-29', criadoEm: '2026-10-20T12:00:00.000Z', atualAte: '' };
+  const le = (quem, p = P) => { const r = acessoAoEstudo(naFila, p, { diaDe: diaSP, ...quem }); return r.ler ? 'ler' + (r.fila ? ' fila' : '') + (r.usarComoBase ? ' base' : '') + (r.presenca ? ' presenca' : '') : r.codigo; };
+  checar(le({ ativo: true, conduz: true, lidera: true }) === 'ler fila' && le({ ativo: true, conduz: true, papel: 'auxiliar' }) === 'ler fila',
+    'acessoAoEstudo(): o líder e o auxiliar leem o estudo da fila (sem presença e sem "Usar como base")');
+  checar(le({ ativo: true }) === 404 && le({ ativo: true, papel: 'visitante' }) === 404 && le({ ativo: false, conduz: true }) === 404
+    && le({ ativo: true, conduz: true }, { id: 'F', mae: 'P', multiplicadaEm: '2026-10-25' }) === 404,
+  'acessoAoEstudo(): o membro, a visitante, quem saiu e a filha recebem 404, nunca 403: não descobrem que o estudo existe');
+  checar(estudoDaLinha({ id: 'x', tipo: 'blocos', agendado_para: '2026-10-29', preparado_em: '2026-10-01T10:00:00.000Z' }).agendadoPara === '2026-10-29'
+    && estudoDaLinha({ id: 'x', tipo: 'blocos' }).agendadoPara === '' && estudoDaLinha({ id: 'x', tipo: 'blocos', preparado_em: 'z' }).preparadoEm === 'z',
+  'estudoDaLinha(): lê agendado_para e preparado_em (vazios fora da fila)');
+  const item = itemDaFila({ id: 'eF', tipo: 'semana', titulo: 'x', refs: ['Efésios 6.12'], agendadoPara: '2026-10-29', criadoPor: 'marcos', criadoEm: '2026-10-20T12:00:00.000Z', fonte: 'segredo', blocos: [{ t: 'texto' }] },
+    { nomeDe: () => 'Marcos' });
+  checar(JSON.stringify(item) === JSON.stringify({ id: 'eF', tipo: 'semana', titulo: '', refs: ['Efésios 6.12'], data: '2026-10-29', criadoPor: 'marcos', criadoPorNome: 'Marcos', editadoEm: '' }),
+    'itemDaFila(): só o que a lista mostra (sem fonte nem partes), com o título da lista');
 }
 
 // =========================================================================
