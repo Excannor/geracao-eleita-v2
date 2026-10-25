@@ -2,11 +2,12 @@
 // criadas pela API num servidor próprio. O líder cola um estudo de 101 partes
 // (ferramentas/estudo-longo.txt): o passo 2 mostra "Este estudo rende 2 encontros" e o botão
 // "Dividir em 2 encontros", no lugar do aviso das 80 partes; a prévia mostra os dois encontros; o
-// "Desfazer a divisão" volta o texto inteiro; dividido, a parte 1 é salva como o estudo da célula e
-// a parte 2 fica guardada para o próximo encontro. Depois de um encontro registrado, "Preparar o
-// próximo" abre a parte 2 pronta, e ela é salva como o estudo seguinte (a parte 1 vai para Estudos
-// anteriores). Por fim, "Imprimir" no app instalado do iPhone (html.app-ios): o PDF tem todas as
-// folhas, com a marca d'água em cada uma, e o tema escuro não vaza para o papel.
+// "Desfazer a divisão" volta o texto inteiro; dividido, a parte 1 é salva como o estudo da célula e,
+// no mesmo pedido, a parte 2 entra nos próximos estudos, na fila do servidor, com a data do encontro
+// seguinte (docs/a-mesa-fila.md). Registrado o encontro com a parte 1, a parte 2 entra sozinha na
+// aba, e a parte 1 vai para Estudos anteriores. Por fim, "Imprimir" no app instalado do iPhone
+// (html.app-ios): o PDF tem todas as folhas, com a marca d'água em cada uma, e o tema escuro não vaza
+// para o papel.
 // As telas a 390 e 360 px, claro e escuro, sem rolagem lateral, toque de 44 px e letra de 12 px.
 // Os textos bíblicos esperados saem de conteudo/biblias, nunca digitados aqui.
 // Uso: CHROME=<chrome> node ferramentas/teste-estudo-dividir.mjs
@@ -50,6 +51,10 @@ const PARTE_2 = [TITULO + ' (parte 2)'].concat(LINHAS.slice(T5)).join('\n');
 const MSG_PARTES = 'O estudo passou de 80 partes. Divida em dois encontros.';
 const hojeEm = (d = new Date()) => new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
 const HOJE = hojeEm();
+const somaDias = (texto, n) => { const d = new Date(texto + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+// sem dia de encontro marcado, o encontro seguinte é uma semana depois de hoje (docs/a-mesa-fila.md)
+const D7 = somaDias(HOJE, 7);
+const curta = (d) => ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'][new Date(d + 'T12:00:00Z').getUTCDay()] + ' ' + d.slice(8, 10) + '/' + d.slice(5, 7);
 
 // ---------- o servidor e o navegador ----------
 const pastaEstado = mkdtempSync(join(tmpdir(), 'cc-estudo-dividir-'));
@@ -92,7 +97,7 @@ const celulaDe = async (cookie, id) => ((await pedir('api/propositos', null, coo
 const lider = await criar('lider', 'Marcos');
 const ID = (await pedir('api/celula', { acao: 'criar', titulo: 'Célula Esperança' }, lider)).dado.proposito.id;
 const token = new URL((await pedir('api/celula', { acao: 'link', id: ID }, lider)).dado.link).searchParams.get('celula');
-await criar('ana', 'Ana', { celula: token });
+const ana = await criar('ana', 'Ana', { celula: token });
 
 // ---------- o navegador ----------
 async function alvo() {
@@ -160,7 +165,9 @@ async function como(cookie, rota, limpar = true, busca = '') {
 }
 const rota = (aba) => '#/novidades/celula/' + ID + (aba ? '/' + aba : '');
 const tema = (escuro) => av('CC.guardarTema(' + (escuro ? 'true' : 'false') + '); true');
+// o que a versão anterior guardava neste celular (agora nada vai para lá) e o rascunho do preparo
 const fila = () => av('JSON.parse(localStorage.getItem("cc.estudo.proximos.' + ID + '") || "null")');
+const rascunho = () => av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '") || "null")');
 
 async function foto(nome, inteira) {
   if (!FOTOS) return;
@@ -252,24 +259,25 @@ const previa = await na(() => [...document.querySelectorAll('.cortina .mesa-enco
 ok(previa.length === 2 && previa[0].includes(TITULO + ' (parte 1)') && previa[0].includes('Do começo do estudo') && previa[0].includes('50 partes') && previa[0].includes('7 versículos')
   && previa[1].includes(TITULO + ' (parte 2)') && previa[1].includes('Começa no Tópico 5') && previa[1].includes('51 partes') && previa[1].includes('8 versículos'),
 '2. a prévia mostra os dois encontros: título, onde começa, partes e versículos (' + previa.join(' / ') + ')');
-ok(await fila() === null, '2. a prévia ainda não muda nada');
+ok(await fila() === null && !(await rascunho()).divisao, '2. a prévia ainda não muda nada');
 await emTodosOsTamanhos('2. a prévia da divisão');
 await foto('03-previa-divisao-390-claro', true);
 await clicar('.cortina [data-confirmar-divisao]');
 ok(await esperar(existe('.mesa-dividido') + ' && !' + existe('[data-aviso-dividir]'), 15000), '2. "Dividir": o passo 2 mostra a parte 1, sem o aviso');
-const f1 = await fila();
-ok(f1 && f1.total === 2 && f1.partes.length === 1 && f1.partes[0].k === 2 && f1.partes[0].fonte === PARTE_2, '2. a parte 2 fica guardada, inteira, para o próximo encontro');
+const r1 = await rascunho();
+ok(r1 && r1.divisao && r1.divisao.total === 2 && JSON.stringify(r1.divisao.partes) === JSON.stringify([PARTE_2]) && await fila() === null,
+  '2. a parte 2 fica no rascunho, inteira, para ir com a parte 1 (nada fica guardado à parte no celular)');
 ok(await av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).fonte') === PARTE_1 && await av(q('[data-continuar]') + '.disabled === false'),
   '2. o rascunho agora é a parte 1, e Continuar liga');
-ok((await texto('.mesa-dividido')).includes('Estudo dividido em 2 encontros. Esta é a parte 1; a parte 2 fica guardada para o próximo encontro.'), '2. a nota diz o que aconteceu');
+ok((await texto('.mesa-dividido')).includes('Estudo dividido em 2 encontros. Esta é a parte 1; ao salvar, a parte 2 entra nos próximos estudos.'), '2. a nota diz o que aconteceu');
 await emTodosOsTamanhos('2. depois de dividir');
 await foto('04-depois-de-dividir-390-claro', true);
 await tema(true);
 await foto('05-depois-de-dividir-390-escuro');
 await tema(false);
 await clicar('[data-desfazer-divisao]');
-ok(await esperar(existe('[data-aviso-dividir]'), 15000) && await fila() === null && await av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).fonte') === LONGO,
-  '2. "Desfazer a divisão": o texto inteiro volta, e a fila fica vazia');
+ok(await esperar(existe('[data-aviso-dividir]'), 15000) && !(await rascunho()).divisao && (await rascunho()).fonte === LONGO,
+  '2. "Desfazer a divisão": o texto inteiro volta, sem parte nenhuma esperando');
 await clicar('[data-dividir]');
 await esperar(existe('.cortina [data-confirmar-divisao]'));
 await clicar('.cortina [data-confirmar-divisao]');
@@ -283,32 +291,33 @@ ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("
 let cel = await celulaDe(lider, ID);
 const S1 = cel.estudo.id;
 ok(cel.estudo.titulo === TITULO + ' (parte 1)' && cel.estudo.blocos.length === 50 && cel.estudo.refs.length === 7, '3. o servidor guardou a parte 1: 50 partes e 7 cartões (' + cel.estudo.titulo + ')');
-ok(await esperar(existe('.mesa-lider .mesa-fila'), 10000) && (await texto('.mesa-lider .mesa-fila')) === 'A parte 2 de 2 já está guardada para o próximo encontro.', '3. o cartão do líder lembra que a parte 2 está guardada');
+ok((cel.fila || []).length === 1 && cel.fila[0].titulo === TITULO + ' (parte 2)' && cel.fila[0].data === D7,
+  '3. no mesmo pedido, a parte 2 entrou nos próximos estudos, na fila do servidor, para o encontro seguinte (' + D7 + ')');
+ok(await fila() === null && await rascunho() === null, '3. e nada fica guardado à parte no celular');
+ok(await esperar(existe('.mesa-lider .mesa-fila'), 10000) && (await texto('.mesa-lider .mesa-fila')) === 'Próximo: ' + TITULO + ' (parte 2) · ' + curta(D7), '3. o cartão do líder diz o que vem: a parte 2');
+ok(await esperar(existe('[data-lista-proximos]'), 10000) && (await texto('[data-lista-proximos]')).includes(TITULO + ' (parte 2)'), '3. e a seção "Próximos estudos" a mostra');
 await emTodosOsTamanhos('3. a aba com a parte 1');
 await foto('06-aba-parte-1-390-claro');
+await av('(() => { document.querySelector("[data-lista-proximos]").scrollIntoView({ block: "start" }); scrollBy(0, -160); return true; })()');
+await foto('06b-parte-2-nos-proximos-390-claro');
+await tema(true);
+await foto('06b-parte-2-nos-proximos-390-escuro');
+await tema(false);
 
-// ---------- 4. depois do encontro, a parte 2 abre pronta ----------
-ok((await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: HOJE, presentes: ['lider', 'ana'], visitantes: 0, estudo: S1 }, lider)).status === 200, '4. o encontro de hoje fica registrado com a parte 1');
+// ---------- 4. depois do encontro, a parte 2 entra sozinha ----------
+const reg = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: HOJE, presentes: ['lider', 'ana'], visitantes: 0, estudo: S1 }, lider);
+ok(reg.status === 200 && reg.dado.promovido && reg.dado.promovido.titulo === TITULO + ' (parte 2)', '4. registrado o encontro com a parte 1, a parte 2 entra na célula');
 await como(lider, rota('estudo'), false);
-ok(await esperar('/Preparar o próximo/.test(' + q('.mesa-lider [data-mudar]') + '?.textContent || "")', 20000), '4. com a parte 1 usada, o botão é "Preparar o próximo"');
-await clicar('.mesa-lider [data-mudar]');
-ok(await esperar(existe('[data-fonte]') + ' && ' + existe('.mesa-da-fila'), 15000), '4. "Preparar o próximo" abre o preparo com a nota da parte 2');
-ok((await texto('.mesa-da-fila')) === 'Parte 2 de 2 de \u201c' + TITULO + '\u201d. Mude o que quiser antes de salvar.' && await av(q('[data-fonte]') + '.value') === PARTE_2,
-  '4. o campo já traz a parte 2, inteira');
-ok(await existe('[data-descartar-parte]') ? (await texto('[data-descartar-parte]')) === 'Descartar a parte 2' : false, '4. dá para descartar a parte 2, se o líder quiser outro estudo');
-await emTodosOsTamanhos('4. o preparo da parte 2');
-await foto('07-preparar-parte-2-390-claro');
-await clicar('[data-ver]');
-ok(await esperar(existe('[data-continuar]') + ' && !' + existe('[data-aviso-dividir]'), 15000) && await av(q('[data-continuar]') + '.disabled === false'), '4. a parte 2 cabe num encontro: sem aviso, Continuar ligado');
-await clicar('[data-continuar]');
-await esperar(existe('[data-salvar]'), 15000);
-await clicar('[data-salvar]');
-ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-imprimir]")', 20000), '4. a parte 2 salva');
+ok(await esperar('/\\(parte 2\\)/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), '4. a aba mostra a parte 2');
 cel = await celulaDe(lider, ID);
-ok(cel.estudo.id !== S1 && cel.estudo.titulo === TITULO + ' (parte 2)' && cel.estudo.blocos.length === 51 && cel.estudo.refs.length === 8, '4. o servidor guardou a parte 2 como o estudo seguinte: 51 partes e 8 cartões');
-ok(await fila() === null && !(await av(existe('.mesa-lider .mesa-fila'))), '4. a fila fica vazia, e o cartão do líder não fala mais dela');
+ok(cel.estudo.id !== S1 && cel.estudo.titulo === TITULO + ' (parte 2)' && cel.estudo.blocos.length === 51 && cel.estudo.refs.length === 8, '4. o servidor tem a parte 2 como o estudo da célula: 51 partes e 8 cartões');
+ok(!(cel.fila || []).length && !(await av(existe('.mesa-lider .mesa-fila'))), '4. a fila fica vazia, e o cartão do líder não fala mais dela');
 const anteriores = await pedir('api/estudos?celula=' + encodeURIComponent(ID), null, lider);
 ok((anteriores.dado.estudos || []).some((x) => x.id === S1 && x.titulo === TITULO + ' (parte 1)'), '4. a parte 1 está em Estudos anteriores');
+const daAna = await celulaDe(ana, ID);
+ok(daAna.estudo.titulo === TITULO + ' (parte 2)' && !('fila' in daAna), '4. a Ana vê a parte 2, e nunca recebeu a fila');
+await emTodosOsTamanhos('4. a aba com a parte 2');
+await foto('07-parte-2-na-aba-390-claro');
 
 // ---------- 5. Imprimir: todas as folhas, com a marca d'água ----------
 console.log('\n  A impressão inteira\n');

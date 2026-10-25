@@ -169,7 +169,267 @@ if (process.env.SO_API) {
   process.exit(falhas ? 1 : 0);
 }
 
-// PARTE_B
+// ---------- o navegador ----------
+console.log('\n  B. O líder no navegador\n');
+const marcos = await criar('marcos', 'Marcos');
+const { id: JD, token: tokJ } = await novaCelula(marcos, 'Célula Jardim');
+const bia = await criar('bia', 'Bia', { celula: tokJ });
+const TA = 'Batalha espiritual e a armadura de Deus';
+const TB = 'O fruto do Espírito no dia a dia';
+const TC = 'Perdão que recomeça';
+const EA = (await pedir('api/celula', estudo(JD, TA), marcos)).dado.estudo.id;
+
+perfil = mkdtempSync(join(tmpdir(), 'cc-estudo-fila-nav-'));
+const PORTA_NAV = await portaLivre();
+nav = spawn(CHROME, ['--headless=new', '--disable-gpu', '--no-first-run', '--hide-scrollbars',
+  '--remote-debugging-port=' + PORTA_NAV, '--user-data-dir=' + perfil, '--window-size=390,844', '--lang=pt-BR', 'about:blank'], { stdio: 'ignore' });
+async function alvo() {
+  for (let i = 0; i < 60; i++) {
+    try {
+      const l = await (await fetch('http://127.0.0.1:' + PORTA_NAV + '/json/list')).json();
+      const p = l.find((x) => x.type === 'page');
+      if (p) return p.webSocketDebuggerUrl;
+    } catch { /* subindo */ }
+    await dormir(250);
+  }
+  throw new Error('sem navegador');
+}
+const ws = new WebSocket(await alvo());
+let seq = 0;
+const pend = new Map();
+ws.addEventListener('message', (e) => {
+  const m = JSON.parse(e.data);
+  if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result || {}); pend.delete(m.id); }
+});
+await new Promise((r) => ws.addEventListener('open', r));
+const cmd = (m, p = {}) => new Promise((res) => { const id = ++seq; pend.set(id, res); ws.send(JSON.stringify({ id, method: m, params: p })); });
+const av = async (e) => {
+  const r = await cmd('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true });
+  if (r.exceptionDetails) console.log('  (erro na expressão: ' + (r.exceptionDetails.exception?.description || r.exceptionDetails.text || '').slice(0, 200) + ')');
+  return r.result?.value;
+};
+const na = (f, ...args) => av('(' + f.toString() + ')(' + args.map((a) => JSON.stringify(a)).join(',') + ')');
+const esperar = async (expr, ms = 10000) => {
+  for (let t = 0; t < ms; t += 150) {
+    if (await av(expr)) return true;
+    await dormir(150);
+  }
+  return false;
+};
+const q = (sel) => 'document.querySelector(' + JSON.stringify(sel) + ')';
+const existe = (sel) => '!!' + q(sel);
+const clicar = (sel) => av('(() => { const el = ' + q(sel) + '; if (!el) return false; el.click(); return true; })()');
+const comum = (t) => String(t == null ? '' : t).replace(/ /g, ' ').replace(/⁠/g, '');
+const textoDe = async (sel) => comum(await av('(' + q(sel) + ' || {}).textContent || ""'));
+const larguras = { 390: 844, 360: 740 };
+let largura = 390;
+const tamanho = async (w, h) => { largura = w; await cmd('Emulation.setDeviceMetricsOverride', { width: w, height: h || larguras[w] || 844, deviceScaleFactor: 2, mobile: true }); };
+
+await cmd('Page.enable');
+await cmd('Runtime.enable');
+await cmd('Network.enable');
+await tamanho(390);
+await cmd('Emulation.setTimezoneOverride', { timezoneId: 'America/Sao_Paulo' });
+await cmd('Emulation.setFocusEmulationEnabled', { enabled: true });
+await cmd('Page.bringToFront');
+await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: 'light' }] });
+await cmd('Page.addScriptToEvaluateOnNewDocument', { source: "try{localStorage.setItem('cc.aviso.push','nunca');localStorage.removeItem('cc.instalar');sessionStorage.setItem('cc.abertura','1')}catch(e){}" });
+
+// Entra como uma conta e abre a rota. limpar: armazenamento limpo; antes: o que pôr no
+// localStorage antes de abrir (a parte que a versão anterior guardava no celular).
+async function como(cookie, rota, { limpar = true, antes = null } = {}) {
+  await cmd('Page.navigate', { url: base + 'privacidade.html' });
+  await esperar('document.readyState === "complete"');
+  if (limpar) await av('localStorage.clear(); sessionStorage.clear(); true');
+  if (antes) await na((x) => { for (const [k, v] of Object.entries(x)) localStorage.setItem(k, JSON.stringify(v)); return true; }, antes);
+  await cmd('Network.clearBrowserCookies');
+  const [nome, ...resto] = cookie.split('=');
+  await cmd('Network.setCookie', { name: nome, value: resto.join('='), url: base });
+  await cmd('Page.navigate', { url: base + rota });
+  await esperar('!!window.CC && !!document.querySelector("#conteudo") && !!document.querySelector(".folha-juntos, .painel-celula")', 15000);
+}
+const rota = (aba) => '#/novidades/celula/' + JD + (aba ? '/' + aba : '');
+const tema = (escuro) => av('CC.guardarTema(' + (escuro ? 'true' : 'false') + '); true');
+// A carta nova do baú pode abrir por cima da tela depois do registro do encontro (a revelação, em
+// tela cheia): sai antes das medidas e das capturas, como o "Pular" faria.
+const semCarta = () => na(() => { let n = 0; document.querySelectorAll('.tela-cheia').forEach((t) => { if (t.querySelector('.rv')) { t.remove(); n++; } }); return n; });
+async function foto(nome, inteira) {
+  if (!FOTOS) return;
+  await dormir(400);
+  await semCarta();
+  await av('document.getElementById("aviso-flutuante")?.remove(); true');
+  if (inteira) {
+    const h = await na(() => {
+      const folha = document.querySelector('.cortina .folha');
+      if (folha) { folha.style.maxHeight = 'none'; folha.style.overflow = 'visible'; return Math.ceil(folha.scrollHeight + 96); }
+      return Math.ceil(document.documentElement.scrollHeight);
+    });
+    await tamanho(largura, Math.max(h, larguras[largura]));
+    await dormir(400);
+  }
+  const r = await cmd('Page.captureScreenshot', { format: 'png', fromSurface: true });
+  if (r.data) writeFileSync(join(FOTOS, nome + '.png'), Buffer.from(r.data, 'base64'));
+  if (inteira) { await tamanho(largura); await dormir(200); }
+}
+async function fotoClaroEscuro(nome, inteira, rolar) {
+  for (const escuro of [false, true]) {
+    await tema(escuro);
+    if (rolar) await av(rolar);
+    await foto(nome + '-390-' + (escuro ? 'escuro' : 'claro'), inteira);
+  }
+  await tema(false);
+}
+// Sem rolagem lateral, todo botão com 44 px na menor medida e nenhuma letra abaixo de 12 px.
+async function medidas(rotulo) {
+  const m = await na(() => {
+    const raizes = [...document.querySelectorAll('.cortina .folha')];
+    if (!raizes.length) raizes.push(document.querySelector('#conteudo'));
+    const visivel = (el) => { const r = el.getBoundingClientRect(); const s = getComputedStyle(el); return r.width > 2 && r.height > 2 && s.visibility !== 'hidden' && s.display !== 'none'; };
+    const pequenos = [];
+    const letras = [];
+    for (const raiz of raizes) {
+      for (const el of raiz.querySelectorAll('button, a[href], select, textarea, input:not([type="checkbox"]), [role="radio"]')) {
+        if (!visivel(el) || el.closest('.acoes-verso')) continue;
+        const r = el.getBoundingClientRect();
+        if (Math.min(r.width, r.height) < 43.5) pequenos.push((el.textContent.trim() || el.getAttribute('aria-label') || el.className).slice(0, 40) + ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+      }
+      const andar = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+      for (let n = andar.nextNode(); n; n = andar.nextNode()) {
+        if (!n.nodeValue.trim() || !n.parentElement || !visivel(n.parentElement)) continue;
+        const f = parseFloat(getComputedStyle(n.parentElement).fontSize);
+        // (o nome escrito no voltar redondo tem letra 0 de propósito: só o leitor de tela o lê)
+        if (f > 0 && f < 11.95) letras.push(n.nodeValue.trim().slice(0, 30) + ' ' + f);
+      }
+    }
+    return { lateral: document.documentElement.scrollWidth - innerWidth, pequenos: [...new Set(pequenos)], letras: [...new Set(letras)] };
+  });
+  const tudoCerto = m.lateral <= 0 && !m.pequenos.length && !m.letras.length;
+  ok(tudoCerto, rotulo + ': sem rolagem lateral, toque de 44 px e letra de 12 px'
+    + (tudoCerto ? '' : ' (lateral ' + m.lateral + ', pequenos: ' + m.pequenos.slice(0, 4).join(' | ') + ', letras: ' + m.letras.slice(0, 4).join(' | ') + ')'));
+}
+async function emTodosOsTamanhos(rotulo) {
+  if (process.env.RAPIDO) return;
+  await semCarta();
+  for (const w of [390, 360]) {
+    for (const escuro of [false, true]) {
+      await tamanho(w);
+      await tema(escuro);
+      await dormir(250);
+      await medidas(rotulo + ' a ' + w + ' px, ' + (escuro ? 'escuro' : 'claro'));
+    }
+  }
+  await tamanho(390);
+  await tema(false);
+}
+const filaDoServidor = async () => titulos((await celulaDe(marcos, JD)).fila);
+const rolarAte = (sel) => '(() => { const el = document.querySelector(' + JSON.stringify(sel) + '); if (el) el.scrollIntoView({ block: "start" }); scrollBy(0, -110); return true; })()';
+
+// Agenda um estudo pelo caminho da tela: "Agendar um estudo", o texto, as partes, o passo 3.
+async function agendarPelaTela(titulo, data, rotuloFoto) {
+  ok(await esperar(existe('[data-agendar]'), 15000), 'B. a seção tem "Agendar um estudo"');
+  await clicar('[data-agendar]');
+  ok(await esperar(existe('[data-fonte]') + ' && /\\/preparar\\/novo$/.test(location.hash)', 15000), 'B. "Agendar um estudo" abre o preparo de um estudo novo (…/preparar/novo)');
+  await na((t) => { const c = document.querySelector('[data-fonte]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, texto(titulo));
+  await clicar('[data-ver]');
+  ok(await esperar(existe('[data-continuar]') + ' && !' + q('[data-continuar]') + '.disabled', 15000), 'B. as partes conferidas');
+  await clicar('[data-continuar]');
+  ok(await esperar(existe('[data-salvar]') + ' && ' + existe('.mesa-quando'), 15000), 'B. o passo 3 tem "Quando usar"');
+  const quando = await na(() => ({
+    marcado: (document.querySelector('[data-quando][aria-checked="true"]') || {}).dataset?.quando,
+    data: (document.querySelector('[data-data-fila]') || {}).value || '',
+    botao: document.querySelector('[data-salvar]').textContent.trim(),
+    ws: !!document.querySelector('.mesa-ws'),
+  }));
+  ok(quando.marcado === 'agendar' && quando.botao === 'Agendar o estudo' && !quando.ws, 'B. vem marcado "Agendar", o botão diz "Agendar o estudo", e sem o cartão dos 4 Ws (' + JSON.stringify(quando) + ')');
+  if (data) {
+    await na((d) => { const c = document.querySelector('[data-data-fila]'); c.value = d; c.dispatchEvent(new Event('change', { bubbles: true })); return true; }, data);
+  }
+  if (rotuloFoto) {
+    await emTodosOsTamanhos('B. o passo 3 com a data');
+    await fotoClaroEscuro(rotuloFoto, false, rolarAte('.mesa-quando'));
+  }
+  await clicar('[data-salvar]');
+  ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-lista-proximos]")', 20000), 'B. agendado, volta para a aba com a fila');
+  return quando;
+}
+
+await como(marcos, rota('estudo'));
+ok(await esperar(existe('.mesa-secao-anteriores .titulo-secao') + ' && /Próximos estudos/.test(document.querySelector(".mesa-secao-anteriores").textContent)', 20000)
+  && (await textoDe('.mesa-secao-anteriores')).includes('Deixe prontos os estudos dos próximos encontros.'), 'B. a fila vazia: a seção com a dica e "Agendar um estudo"');
+await emTodosOsTamanhos('B. a aba com a fila vazia');
+const q1 = await agendarPelaTela(TB, '', '02-agendar-com-data');
+ok(q1.data === D7, 'B. a data já vem com o encontro seguinte (' + q1.data + ')');
+ok(await filaDoServidor() === TB + '@' + D7, 'B. o servidor guardou o estudo na fila');
+await agendarPelaTela(TC, D21);
+ok(await filaDoServidor() === TB + '@' + D7 + ' ' + TC + '@' + D21, 'B. o segundo, com a data escolhida (' + D21 + ')');
+ok(await esperar(existe('.mesa-lider .mesa-fila'), 10000) && (await textoDe('.mesa-lider .mesa-fila')) === 'Próximo: ' + TB + ' · ' + curta(D7), 'B. o cartão do líder diz o que vem: "Próximo: ' + TB + ' · ' + curta(D7) + '"');
+const linhas = await na(() => [...document.querySelectorAll('.mesa-proximo')].map((l) => l.textContent.replace(/ /g, ' ')));
+ok(linhas.length === 2 && linhas[0].includes('Para ' + longa(D7)) && linhas[0].includes(TB) && linhas[1].includes('Para ' + longa(D21)) && linhas[1].includes(TC), 'B. a lista em ordem, com a data de cada um');
+ok(await av(q('[data-subir="0"]') + '.disabled && !' + q('[data-descer="0"]') + '.disabled && ' + q('[data-descer="1"]') + '.disabled'), 'B. as setas das pontas ficam desligadas');
+await emTodosOsTamanhos('B. a aba com a fila');
+await fotoClaroEscuro('01-aba-com-a-fila', false, rolarAte('.mesa-lider'));
+await fotoClaroEscuro('01b-secao-proximos', false, rolarAte('[data-lista-proximos]'));
+
+// trocar a ordem: as datas ficam
+await clicar('[data-descer="0"]');
+ok(await esperar('document.querySelector(".mesa-proximo .mesa-proximo-ler b")?.textContent === ' + JSON.stringify(TC), 15000), 'B. "Passar para depois" troca a ordem na tela');
+ok(await filaDoServidor() === TC + '@' + D7 + ' ' + TB + '@' + D21, 'B. as datas ficaram nos lugares: ' + TC + ' agora é de ' + D7);
+await fotoClaroEscuro('03-depois-de-reordenar', false, rolarAte('[data-lista-proximos]'));
+
+// mudar a data de um, pela leitura dele
+await clicar('.mesa-proximo:last-child .mesa-proximo-ler');
+ok(await esperar(existe('[data-mudar-data]'), 15000) && (await textoDe('.mesa-cabeca-anterior')).includes('Próximo estudo') && (await textoDe('.mesa-cabeca-anterior')).includes('Para o encontro de ' + longa(D21)),
+  'B. a leitura de um estudo da fila: "Próximo estudo", para quando, e os botões do líder');
+await emTodosOsTamanhos('B. a leitura de um estudo da fila');
+await fotoClaroEscuro('04-ler-um-da-fila', true);
+await clicar('[data-mudar-data]');
+ok(await esperar(existe('.cortina [data-nova-data]')), 'B. "Mudar a data" abre a folha');
+await na((d) => { const c = document.querySelector('[data-nova-data]'); c.value = d; return true; }, D14);
+await clicar('.cortina [data-salvar-data]');
+ok(await esperar('!document.querySelector(".cortina [data-nova-data]")', 10000) && await esperar('/Para o encontro de ' + longa(D14).replace('/', '\\/') + '/.test(document.querySelector(".mesa-cabeca-anterior")?.textContent || "")', 15000),
+  'B. a data nova aparece na leitura');
+ok(await filaDoServidor() === TC + '@' + D7 + ' ' + TB + '@' + D14, 'B. e no servidor');
+
+// o encontro de hoje, registrado pela folha
+await como(marcos, rota(''), { limpar: false });
+ok(await esperar(existe('[data-registrar-encontro]'), 15000), 'B. a aba Hoje tem "Registrar o encontro"');
+await clicar('[data-registrar-encontro]');
+ok(await esperar(existe('.cortina [data-salvar]')), 'B. a folha "Quem foi ao encontro?" abre');
+ok((await textoDe('.cortina [data-estudo-escolhido]')) === TA, 'B. com o estudo atual escolhido, e nada da fila na folha');
+ok(!(await textoDe('.cortina .folha')).includes(TC), 'B. a folha não oferece um estudo da fila');
+await clicar('.cortina [data-salvar]');
+ok(await esperar('/O próximo estudo já está na aba Estudo/.test(document.getElementById("aviso-flutuante")?.textContent || "")', 15000), 'B. o aviso: "Encontro registrado. O próximo estudo já está na aba Estudo."');
+await como(marcos, rota('estudo'), { limpar: false });
+ok(await esperar('/' + TC + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'B. ' + TC + ' é o estudo da aba');
+ok(await esperar(existe('.mesa-anterior'), 15000) && (await textoDe('.mesa-anteriores')).includes(TA), 'B. ' + TA + ' está em Estudos anteriores');
+ok((await textoDe('.mesa-lider .mesa-fila')) === 'Próximo: ' + TB + ' · ' + curta(D14) && (await na(() => document.querySelectorAll('.mesa-proximo').length)) === 1, 'B. a fila fica com ' + TB);
+await emTodosOsTamanhos('B. a aba depois do encontro');
+await fotoClaroEscuro('05-promovido-depois-do-encontro', false, rolarAte('.mesa-lider'));
+await fotoClaroEscuro('05b-anteriores-depois-do-encontro', false, rolarAte('[data-lista-proximos]'));
+
+console.log('\n  C. O membro\n');
+const filaJ = (await celulaDe(marcos, JD)).fila;
+await como(bia, rota('estudo'));
+ok(await esperar('/' + TC + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'C. a Bia vê ' + TC + ' na aba');
+await esperar(existe('.mesa-secao-anteriores .titulo-secao'), 10000);
+const daBia = await textoDe('#conteudo');
+ok(!daBia.includes('Próximos estudos') && !daBia.includes('Próximo:') && !daBia.includes(TB) && !(await av(existe('.mesa-proximos'))), 'C. sem a seção "Próximos estudos", sem a linha "Próximo" e sem o título do estudo da fila');
+ok(!('fila' in (await celulaDe(bia, JD))), 'C. o retrato dela não traz a fila');
+await emTodosOsTamanhos('C. a aba do membro');
+await fotoClaroEscuro('06-membro-sem-a-fila', false, rolarAte('.mesa-secao-anteriores'));
+await como(bia, rota('estudo') + '/' + encodeURIComponent(filaJ[0].id), { limpar: false });
+ok(await esperar('/não está aberto para você/.test(document.querySelector("#conteudo")?.textContent || "")', 15000), 'C. o endereço de um estudo da fila mostra "não está aberto para você"');
+
+console.log('\n  D. A parte guardada no celular\n');
+const guardada = { ['cc.estudo.proximos.' + JD]: { v: 1, titulo: 'Longo', total: 2, traducao: 'nbv', partes: [{ origem: 'd1', k: 2, total: 2, titulo: 'Longo', traducao: 'nbv', fonte: texto('Longo (parte 2)') }] } };
+await como(marcos, rota('estudo'), { antes: guardada });
+ok(await esperar(existe('[data-migrar]'), 20000) && (await textoDe('[data-migrar] p')) === 'A parte 2 de “Longo” está guardada só neste celular.', 'D. o cartão diz o que o celular guarda');
+await emTodosOsTamanhos('D. o cartão da parte guardada');
+await fotoClaroEscuro('07-parte-guardada-no-celular', false, rolarAte('.mesa-lider'));
+await clicar('[data-migrar-por]');
+ok(await esperar('!document.querySelector("[data-migrar]") && !!document.querySelector("[data-lista-proximos]")', 15000), 'D. "Pôr nos próximos estudos": o cartão some');
+ok(await av('localStorage.getItem("cc.estudo.proximos.' + JD + '") === null'), 'D. e o celular não guarda mais a parte');
+ok(await filaDoServidor() === 'Longo (parte 2)@' + D14 + ' ' + TB + '@' + D21, 'D. a parte 2 está na fila do servidor, logo depois do encontro do atual (' + D7 + '), e ' + TB + ' passa para o seguinte');
 
 await encerrar();
 console.log('\n  ' + (falhas ? falhas + ' falha(s)' : 'tudo certo') + '\n');
