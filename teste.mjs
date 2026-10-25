@@ -1429,6 +1429,30 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   checar(!comGiria.length, 'os textos das telas não têm "Bora", "tempão" nem "sumido"' + (comGiria.length ? ' (' + comGiria.slice(0, 3).join(' | ') + ')' : ''));
 }
 
+// --- os próximos estudos: as regras puras da tela (estudo-regras.js, docs/a-mesa-fila.md, 2.2) ---
+{
+  const R = CC.estudoRegras;
+  checar(R.dataLonga('2026-10-29') === 'quinta, 29/10' && R.dataCurta('2026-10-29') === 'qui 29/10' && R.dataCurta('2026-10-31') === 'sáb 31/10'
+    && R.dataCurta('2026-10-27') === 'ter 27/10' && R.dataCurta('x') === '' && R.dataLonga('') === '', 'dataLonga() e dataCurta(): "quinta, 29/10" e "qui 29/10"');
+  const fila = [{ id: 'b', tipo: 'blocos', titulo: 'Batalha espiritual', data: '2026-10-29' }, { id: 'c', tipo: 'semana', titulo: '', data: '2026-11-05' }];
+  checar(R.linhaDoProximo(fila) === 'Próximo: Batalha espiritual · qui 29/10' && R.linhaDoProximo(fila.slice(1)) === 'Próximo: A leitura da semana · qui 05/11'
+    && R.linhaDoProximo([]) === '' && R.linhaDoProximo(null) === '', 'linhaDoProximo(): o que o cartão do líder diz; com a fila vazia, nada');
+  checar(R.quandoNaFila(fila[0], '2026-10-25') === 'Para quinta, 29/10' && R.quandoNaFila(fila[0], '2026-10-29') === 'Para quinta, 29/10'
+    && R.quandoNaFila(fila[0], '2026-10-30') === 'Para quinta, 29/10 · a data já passou', 'quandoNaFila(): a data da linha, e "a data já passou" sem culpa');
+  checar(JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, -1)) === '["b","a","c"]' && JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, 1)) === '["a","c","b"]'
+    && R.moverNaFila(['a', 'b'], 0, -1) === null && R.moverNaFila(['a', 'b'], 1, 1) === null && R.moverNaFila(['a'], 0, 1) === null, 'moverNaFila(): troca com o vizinho; nas pontas, null');
+  checar(!R.datasPedemAjuste(fila, { hoje: '2026-10-25', encontro: 4 }) && R.datasPedemAjuste(fila, { hoje: '2026-10-30', encontro: 4 })
+    && R.datasPedemAjuste(fila, { hoje: '2026-10-25', encontro: 3 }) && !R.datasPedemAjuste(fila, { hoje: '2026-10-25', encontro: -1 }) && !R.datasPedemAjuste([], { hoje: '2026-10-30', encontro: 3 }),
+  'datasPedemAjuste(): uma data que passou, ou fora do dia do encontro, pede "Ajustar as datas"');
+  checar(R.escolhaDoPreparo({ temAtual: false }) === '' && R.escolhaDoPreparo({ temAtual: true, editando: true }) === ''
+    && R.escolhaDoPreparo({ temAtual: true, atualUsado: true }) === 'agora' && R.escolhaDoPreparo({ temAtual: true, atualUsado: false }) === 'agendar'
+    && R.escolhaDoPreparo({ temAtual: true, atualUsado: true, novo: true }) === 'agendar',
+  'escolhaDoPreparo(): sem atual ou mudando um estudo, sem escolha; depois do encontro, "Usar agora"; com o atual esperando ou por "Agendar um estudo", "Agendar"');
+  const guardado = { v: 1, titulo: 'Longo', total: 3, traducao: 'blivre', partes: [{ origem: 'd1', k: 2, total: 3, fonte: 'Longo (parte 2)\nTexto.' }, { origem: 'd1', k: 3, fonte: '  ', traducao: 'nbv' }, { k: 4, fonte: 'Longo (parte 4)', traducao: 'nbv' }] };
+  checar(JSON.stringify(R.partesDoCelular(guardado)) === JSON.stringify([{ fonte: 'Longo (parte 2)\nTexto.', traducao: 'blivre' }, { fonte: 'Longo (parte 4)', traducao: 'nbv' }])
+    && R.partesDoCelular(null).length === 0 && R.partesDoCelular({ partes: 'x' }).length === 0, 'partesDoCelular(): as partes guardadas no formato de filaPartes, na ordem, sem as vazias');
+}
+
 // =========================================================================
 secao('cartas e álbuns (docs/cartas.md)');
 // =========================================================================

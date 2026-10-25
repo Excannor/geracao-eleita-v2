@@ -492,6 +492,41 @@
   // encontro ligado, a do preparo.
   const dataDaLista = (item) => (item.dataDe === 'encontro' ? 'Encontro de ' : 'Preparado em ') + ddmm(item.data);
 
+  // ---------- os próximos estudos (docs/a-mesa-fila.md, seção 2.2) ----------
+  // As datas da fila são dias de calendário ('AAAA-MM-DD'), contados sem fuso.
+  const DIAS_DA_SEMANA = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
+  const semanaDe = (iso) => new Date(String(iso) + 'T12:00:00Z').getUTCDay();
+  const eDia = (iso) => /^\d{4}-\d{2}-\d{2}$/.test(String(iso || ''));
+  // "quinta, 30/10" e "qui 30/10"
+  const dataLonga = (iso) => (eDia(iso) ? DIAS_DA_SEMANA[semanaDe(iso)] + ', ' + ddmm(iso) : '');
+  const dataCurta = (iso) => (eDia(iso) ? DIAS_DA_SEMANA[semanaDe(iso)].slice(0, 3) + ' ' + ddmm(iso) : '');
+  const tituloDaFila = (x) => titulo(x) || 'Estudo do encontro';
+  // O que o cartão do líder diz da fila: "Próximo: Batalha espiritual · qui 30/10".
+  const linhaDoProximo = (fila) => ((fila || [])[0] ? 'Próximo: ' + tituloDaFila(fila[0]) + PONTO + dataCurta(fila[0].data) : '');
+  // A data de uma linha da fila, sem culpa quando ela já passou (a semana sem encontro, a fila parada).
+  const quandoNaFila = (item, hoje) => 'Para ' + dataLonga(item.data) + (eDia(hoje) && item.data < hoje ? PONTO + 'a data já passou' : '');
+  // Reordenar pelas setas: o item i troca de lugar com o vizinho (passo -1 ou +1); nas pontas, null.
+  function moverNaFila(ids, i, passo) {
+    const j = i + passo;
+    if (!Array.isArray(ids) || i < 0 || i >= ids.length || j < 0 || j >= ids.length || i === j) return null;
+    const nova = ids.slice();
+    [nova[i], nova[j]] = [nova[j], nova[i]];
+    return nova;
+  }
+  // "Ajustar as datas" aparece quando alguma data já passou ou, com dia de encontro marcado, caiu
+  // fora dele (o dia do encontro mudou, ou o líder escolheu outro dia).
+  const datasPedemAjuste = (fila, { hoje = '', encontro = -1 } = {}) => (fila || []).some((x) => (eDia(hoje) && x.data < hoje)
+    || (Number.isInteger(encontro) && encontro >= 0 && encontro <= 6 && eDia(x.data) && semanaDe(x.data) !== encontro));
+  // A escolha "Usar agora" ou "Agendar" no fim do preparo: só com estudo atual e preparando um
+  // estudo novo (nem mudando o atual, nem um da fila). Vem marcado "Agendar" quando o caminho foi
+  // "Agendar um estudo" (novo) ou quando o atual ainda espera o encontro dele; senão "Usar agora".
+  const escolhaDoPreparo = ({ temAtual = false, atualUsado = false, editando = false, novo = false } = {}) => (!temAtual || editando ? '' : novo || !atualUsado ? 'agendar' : 'agora');
+  // As partes que a versão anterior guardava neste celular (cc.estudo.proximos.<célula>), no formato
+  // do pedido filaPartes, na ordem em que esperavam. O que não tem texto fica de fora.
+  const partesDoCelular = (guardado) => ((guardado && Array.isArray(guardado.partes) ? guardado.partes : [])
+    .filter((x) => x && String(x.fonte || '').trim())
+    .map((x) => ({ fonte: String(x.fonte), traducao: x.traducao || guardado.traducao || 'nbv' })));
+
   // O estudo no papel (Imprimir): HTML puro, tudo escapado, tinta preta em papel branco.
   // contexto: celula (o nome), linha ("Encontro de quinta, 22/10 · preparado por Marcos"), textos
   // (ref -> o texto da Bíblia do app, já pedido), sigla (a abreviatura da tradução), credito (as
@@ -563,5 +598,6 @@
     TETOS_DO_ESTUDO, pontoDeCorte, tituloDaParte, dividirEmEncontros,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
     lembrarCombinado, refsCurtas, dataDaLista, paraImprimir,
+    dataLonga, dataCurta, linhaDoProximo, quandoNaFila, moverNaFila, datasPedemAjuste, escolhaDoPreparo, partesDoCelular,
   };
 })(window.CC);
