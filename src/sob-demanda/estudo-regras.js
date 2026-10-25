@@ -520,7 +520,8 @@
   // A escolha "Usar agora" ou "Agendar" no fim do preparo: só com estudo atual e preparando um
   // estudo novo (nem mudando o atual, nem um da fila). Vem marcado "Agendar" quando o caminho foi
   // "Agendar um estudo" (novo) ou quando o atual ainda espera o encontro dele; senão "Usar agora".
-  const escolhaDoPreparo = ({ temAtual = false, atualUsado = false, editando = false, novo = false } = {}) => (!temAtual || editando ? '' : novo || !atualUsado ? 'agendar' : 'agora');
+  // "Usar como base" (deBase) vem com "Usar agora": a confirmação de lá já disse que o atual sai.
+  const escolhaDoPreparo = ({ temAtual = false, atualUsado = false, editando = false, novo = false, deBase = false } = {}) => (!temAtual || editando ? '' : deBase ? 'agora' : novo || !atualUsado ? 'agendar' : 'agora');
   // As partes que a versão anterior guardava neste celular (cc.estudo.proximos.<célula>), no formato
   // do pedido filaPartes, na ordem em que esperavam. O que não tem texto fica de fora.
   const partesDoCelular = (guardado) => ((guardado && Array.isArray(guardado.partes) ? guardado.partes : [])

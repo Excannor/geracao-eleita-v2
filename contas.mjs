@@ -1727,6 +1727,8 @@ export class Contas {
     if (mudarDaFila && e.baseEm !== undefined && e.baseEm !== null && String(e.baseEm) !== (daFila.editadoEm || '')) throw erro(MSG_ESTUDO.estudoMudou, 409);
     const agendar = !!(novo && e.agendar === true && !mudarDaFila);
     const seguintes = novo && Array.isArray(e.seguintes) ? e.seguintes : [];
+    // a conta da fila antes de ler cada parte: um pedido com partes demais nem passa pelo leitor
+    if (fila.length + seguintes.length > FILA_MAX) throw erro(MSG_ESTUDO.filaCheia);
     const partes = [];
     if (seguintes.length) {
       if (tipo !== 'blocos') throw erro(MSG_ESTUDO.vazio);

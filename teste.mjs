@@ -1446,7 +1446,7 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   'datasPedemAjuste(): uma data que passou, ou fora do dia do encontro, pede "Ajustar as datas"');
   checar(R.escolhaDoPreparo({ temAtual: false }) === '' && R.escolhaDoPreparo({ temAtual: true, editando: true }) === ''
     && R.escolhaDoPreparo({ temAtual: true, atualUsado: true }) === 'agora' && R.escolhaDoPreparo({ temAtual: true, atualUsado: false }) === 'agendar'
-    && R.escolhaDoPreparo({ temAtual: true, atualUsado: true, novo: true }) === 'agendar',
+    && R.escolhaDoPreparo({ temAtual: true, atualUsado: true, novo: true }) === 'agendar' && R.escolhaDoPreparo({ temAtual: true, atualUsado: false, deBase: true }) === 'agora',
   'escolhaDoPreparo(): sem atual ou mudando um estudo, sem escolha; depois do encontro, "Usar agora"; com o atual esperando ou por "Agendar um estudo", "Agendar"');
   const guardado = { v: 1, titulo: 'Longo', total: 3, traducao: 'blivre', partes: [{ origem: 'd1', k: 2, total: 3, fonte: 'Longo (parte 2)\nTexto.' }, { origem: 'd1', k: 3, fonte: '  ', traducao: 'nbv' }, { k: 4, fonte: 'Longo (parte 4)', traducao: 'nbv' }] };
   checar(JSON.stringify(R.partesDoCelular(guardado)) === JSON.stringify([{ fonte: 'Longo (parte 2)\nTexto.', traducao: 'blivre' }, { fonte: 'Longo (parte 4)', traducao: 'nbv' }])

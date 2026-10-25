@@ -85,8 +85,9 @@
     // partes seguintes, que vão em "seguintes" ao salvar; desfazer volta o original)
     divisao: null,
     // os próximos estudos (docs/a-mesa-fila.md, 5.4): quando ('agora' ou 'agendar', a escolha do
-    // passo 3), dataFila (o dia do encontro na fila) e, mudando um da fila, baseEm (a versão salva)
-    quando: '', dataFila: '', baseEm: undefined,
+    // passo 3) e dataFila (o dia do encontro na fila). Mudando um da fila, baseEm (acima) é a versão
+    // dele que o rascunho começou, e vai no pedido (409 se mudou em outro aparelho)
+    quando: '', dataFila: '',
   });
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
@@ -218,7 +219,7 @@
     }
     const guardar = () => gravarRascunho(p.id, st, lugar);
     // a escolha do passo 3 ("Usar agora" ou "Agendar"), quando há (docs/a-mesa-fila.md, 5.4)
-    const escolha = R.escolhaDoPreparo({ temAtual: !!p.estudo, atualUsado: !!(p.estudo && p.estudo.usado), editando: modo === 'fila' || !!st.base, novo: modo === 'novo' });
+    const escolha = R.escolhaDoPreparo({ temAtual: !!p.estudo, atualUsado: !!(p.estudo && p.estudo.usado), editando: modo === 'fila' || !!st.base, novo: modo === 'novo', deBase: !!st.deBase });
     if (!escolha) st.quando = '';
     else if (st.quando !== 'agora' && st.quando !== 'agendar') st.quando = escolha;
     if ((st.quando === 'agendar' && !st.dataFila) || (st.dataFila && st.dataFila < CC.hojeIso() && modo !== 'fila')) st.dataFila = p.filaProxima || '';
@@ -1061,7 +1062,7 @@
       }
       // "Usar agora" por cima de um atual que a célula ainda não usou (só pelo "Agendar um estudo" ou
       // por "Usar como base"): pergunta antes, como "Usar agora" na fila
-      if (st.quando === 'agora' && p.estudo && !p.estudo.usado
+      if (st.quando === 'agora' && p.estudo && !p.estudo.usado && !st.deBase
         && await CC.confirmar({ titulo: 'Usar agora?', texto: 'O estudo atual ainda não foi usado num encontro. Se você usar este agora, o atual vai para Estudos anteriores.', acao: 'Usar agora' }) !== true) return;
       if (st.perguntas.some((x) => x.marcada && x.texto.trim().length > PERGUNTA_MAX)) {
         mostrarErro(painel, ['Encurte a pergunta marcada que passou de ' + PERGUNTA_MAX + ' caracteres: toque em Mudar nela.']);
