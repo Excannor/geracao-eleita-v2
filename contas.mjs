@@ -23,7 +23,7 @@ import {
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
   limparCombinado, estudoDoDia, dataNoHistorico, combinadoDoAnterior, acessoAoEstudo, quemFaltou, cursorDe, lerCursor, ESTUDOS_POR_PAGINA,
   daMaeAteOCorte, encontrosAteOCorte,
-  FILA_MAX, encontroDepois, primeiraDataDaFila, proximaDataDaFila, encaixarNaFila, reordenarFila, ajustarDatasDaFila,
+  FILA_MAX, encontroDepois, limiteDaFila, primeiraDataDaFila, proximaDataDaFila, encaixarNaFila, reordenarFila, ajustarDatasDaFila,
   jaTeveEncontro, devePromover, limparDataDaFila,
 } from './estudos.mjs';
 
@@ -1847,11 +1847,12 @@ export class Contas {
   }
 
   // A fila como quem conduz a recebe no retrato: os estudos, a data que um novo recebe sem escolha
-  // (proxima) e a primeira data livre (primeira, a de "Ajustar as datas").
+  // (proxima), a primeira data livre (primeira, a de "Ajustar as datas") e o limite da promoção
+  // (limite: sem estudo atual, o primeiro da fila com data até aqui entra).
   dadosDaFila(p, agora = new Date()) {
     const itens = this.filaDe(p.id);
     const contexto = this.contextoDaFila(p, agora);
-    return { itens, proxima: proximaDataDaFila(itens, contexto), primeira: primeiraDataDaFila(contexto) };
+    return { itens, proxima: proximaDataDaFila(itens, contexto), primeira: primeiraDataDaFila(contexto), limite: limiteDaFila(contexto) };
   }
 
   // Grava as datas novas da fila (só as que mudaram), dentro da transação de quem chama. Para não

@@ -146,3 +146,7 @@ div.mesa-aviso { cursor: auto; padding-bottom: 18px; }
 .mesa-encontro-dividido small { color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
 .mesa-encontro-dividido .mesa-resumo { margin-top: 6px; }
 .mesa-encontro-dividido .mesa-resumo li { background: var(--cartao); }
+/* Quando usar: agora ou na fila (docs/a-mesa-fila.md, 5.4), com o dia do encontro */
+.mesa-quando { display: grid; gap: 10px; }
+.mesa-quando-titulo { margin: 0 4px; color: var(--tinta-forte); font-size: 1rem; font-weight: 800; }
+.mesa-quando .mesa-data-fila { margin: 0; }

@@ -2,7 +2,9 @@
    leitura da semana ou um trecho), "Confira as partes" e "Para conversar". Só o líder chega aqui
    (a casca em 08b-propositos.js confere euPreparoEstudo). O build junta este arquivo com o leitor
    de marcas (estudo-marcas.js) na peça estudo-preparo, que depende da estudo-celula.
-   O rascunho fica neste celular (localStorage, cc.rascunho.estudo.<célula>) a cada mudança.
+   O rascunho fica neste celular (localStorage, cc.rascunho.estudo.<célula>) a cada mudança; o de
+   um estudo novo para a fila (…/preparar/novo) e o de um estudo da fila (…/preparar/<id>) moram em
+   cc.rascunho.fila.<célula>.novo e cc.rascunho.fila.<célula>.<id> (docs/a-mesa-fila.md, 5.4).
    O texto bíblico dos cartões vem da Bíblia do app pela referência, na tradução do estudo: o que o
    líder colou de outra tradução fica fora (o servidor relê a fonte e grava só a versão limpa). */
 (function (CC) {
@@ -56,15 +58,16 @@
   const normalizar = (t) => String(t == null ? '' : t).replace(/\r\n?|[\u2028\u2029]/g, '\n').replace(/^(?:[ \t\u00a0]*\n)+/, '').replace(/\s+$/, '');
 
   // ---------- o rascunho neste celular ----------
-  const chave = (id) => 'cc.rascunho.estudo.' + id;
-  function lerRascunho(id) {
+  // lugar: '' (o rascunho de sempre), 'novo' (um estudo novo para a fila) ou o id de um da fila
+  const chave = (id, lugar) => (lugar ? 'cc.rascunho.fila.' + id + '.' + lugar : 'cc.rascunho.estudo.' + id);
+  function lerRascunho(id, lugar) {
     try {
-      const r = JSON.parse(localStorage.getItem(chave(id)) || 'null');
+      const r = JSON.parse(localStorage.getItem(chave(id, lugar)) || 'null');
       return r && r.v === 1 ? r : null;
     } catch (e) { return null; }
   }
-  const gravarRascunho = (id, st) => { try { localStorage.setItem(chave(id), JSON.stringify(Object.assign({}, st, { em: new Date().toISOString() }))); } catch (e) { /* segue */ } };
-  const apagarRascunho = (id) => { try { localStorage.removeItem(chave(id)); } catch (e) { /* segue */ } };
+  const gravarRascunho = (id, st, lugar) => { try { localStorage.setItem(chave(id, lugar), JSON.stringify(Object.assign({}, st, { em: new Date().toISOString() }))); } catch (e) { /* segue */ } };
+  const apagarRascunho = (id, lugar) => { try { localStorage.removeItem(chave(id, lugar)); } catch (e) { /* segue */ } };
 
   // Um rascunho de outro estudo (o estudo mudou em outro aparelho) não serve mais. O estudo que já
   // foi usado num encontro não é a base de nada: o líder prepara o próximo, em branco, e o usado
@@ -78,20 +81,13 @@
     v: 1, base, baseEm, tipo: 'blocos', passo: 1, fonte: '', palavra: '', trecho: { livro: 'Gênesis', cap: '1', vers: '' }, traducao: 'nbv',
     opcoes: true, modo: 'colar', colado: false, coladoWord: false, recusadas: [], perguntas: null, chavePerguntas: '', salvas: null,
     ws: base ? null : { acolhida: '', adoracao: '', testemunho: '' }, combinado: '', deBase: '', deBaseData: '',
-    // divisao: o estudo comprido dividido aqui ({ id, original, total, titulo }: desfazer volta o
-    // original); daFila: a parte que esperava o próximo encontro ({ id, k, total, titulo })
-    divisao: null, daFila: null,
+    // divisao: o estudo comprido dividido aqui ({ id, original, total, titulo, partes }: as fontes das
+    // partes seguintes, que vão em "seguintes" ao salvar; desfazer volta o original)
+    divisao: null,
+    // os próximos estudos (docs/a-mesa-fila.md, 5.4): quando ('agora' ou 'agendar', a escolha do
+    // passo 3), dataFila (o dia do encontro na fila) e, mudando um da fila, baseEm (a versão salva)
+    quando: '', dataFila: '', baseEm: undefined,
   });
-  // As partes de um estudo dividido que esperam o próximo encontro (estudo-celula.js, proximos).
-  const fila = () => (CC.estudoCelula && CC.estudoCelula.proximos) || { ler: () => null, gravar: () => {}, tirar: () => {} };
-  // O preparo do próximo começa pela primeira parte da fila, quando há.
-  function daFila(id) {
-    const x = fila().ler(id);
-    if (!x) return null;
-    const parte = x.partes[0];
-    return { tipo: 'blocos', fonte: parte.fonte, traducao: parte.traducao || x.traducao || 'nbv', opcoes: false, modo: 'escrever',
-      daFila: { id: parte.origem, k: parte.k, total: parte.total || x.total, titulo: parte.titulo || x.titulo || '' } };
-  }
   function estadoInicial(p) {
     const e = p.estudo && !p.estudo.usado ? p.estudo : null;
     const base = e ? e.id : '';
@@ -103,7 +99,18 @@
     if (salvo && (salvo.base || '') === base && (salvo.baseEm === undefined || salvo.baseEm === baseEm)) return salvo;
     if (salvo && base && (salvo.base || '') === base) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
     const st = estadoVazio(base, baseEm);
-    return e ? Object.assign(st, doEstudo(e)) : Object.assign(st, daFila(p.id) || {});
+    return e ? Object.assign(st, doEstudo(e)) : st;
+  }
+  // Um estudo novo para a fila ("Agendar um estudo", …/preparar/novo): em branco, ou o rascunho dele.
+  const estadoNovo = (p) => lerRascunho(p.id, 'novo') || estadoVazio('', '');
+  // Mudar um estudo da fila (…/preparar/<id>): o rascunho dele, se começou da versão que está salva;
+  // senão, o texto salvo. r: a leitura (GET /api/estudos?estudo=), com a fonte só para o líder.
+  function estadoDaFila(p, r) {
+    const em = r.estudo.editadoEm || '';
+    const salvo = lerRascunho(p.id, r.estudo.id);
+    if (salvo && salvo.baseEm === em) return salvo;
+    if (salvo) CC.avisar('O estudo mudou em outro aparelho. O preparo começa da versão salva.');
+    return Object.assign(estadoVazio(r.estudo.id, em), doEstudo(r.estudo), { ws: null, baseEm: em, dataFila: r.data || '' });
   }
   // Os campos do preparo a partir de um estudo salvo (o atual, em "Mudar", ou um anterior, em
   // "Usar como base").
@@ -162,21 +169,35 @@
 
   // ---------- a tela ----------
   let geracao = 0;
-  // opcoes.deBase: o estudo anterior que o líder usa como base (…/preparar/<id>).
+  // opcoes.deBase: o terceiro pedaço do endereço (…/preparar/<x>): 'novo' é um estudo novo para a
+  // fila ("Agendar um estudo"); o id de um estudo da fila é mudar esse estudo; o id de um anterior é
+  // "Usar como base".
   async function tela(raiz, p, apoio, opcoes = {}) {
     const meu = ++geracao;
     const vivo = () => meu === geracao && raiz.isConnected && /\/preparar(\/[^/]+)?$/.test(location.hash);
     let st;
-    if (opcoes.deBase) {
+    // modo: '' (o de sempre e "Usar como base"), 'novo' ou 'fila'; lugar: onde mora o rascunho
+    let modo = '';
+    let lugar = '';
+    if (opcoes.deBase === 'novo') {
+      modo = 'novo';
+      lugar = 'novo';
+      st = estadoNovo(p);
+    } else if (opcoes.deBase) {
       let r = null;
       try { r = await CC.api('api/estudos?estudo=' + encodeURIComponent(opcoes.deBase) + '&celula=' + encodeURIComponent(p.id)); } catch (e) { r = null; }
       if (!vivo()) return;
-      if (!r || !r.usarComoBase || !r.estudo) {
+      if (r && r.atual) { CC.substituirRota(apoio.endereco(p.id, 'preparar')); return; }
+      if (!r || !r.estudo || !(r.usarComoBase || (r.fila && r.estudo.fonte !== undefined) || (r.fila && r.estudo.tipo !== 'blocos'))) {
         CC.avisar('Não consegui abrir este estudo agora. Tente de novo.', { tipo: 'erro' });
         CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(opcoes.deBase));
         return;
       }
-      st = estadoDaBase(p, r);
+      if (r.fila) {
+        modo = 'fila';
+        lugar = r.estudo.id;
+        st = estadoDaFila(p, r);
+      } else st = estadoDaBase(p, r);
     } else {
       // um rascunho começado de um estudo anterior: continuar nele (no endereço dele) ou deixar
       // de lado e partir do estudo atual (ou do zero)
@@ -195,7 +216,12 @@
       }
       st = estadoInicial(p);
     }
-    const guardar = () => gravarRascunho(p.id, st);
+    const guardar = () => gravarRascunho(p.id, st, lugar);
+    // a escolha do passo 3 ("Usar agora" ou "Agendar"), quando há (docs/a-mesa-fila.md, 5.4)
+    const escolha = R.escolhaDoPreparo({ temAtual: !!p.estudo, atualUsado: !!(p.estudo && p.estudo.usado), editando: modo === 'fila' || !!st.base, novo: modo === 'novo' });
+    if (!escolha) st.quando = '';
+    else if (st.quando !== 'agora' && st.quando !== 'agendar') st.quando = escolha;
+    if ((st.quando === 'agendar' && !st.dataFila) || (st.dataFila && st.dataFila < CC.hojeIso() && modo !== 'fila')) st.dataFila = p.filaProxima || '';
     const sem = () => R.semana(p.semanaAte);
     const refDoTrecho = () => {
       const v = String(st.trecho.vers || '').replace(/\s+/g, '').replace(/[\u2013\u2014]/g, '-');
@@ -216,7 +242,7 @@
         + '<h1>' + esc(titulo) + '</h1><span class="vao"></span></div>'
         + '<div class="mesa-passos" aria-hidden="true">' + [1, 2, 3].map((k) => '<i' + (k <= n ? ' class="feito"' : '') + '></i>').join('') + '</div>'
         + '<p class="mesa-passo"><b>Passo ' + n + ' de 3</b>' + PONTO + esc(nome) + '</p></div>'
-        + '<div class="painel-celula mesa-preparo" data-passo="' + n + '" data-celula="' + esc(p.id) + '" data-de-base="' + esc(st.deBase || '') + '">' + painel + '</div>';
+        + '<div class="painel-celula mesa-preparo" data-passo="' + n + '" data-celula="' + esc(p.id) + '" data-de-base="' + esc(opcoes.deBase || '') + '">' + painel + '</div>';
       raiz.querySelector('[data-voltar]').onclick = () => (n === 1 ? sair() : irPara(n - 1));
       return raiz.querySelector('.mesa-preparo');
     }
@@ -254,14 +280,14 @@
     // divisão"), ou a parte que esperava o próximo encontro.
     function notaDaDivisao() {
       if (st.divisao) {
-        const seguintes = st.divisao.total === 2 ? 'a parte 2 fica guardada para o próximo encontro' : 'as partes 2 a ' + st.divisao.total + ' ficam guardadas para os próximos encontros';
+        const seguintes = st.divisao.total === 2 ? 'ao salvar, a parte 2 entra nos próximos estudos' : 'ao salvar, as partes 2 a ' + st.divisao.total + ' entram nos próximos estudos';
         return '<div class="mesa-nota mesa-de-base mesa-dividido" role="status">' + CC.ico('calendario')
           + '<span><b>Estudo dividido em ' + st.divisao.total + ' encontros.</b> Esta é a parte 1; ' + seguintes + '.</span>'
           + '<button type="button" class="botao pequeno contorno" data-desfazer-divisao>Desfazer a divisão</button></div>';
       }
-      if (st.daFila) {
-        return '<p class="mesa-nota mesa-de-base mesa-da-fila">' + CC.ico('calendario') + 'Parte ' + esc(st.daFila.k) + ' de ' + esc(st.daFila.total)
-          + (st.daFila.titulo ? ' de \u201c' + esc(st.daFila.titulo) + '\u201d' : '') + '. Mude o que quiser antes de salvar.</p>';
+      // mudando um estudo da fila: para quando ele está agendado
+      if (modo === 'fila' && st.dataFila) {
+        return '<p class="mesa-nota mesa-de-base mesa-da-fila">' + CC.ico('calendario') + 'Agendado para ' + esc(R.dataLonga(st.dataFila)) + '. Ele entra na aba Estudo depois do encontro anterior.</p>';
       }
       return '';
     }
@@ -269,7 +295,6 @@
       const desfazer = painel.querySelector('[data-desfazer-divisao]');
       if (!desfazer) return;
       desfazer.onclick = () => {
-        fila().tirar(p.id, st.divisao.id);
         st.fonte = st.divisao.original;
         st.divisao = null;
         guardar();
@@ -299,8 +324,8 @@
         + '<ul class="mesa-resumo"><li>' + plural(x.blocos, 'parte', 'partes') + '</li>' + (x.cartoes ? '<li>' + plural(x.cartoes, 'versículo', 'versículos') + '</li>' : '') + '</ul></section>';
       CC.folha('<h2>Dividir em ' + n + ' encontros</h2>'
         + partes.map(encontro).join('')
-        + '<p class="mesa-nota">' + CC.ico('info') + (n === 2 ? 'Você segue com a parte 1. A parte 2 fica guardada neste celular e abre pronta em Preparar o próximo.'
-          : 'Você segue com a parte 1. As outras ficam guardadas neste celular e abrem prontas, uma de cada vez, em Preparar o próximo.') + '</p>'
+        + '<p class="mesa-nota">' + CC.ico('info') + (n === 2 ? 'Você segue com a parte 1. A parte 2 entra nos próximos estudos, no encontro seguinte.'
+          : 'Você segue com a parte 1. As outras entram nos próximos estudos, uma em cada encontro seguinte.') + '</p>'
         + '<div class="acoes"><button class="botao" data-confirmar-divisao>' + CC.ico('certo') + 'Dividir</button><button class="botao plano" data-fechar>Cancelar</button></div>',
       {
         rotulo: 'Dividir em ' + n + ' encontros',
@@ -309,19 +334,18 @@
           folha.querySelector('[data-fechar]').onclick = fechar;
           folha.querySelector('[data-confirmar-divisao]').onclick = () => {
             const id = 'd' + Date.now().toString(36);
-            const antes = fila().ler(p.id);
-            // a divisão de uma parte que já vinha da fila entra na frente do que esperava
-            fila().gravar(p.id, {
-              titulo: r.titulo || '', total: n, traducao: st.traducao,
-              partes: partes.slice(1).map((x, i) => ({ origem: id, k: i + 2, total: n, titulo: r.titulo || '', traducao: st.traducao, fonte: x.fonte })).concat(antes ? antes.partes : []),
-            });
-            st.divisao = { id, original: st.fonte, total: n, titulo: r.titulo || '' };
+            // as partes seguintes ficam no rascunho e vão para a fila do servidor junto com a parte 1
+            // ("seguintes", ao salvar): ou entra o estudo dividido inteiro, ou nada
+            // (docs/a-mesa-fila.md, F11). Dividir de novo uma parte 1 põe as novas na frente.
+            const antes = st.divisao;
+            const seguintes = partes.slice(1).map((x) => x.fonte).concat(antes ? antes.partes || [] : []);
+            st.divisao = { id, original: antes ? antes.original : st.fonte, total: seguintes.length + 1, titulo: r.titulo || '', partes: seguintes };
             st.fonte = partes[0].fonte;
             guardar();
             fechar();
             rolarAoTopo();
             passo2();
-            CC.avisar('Pronto: estudo dividido em ' + n + ' encontros', { tipo: 'certo' });
+            CC.avisar('Pronto: estudo dividido em ' + st.divisao.total + ' encontros', { tipo: 'certo' });
           };
         },
       });
@@ -383,9 +407,9 @@
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-ver>Ver as partes' + CC.ico('avancar') + '</button>'
         + '<button class="botao plano" data-cancelar>Cancelar</button>'
-        + (p.estudo && !st.deBase ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
-        + (st.deBase ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '')
-        + (st.daFila ? '<button class="botao plano perigo" data-descartar-parte>Descartar a parte ' + esc(st.daFila.k) + '</button>' : '') + '</div>');
+        + (p.estudo && !st.deBase && !modo ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
+        + (modo === 'fila' ? '<button class="botao plano perigo" data-tirar-da-fila>Tirar dos próximos</button>' : '')
+        + (st.deBase || modo === 'novo' ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '') + '</div>');
       ligarDivisao(painel);
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('[data-tipo]').forEach((b) => {
@@ -393,8 +417,11 @@
       });
       q('[data-cancelar]').onclick = sair;
       const tirar = q('[data-tirar]');
+      // com o primeiro da fila do próximo encontro, tirado o atual, ele entra (docs/a-mesa-fila.md, 4.1)
+      const vemDaFila = (p.fila || [])[0] && p.filaLimite && p.fila[0].data <= p.filaLimite ? p.fila[0] : null;
       if (tirar) tirar.onclick = async () => {
-        if (!await CC.confirmar({ titulo: 'Tirar o estudo?', texto: 'A célula volta a ver que o estudo ainda não foi preparado.', acao: 'Tirar', perigo: true })) return;
+        if (!await CC.confirmar({ titulo: 'Tirar o estudo?', texto: vemDaFila ? 'O próximo da fila, \u201c' + (R.titulo(vemDaFila) || 'Estudo do encontro') + '\u201d, passa a ser o estudo da célula.'
+          : 'A célula volta a ver que o estudo ainda não foi preparado.', acao: 'Tirar', perigo: true })) return;
         try {
           await CC.api('api/celula', { acao: 'estudo', id: p.id, estudo: '' });
         } catch (e) { mostrarErro(painel, [mensagemDe(e)]); return; }
@@ -407,20 +434,30 @@
       };
       const descartar = q('[data-descartar]');
       if (descartar) descartar.onclick = async () => {
+        if (modo === 'novo') {
+          if (await CC.confirmar({ titulo: 'Descartar o rascunho?', texto: 'O que você escreveu sai deste celular.', acao: 'Descartar', perigo: true }) !== true) return;
+          apagarRascunho(p.id, lugar);
+          sair();
+          return;
+        }
         if (await CC.confirmar({ titulo: 'Descartar o rascunho?', texto: 'O que você escreveu a partir do estudo de ' + ddmm(st.deBaseData) + ' sai deste celular. O estudo de ' + ddmm(st.deBaseData) + ' continua guardado.', acao: 'Descartar', perigo: true }) !== true) return;
         apagarRascunho(p.id);
         CC.substituirRota(apoio.endereco(p.id, 'estudo') + '/' + encodeURIComponent(st.deBase));
       };
-      const descartarParte = q('[data-descartar-parte]');
-      if (descartarParte) descartarParte.onclick = async () => {
-        const k = st.daFila.k;
-        if (await CC.confirmar({ titulo: 'Descartar a parte ' + k + '?', texto: 'O texto da parte ' + k + ' de \u201c' + st.daFila.titulo + '\u201d sai deste celular.', acao: 'Descartar', perigo: true }) !== true) return;
-        fila().tirar(p.id, st.daFila.id, k);
-        apagarRascunho(p.id);
-        st = estadoInicial(p);
-        guardar();
-        rolarAoTopo();
-        desenhar();
+      const tirarDaFila = q('[data-tirar-da-fila]');
+      if (tirarDaFila) tirarDaFila.onclick = async () => {
+        const nome = R.titulo(st.tipo === 'blocos' ? CC.lerEstudo(st.fonte, { capitulos: capitulos() }) : { tipo: st.tipo, titulo: '' }) || 'Este estudo';
+        if (await CC.confirmar({ titulo: 'Tirar dos próximos?', texto: '\u201c' + nome + '\u201d sai da lista e não vai para a célula.', acao: 'Tirar', perigo: true }) !== true) return;
+        try {
+          await CC.api('api/celula', { acao: 'filaTirar', id: p.id, estudo: st.base });
+        } catch (e) {
+          if (e.status !== 404) { mostrarErro(painel, [mensagemDe(e)]); return; }
+        }
+        apagarRascunho(p.id, lugar);
+        if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
+        await apoio.carregar();
+        CC.substituirRota(apoio.endereco(p.id, 'estudo'));
+        CC.avisar('Estudo tirado dos próximos', { tipo: 'certo' });
       };
       const ver = q('[data-ver]');
       ver.onclick = () => irPara(2);
@@ -866,11 +903,15 @@
         + '<textarea data-combinado name="combinado-da-semana" rows="2" maxlength="' + COMBINADO_MAX + '" autocomplete="off" placeholder="Ex.: Orar todo dia por alguém que ainda não conhece Jesus."></textarea>'
         // perto do teto, o aviso fica no próprio cartão, logo abaixo do campo
         + '<small class="mesa-limite" data-limite-combinado role="status" hidden></small></label>'
-        + '<div class="mesa-ws"><header><b>Acolhida, adoração e testemunho</b><button type="button" class="botao pequeno contorno" data-mudar-ws>Mudar</button></header><dl>'
-        + [['acolhida', 'Acolhida'], ['adoracao', 'Adoração'], ['testemunho', 'Testemunho']].map(([k, r]) => '<dt>' + r + '</dt><dd>' + esc(valorW(k) || sugestaoW[k]()) + '</dd>').join('') + '</dl></div>'
-        + '<p class="mesa-nota">' + CC.ico('pessoas') + 'Ao salvar, a célula vê o estudo na aba Estudo.</p>'
+        // na fila, acolhida, adoração e testemunho ficam para quando ele for o estudo da semana: eles
+        // são da célula de agora (docs/a-mesa-fila.md, F8)
+        + (naFila() ? '<p class="mesa-nota">' + CC.ico('info') + 'Acolhida, adoração e testemunho você escolhe quando ele for o estudo da semana.</p>'
+          : '<div class="mesa-ws"><header><b>Acolhida, adoração e testemunho</b><button type="button" class="botao pequeno contorno" data-mudar-ws>Mudar</button></header><dl>'
+          + [['acolhida', 'Acolhida'], ['adoracao', 'Adoração'], ['testemunho', 'Testemunho']].map(([k, r]) => '<dt>' + r + '</dt><dd>' + esc(valorW(k) || sugestaoW[k]()) + '</dd>').join('') + '</dl></div>')
+        + quandoHtml()
+        + '<p class="mesa-nota">' + CC.ico(naFila() ? 'calendario' : 'pessoas') + (naFila() ? 'Ele entra na aba Estudo depois do encontro anterior.' : 'Ao salvar, a célula vê o estudo na aba Estudo.') + '</p>'
         + '<div data-erro role="alert" hidden></div>'
-        + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico('certo') + 'Salvar o estudo</button>'
+        + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico(st.quando === 'agendar' ? 'calendario' : 'certo') + (st.quando === 'agendar' ? 'Agendar o estudo' : 'Salvar o estudo') + '</button>'
         + '<button class="botao plano" data-voltar-partes>Voltar às partes</button></div>';
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('.mesa-pergunta input[type="checkbox"]').forEach((caixa) => {
@@ -946,7 +987,9 @@
       crescer(combinado);
       contarCombinado();
       combinado.addEventListener('input', () => { st.combinado = combinado.value; guardar(); crescer(combinado); contarCombinado(); });
-      q('[data-mudar-ws]').onclick = () => mudarWs(painel);
+      const ws = q('[data-mudar-ws]');
+      if (ws) ws.onclick = () => mudarWs(painel);
+      ligarQuando(painel);
       q('[data-voltar-partes]').onclick = () => irPara(2);
       q('[data-salvar]').onclick = () => salvar(painel);
       if (CC.inseparavel) CC.inseparavel(painel);
@@ -980,8 +1023,46 @@
       });
     }
 
+    // ---------- "Quando usar": agora ou na fila (docs/a-mesa-fila.md, 5.4) ----------
+    // O estudo vai para a fila quando ele já é de lá (modo 'fila') ou quando o líder escolhe "Agendar".
+    const naFila = () => modo === 'fila' || st.quando === 'agendar';
+    const campoData = () => '<label class="campo-senha mesa-data-fila"><span>Para o encontro de</span>'
+      + '<input type="date" data-data-fila min="' + esc(CC.hojeIso()) + '" value="' + esc(st.dataFila || '') + '"></label>';
+    function quandoHtml() {
+      if (modo === 'fila') return '<div class="mesa-quando">' + campoData() + '</div>';
+      if (!st.quando) return '';
+      const opcao = (k, ico, titulo, texto) => '<button type="button" class="mesa-opcao" role="radio" aria-checked="' + (st.quando === k) + '" data-quando="' + k + '">'
+        + CC.ico(ico) + '<span><b>' + titulo + '</b><small>' + texto + '</small></span><span class="marca-opcao">' + (st.quando === k ? CC.ico('certo') : '') + '</span></button>';
+      return '<div class="mesa-quando"><b class="mesa-quando-titulo" id="quando-usar">Quando usar</b>'
+        + '<div class="mesa-opcoes" role="radiogroup" aria-labelledby="quando-usar">'
+        + opcao('agora', 'livro', 'Usar agora', 'Entra na aba Estudo hoje.')
+        + opcao('agendar', 'calendario', 'Agendar', 'Entra na aba Estudo depois do encontro anterior.') + '</div>'
+        + (st.quando === 'agendar' ? campoData() : '') + '</div>';
+    }
+    function ligarQuando(painel) {
+      painel.querySelectorAll('[data-quando]').forEach((b) => {
+        b.onclick = () => {
+          if (st.quando === b.dataset.quando) return;
+          st.quando = b.dataset.quando;
+          if (st.quando === 'agendar' && !st.dataFila) st.dataFila = p.filaProxima || '';
+          guardar();
+          desenharPerguntas(painel);
+        };
+      });
+      const data = painel.querySelector('[data-data-fila]');
+      if (data) data.onchange = () => { st.dataFila = data.value; guardar(); };
+    }
+
     async function salvar(painel) {
       const botao = painel.querySelector('[data-salvar]');
+      if (naFila() && !st.dataFila) {
+        mostrarErro(painel, ['Escolha o dia do encontro deste estudo.']);
+        return;
+      }
+      // "Usar agora" por cima de um atual que a célula ainda não usou (só pelo "Agendar um estudo" ou
+      // por "Usar como base"): pergunta antes, como "Usar agora" na fila
+      if (st.quando === 'agora' && p.estudo && !p.estudo.usado
+        && await CC.confirmar({ titulo: 'Usar agora?', texto: 'O estudo atual ainda não foi usado num encontro. Se você usar este agora, o atual vai para Estudos anteriores.', acao: 'Usar agora' }) !== true) return;
       if (st.perguntas.some((x) => x.marcada && x.texto.trim().length > PERGUNTA_MAX)) {
         mostrarErro(painel, ['Encurte a pergunta marcada que passou de ' + PERGUNTA_MAX + ' caracteres: toque em Mudar nela.']);
         return;
@@ -995,23 +1076,32 @@
         base: st.base || '',
         combinado: String(st.combinado || '').replace(/\s+/g, ' ').trim(),
       };
-      if (st.ws) Object.assign(corpo, st.ws);
+      // na fila: um estudo novo agendado, ou um da fila mudado (com a versão de quando o rascunho
+      // começou: outro aparelho pode ter mudado); os 4 Ws não vão (F8)
+      if (modo === 'fila') Object.assign(corpo, { baseEm: st.baseEm || '', data: st.dataFila });
+      else if (st.quando === 'agendar') Object.assign(corpo, { agendar: true, data: st.dataFila });
+      else if (st.ws) Object.assign(corpo, st.ws);
+      // o estudo dividido: as partes seguintes vão junto e entram na fila logo depois deste
+      const partes = (st.divisao && st.divisao.partes) || [];
+      if (partes.length) corpo.seguintes = partes;
       botao.disabled = true;
+      let r;
       try {
-        await CC.api('api/celula', corpo);
+        r = await CC.api('api/celula', corpo);
       } catch (e) {
         botao.disabled = false;
         mostrarErro(painel, [mensagemDe(e)]);
         return;
       }
-      apagarRascunho(p.id);
-      // a parte que esperava o próximo encontro sai da fila: agora é o estudo da célula
-      if (st.daFila) fila().tirar(p.id, st.daFila.id, st.daFila.k);
-      // a lista de estudos anteriores muda (o atual de antes entra nela)
+      apagarRascunho(p.id, lugar);
+      // a lista de estudos anteriores muda (o atual de antes entra nela), e a fila também
       if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
       await apoio.carregar();
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
-      CC.avisar(!st.divisao ? 'Estudo salvo' : st.divisao.total === 2 ? 'Estudo salvo. A parte 2 fica para o próximo encontro.' : 'Estudo salvo. As outras partes ficam para os próximos encontros.', { tipo: 'certo' });
+      const dividido = !partes.length ? '' : partes.length === 1 ? 'A parte 2 está nos próximos estudos.' : 'As outras partes estão nos próximos estudos.';
+      const agendado = r && r.agendado && modo !== 'fila';
+      CC.avisar(agendado ? (dividido ? 'Estudo agendado. ' + dividido : 'Estudo agendado para ' + R.dataLonga(r.agendado.data))
+        : dividido ? 'Estudo salvo. ' + dividido : 'Estudo salvo', { tipo: 'certo' });
     }
 
     desenhar();

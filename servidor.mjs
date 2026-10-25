@@ -818,10 +818,10 @@ async function nomesDosAutores(estudos) {
 }
 
 // A fila como quem conduz a recebe: os estudos (só o que a lista mostra), a data que um novo recebe
-// sem escolha e a primeira data livre (a de "Ajustar as datas").
+// sem escolha, a primeira data livre (a de "Ajustar as datas") e o limite da promoção.
 function filaNoRetrato(p, info) {
   const f = CONTAS.dadosDaFila(p);
-  return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira };
+  return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira, filaLimite: f.limite };
 }
 
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
