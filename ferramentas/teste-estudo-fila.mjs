@@ -390,6 +390,26 @@ ok(await esperar('!document.querySelector(".cortina [data-nova-data]")', 10000) 
   'B. a data nova aparece na leitura');
 ok(await filaDoServidor() === TC + '@' + D7 + ' ' + TB + '@' + D14, 'B. e no servidor');
 
+// mudar o texto de um estudo da fila: o preparo dele, com a data, sem "Quando usar"
+await clicar('[data-mudar-agendado]');
+ok(await esperar(existe('[data-fonte]') + ' && ' + existe('.mesa-da-fila'), 15000) && (await textoDe('.mesa-da-fila')) === 'Agendado para ' + longa(D14) + '. Ele entra na aba Estudo depois do encontro anterior.'
+  && await av(q('[data-fonte]') + '.value') === texto(TB), 'B. "Mudar o estudo" abre o preparo do estudo da fila, com o texto salvo e para quando ele está agendado');
+ok(await av(existe('[data-tirar-da-fila]') + ' && !' + existe('[data-tirar]')), 'B. no lugar de "Tirar o estudo", "Tirar dos próximos"');
+await na((t) => { const c = document.querySelector('[data-fonte]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, texto(TB) + '\nMais uma frase para a conversa.');
+await clicar('[data-ver]');
+await esperar(existe('[data-continuar]') + ' && !' + q('[data-continuar]') + '.disabled', 15000);
+await clicar('[data-continuar]');
+ok(await esperar(existe('[data-salvar]'), 15000), 'B. o passo 3 do estudo da fila');
+const p3 = await na(() => ({ data: (document.querySelector('[data-data-fila]') || {}).value || '', opcoes: document.querySelectorAll('[data-quando]').length,
+  botao: document.querySelector('[data-salvar]').textContent.trim(), ws: !!document.querySelector('.mesa-ws') }));
+ok(p3.data === D14 && p3.opcoes === 0 && p3.botao === 'Salvar o estudo' && !p3.ws, 'B. com o dia dele, sem "Usar agora", e sem o cartão dos 4 Ws (' + JSON.stringify(p3) + ')');
+await clicar('[data-salvar]');
+ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-lista-proximos]")', 20000), 'B. salvo, volta para a aba');
+const idTB = (await celulaDe(marcos, JD)).fila.find((x) => x.titulo === TB).id;
+const lidoTB = await pedir('api/estudos?estudo=' + idTB + '&celula=' + JD, null, marcos);
+ok(lidoTB.dado.fila === true && lidoTB.dado.estudo.fonte.includes('Mais uma frase para a conversa.') && await filaDoServidor() === TC + '@' + D7 + ' ' + TB + '@' + D14,
+  'B. o servidor guardou o texto novo, e o estudo continua na fila, no mesmo dia');
+
 // o encontro de hoje, registrado pela folha
 await como(marcos, rota(''), { limpar: false });
 ok(await esperar(existe('[data-registrar-encontro]'), 15000), 'B. a aba Hoje tem "Registrar o encontro"');
