@@ -2734,6 +2734,164 @@ secao('próximos estudos: as regras da fila (estudos.mjs, docs/a-mesa-fila.md)')
 }
 
 // =========================================================================
+secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-mesa-fila.md)');
+// =========================================================================
+// Uma célula de quinta: Marcos (líder), Paulo (auxiliar), Ana (membro), Vera (visitante) e, de fora,
+// Otto, líder de outra célula. As datas vêm como parâmetro: quando(dia, hora) é aquele dia de 2026
+// àquela hora de Brasília. Outubro e novembro: 22, 29, 5 e 12 são quintas.
+{
+  const C = ctxEstudo.window.CC;
+  const tentar = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + e.codigo + (e.precisaConfirmar ? '|confirmar' : ''); } };
+  const contagens = Object.fromEntries(TRADUCOES.map((t) => {
+    const b = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', t + '.json'), 'utf8'));
+    return [t, Object.fromEntries(Object.entries(b.livros).map(([l, caps]) => [l, caps.map((v) => (v || []).length)]))];
+  }));
+  const opcoes = { regras: C, livros: [...LIVROS], capitulos: capitulosDoPlano, versiculos: (t) => (livro, cap) => ((contagens[t] || {})[livro] || [])[cap - 1] || 0 };
+  const quando = (dm, h = 9) => new Date(Date.parse('2026-' + dm + 'T00:00:00Z') + (h + 3) * 3600000);
+  const texto = (titulo, ref = 'João 3.16') => titulo + '\nUm parágrafo para conversar sobre o texto.\n' + ref;
+  const estudo = (titulo, extra = {}) => ({ estudo: 'blocos', fonte: texto(titulo), traducao: 'nbv', ...extra });
+
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-teste-fila-'));
+  let ce = await new Contas(join(pasta, 'contas.json')).carregar();
+  const nomes = { lider: 'Marcos', aux: 'Paulo', ana: 'Ana', vera: 'Vera', outro: 'Otto' };
+  for (const [u, nome] of Object.entries(nomes)) await ce.criar({ usuario: u, senha: '12345678', nome, email: u + '@x.com', nascimento: '1990-01-01', consentimento: true });
+  const ID = (await ce.criarCelula('lider', { titulo: 'Esperança' }, '2026-10-01')).id;
+  const tok = ce.gerarLinkCelula('lider', ID, assinar).token;
+  for (const u of ['aux', 'ana']) await ce.entrarNaCelula(u, tok, assinar, '2026-10-01');
+  await ce.entrarNaCelula('vera', tok, assinar, '2026-10-01', Date.now(), { visitante: true });
+  await ce.definirAuxiliar('lider', ID, 'aux', true);
+  await ce.definirEncontro('lider', ID, 4);
+  const OUTRA = (await ce.criarCelula('outro', { titulo: 'Outra' }, '2026-10-01')).id;
+  const p = () => ce.proposito(ID);
+  const fila = () => ce.filaDe(ID).map((x) => x.titulo + '@' + x.agendadoPara).join(' ');
+  const linha = (id) => ce.banco().prepare('SELECT * FROM celula_estudos WHERE id = ?').get(id);
+
+  // --- agendar ---
+  const A = (await ce.salvarEstudo('lider', ID, estudo('Estudo A', { testemunho: 'Orem pelo Jonas.' }), opcoes, quando('10-20'))).estudo.id;
+  const rB = await ce.salvarEstudo('lider', ID, estudo('Estudo B', { agendar: true, combinado: 'Ligar para alguém.', testemunho: 'Não grava.' }), opcoes, quando('10-21'));
+  const B = rB.estudo.id;
+  checar(rB.agendado === '2026-10-29' && p().estudoId === A && linha(B).agendado_para === '2026-10-29' && rB.estudo.combinado === 'Ligar para alguém.',
+    'agendar: sem data, o estudo vai para o encontro depois do do atual (29/10), e o atual continua o mesmo');
+  checar(p().estudoTestemunho === 'Orem pelo Jonas.' && !rB.promovido, 'agendar não mexe em acolhida, adoração e testemunho da célula, e nada entra na célula');
+  const D1 = (await ce.salvarEstudo('lider', ID, estudo('Estudo C', { agendar: true }), opcoes, quando('10-21', 10))).estudo.id;
+  checar(fila() === 'Estudo B@2026-10-29 Estudo C@2026-11-05', 'o segundo vai para o encontro seguinte (5/11)');
+  const daFila = ce.dadosDaFila(p(), quando('10-21', 11));
+  checar(daFila.itens.length === 2 && daFila.proxima === '2026-11-12' && daFila.primeira === '2026-10-29', 'dadosDaFila(): os estudos, a próxima data (12/11) e a primeira livre (29/10)');
+  checar(await tentar(() => ce.salvarEstudo('lider', ID, estudo('X', { agendar: true, data: '2026-10-20' }), opcoes, quando('10-21'))) === MSG_ESTUDO.dataDaFila + '|400',
+    'agendar para um dia que já passou dá 400');
+
+  // --- quem pode ---
+  for (const u of ['aux', 'ana', 'vera', 'outro']) {
+    checar(await tentar(() => ce.salvarEstudo(u, ID, estudo('Do ' + u, { agendar: true }), opcoes, quando('10-21'))) === MSG_ESTUDO.soLider + '|403'
+      && await tentar(() => ce.reordenarAFila(u, ID, [D1, B], quando('10-21'))) === MSG_ESTUDO.soLider + '|403'
+      && await tentar(() => ce.tirarDaFila(u, ID, B, quando('10-21'))) === MSG_ESTUDO.soLider + '|403'
+      && await tentar(() => ce.usarDaFila(u, ID, B, true, quando('10-21'))) === MSG_ESTUDO.soLider + '|403'
+      && await tentar(() => ce.mudarDataNaFila(u, ID, B, '2026-11-19', quando('10-21'))) === MSG_ESTUDO.soLider + '|403'
+      && await tentar(() => ce.ajustarAFila(u, ID, quando('10-21'))) === MSG_ESTUDO.soLider + '|403',
+    'só o líder mexe na fila: ' + u + ' recebe 403 em agendar, reordenar, tirar, usar, mudar a data e ajustar');
+  }
+  checar(fila() === 'Estudo B@2026-10-29 Estudo C@2026-11-05', 'as recusas não mudaram a fila');
+  checar(ce.estudoParaLer('aux', B, ID).acesso.fila && ce.estudoParaLer('lider', B).acesso.fila, 'o líder e o auxiliar abrem um estudo da fila');
+  checar(await tentar(() => ce.estudoParaLer('ana', B, ID)) === MSG_ESTUDO.naoAberto + '|404' && await tentar(() => ce.estudoParaLer('vera', B)) === MSG_ESTUDO.naoAberto + '|404'
+    && await tentar(() => ce.estudoParaLer('outro', B)) === MSG_ESTUDO.naoAberto + '|404', 'o membro, a visitante e quem é de fora recebem 404 num estudo da fila');
+  checar(!ce.estudosAnteriores('ana', ID).itens.length && !ce.dadosDoEstudo(p(), { membro: true, eu: 'ana' }, quando('10-21')).temAnteriores,
+    'a fila não entra em Estudos anteriores');
+  const reg = ce.dadosDoEstudo(p(), { conduz: true, hoje: '2026-10-21' }, quando('10-21')).registro;
+  checar(reg.estudos.map((x) => x.id).join() === A && reg.dias.every((d) => d.padrao === A || d.padrao === ''), 'a folha de registro e o estudo de cada dia não veem a fila');
+  checar(await tentar(() => ce.registrarEncontro('lider', ID, { data: '2026-10-21', presentes: [], visitantes: 0, estudo: B }, '2026-10-21', quando('10-21'))) === MSG_ESTUDO.estudoDoRegistro + '|400',
+    'o registro não aceita um estudo da fila');
+
+  // --- reordenar, mudar a data, ajustar ---
+  await ce.reordenarAFila('lider', ID, [D1, B], quando('10-21'));
+  checar(fila() === 'Estudo C@2026-10-29 Estudo B@2026-11-05', 'reordenar: os estudos trocam de lugar e as datas ficam');
+  checar(await tentar(() => ce.reordenarAFila('lider', ID, [B], quando('10-21'))) === MSG_ESTUDO.filaMudou + '|409', 'reordenar com uma fila velha (outro aparelho) dá 409');
+  await ce.mudarDataNaFila('lider', ID, B, '2026-10-29', quando('10-21'));
+  checar(fila() === 'Estudo B@2026-10-29 Estudo C@2026-11-05', 'mudar a data para a de outro estudo empurra esse para o encontro seguinte');
+  await ce.mudarDataNaFila('lider', ID, D1, '2026-11-19', quando('10-21'));
+  checar(fila() === 'Estudo B@2026-10-29 Estudo C@2026-11-19', 'mudar a data para um dia livre só muda aquele');
+  checar(await tentar(() => ce.mudarDataNaFila('lider', ID, A, '2026-11-26', quando('10-21'))) === MSG_ESTUDO.foraDaFila + '|404', 'o estudo atual não é da fila: 404');
+  await ce.ajustarAFila('lider', ID, quando('10-21'));
+  checar(fila() === 'Estudo B@2026-10-29 Estudo C@2026-11-05', 'ajustar as datas: um por encontro, a partir da primeira data livre');
+
+  // --- mudar um estudo da fila ---
+  const mB = await ce.salvarEstudo('lider', ID, estudo('Estudo B mudado', { base: B, baseEm: '' }), opcoes, quando('10-21', 12));
+  checar(mB.estudo.id === B && mB.agendado === '2026-10-29' && linha(B).titulo === 'Estudo B mudado' && linha(B).agendado_para === '2026-10-29' && p().estudoId === A
+    && linha(B).combinado === 'Ligar para alguém.', 'mudar um estudo da fila: a mesma linha, que continua na fila, na mesma data, com o combinado de antes');
+  checar(await tentar(() => ce.salvarEstudo('lider', ID, estudo('Velho', { base: B, baseEm: '' }), opcoes, quando('10-21', 13))) === MSG_ESTUDO.estudoMudou + '|409',
+    'mudar com a versão velha (o rascunho de outro aparelho) dá 409, e nada muda');
+  checar(linha(B).titulo === 'Estudo B mudado', 'a versão salva ficou');
+
+  // --- a promoção pelo dia ---
+  checar(ce.promoverDaFila(p(), quando('10-22', 20)) === null && p().estudoId === A, 'na quinta do encontro do atual, ainda nada entra');
+  const B0 = linha(B).criado_em;
+  const entrou = ce.promoverDaFila(p(), quando('10-23', 8));
+  checar(entrou && entrou.id === B && p().estudoId === B && linha(B).agendado_para === '' && linha(B).criado_em === quando('10-23', 8).toISOString() && linha(B).preparado_em === B0,
+    'na sexta, sem registro, a quinta passou: B entra, com criado_em de agora e preparado_em de quando foi escrito');
+  checar(ce.estudo(A).atualAte === quando('10-23', 8).toISOString() && p().estudoTestemunho === '' && ce.estudosAnteriores('ana', ID).itens.map((x) => x.e.id).join() === A,
+    'A vai para Estudos anteriores, e acolhida, adoração e testemunho voltam às sugestões');
+  checar(ce.promoverDaFila(p(), quando('10-23', 9)) === null && fila() === 'Estudo C@2026-11-05', 'um por vez: C espera B ter o encontro dele');
+
+  // --- a promoção pelo registro ---
+  const r29 = await ce.registrarEncontro('lider', ID, { data: '2026-10-29', presentes: ['lider', 'ana'], visitantes: 0, estudo: B }, '2026-10-29', quando('10-29', 21));
+  checar(r29.promovido && r29.promovido.id === D1 && p().estudoId === D1 && !ce.filaDe(ID).length, 'registrado o encontro com B, C entra na hora');
+
+  // --- a semana sem encontro segura a fila ---
+  const E = (await ce.salvarEstudo('lider', ID, estudo('Estudo E', { agendar: true }), opcoes, quando('10-29', 22))).estudo.id;
+  checar(fila() === 'Estudo E@2026-11-12', 'com C esperando o encontro dele (5/11), o novo vai para 12/11');
+  await ce.registrarEncontro('lider', ID, { data: '2026-11-05', semEncontro: true, presentes: [], visitantes: 0 }, '2026-11-05', quando('11-05', 21));
+  checar(ce.promoverDaFila(p(), quando('11-06', 8)) === null && p().estudoId === D1, 'com "Não houve encontro" em 5/11, C não teve o encontro dele, e E espera');
+  checar(ce.promoverDaFila(p(), quando('11-13', 8)) && p().estudoId === E, 'passada a quinta seguinte (12/11) sem registro, E entra');
+
+  // --- usar agora e tirar o estudo ---
+  const F = (await ce.salvarEstudo('lider', ID, estudo('Estudo F', { agendar: true, data: '2026-12-03' }), opcoes, quando('11-13', 9))).estudo.id;
+  checar(await tentar(() => ce.usarDaFila('lider', ID, F, false, quando('11-13', 10))) === MSG_ESTUDO.confirmarUsar + '|409|confirmar' && p().estudoId === E,
+    '"Usar agora" por cima de um atual sem uso pede confirmação (409), e nada muda');
+  const usado = await ce.usarDaFila('lider', ID, F, true, quando('11-13', 10));
+  checar(usado.promovido.id === F && p().estudoId === F && ce.estudo(E).atualAte !== '', 'confirmado, F entra, e E vai para Estudos anteriores');
+  const G = (await ce.salvarEstudo('lider', ID, estudo('Estudo G', { agendar: true, data: '2026-11-19' }), opcoes, quando('11-13', 11))).estudo.id;
+  const tirado = await ce.salvarEstudo('lider', ID, { estudo: '' }, opcoes, quando('11-13', 12));
+  checar(tirado.promovido && tirado.promovido.id === G && p().estudoId === G, '"Tirar o estudo": sem estudo atual, o primeiro da fila, do próximo encontro, entra');
+
+  // --- dividir: as partes seguintes na fila ---
+  const H = (await ce.salvarEstudo('lider', ID, estudo('Estudo H', { agendar: true }), opcoes, quando('11-13', 13))).estudo.id;
+  checar(fila() === 'Estudo H@2026-11-26', 'H, agendado, vai para 26/11 (G espera o de 19/11)');
+  const dividido = await ce.salvarEstudo('lider', ID, estudo('Longo (parte 1)', { seguintes: [texto('Longo (parte 2)'), texto('Longo (parte 3)', 'Romanos 8.28')] }), opcoes, quando('11-13', 14));
+  checar(p().estudoId === dividido.estudo.id && fila() === 'Longo (parte 2)@2026-11-26 Longo (parte 3)@2026-12-03 Estudo H@2026-12-10',
+    'dividido e usado agora: as partes 2 e 3 entram na fila logo depois, e H é empurrado');
+  checar(await tentar(() => ce.salvarEstudo('lider', ID, estudo('Outro (parte 1)', { seguintes: [Array.from({ length: 17 }, (_, i) => (i ? 'Salmos 119.' + i : 'Outro (parte 2)')).join('\n')] }), opcoes, quando('11-13', 15)))
+    === 'na parte 2: ' + MSG_ESTUDO.cartoes + '|400' && ce.estudo(p().estudoId).titulo === 'Longo (parte 1)', 'uma parte acima dos tetos recusa o pedido inteiro, e nada muda');
+  const ag = await ce.salvarEstudo('lider', ID, estudo('Agendado (parte 1)', { agendar: true, data: '2026-12-03', seguintes: [texto('Agendado (parte 2)')] }), opcoes, quando('11-13', 16));
+  checar(ag.agendado === '2026-12-03' && fila() === 'Longo (parte 2)@2026-11-26 Agendado (parte 1)@2026-12-03 Agendado (parte 2)@2026-12-10 Longo (parte 3)@2026-12-17 Estudo H@2026-12-24',
+    'agendado e dividido: a parte 2 vai para o encontro seguinte ao da parte 1, empurrando o resto');
+
+  // --- as partes do celular ---
+  const r5 = await ce.porPartesNaFila('lider', ID, [{ fonte: texto('Do celular (parte 2)'), traducao: 'blivre' }], opcoes, quando('11-13', 17));
+  checar(r5.fila[0].titulo === 'Do celular (parte 2)' && r5.fila[0].agendadoPara === '2026-11-26' && r5.fila[0].traducao === 'blivre' && r5.fila.length === 6,
+    'as partes guardadas no celular entram logo depois do encontro do atual, com a tradução delas');
+  checar((await tentar(() => ce.porPartesNaFila('lider', ID, [{ fonte: '' }], opcoes, quando('11-13', 18)))).startsWith('na parte 2: ')
+    && await tentar(() => ce.porPartesNaFila('aux', ID, [{ fonte: texto('X') }], opcoes, quando('11-13', 18))) === MSG_ESTUDO.soLider + '|403', 'a parte recusada diz qual; o auxiliar recebe 403');
+
+  // --- a fila cheia ---
+  for (let i = ce.filaDe(ID).length; i < FILA_MAX; i++) await ce.salvarEstudo('lider', ID, estudo('Mais ' + i, { agendar: true }), opcoes, quando('11-13', 19));
+  checar(ce.filaDe(ID).length === FILA_MAX && await tentar(() => ce.salvarEstudo('lider', ID, estudo('Demais', { agendar: true }), opcoes, quando('11-13', 20))) === MSG_ESTUDO.filaCheia + '|400',
+    'a fila tem até 12 estudos: o 13º dá 400');
+  await ce.tirarDaFila('lider', ID, H, quando('11-13', 20));
+  checar(ce.filaDe(ID).length === FILA_MAX - 1 && !linha(H) && await tentar(() => ce.tirarDaFila('lider', ID, H, quando('11-13', 20))) === MSG_ESTUDO.foraDaFila + '|404',
+    'tirar da fila apaga a linha; tirar de novo dá 404');
+
+  // --- quem sai e quem apaga a conta leva a fila ---
+  const doOtto = (await ce.salvarEstudo('outro', OUTRA, estudo('Do Otto'), opcoes, quando('11-13'))).estudo.id;
+  const naFilaDoOtto = (await ce.salvarEstudo('outro', OUTRA, estudo('Fila do Otto', { agendar: true }), opcoes, quando('11-13'))).estudo.id;
+  await ce.apagar('outro');
+  checar(!linha(naFilaDoOtto) && !!linha(doOtto), 'a conta apagada leva a fila dela; o estudo publicado fica com o @');
+  await ce.sairDoProposito('lider', ID, '2026-11-13');
+  checar(!ce.filaDe(ID).length && ce.estudo(p().estudoId).criadoPor === 'lider', 'o líder que sai leva a fila da célula; o atual fica');
+
+  fecharBanco(arquivoDoBanco(pasta));
+  rmSync(pasta, { recursive: true, force: true });
+}
+
+// =========================================================================
 secao('colocar um estudo na célula direto no banco (ferramentas/colocar-estudo.mjs)');
 // =========================================================================
 // A ferramenta do dono grava pelo mesmo Contas.salvarEstudo e com as mesmas opções do servidor

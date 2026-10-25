@@ -23,6 +23,8 @@ import {
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
   limparCombinado, estudoDoDia, dataNoHistorico, combinadoDoAnterior, acessoAoEstudo, quemFaltou, cursorDe, lerCursor, ESTUDOS_POR_PAGINA,
   daMaeAteOCorte, encontrosAteOCorte,
+  FILA_MAX, encontroDepois, primeiraDataDaFila, proximaDataDaFila, encaixarNaFila, reordenarFila, ajustarDatasDaFila,
+  jaTeveEncontro, devePromover, limparDataDaFila,
 } from './estudos.mjs';
 
 const scrypt = promisify(scryptCb);
@@ -781,6 +783,8 @@ export class Contas {
     }
     // os estudos que a pessoa preparou (celula_estudos) ficam na célula com o @ dela, de propósito
     // (decisão do dono, 17/10; a política de privacidade diz isso): a tela mostra o @ no lugar do nome.
+    // Os que ela deixou na fila, que a célula nunca recebeu, saem com ela (docs/a-mesa-fila.md, F9).
+    if (this.db) this.db.prepare("DELETE FROM celula_estudos WHERE criado_por = ? AND agendado_para != ''").run(chave);
     // sai da lista de presentes de qualquer encontro já registrado; o encontro em si (quem
     // registrou, quantas pessoas vieram) continua de pé
     for (const p of Object.values(this.dados.propositos || {})) {
@@ -1469,9 +1473,10 @@ export class Contas {
 
   // As linhas de uma célula em celula_estudos, do mais novo para o mais velho, só com as colunas
   // que a lista, a folha de registro e as datas usam (sem a fonte e sem as partes).
+  // Os da fila (docs/a-mesa-fila.md) ficam de fora: ainda não são estudo da célula.
   estudosLeves(proposito) {
     return this.banco().prepare('SELECT id, proposito, tipo, titulo, ref, refs, plano_ate, traducao, criado_por, criado_em, editado_em, atual_ate, combinado, antes_do_historico '
-      + 'FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC').all(String(proposito || '')).map(estudoDaLinha);
+      + "FROM celula_estudos WHERE proposito = ? AND agendado_para = '' ORDER BY criado_em DESC, id DESC").all(String(proposito || '')).map(estudoDaLinha);
   }
 
   // O que uma pessoa pode num estudo, chegando por uma célula (estudos.mjs, acessoAoEstudo). O dia
@@ -1587,7 +1592,7 @@ export class Contas {
       const atual = p.estudoId ? this.estudo(p.estudoId) : null;
       if (atual) {
         const linha = db.prepare('SELECT id, proposito, tipo, criado_em, atual_ate, combinado FROM celula_estudos '
-          + 'WHERE proposito = ? AND id != ? AND criado_em < ? ORDER BY criado_em DESC, id DESC LIMIT 1').get(p.id, atual.id, atual.criadoEm);
+          + "WHERE proposito = ? AND id != ? AND criado_em < ? AND agendado_para = '' ORDER BY criado_em DESC, id DESC LIMIT 1").get(p.id, atual.id, atual.criadoEm);
         saida.combinadoAnterior = combinadoDoAnterior({
           anterior: estudoDaLinha(linha), encontros: p.encontros, encontro: p.encontro, hoje: diaDe(agora.toISOString()), diaDe,
         });
@@ -1627,12 +1632,21 @@ export class Contas {
   //   do estudo que está sendo mudado. Igual ao atual (e ainda sem uso), a linha é atualizada; em
   //   qualquer outro caso nasce uma linha nova, a anterior ganha atual_ate, para o histórico, e
   //   acolhida, adoração e testemunho voltam a vazio, a não ser que o pedido os traga.
+  //   Os próximos estudos (docs/a-mesa-fila.md, seção 3.4):
+  //   agendar: true põe o estudo novo na fila, na data (data, 'AAAA-MM-DD'; sem ela, a próxima da
+  //            fila), sem mexer no atual nem em acolhida, adoração e testemunho;
+  //   base igual a um estudo da fila desta célula: muda esse estudo, que continua na fila (com data,
+  //            muda também a data); baseEm é o editadoEm de quando o rascunho começou (409 se mudou);
+  //   seguintes: as fontes das partes seguintes de um estudo dividido, que entram na fila logo depois
+  //            deste, na mesma transação, cada uma conferida pelos mesmos tetos.
   // opcoes: regras (o CC das regras do app: lerEstudo, lerRefLivre, lerRef, escreverRef), livros,
   //   capitulos, versiculos(traducao) => (livro, cap) => quantos versículos, planoAte (até que dia do
   //   plano vai a semana do líder hoje) e refSemana (a referência-chave dessa semana).
   // O estudo escrito é relido aqui pelo mesmo leitor do aparelho, e o que se grava é a fonte limpa
   // que ele devolve, nunca a recebida. Tudo é validado antes de mudar qualquer coisa; a linha do
-  // estudo e o ponteiro da célula entram na mesma transação.
+  // estudo, as da fila e o ponteiro da célula entram na mesma transação. Depois, a promoção
+  // (promoverDaFila) roda, como depois de toda mudança.
+  // Devolve { p, estudo (o gravado: o atual, ou o da fila), agendado ('AAAA-MM-DD' ou ''), promovido }.
   async salvarEstudo(eu, id, entrada = {}, opcoes = {}, agora = new Date()) {
     const p = this.celulaDeQuemPrepara(eu, id);
     const { regras = {}, livros = [], capitulos = null, versiculos = null, planoAte = 0, refSemana = '' } = opcoes;
@@ -1651,9 +1665,16 @@ export class Contas {
     if (tipo === 'livre') tipo = 'blocos';
     let novo = null;
     let combinado = null;
+    // o estudo escrito, relido e conferido pelos tetos (o do pedido e cada parte seguinte)
+    const lerBlocos = (recebida, contar) => {
+      if (!recebida) throw erro(MSG_ESTUDO.vazio);
+      if (recebida.length > ESTUDO_BRUTO_MAX) throw erro(MSG_ESTUDO.tamanho);
+      return validarLeitura(regras.lerEstudo(recebida, { capitulos, versiculos: contar }), { lerRef: regras.lerRef, livros, capitulos, versiculos: contar });
+    };
+    let traducao = 'nbv';
     if (tipo) {
       if (!TIPOS_ESTUDO.includes(tipo)) throw erro(MSG_ESTUDO.tipo);
-      const traducao = e.traducao === undefined || e.traducao === null || e.traducao === '' ? 'nbv' : String(e.traducao);
+      traducao = e.traducao === undefined || e.traducao === null || e.traducao === '' ? 'nbv' : String(e.traducao);
       if (!TRADUCOES.includes(traducao)) throw erro(MSG_ESTUDO.traducao);
       const perguntas = e.perguntas === undefined || e.perguntas === null ? null : limparPerguntas(e.perguntas);
       const recebida = limparFonte(e.fonte !== undefined && e.fonte !== null ? e.fonte : e.texto);
@@ -1672,8 +1693,7 @@ export class Contas {
       }
       novo = { tipo, titulo: '', ref: '', planoAte: 0, fonte: recebida, blocos: [], refs: [], perguntas: perguntas || [], traducao };
       if (tipo === 'blocos') {
-        if (!recebida) throw erro(MSG_ESTUDO.vazio);
-        const lido = validarLeitura(regras.lerEstudo(recebida, { capitulos, versiculos: contar }), { lerRef: regras.lerRef, livros, capitulos, versiculos: contar });
+        const lido = lerBlocos(recebida, contar);
         Object.assign(novo, { titulo: lido.titulo, fonte: lido.fonte, blocos: lido.blocos, refs: lido.refs });
         if (!perguntas) novo.perguntas = lido.perguntas;
       } else {
@@ -1692,43 +1712,110 @@ export class Contas {
       }
     }
 
+    // A fila (docs/a-mesa-fila.md): agendar um estudo novo, mudar um que já está nela e as partes
+    // seguintes de um estudo dividido. Tudo conferido antes de gravar.
     const db = this.banco();
     const quando = agora.toISOString();
+    const hoje = this.diaNaCelula(p)(quando);
+    const fila = this.filaDe(p.id);
+    const baseId = String(e.base || '');
+    const daFila = novo && baseId ? this.estudo(baseId) : null;
+    const mudarDaFila = !!(daFila && daFila.proposito === p.id && daFila.agendadoPara);
+    // o rascunho de um estudo da fila (o pedido traz baseEm) cuja base já saiu dela, promovida ou
+    // tirada em outro aparelho: nada é gravado, e o rascunho fica no celular
+    if (novo && 'baseEm' in e && !mudarDaFila) throw erro(MSG_ESTUDO.foraDaFila, 409);
+    if (mudarDaFila && e.baseEm !== undefined && e.baseEm !== null && String(e.baseEm) !== (daFila.editadoEm || '')) throw erro(MSG_ESTUDO.estudoMudou, 409);
+    const agendar = !!(novo && e.agendar === true && !mudarDaFila);
+    const seguintes = novo && Array.isArray(e.seguintes) ? e.seguintes : [];
+    const partes = [];
+    if (seguintes.length) {
+      if (tipo !== 'blocos') throw erro(MSG_ESTUDO.vazio);
+      const contar = typeof versiculos === 'function' ? versiculos(traducao) : null;
+      seguintes.forEach((fonte, i) => {
+        try {
+          const lido = lerBlocos(limparFonte(typeof fonte === 'string' ? fonte : (fonte && fonte.fonte) || ''), contar);
+          partes.push({ tipo: 'blocos', titulo: lido.titulo, ref: '', planoAte: 0, fonte: lido.fonte, blocos: lido.blocos, refs: lido.refs, perguntas: lido.perguntas, traducao });
+        } catch (falha) {
+          if (falha.publico) throw erro('na parte ' + (i + 2) + ': ' + falha.message, falha.codigo || 400);
+          throw falha;
+        }
+      });
+    }
+    if (fila.length + (agendar ? 1 : 0) + partes.length > FILA_MAX) throw erro(MSG_ESTUDO.filaCheia);
+    const contexto = this.contextoDaFila(p, agora);
+    let dataPedida = '';
+    if (agendar) dataPedida = e.data ? limparDataDaFila(e.data, hoje) : proximaDataDaFila(fila, contexto);
+    else if (mudarDaFila && e.data !== undefined && e.data !== null && e.data !== '' && e.data !== daFila.agendadoPara) dataPedida = limparDataDaFila(e.data, hoje);
+
     const antes = { estudoId: p.estudoId || '', estudoAcolhida: p.estudoAcolhida, estudoAdoracao: p.estudoAdoracao, estudoTestemunho: p.estudoTestemunho };
     const encerrar = (estudoId) => db.prepare("UPDATE celula_estudos SET atual_ate = ? WHERE id = ? AND atual_ate = ''").run(quando, estudoId);
+    let gravado = '';
+    let agendado = '';
     try {
       transacao(db, () => {
         const atual = p.estudoId ? this.estudo(p.estudoId) : null;
         let nasceuLinha = false;
+        let lista = fila.map((x) => ({ id: x.id, data: x.agendadoPara }));
+        const inserir = (x, agendadoPara) => {
+          const novoId = 'e' + randomBytes(6).toString('hex');
+          db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, combinado, criado_por, criado_em, agendado_para) '
+            + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+            .run(novoId, p.id, x.tipo, x.titulo, x.ref, x.planoAte, x.fonte, JSON.stringify(x.blocos), JSON.stringify(x.refs), JSON.stringify(x.perguntas), x.traducao, x.combinado || '', p.criadoPor, quando, agendadoPara);
+          return novoId;
+        };
         if (tipo === '') {
           if (atual) encerrar(atual.id);
           p.estudoId = '';
         } else if (novo) {
           const valores = [novo.tipo, novo.titulo, novo.ref, novo.planoAte, novo.fonte, JSON.stringify(novo.blocos), JSON.stringify(novo.refs), JSON.stringify(novo.perguntas), novo.traducao];
-          // mudar o estudo atual (base igual) atualiza a mesma linha, a não ser que ele já tenha
-          // sido usado num encontro: aí é o estudo do próximo, e o usado fica para o histórico
-          if (atual && String(e.base || '') === atual.id && !this.estudoJaUsado(p, atual, agora)) {
-            // o estudo de antes da v19 não tinha autor: quem o muda agora é o líder
+          if (mudarDaFila) {
+            // o estudo da fila muda e continua na fila (com a data nova, se veio)
+            db.prepare('UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, combinado = ?, editado_em = ? WHERE id = ?')
+              .run(...valores, combinado === null ? daFila.combinado : combinado, quando, daFila.id);
+            gravado = daFila.id;
+            if (dataPedida) lista = encaixarNaFila(lista, { id: gravado, data: dataPedida }, p.encontro);
+          } else if (agendar) {
+            gravado = inserir({ ...novo, combinado: combinado || '' }, dataPedida);
+            lista = encaixarNaFila(lista, { id: gravado, data: dataPedida }, p.encontro);
+          } else if (atual && baseId === atual.id && !this.estudoJaUsado(p, atual, agora)) {
+            // mudar o estudo atual (base igual) atualiza a mesma linha, a não ser que ele já tenha
+            // sido usado num encontro: aí é o estudo do próximo, e o usado fica para o histórico.
+            // O estudo de antes da v19 não tinha autor: quem o muda agora é o líder
             db.prepare("UPDATE celula_estudos SET tipo = ?, titulo = ?, ref = ?, plano_ate = ?, fonte = ?, blocos = ?, refs = ?, perguntas = ?, traducao = ?, combinado = ?, editado_em = ?, "
               + "criado_por = CASE WHEN criado_por = '' THEN ? ELSE criado_por END WHERE id = ?").run(...valores, combinado === null ? atual.combinado : combinado, quando, p.criadoPor, atual.id);
+            gravado = atual.id;
           } else {
-            const novoId = 'e' + randomBytes(6).toString('hex');
-            db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, combinado, criado_por, criado_em) '
-              + 'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').run(novoId, p.id, ...valores, combinado || '', p.criadoPor, quando);
+            const novoId = inserir({ ...novo, combinado: combinado || '' }, '');
             if (atual) encerrar(atual.id);
             p.estudoId = novoId;
+            gravado = novoId;
             nasceuLinha = true;
-            // o histórico de uma célula tem teto: além dele, sai o mais antigo que não é o atual
-            db.prepare('DELETE FROM celula_estudos WHERE proposito = ? AND id != ? AND id NOT IN '
-              + '(SELECT id FROM celula_estudos WHERE proposito = ? ORDER BY criado_em DESC, id DESC LIMIT ?)').run(p.id, novoId, p.id, ESTUDOS_POR_CELULA);
+            // o histórico de uma célula tem teto: além dele, sai o mais antigo que não é o atual (os
+            // da fila não contam nem saem)
+            db.prepare("DELETE FROM celula_estudos WHERE proposito = ? AND id != ? AND agendado_para = '' AND id NOT IN "
+              + "(SELECT id FROM celula_estudos WHERE proposito = ? AND agendado_para = '' ORDER BY criado_em DESC, id DESC LIMIT ?)").run(p.id, novoId, p.id, ESTUDOS_POR_CELULA);
           }
+          // as partes seguintes de um estudo dividido: logo depois deste (da data dele, na fila; do
+          // encontro dele, quando ele é o atual), uma por encontro, empurrando o resto da fila
+          if (partes.length) {
+            const naFila = lista.find((x) => x.id === gravado);
+            let data = naFila ? encontroDepois(naFila.data, p.encontro) : primeiraDataDaFila({ ...contexto, atualEspera: true });
+            for (const x of partes) {
+              const idParte = inserir(x, data);
+              lista = encaixarNaFila(lista, { id: idParte, data }, p.encontro);
+              data = encontroDepois(data, p.encontro);
+            }
+          }
+          this.gravarDatasDaFila(lista, fila);
+          agendado = (lista.find((x) => x.id === gravado) || {}).data || '';
         }
         // O estudo novo começa com acolhida, adoração e testemunho vazios (as sugestões da semana),
         // a não ser que o pedido traga os campos: o testemunho de uma semana, às vezes com nomes, não
         // passa para a seguinte à vista de visitantes (docs/a-mesa-fase2.md, A5). Mudar o mesmo
-        // estudo e tirar o estudo deixam os três como estão.
+        // estudo e tirar o estudo deixam os três como estão. O estudo da fila não mexe nos três:
+        // eles são da célula de agora (docs/a-mesa-fila.md, F8).
         if (nasceuLinha) Object.assign(p, { estudoAcolhida: '', estudoAdoracao: '', estudoTestemunho: '' });
-        Object.assign(p, ws);
+        if (!agendar && !mudarDaFila) Object.assign(p, ws);
         gravarMeta(db, 'contas_versao', this.dados.versao || 2);
         sincronizar(db, paraLinhas(this.dados));
       });
@@ -1736,7 +1823,186 @@ export class Contas {
       Object.assign(p, antes);
       throw falha;
     }
-    return { p, estudo: this.estudo(p.estudoId) };
+    const promovido = this.promoverDaFila(p, agora);
+    return { p, estudo: this.estudo(gravado || p.estudoId), agendado, promovido };
+  }
+
+  // ---------- os próximos estudos: a fila (docs/a-mesa-fila.md) ----------
+  // A fila de uma célula, na ordem das datas: as linhas de celula_estudos com agendado_para, sem a
+  // fonte e sem as partes (a leitura de cada um traz o resto).
+  filaDe(proposito) {
+    return this.banco().prepare('SELECT id, proposito, tipo, titulo, ref, refs, plano_ate, traducao, criado_por, criado_em, editado_em, atual_ate, combinado, antes_do_historico, agendado_para, preparado_em '
+      + "FROM celula_estudos WHERE proposito = ? AND agendado_para != '' ORDER BY agendado_para, id").all(String(proposito || '')).map(estudoDaLinha);
+  }
+
+  // O que as datas da fila precisam saber da célula agora: o dia de hoje no fuso do líder, o dia do
+  // encontro, o último encontro registrado e se o estudo atual ainda espera o encontro dele.
+  contextoDaFila(p, agora = new Date()) {
+    const diaDe = this.diaNaCelula(p);
+    const hoje = diaDe(agora.toISOString());
+    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+    const ultimoEncontro = (p.encontros || []).reduce((m, x) => (x && x.data > m ? x.data : m), '');
+    const atualEspera = !!atual && !jaTeveEncontro({ id: atual.id, criadoEm: atual.criadoEm, nasceu: diaDe(atual.criadoEm), hoje, encontro: p.encontro, encontros: p.encontros });
+    return { hoje, encontro: Number.isInteger(p.encontro) ? p.encontro : -1, ultimoEncontro, atualEspera };
+  }
+
+  // A fila como quem conduz a recebe no retrato: os estudos, a data que um novo recebe sem escolha
+  // (proxima) e a primeira data livre (primeira, a de "Ajustar as datas").
+  dadosDaFila(p, agora = new Date()) {
+    const itens = this.filaDe(p.id);
+    const contexto = this.contextoDaFila(p, agora);
+    return { itens, proxima: proximaDataDaFila(itens, contexto), primeira: primeiraDataDaFila(contexto) };
+  }
+
+  // Grava as datas novas da fila (só as que mudaram), dentro da transação de quem chama. Para não
+  // esbarrar em duas linhas com a mesma data no meio do caminho, não há índice único: a regra das
+  // funções puras (encaixarNaFila, reordenarFila, ajustarDatasDaFila) já garante uma data por estudo.
+  gravarDatasDaFila(lista, antes = []) {
+    const db = this.banco();
+    const eram = new Map(antes.map((x) => [x.id, x.agendadoPara]));
+    for (const x of lista) if (eram.get(x.id) !== x.data) db.prepare("UPDATE celula_estudos SET agendado_para = ? WHERE id = ? AND agendado_para != ''").run(x.data, x.id);
+  }
+
+  // Um estudo entra na célula: o atual (se houver) vai para o histórico, o da fila perde a data,
+  // ganha criado_em = agora (o instante em que passou a valer na célula, como todas as regras leem) e
+  // guarda em preparado_em o instante em que foi escrito. Acolhida, adoração e testemunho voltam a
+  // vazio, como em todo estudo novo (A5). Dentro de uma transação, com a célula em memória.
+  promoverEstudo(p, e, agora = new Date()) {
+    const db = this.banco();
+    const quando = agora.toISOString();
+    const antes = { estudoId: p.estudoId || '', estudoAcolhida: p.estudoAcolhida, estudoAdoracao: p.estudoAdoracao, estudoTestemunho: p.estudoTestemunho };
+    try {
+      transacao(db, () => {
+        if (p.estudoId) db.prepare("UPDATE celula_estudos SET atual_ate = ? WHERE id = ? AND atual_ate = ''").run(quando, p.estudoId);
+        db.prepare("UPDATE celula_estudos SET agendado_para = '', preparado_em = criado_em, criado_em = ? WHERE id = ? AND agendado_para != ''").run(quando, e.id);
+        Object.assign(p, { estudoId: e.id, estudoAcolhida: '', estudoAdoracao: '', estudoTestemunho: '' });
+        gravarMeta(db, 'contas_versao', this.dados.versao || 2);
+        sincronizar(db, paraLinhas(this.dados));
+      });
+    } catch (falha) {
+      Object.assign(p, antes);
+      throw falha;
+    }
+    return this.estudo(e.id);
+  }
+
+  // A promoção (docs/a-mesa-fila.md, seção 4): o primeiro da fila entra na célula quando o atual já
+  // teve o encontro dele (ou não há atual) e ele é do próximo encontro (estudos.mjs, devePromover).
+  // Roda a cada leitura da célula, a cada registro de encontro e a cada mudança na fila ou no estudo.
+  // Um estudo por vez. Devolve o estudo que entrou, ou null.
+  promoverDaFila(p, agora = new Date()) {
+    if (!p || !p.celula || p.encerradoEm) return null;
+    const cabeca = this.filaDe(p.id)[0];
+    if (!cabeca) return null;
+    const diaDe = this.diaNaCelula(p);
+    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+    if (!devePromover({ atual, cabeca, hoje: diaDe(agora.toISOString()), encontro: p.encontro, encontros: p.encontros, diaDe })) return null;
+    return this.promoverEstudo(p, cabeca, agora);
+  }
+
+  // Um estudo da fila desta célula, ou 404 "esse estudo já não está nos próximos estudos".
+  estudoDaFila(p, estudoId) {
+    const e = String(estudoId || '').length <= 64 ? this.estudo(estudoId) : null;
+    if (!e || e.proposito !== p.id || !e.agendadoPara) throw erro(MSG_ESTUDO.foraDaFila, 404);
+    return e;
+  }
+
+  // As ações da fila (POST /api/celula), só do líder (celulaDeQuemPrepara: o auxiliar vê a fila,
+  // mas não mexe, docs/a-mesa-fila.md, F2). Cada uma roda a promoção no fim e devolve
+  // { p, fila, promovido }.
+  async mexerNaFila(eu, id, mexer, agora = new Date()) {
+    const p = this.celulaDeQuemPrepara(eu, id);
+    const db = this.banco();
+    const fila = this.filaDe(p.id);
+    transacao(db, () => mexer(p, fila, db));
+    const promovido = this.promoverDaFila(p, agora);
+    return { p, fila: this.filaDe(p.id), promovido };
+  }
+
+  // Põe um estudo da fila numa data (a fila empurra quem estava nela e os seguintes).
+  mudarDataNaFila(eu, id, estudoId, data, agora = new Date()) {
+    return this.mexerNaFila(eu, id, (p, fila) => {
+      const e = this.estudoDaFila(p, estudoId);
+      const d = limparDataDaFila(data, this.diaNaCelula(p)(agora.toISOString()));
+      this.gravarDatasDaFila(encaixarNaFila(fila.map((x) => ({ id: x.id, data: x.agendadoPara })), { id: e.id, data: d }, p.encontro), fila);
+    }, agora);
+  }
+
+  // Reordena: ordem é a fila inteira na ordem nova; as datas ficam nos lugares. Uma lista que não é a
+  // fila de agora (outro aparelho mudou a fila) dá 409.
+  reordenarAFila(eu, id, ordem, agora = new Date()) {
+    return this.mexerNaFila(eu, id, (p, fila) => {
+      const nova = reordenarFila(fila, ordem);
+      if (!nova) throw erro(MSG_ESTUDO.filaMudou, 409);
+      this.gravarDatasDaFila(nova, fila);
+    }, agora);
+  }
+
+  // "Ajustar as datas": a fila inteira nos encontros a partir da primeira data livre.
+  ajustarAFila(eu, id, agora = new Date()) {
+    return this.mexerNaFila(eu, id, (p, fila) => {
+      this.gravarDatasDaFila(ajustarDatasDaFila(fila, primeiraDataDaFila(this.contextoDaFila(p, agora)), p.encontro), fila);
+    }, agora);
+  }
+
+  // Tira um estudo da fila: a linha sai (a célula nunca o recebeu).
+  tirarDaFila(eu, id, estudoId, agora = new Date()) {
+    return this.mexerNaFila(eu, id, (p, fila, db) => {
+      const e = this.estudoDaFila(p, estudoId);
+      db.prepare("DELETE FROM celula_estudos WHERE id = ? AND agendado_para != ''").run(e.id);
+    }, agora);
+  }
+
+  // "Usar agora": o estudo da fila entra na célula já. Por cima de um atual que ainda não foi usado
+  // num encontro, só com confirmar (senão 409 com precisaConfirmar: a tela pergunta).
+  async usarDaFila(eu, id, estudoId, confirmar = false, agora = new Date()) {
+    const p = this.celulaDeQuemPrepara(eu, id);
+    const e = this.estudoDaFila(p, estudoId);
+    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+    if (atual && !this.estudoJaUsado(p, atual, agora) && confirmar !== true) throw Object.assign(erro(MSG_ESTUDO.confirmarUsar, 409), { precisaConfirmar: true });
+    const entrou = this.promoverEstudo(p, e, agora);
+    return { p, fila: this.filaDe(p.id), promovido: entrou };
+  }
+
+  // As partes que a versão anterior guardava no celular do líder (docs/a-mesa-fila.md, 5.5): entram
+  // na fila logo depois do encontro do estudo atual, uma por encontro, empurrando o resto. Cada uma
+  // passa pelos mesmos tetos de um estudo; uma recusada recusa o pedido inteiro.
+  //   partes: [{ fonte, traducao }]; opcoes: as de salvarEstudo.
+  async porPartesNaFila(eu, id, partes, opcoes = {}, agora = new Date()) {
+    const p = this.celulaDeQuemPrepara(eu, id);
+    const { regras = {}, livros = [], capitulos = null, versiculos = null } = opcoes;
+    const lista = Array.isArray(partes) ? partes : [];
+    if (!lista.length) throw erro(MSG_ESTUDO.vazio);
+    const fila = this.filaDe(p.id);
+    if (fila.length + lista.length > FILA_MAX) throw erro(MSG_ESTUDO.filaCheia);
+    const lidas = lista.map((x, i) => {
+      try {
+        const traducao = x && TRADUCOES.includes(x.traducao) ? x.traducao : 'nbv';
+        const contar = typeof versiculos === 'function' ? versiculos(traducao) : null;
+        const fonte = limparFonte(x && x.fonte);
+        if (!fonte) throw erro(MSG_ESTUDO.vazio);
+        if (fonte.length > ESTUDO_BRUTO_MAX) throw erro(MSG_ESTUDO.tamanho);
+        const lido = validarLeitura(regras.lerEstudo(fonte, { capitulos, versiculos: contar }), { lerRef: regras.lerRef, livros, capitulos, versiculos: contar });
+        return { ...lido, traducao };
+      } catch (falha) {
+        if (falha.publico) throw erro('na parte ' + (i + 2) + ': ' + falha.message, falha.codigo || 400);
+        throw falha;
+      }
+    });
+    const quando = agora.toISOString();
+    return this.mexerNaFila(eu, id, (pp, filaAgora, db) => {
+      let datas = filaAgora.map((x) => ({ id: x.id, data: x.agendadoPara }));
+      let data = primeiraDataDaFila(this.contextoDaFila(pp, agora));
+      for (const x of lidas) {
+        const novoId = 'e' + randomBytes(6).toString('hex');
+        db.prepare('INSERT INTO celula_estudos (id, proposito, tipo, titulo, ref, plano_ate, fonte, blocos, refs, perguntas, traducao, combinado, criado_por, criado_em, agendado_para) '
+          + "VALUES (?, ?, 'blocos', ?, '', 0, ?, ?, ?, ?, ?, '', ?, ?, ?)")
+          .run(novoId, pp.id, x.titulo, x.fonte, JSON.stringify(x.blocos), JSON.stringify(x.refs), JSON.stringify(x.perguntas), x.traducao, pp.criadoPor, quando, data);
+        datas = encaixarNaFila(datas, { id: novoId, data }, pp.encontro);
+        data = encontroDepois(data, pp.encontro);
+      }
+      this.gravarDatasDaFila(datas, filaAgora);
+    }, agora);
   }
 
   // Quem conduz registra quem foi ao encontro: hoje ou um dos 7 dias anteriores, membros e
@@ -1765,7 +2031,8 @@ export class Contas {
       else if (pedido) {
         const e = pedido.length <= 64 ? this.estudo(pedido) : null;
         const nasceu = e ? diaDe(e.criadoEm) : '';
-        if (!e || e.proposito !== p.id || !nasceu || nasceu > d) throw erro(MSG_ESTUDO.estudoDoRegistro);
+        // um estudo da fila ainda não era o estudo da célula (docs/a-mesa-fila.md, 4.2)
+        if (!e || e.proposito !== p.id || e.agendadoPara || !nasceu || nasceu > d) throw erro(MSG_ESTUDO.estudoDoRegistro);
         ligado = e.id;
       } else {
         ligado = estudoDoDia(this.estudosLeves(p.id), d, diaDe);
@@ -1780,7 +2047,9 @@ export class Contas {
     if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
     const quemConduz = this.ativosDe(p).map((m) => m.usuario).filter((u) => podeConduzir(p, u));
-    return { p, registro, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
+    // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, seção 4)
+    const promovido = this.promoverDaFila(p, agora);
+    return { p, registro, promovido, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
   }
 
   // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem
@@ -1916,6 +2185,9 @@ export class Contas {
     m.saiuEm = hoje;
     if (!p.grupo || this.presentes(p).length < 2) p.encerradoEm = hoje;
     if (p.celula) this.limparPedidosDaCelula(a.usuario, id);
+    // o líder que sai leva a fila da célula: ela é o plano dele, e a célula nunca recebeu esses
+    // estudos (docs/a-mesa-fila.md, F9); o atual e os anteriores ficam com o @
+    if (p.celula && p.criadoPor === a.usuario) this.banco().prepare("DELETE FROM celula_estudos WHERE proposito = ? AND agendado_para != ''").run(p.id);
     await this.salvar();
     return p;
   }
