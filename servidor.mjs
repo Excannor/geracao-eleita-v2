@@ -28,7 +28,7 @@ import {
   MAX_TOQUES_RECEBIDOS_DIA, DESTINOS_AVISO, AVISO_TITULO_MAX, AVISO_TEXTO_MAX, AVISO_FOTO_MAX, tipoDaImagem, limparMetadados, avisosDesligados, umaDeCadaVez,
 } from './notificacoes.mjs';
 import { montarPainel } from './painel.mjs';
-import { estudoNoRetrato, itemDoHistorico, estudoDoRegistro, resumoDoEstudo, encontrosDoEstudo, dataNoHistorico } from './estudos.mjs';
+import { estudoNoRetrato, itemDoHistorico, estudoDoRegistro, resumoDoEstudo, encontrosDoEstudo, dataNoHistorico, itemDaFila } from './estudos.mjs';
 import {
   chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
   saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
@@ -817,6 +817,13 @@ async function nomesDosAutores(estudos) {
   };
 }
 
+// A fila como quem conduz a recebe: os estudos (só o que a lista mostra), a data que um novo recebe
+// sem escolha e a primeira data livre (a de "Ajustar as datas").
+function filaNoRetrato(p, info) {
+  const f = CONTAS.dadosDaFila(p);
+  return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira };
+}
+
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
   const semanaAte = semanaDoLider(lider && lider.estado);
@@ -825,6 +832,9 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   // isto, nunca por euConduzo.
   const minha = p.membros.find((m) => m.usuario === eu) || {};
   const convidado = minha.estado === 'convidado';
+  // Os próximos estudos (docs/a-mesa-fila.md, seção 4): antes de montar a célula, o primeiro da fila
+  // entra, se a regra mandar. Assim quem abre a célula vê sempre o estudo que vale agora.
+  CONTAS.promoverDaFila(p);
   const atual = CONTAS.estudo(p.estudoId);
   const euPreparoEstudo = p.criadoPor === eu && minha.estado === 'ativo' && !aprovacaoQueFalta(p, eu, 'lider');
   // Fase 2 (docs/a-mesa-fase2.md, 3.4): o combinado do estudo de antes e se há estudos anteriores
@@ -888,6 +898,9 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     ultimoEncontro: ultimo ? { data: ultimo.data, presentes: ultimo.presentes.length, visitantes: ultimo.visitantes, semEncontro: !!ultimo.semEncontro, estudo: estudoDoUltimo } : null,
     // só quem conduz registra: o administrador que abre a célula vê o resto, mas não a folha
     ...(conduzo && doEstudo.registro ? { registro: { estudos: doEstudo.registro.estudos.map((e) => estudoDoRegistro(e, diaDe)), dias: doEstudo.registro.dias } } : {}),
+    // os próximos estudos, só para quem conduz (o líder mexe, o auxiliar só vê; docs/a-mesa-fila.md,
+    // F2): o administrador que abre a célula também não os recebe
+    ...(conduzo ? filaNoRetrato(p, info) : {}),
     encontrosRegistrados: encontros.filter((e) => !e.semEncontro && e.data >= limiteJanela && e.data <= referencia).length,
     painel: painelDaCelula(p, info, ativos, referencia),
   };
@@ -1846,7 +1859,7 @@ const servidor = createServer(async (req, res) => {
         const resposta = await fazer(await lerJson(req));
         json(res, 200, { ok: true, ...(resposta || {}) });
       } catch (e) {
-        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora' });
+        json(res, e.codigo || 400, { erro: e.publico ? e.message : 'não deu certo agora', ...(e.precisaConfirmar ? { precisaConfirmar: true } : {}) });
       }
     };
 
@@ -1977,7 +1990,30 @@ const servidor = createServer(async (req, res) => {
           if (!dentroDoLimite('estudo:' + eu, 20)) throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
           const r = await CONTAS.salvarEstudo(eu, id, corpo, APP.opcoesDoEstudo(await lerEstado(arquivoDe(eu))));
           const nomes = new Map([[eu, await nomeDeExibicao(eu)]]);
-          return { estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe: (u) => nomes.get(u) || '@' + u, usado: CONTAS.estudoJaUsado(r.p, r.estudo) }) };
+          const nomeDe = (u) => nomes.get(u) || '@' + u;
+          // agendar e mudar um estudo da fila (docs/a-mesa-fila.md, 3.4): a resposta leva a data dele
+          // e a fila como ficou; o que entrou na célula pela promoção, se entrou
+          return {
+            estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe, usado: !r.agendado && CONTAS.estudoJaUsado(r.p, r.estudo) }),
+            agendado: r.agendado ? { data: r.agendado } : null,
+            fila: CONTAS.filaDe(r.p.id).map((e) => itemDaFila(e, { nomeDe })),
+            promovido: resumoDoEstudo(r.promovido),
+          };
+        }
+        // Os próximos estudos (docs/a-mesa-fila.md, 3.5): só o líder mexe (contas.mjs dá 403 aos
+        // outros), com o mesmo limite por minuto de gravar o estudo. Cada uma responde a fila como
+        // ficou e o estudo que entrou na célula, se a promoção rodou.
+        if (['filaData', 'filaOrdem', 'filaAjustar', 'filaTirar', 'filaUsar', 'filaPartes'].includes(qual)) {
+          if (!dentroDoLimite('estudo:' + eu, 20)) throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
+          const c = corpo || {};
+          const r = qual === 'filaData' ? await CONTAS.mudarDataNaFila(eu, id, c.estudo, c.data)
+            : qual === 'filaOrdem' ? await CONTAS.reordenarAFila(eu, id, c.ordem)
+              : qual === 'filaAjustar' ? await CONTAS.ajustarAFila(eu, id)
+                : qual === 'filaTirar' ? await CONTAS.tirarDaFila(eu, id, c.estudo)
+                  : qual === 'filaUsar' ? await CONTAS.usarDaFila(eu, id, c.estudo, c.confirmar === true)
+                    : await CONTAS.porPartesNaFila(eu, id, c.partes, APP.opcoesDoEstudo(await lerEstado(arquivoDe(eu))));
+          const nomeDe = await nomesDosAutores(r.fila);
+          return { fila: r.fila.map((e) => itemDaFila(e, { nomeDe })), promovido: resumoDoEstudo(r.promovido) };
         }
         if (qual === 'registrarEncontro') {
           // estudo: o id do estudo usado, '-' (de fora do app) ou nada (o app antigo: o servidor
@@ -1988,7 +2024,7 @@ const servidor = createServer(async (req, res) => {
           const faltaram = [];
           for (const u of r.faltaram) faltaram.push({ usuario: u, nome: await nomeDeExibicao(u) });
           faltaram.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.usuario.localeCompare(b.usuario));
-          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram };
+          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram, promovido: resumoDoEstudo(r.promovido) };
         }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {
@@ -2137,6 +2173,15 @@ const servidor = createServer(async (req, res) => {
         if (q.has('estudo')) {
           const r = CONTAS.estudoParaLer(eu, q.get('estudo'), q.get('celula') || '');
           const nomeDe = await nomesDosAutores([r.e]);
+          // um estudo da fila (docs/a-mesa-fila.md, 3.3): só quem conduz chega aqui, e a fonte vai só
+          // para o líder (é ela que volta ao campo em "Mudar o estudo")
+          if (r.acesso.fila) {
+            json(res, 200, {
+              celula: r.p.id, atual: false, fila: true, daMae: null, agendado: { data: r.e.agendadoPara }, data: r.e.agendadoPara, dataDe: 'agendado',
+              estudo: estudoNoRetrato(r.e, { comFonte: r.p.criadoPor === eu, nomeDe }), encontros: [], usarComoBase: false,
+            });
+            return;
+          }
           json(res, 200, {
             celula: r.p.id, atual: r.acesso.atual,
             daMae: r.acesso.daMae ? { titulo: r.dono.titulo, ate: r.p.multiplicadaEm } : null,
