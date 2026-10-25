@@ -140,7 +140,7 @@ export function itemDaFila(e, { nomeDe }) // -> { id, tipo, titulo, refs, data, 
 - `quandoNaFila(item, hoje)`: "Para quinta, 30/10" ou, com a data já passada, "Para quinta, 23/10 · a data já passou".
 - `moverNaFila(ids, i, passo)`: a lista nova com o item i trocado de lugar com o vizinho (passo -1 ou +1), ou null nas pontas.
 - `datasPedemAjuste(fila, { hoje, encontro })`: alguma data já passou, ou (com dia marcado) caiu fora do dia do encontro.
-- `escolhaDoPreparo({ temAtual, atualUsado, editando, novo })`: 'agora', 'agendar' ou '' (sem escolha). Com estudo atual e preparando um estudo novo: 'agendar' quando o atual ainda espera o encontro dele ou quando o caminho foi "Agendar um estudo" (`…/preparar/novo`); senão 'agora'. Sem estudo atual, ou mudando o atual ou um da fila: ''.
+- `escolhaDoPreparo({ temAtual, atualUsado, editando, novo })`: 'agora', 'agendar' ou '' (sem escolha). Com estudo atual e preparando um estudo novo: 'agendar' quando o atual ainda espera o encontro dele ou quando o caminho foi "Agendar um estudo" (`…/preparar/novo`); senão 'agora'. Em "Usar como base", 'agora' (a confirmação de lá já disse que o atual sai). Sem estudo atual, ou mudando o atual ou um da fila: ''.
 - `partesDoCelular(guardado)`: as partes que a versão anterior guardou neste celular (`cc.estudo.proximos.<célula>`), no formato do pedido `filaPartes` ([{ fonte, traducao }]), na ordem.
 
 ---
@@ -174,6 +174,7 @@ fila: [ { id: 'e7a1…', tipo: 'blocos', titulo: 'O fruto do Espírito no dia a 
           data: '2026-10-29', criadoPor: 'marcos', criadoPorNome: 'Marcos', editadoEm: '' } ],
 filaProxima: '2026-11-05',   // a data que um estudo novo na fila recebe sem escolha
 filaPrimeira: '2026-10-29',  // a primeira data livre (a de "Ajustar as datas")
+filaLimite: '2026-10-29',    // o limite da promoção (sem estudo atual, o primeiro da fila com data até aqui entra)
 ```
 
 Antes de montar a célula, o retrato chama `Contas.promoverDaFila(p)` (seção 4).
@@ -202,7 +203,7 @@ O pedido de sempre (Fase 1 e 2) ganha quatro campos, todos opcionais:
 - **`agendar: true`:** nasce uma linha com `agendado_para`; o estudo atual, o ponteiro da célula e Acolhida, Adoração e Testemunho não mudam (os três do pedido são ignorados). A data passa por `limparDataDaFila` e por `encaixarNaFila`. Com a fila cheia: 400 `filaCheia`.
 - **`base` igual a um estudo da fila desta célula:** a mesma linha é atualizada e continua na fila; com `data`, ela muda de lugar como em `filaData`. Com `baseEm` diferente do `editado_em` da linha: **409** `estudoMudou`. Uma `base` que já saiu da fila (foi promovida ou tirada) dá **409** `foraDaFila`, e nada é gravado: o rascunho fica no celular.
 - **Sem `agendar` e sem base da fila:** como hoje (entra na célula; o atual vai para o histórico, ou é corrigido se ainda não foi usado).
-- **`seguintes`:** cada fonte passa pelo mesmo leitor e pelo mesmo `validarLeitura` (com a mesma tradução e sem perguntas escolhidas: as do texto, se houver). Elas entram na fila logo depois do estudo do pedido: depois da data dele, quando ele é agendado ou é da fila; depois do encontro do estudo atual, quando ele entra na célula agora. Os que estavam na fila a partir dali são empurrados (`encaixarNaFila`). Até 11 (`FILA_MAX - 1`), e a fila inteira até 12. Uma parte recusada recusa o pedido inteiro, com a mensagem dela precedida de "Parte N: ".
+- **`seguintes`:** cada fonte passa pelo mesmo leitor e pelo mesmo `validarLeitura` (com a mesma tradução e sem perguntas escolhidas: as do texto, se houver). Elas entram na fila logo depois do estudo do pedido: depois da data dele, quando ele é agendado ou é da fila; depois do encontro do estudo atual, quando ele entra na célula agora. Os que estavam na fila a partir dali são empurrados (`encaixarNaFila`). Até 11 (`FILA_MAX - 1`), e a fila inteira até 12. Uma parte recusada recusa o pedido inteiro, com a mensagem dela precedida de "na parte N: " (a tela põe a maiúscula).
 - **Resposta:** `{ estudo, agendado: { data } | null, fila: [...] }` (a fila só para o líder, já no formato do retrato).
 
 ### 3.5 As ações da fila: `POST /api/celula`
@@ -361,7 +362,7 @@ Só o aviso depois de salvar: "Encontro registrado. O próximo estudo já está 
 | Leitura, linha | Para o encontro de quinta, 30/10 · preparado por {quem} |
 | Leitura, botões | Mudar o estudo / Mudar a data / Usar agora / Tirar dos próximos |
 | Folha da data | Mudar a data / O dia do encontro em que este estudo vai ser usado. Se ele já tiver um estudo, esse e os seguintes passam para os encontros seguintes. / Salvar a data / Cancelar |
-| Aviso da data | Data mudada para quinta, 6/11 |
+| Aviso da data | Data mudada para quinta, 06/11 |
 | Usar agora? | O estudo atual ainda não foi usado num encontro. Se você usar “{título}” agora, o atual vai para Estudos anteriores. |
 | Aviso de usar | Pronto: “{título}” está na aba Estudo |
 | Tirar dos próximos? | “{título}” sai da lista e não vai para a célula. / Tirar |
@@ -426,3 +427,21 @@ done
 - **A promoção no dia seguinte ao encontro sem registro.** Numa célula que não registra encontros, o próximo entra no dia seguinte ao dia do encontro (o mesmo momento em que o botão do líder vira "Preparar o próximo"). Se a célula se reuniu num dia diferente do marcado, o estudo pode entrar antes do encontro. O líder evita registrando o encontro ou marcando o dia certo.
 - **A semana pulada não empurra as datas sozinha.** Empurrar sem perguntar mexeria no plano do líder sem ele ver; "Ajustar as datas" faz isso num toque.
 - **Política de privacidade:** a fila é texto do líder guardado no servidor, visto só por quem conduz até entrar na célula, e apagado quando o líder sai ou apaga a conta. Proposta para o dono, no quadro de quem vê: "Os próximos estudos que o líder agenda ficam visíveis só para quem conduz a célula até entrarem na aba Estudo, e saem se o líder sair da célula ou apagar a conta." O texto da política não muda sem ele.
+
+---
+
+## 9. O que foi entregue (25/10)
+
+Os commits `b874ded` (banco v23 e as regras puras do servidor), `941c82f` (as contas: agendar, mexer e promover), `172b0af` (a API), `2faffaa` (as regras puras da tela), `8957a42` (a aba Estudo), `2b95148` (o preparo), `7b1daf7` e `9059e73` (os testes no navegador) e `8605581` (os acertos da rodada de testes), depois do plano em `d7404de`. O que ficou diferente do plano ou não estava escrito nele:
+
+- **As datas na tela** levam o zero, como o resto das listas do estudo ("Encontro de 05/11"): "qui 05/11", "Para quinta, 05/11".
+- **A primeira data livre** conta o encontro do estudo atual mesmo quando ele foi registrado hoje: com o encontro de hoje já registrado, o estudo seguinte é do encontro da semana que vem, e uma parte do celular posta na fila depois disso vai para o encontro depois do do novo atual (ele ainda espera o dele).
+- **Sem dia de encontro marcado**, a fila anda de 7 em 7 dias a partir de hoje + 7, e o limite da promoção é hoje + 7. O `teste-estudo-dividir.mjs` roda assim (a célula dele não marca o dia).
+- **"Usar como base"** vem com "Usar agora" marcado, mesmo com o atual sem uso: a confirmação de "Usar como base" já disse que o atual vai para Estudos anteriores, e o passo 3 não pergunta de novo.
+- **O rascunho do estudo novo para a fila** tem "Descartar o rascunho" no passo 1 (o de sempre tem "Tirar o estudo").
+- **`Contas.promoverEstudo`** é o nome da troca do atual pelo da fila (o `entrarNaCelula` que já existia é o da entrada de alguém pelo link).
+- **`salvarEstudo`** devolve também `agendado` e `promovido`; quem já o chamava (o servidor e `ferramentas/colocar-estudo.mjs`) continua recebendo o estudo gravado em `estudo`.
+- **A folha de registro** não mudou além do aviso: ela já só mostra os estudos de `registro.estudos`, que não contam a fila.
+- **Capturas** (`FOTOS`) do `teste-estudo-fila.mjs`: a aba com a fila, agendar com a data, depois de reordenar, a leitura de um estudo da fila, a aba depois do encontro, a do membro e o cartão da parte do celular, a 390 px, claro e escuro; o `teste-estudo-dividir.mjs` guarda a parte 2 nos próximos estudos.
+
+Ficam para o dono: F2 (o auxiliar só vê a fila) e a linha da política de privacidade (seção 8).
