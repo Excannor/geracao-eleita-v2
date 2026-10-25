@@ -325,7 +325,8 @@
   }
   // alvo: um estudo anterior (…/estudo/<id>), lido pela peça (GET /api/estudos). Sem estudo
   // atual, o vazio de sempre e, para quem faz parte da célula e tem estudos guardados (ou os da
-  // célula de origem), a seção "Estudos anteriores" embaixo, desenhada pela peça.
+  // célula de origem), a seção "Estudos anteriores" embaixo, desenhada pela peça; para quem
+  // conduz, com a fila não vazia, também "Próximos estudos" (docs/a-mesa-fila.md, 5.1).
   function preencherEstudo(painel, p, aindaAqui, alvo) {
     if (alvo && !(p.estudo && p.estudo.id === alvo)) {
       pedirEstudo(false).then(() => { if (aindaAqui()) CC.estudoCelula.anterior(painel, p, apoio, alvo, aindaAqui); },
@@ -338,7 +339,7 @@
           : CC.esc(nomeDoLider(p)) + ' ainda não preparou o estudo deste encontro.') + '</p>'
         + (p.euPreparoEstudo ? '<button class="botao" data-preparar>' + CC.ico('livro') + 'Preparar o estudo</button>'
           : '<a class="botao" href="' + leituraDaSemana(p) + '" data-leitura-semana>Ler a leitura da semana' + CC.ico('avancar') + '</a>') + '</div>'
-        + (p.temAnteriores || p.daMae ? '<div data-anteriores></div>' : '');
+        + (p.temAnteriores || p.daMae || (p.fila && p.fila.length) ? '<div data-anteriores></div>' : '');
       const preparar = painel.querySelector('[data-preparar]');
       if (preparar) preparar.onclick = () => { location.hash = enderecoCelula(p.id, 'preparar'); };
       const anteriores = painel.querySelector('[data-anteriores]');
@@ -1461,7 +1462,8 @@
             return;
           }
           fechar();
-          CC.avisar('Encontro registrado');
+          // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, 3.6)
+          CC.avisar(r && r.promovido ? 'Encontro registrado. O próximo estudo já está na aba Estudo.' : 'Encontro registrado');
           if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
           // quem não veio, com a mensagem pronta: quem conduz decide se manda (o app não avisa ninguém)
           const faltaram = (r && r.faltaram) || [];

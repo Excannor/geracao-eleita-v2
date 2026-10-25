@@ -154,6 +154,35 @@
 .mesa-anterior b { font-size: 1rem; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; }
 .mesa-anterior small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
 .mesa-secao-anteriores .botao.pequeno { justify-self: start; }
+/* Próximos estudos (docs/a-mesa-fila.md, 5.1): a fila num cartão, logo acima dos anteriores; o
+   selo da data à esquerda, o link para ler no meio e, para o líder, as setas empilhadas */
+.mesa-proximos { display: grid; border-radius: var(--raio-cartao); background: var(--cartao); overflow: hidden; }
+.mesa-proximo { display: grid; grid-template-columns: 44px minmax(0, 1fr) 20px; align-items: center; gap: 14px; min-height: 72px; padding: 10px 14px; }
+.mesa-proximo.com-setas { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 12px; min-height: 104px; padding: 6px 8px 6px 14px; }
+.mesa-proximo + .mesa-proximo { border-top: 1px solid var(--contorno); }
+.mesa-data { display: grid; place-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); text-align: center; line-height: 1.1; }
+.mesa-data small, .mesa-data b { font-size: .75rem; }
+.mesa-data small { font-weight: 700; }
+.mesa-data b { font-weight: 800; }
+.mesa-proximo-ler { display: grid; align-content: center; gap: 2px; min-width: 0; min-height: 44px; align-self: stretch; color: var(--tinta-forte); text-decoration: none; }
+.mesa-proximo-ler:active { opacity: .7; }
+.mesa-proximo-ler b { font-size: 1rem; font-weight: 800; line-height: 1.3; overflow-wrap: anywhere; text-wrap: pretty; }
+.mesa-proximo-ler small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
+.mesa-proximo > svg:last-child { width: 20px; height: 20px; color: var(--tinta-fraca); }
+.mesa-setas { display: grid; gap: 4px; }
+.mesa-setas .botao-icone { width: 44px; height: 44px; background: var(--campo); }
+.mesa-setas [data-subir] svg { transform: rotate(180deg); }
+.mesa-setas .botao-icone:disabled { opacity: .35; cursor: default; }
+.mesa-proximos-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.mesa-proximos-acoes .botao.pequeno { min-height: 44px; }
+.mesa-acoes-agendado .botao.perigo { margin-top: 4px; }
+/* as partes que a versão anterior guardava no celular: o caminho para a fila (5.5) */
+.mesa-migrar { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 10px 12px; padding: 16px; border-radius: var(--raio-cartao); background: var(--salvia-palido); }
+.mesa-migrar > svg { width: 22px; height: 22px; margin-top: 1px; color: var(--salvia-texto); }
+.mesa-migrar > p { margin: 0; color: var(--tinta-forte); font-size: .9375rem; font-weight: 600; line-height: 1.45; text-wrap: pretty; }
+.mesa-migrar-acoes { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.mesa-migrar-acoes .botao.pequeno { min-height: 44px; }
+.mesa-migrar .erro-proposito { grid-column: 1 / -1; margin: 0; }
 /* sem estudo atual, o vazio de sempre e a seção logo embaixo, sem o vão do respiro do vazio */
 .painel-celula > .vazio-amigos:has(+ .mesa-secao-anteriores) { padding-bottom: 8px; }
 /* ler um anterior: o voltar, a etiqueta e a presença (só quem conduz) */
