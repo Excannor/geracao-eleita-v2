@@ -1595,13 +1595,13 @@
   }
 
   // ---------- (5) Objetos: a Arca da Aliança (ouro, a carta-tema do álbum) ----------
-  // Em três quartos, no escuro do Lugar Santíssimo, como prancha gravada: atrás, o véu em
-  // pregas fundas; a arca de ouro (2,5 x 1,5 x 1,5 côvados) com a moldura em volta (Êx 25.11),
-  // os pés, as argolas e as duas varas passando por dentro delas (Êx 25.12-15); sobre a tampa,
-  // os querubins de ouro mostrados só pelas asas (dono, 23/10: nem corpo nem rosto): em cada
-  // ponta da tampa, um par de asas que sobe dela, de uma peça só com ela (Êx 25.19), e se abre
-  // para cima e para a frente, cobrindo-a, as duas pontas de frente uma para a outra (Êx
-  // 25.20): penas em fileiras ordenadas, umas por cima das outras. Entre elas, a luz (Êx 25.22).
+  // Quase de frente, um pouco de cima, no escuro do Lugar Santíssimo, como prancha gravada:
+  // atrás, o véu em pregas fundas; a arca de ouro (2,5 x 1,5 x 1,5 côvados) com a coroa em volta
+  // (Êx 25.11), os pés, as argolas e as duas varas por dentro delas, com as pontas redondas à
+  // vista (Êx 25.12-15). Sobre a tampa, os querubins mostrados só pelas asas (dono, 23/10: nem
+  // corpo nem rosto): um em cada ponta, cada um com a sua base e o seu par de asas, que sobe e
+  // se curva para o meio, as pontas quase se tocando por cima do propiciatório (Êx 25.18-20).
+  // A luz entre eles (Êx 25.22) é só gravura: riscos finos e abertos onde há luz, sem clarão.
   const OURO_TONS = [[0, [38, 26, 6]], [0.25, [110, 78, 18]], [0.5, [201, 148, 48]], [0.75, [246, 214, 130]], [1, [255, 246, 214]]];
   function tomDeOuro(v, a = 1) {
     const t = Math.max(0, Math.min(1, v));
@@ -1649,124 +1649,175 @@
     k.stroke(p);
     return p;
   }
-  // Uma pena: a lâmina de ponta redonda, o tom da luz, a haste e a gravura no lado da sombra.
-  function pena(k, B, D, comp, larg, luz) {
+  // Uma pena de ouro gravada: a lâmina de ponta redonda (a raque um pouco curva), o tom da
+  // luz, as barbas em riscos oblíquos (mais grossos e cruzados na sombra) e o fio de luz.
+  function penaDeOuro(k, B, D, comp, larg, luz, curva, obj) {
     const N = [-D[1], D[0]];
-    const P = (a, b) => [B[0] + D[0] * a + N[0] * b, B[1] + D[1] * a + N[1] * b];
+    const P = (a, b) => {
+      const c = curva * comp * (a / comp) ** 2;
+      return [B[0] + D[0] * a + N[0] * (b + c), B[1] + D[1] * a + N[1] * (b + c)];
+    };
     const p = new Path2D();
-    p.moveTo(...P(0, larg * 0.3));
-    p.bezierCurveTo(...P(comp * 0.35, larg * 0.55), ...P(comp * 0.75, larg * 0.55), ...P(comp * 0.94, larg * 0.32));
-    p.quadraticCurveTo(...P(comp * 1.04, 0), ...P(comp * 0.94, -larg * 0.32));
-    p.bezierCurveTo(...P(comp * 0.75, -larg * 0.55), ...P(comp * 0.35, -larg * 0.55), ...P(0, -larg * 0.3));
+    p.moveTo(...P(0, larg * 0.22));
+    p.bezierCurveTo(...P(comp * 0.3, larg * 0.56), ...P(comp * 0.74, larg * 0.52), ...P(comp * 0.92, larg * 0.3));
+    p.quadraticCurveTo(...P(comp * 1.03, larg * 0.02), ...P(comp * 0.93, -larg * 0.28));
+    p.bezierCurveTo(...P(comp * 0.76, -larg * 0.5), ...P(comp * 0.3, -larg * 0.5), ...P(0, -larg * 0.22));
     p.closePath();
-    const g = k.createLinearGradient(...P(0, -larg / 2), ...P(0, larg / 2));
-    g.addColorStop(0, tomDeOuro(0.18 + luz * 0.62));
-    g.addColorStop(1, tomDeOuro(0.1 + luz * 0.45));
+    if (obj) obj.fill(p);
+    // a sombra que a pena faz na de baixo, logo depois da ponta: é ela que separa as fileiras
+    k.save();
+    k.translate(D[0] * larg * 0.16, D[1] * larg * 0.16 + larg * 0.05);
+    k.fillStyle = 'rgba(16,10,0,.55)';
+    k.fill(p);
+    k.restore();
+    const g = k.createLinearGradient(...P(comp * 0.5, -larg / 2), ...P(comp * 0.5, larg / 2));
+    g.addColorStop(0, tomDeOuro(0.3 + luz * 0.62));
+    g.addColorStop(0.5, tomDeOuro(0.2 + luz * 0.55));
+    g.addColorStop(1, tomDeOuro(0.08 + luz * 0.4));
     k.fillStyle = g;
     k.fill(p);
     k.save();
     k.clip(p);
     k.strokeStyle = TINTA_OURO;
     k.lineCap = 'round';
-    // as barbas: riscos finos e oblíquos no lado da sombra, mais fortes quanto menos luz
-    const n = Math.round(comp / 6);
-    for (let i = 1; i < n; i++) {
-      const a = (i / n) * comp;
-      k.lineWidth = 0.6 + (1 - luz) * 1.1;
+    const passo = Math.max(2.6, larg * 0.17);
+    for (let a = passo * 0.6; a < comp * 1.02; a += passo) {
+      const u = a / comp;
+      // o lado de baixo (b > 0) é o da sombra: risco grosso; o de cima só na pouca luz
+      k.lineWidth = Math.max(0.35, 0.45 + (1 - luz) * 1.5 - u * 0.25);
       k.beginPath();
-      k.moveTo(...P(a, 0));
-      k.lineTo(...P(a + larg * 0.35, larg * 0.6));
+      k.moveTo(...P(a, 1));
+      k.lineTo(...P(a + larg * 0.42, larg * 0.62));
       k.stroke();
-      if (luz < 0.55) {
-        k.lineWidth = 0.5 + (0.55 - luz) * 1.4;
+      if (luz < 0.7) {
+        k.lineWidth = Math.max(0.3, (0.7 - luz) * 1.6);
         k.beginPath();
-        k.moveTo(...P(a, 0));
-        k.lineTo(...P(a + larg * 0.35, -larg * 0.6));
+        k.moveTo(...P(a, -1));
+        k.lineTo(...P(a + larg * 0.42, -larg * 0.62));
+        k.stroke();
+      }
+    }
+    // a hachura cruzada, só no fundo da sombra
+    if (luz < 0.35) {
+      k.lineWidth = 0.6;
+      for (let a = 0; a < comp; a += passo * 1.3) {
+        k.beginPath();
+        k.moveTo(...P(a + larg * 0.5, larg * 0.1));
+        k.lineTo(...P(a - larg * 0.1, larg * 0.6));
         k.stroke();
       }
     }
     k.restore();
+    // a raque: um fio claro, que some perto da ponta
     k.lineCap = 'round';
-    k.strokeStyle = tomDeOuro(0.55 + luz * 0.45, 0.9);
-    k.lineWidth = 1.3;
+    k.strokeStyle = tomDeOuro(0.62 + luz * 0.38, 0.95);
+    k.lineWidth = Math.max(1, larg * 0.07);
     k.beginPath();
-    k.moveTo(...P(comp * 0.02, -1));
-    k.quadraticCurveTo(...P(comp * 0.5, -larg * 0.05), ...P(comp * 0.9, -1));
+    k.moveTo(...P(comp * 0.03, -0.5));
+    for (let i = 1; i <= 8; i++) k.lineTo(...P(comp * (0.03 + i * 0.1), -0.5));
     k.stroke();
-    k.strokeStyle = 'rgba(42,28,5,.95)';
-    k.lineWidth = 1.4;
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 1.5;
     k.stroke(p);
   }
-  // A asa aberta, ordenada como numa escultura: as rêmiges (primárias na mão, secundárias no
-  // braço), depois três fileiras de coberteiras, cada uma por cima da anterior, e a fileira
-  // miúda na beirada. "borda" é a beirada da frente, do ombro à ponta; as penas pendem dela
-  // para o lado de "baixo" (o lado de fora da curva, para a tampa).
-  function asaOrdenada(k, borda, luzEm, { escurecer = 0, escala = 1, lado = 1, obj } = {}) {
-    const n = 160;
-    const pts = bezier(...borda, n);
+  // Uma asa aberta de querubim, de ouro, sem corpo. Desenhada com o ombro em (0, 0) e o meio da
+  // tampa a 150 unidades para dentro ("lado" 1 abre para a direita): a beirada da frente (o osso)
+  // sobe do ombro e vira para dentro, lá em cima; as penas saem dela em leque e acabam numa
+  // beirada de trás desenhada (do ombro, em arco, até a ponta, quase no meio da tampa), de modo
+  // que a asa é cheia, larga no pulso e fina na ponta: as rêmiges por baixo (as primárias, mais
+  // compridas, formando a ponta), três fileiras de coberteiras por cima, cada vez mais curtas.
+  function asaDeQuerubim(k, S, lado, esc, luzEm, { escurecer = 0, ergue = 0, obj } = {}) {
+    const T = ([x, y]) => [S[0] + lado * x * esc, S[1] + y * esc];
+    const e = ergue;
+    const borda = bezier([0, 0], [-22, -80 - e * 0.5], [-12, -192 - e], [32, -230 - e], 60)
+      .concat(bezier([32, -230 - e], [70, -246 - e], [110, -218 - e * 0.8], [141, -178 - e * 0.6], 44).slice(1));
+    const tras = bezier([16, 2], [56, -36], [102, -100 - e * 0.4], [142, -152 - e * 0.55], 120);
+    const pts = borda.map(T);
+    const atras = tras.map(T);
+    const n = pts.length - 1;
     const em = (t) => pts[Math.round(Math.max(0, Math.min(1, t)) * n)];
-    const norm = (v) => { const d = Math.hypot(v[0], v[1]) || 1; return [v[0] / d, v[1] / d]; };
-    // as penas pendem da beirada: para baixo e um pouco para trás no braço; na mão (a ponta)
-    // deitam para a frente, para onde a asa aponta
-    const pontaDir = norm([pts[n][0] - pts[n - 12][0], pts[n][1] - pts[n - 12][1]]);
-    const dir = (t) => {
-      const desce = norm([-0.32 * lado, 1]);
-      if (t < 0.6) return desce;
-      const u = (t - 0.6) / 0.4;
-      return norm([desce[0] * (1 - u) + (pontaDir[0] + 0.25 * lado * 0) * u * 1.1, desce[1] * (1 - u) + (pontaDir[1] + 0.5) * u]);
+    const alvo = (t) => atras[Math.round(Math.max(0, Math.min(1, t)) * (atras.length - 1))];
+    const luz = (B, D, L) => Math.max(0.04, Math.min(1, luzEm([B[0] + D[0] * L * 0.55, B[1] + D[1] * L * 0.55]) * (1 - escurecer)));
+    // cada pena vai da beirada da frente (t) até a de trás (s): o leque
+    const pena = (t, s, fr, Lr, larg, sobra) => {
+      const B0 = em(t);
+      const Q = alvo(s);
+      const v = [Q[0] - B0[0], Q[1] - B0[1]];
+      const d = Math.hypot(v[0], v[1]) || 1;
+      const D = [v[0] / d, v[1] / d];
+      const B = [B0[0] + D[0] * d * fr, B0[1] + D[1] * d * fr];
+      const L = Math.max(18 * esc, d * Lr + sobra * esc);
+      penaDeOuro(k, B, D, L, larg * esc, luz(B, D, L), 0.06 * lado, obj);
+      return [B[0] + D[0] * L, B[1] + D[1] * L];
     };
-    const luz = (B, D, L) => Math.max(0.05, Math.min(1, luzEm([B[0] + D[0] * L * 0.6, B[1] + D[1] * L * 0.6]) * (1 - escurecer)));
-    const comp = (t) => (100 - t * 36 + (t > 0.78 ? (t - 0.78) * 160 : 0)) * escala;
-    const pinta = (B, D, L, larg) => pena(k, B, D, L, larg * escala, luz(B, D, L));
-    if (obj) {
-      const sil = new Path2D();
-      for (let i = 0; i <= 24; i++) { const q = em(i / 24); if (i) sil.lineTo(q[0], q[1]); else sil.moveTo(q[0], q[1]); }
-      for (let i = 24; i >= 0; i--) { const tt = i / 24; const B = em(tt); const D = dir(tt); const L = comp(tt); sil.lineTo(B[0] + D[0] * L, B[1] + D[1] * L); }
-      sil.closePath();
-      obj.fill(sil);
+    const mapa = (t) => 0.02 + 0.98 * Math.pow(t, 1.1);
+    const jit = [3, -4, 6, -2, 1, -5, 4, -1, 5, -3, 2, -6, 3, 0, -4, 5, -2, 4, -5, 1, 3, -3, 6, -1, 2];
+    // as rêmiges, da ponta para o ombro (cada uma por cima da de fora); as últimas primárias
+    // passam da beirada de trás, em dedos, e fazem a ponta
+    let ponta = null;
+    const NR = 22;
+    for (let i = NR; i >= 0; i--) {
+      const t = 0.05 + (i / NR) * 0.95;
+      const dedo = t > 0.7 ? Math.sin(((t - 0.7) / 0.3) * Math.PI * 0.85) * 10 : 0;
+      const q = pena(t, mapa(t), 0, 1, 30, 6 + dedo + jit[i] * 0.8);
+      if (i === NR) ponta = q;
     }
-    // as rêmiges: do ombro à ponta, cada uma por cima da anterior
-    for (let i = 0; i <= 19; i++) {
-      const t = 0.04 + (i / 19) * 0.96;
-      pinta(em(t), dir(t), comp(t), 25);
-    }
-    // as coberteiras, em três fileiras: cada fileira mais curta, mais perto da beirada e por cima
-    for (const [fr, L, larg, qtd] of [[0.5, 0.52, 22, 17], [0.26, 0.34, 18, 21], [0.08, 0.2, 14, 27]]) {
-      for (let i = 0; i < qtd; i++) {
-        const t = 0.02 + (i / (qtd - 1)) * 0.9;
-        const B = em(t);
-        const D = dir(t);
-        const c = comp(t);
-        pinta([B[0] + D[0] * c * fr * 0.35, B[1] + D[1] * c * fr * 0.35], D, c * L, larg);
+    // as coberteiras, em três fileiras, cada uma mais curta e por cima; a miúda faz a beirada
+    for (const [fr, Lr, larg, qtd, t1] of [[0.04, 0.56, 32, 15, 0.9], [0.02, 0.34, 26, 18, 0.9], [-0.02, 0.17, 18, 26, 0.92]]) {
+      for (let i = qtd - 1; i >= 0; i--) {
+        const t = 0.03 + (i / (qtd - 1)) * (t1 - 0.03);
+        pena(t, mapa(t), fr, Lr, larg, 6);
       }
     }
-    // a beirada: o osso da asa, um friso liso de ouro
+    // a beirada da frente: a faixa do braço, coberta de penugem miúda (gravada em riscos
+    // curtos), que esconde a raiz das coberteiras; o contorno é só um fio escuro
+    const faixa = new Path2D();
+    const larF = (t) => (5 + 9 * Math.sin(Math.min(1, t * 1.25) * Math.PI)) * esc;
+    pts.forEach((q, i) => (i ? faixa.lineTo(q[0], q[1]) : faixa.moveTo(q[0], q[1])));
+    for (let i = n; i >= 0; i -= 2) {
+      const t = i / n;
+      const q = pts[i];
+      const Q = alvo(mapa(t));
+      const d = Math.hypot(Q[0] - q[0], Q[1] - q[1]) || 1;
+      faixa.lineTo(q[0] + ((Q[0] - q[0]) / d) * larF(t), q[1] + ((Q[1] - q[1]) / d) * larF(t));
+    }
+    faixa.closePath();
+    if (obj) obj.fill(faixa);
+    k.fillStyle = tomDeOuro(0.62 * (1 - escurecer) + 0.08);
+    k.fill(faixa);
+    k.save();
+    k.clip(faixa);
+    k.strokeStyle = TINTA_OURO;
+    k.lineCap = 'round';
+    for (let i = 0; i <= n; i += 2) {
+      const q = pts[i];
+      const Q = alvo(mapa(i / n));
+      const d = Math.hypot(Q[0] - q[0], Q[1] - q[1]) || 1;
+      const l = luzEm(q) * (1 - escurecer);
+      k.lineWidth = 0.5 + (1 - l) * 1.1;
+      k.beginPath();
+      k.moveTo(q[0] + ((Q[0] - q[0]) / d) * 3, q[1] + ((Q[1] - q[1]) / d) * 3);
+      k.lineTo(q[0] + ((Q[0] - q[0]) / d) * 16 * esc, q[1] + ((Q[1] - q[1]) / d) * 16 * esc);
+      k.stroke();
+    }
+    k.restore();
     k.save();
     k.lineCap = 'round';
-    k.strokeStyle = TINTA_OURO;
-    k.lineWidth = 10 * escala;
+    k.lineJoin = 'round';
     k.beginPath();
     pts.forEach((q, i) => (i ? k.lineTo(q[0], q[1]) : k.moveTo(q[0], q[1])));
-    k.stroke();
-    k.strokeStyle = tomDeOuro(0.72 * (1 - escurecer) + 0.1);
-    k.lineWidth = 6.5 * escala;
-    k.stroke();
-    k.strokeStyle = 'rgba(255,246,214,' + (0.7 * (1 - escurecer)).toFixed(2) + ')';
-    k.lineWidth = 1.4;
-    k.translate(0, -2);
+    k.strokeStyle = TINTA_OURO;
+    k.lineWidth = 2.2;
     k.stroke();
     k.restore();
+    return ponta;
   }
-  // As asas de um querubim, sem corpo nem rosto: o par sobe da ponta da tampa (as penas de
-  // baixo pousam nela, de uma peça só) e se abre para cima e para dentro, para o meio da
-  // tampa. A asa de trás é mais alta e mais escura; a da frente, mais baixa, avança mais sobre
-  // a tampa. "lado" 1 abre para a direita.
-  function asasDoQuerubim(k, x0, y0, esc, lado, luzEm, obj) {
-    const T = (x, y) => [x0 + lado * x * esc, y0 + y * esc];
-    // a asa de trás: mais alta, mais escura, a ponta lá em cima, sobre o meio da tampa
-    asaOrdenada(k, [T(-40, -96), T(-96, -270), T(10, -348), T(96, -316)], luzEm, { escurecer: 0.42, escala: esc * 0.92, lado, obj });
-    // a asa da frente: sai mais baixa e avança mais sobre a tampa
-    asaOrdenada(k, [T(-14, -84), T(-56, -236), T(40, -306), T(118, -262)], luzEm, { escala: esc, lado, obj });
+  // As asas de um querubim, de uma peça com a tampa (Êx 25.19): o par sobe da base, na ponta da
+  // tampa; a de trás (do lado de lá da tampa) sai um pouco mais para fora, mais alta, menor e
+  // mais escura, e aparece por cima e por fora da da frente.
+  function parDeAsas(k, S, lado, esc, luzEm, obj) {
+    asaDeQuerubim(k, [S[0] - lado * 8 * esc, S[1] - 12 * esc], lado, esc * 0.97, luzEm, { escurecer: 0.5, ergue: 40, obj });
+    return asaDeQuerubim(k, S, lado, esc, luzEm, { obj });
   }
   // O véu atrás, em pregas fundas: as linhas da gravura correm de cima a baixo e se apertam
   // onde a prega vira para dentro (escuro) e se abrem onde ela vem para a frente (luz).
@@ -1837,23 +1888,40 @@
   }
   function desenhoArca(k, W, H, obj) {
     const r = sorteio(4507);
-    // a perspectiva é leve (foco longo): as quinas de cima e de baixo da frente correm quase
-    // paralelas e se encontram, de leve, no mesmo ponto de fuga à esquerda
-    const P = camera(W / 2 + 10, 690, 1.42, -0.5, 0.3, 4000);
+    // quase de frente, um pouco de cima e um pouco da direita: as duas pontas da tampa ficam
+    // bem separadas, cada uma com o seu querubim, e a cabeceira da direita aparece de leve
+    const P = camera(W / 2 - 6, 660, 1.5, -0.26, 0.24, 4000);
     const chao = Math.round(P([0, -16, -330])[1]);
-    // a luz pousa sobre a tampa, no meio dos dois querubins (Êx 25.22), não nas mãos deles
-    const centro = P([0, 188, 0]);
-    const fonte = [centro[0], centro[1]];
-    const luzEm = ([x, y]) => Math.max(0, Math.min(1, 0.06 + 0.94 * Math.exp(-(((x - fonte[0]) / 300) ** 2 + ((y - fonte[1]) / 280) ** 2))));
+    const L = 125;
+    const Z = 75;
+    const A = 150;
+    const M = 6;
+    const mA = A + 16;
+    // a luz pousa sobre a tampa, entre os dois querubins (Êx 25.22): ela só muda a gravura
+    // (riscos finos e espaçados onde há luz, grossos e juntos na sombra), sem clarão
+    const fonte = P([0, mA + 2, 0]);
+    const luzEm = ([x, y]) => Math.max(0, Math.min(1, 0.05 + 0.95 * Math.exp(-(((x - fonte[0]) / 250) ** 2 + ((y - fonte[1] + 60) / 250) ** 2))));
     veuEmPregas(k, r, W, chao, luzEm);
-    // o chão de pedra, em perspectiva
+    // o chão: pedra escura, gravada em riscos deitados que se abrem perto da arca
     const gch = k.createLinearGradient(0, chao, 0, H);
     gch.addColorStop(0, '#1a150d');
     gch.addColorStop(1, '#0a0806');
     k.fillStyle = gch;
     k.fillRect(0, chao, W, H - chao);
     k.save();
-    k.strokeStyle = 'rgba(232,196,120,.07)';
+    k.lineCap = 'round';
+    for (let y = chao + 3, i = 0; y < H + 4; y += 3.2 + (y - chao) * 0.018, i++) {
+      for (let x = -10; x < W + 10; x += 14) {
+        const l = luzEm([x, (y - chao) * 1.6 + fonte[1] + 40]);
+        k.strokeStyle = 'rgba(232,196,120,' + (0.04 + l * 0.3).toFixed(3) + ')';
+        k.lineWidth = 0.4 + l * 1.3;
+        k.beginPath();
+        k.moveTo(x, y + Math.sin(x * 0.03 + i) * 0.5);
+        k.lineTo(x + 14, y + Math.sin((x + 14) * 0.03 + i) * 0.5);
+        k.stroke();
+      }
+    }
+    k.strokeStyle = 'rgba(232,196,120,.08)';
     k.lineWidth = 1.2;
     for (let i = -8; i <= 8; i++) {
       const a = P([i * 70, -16, 300]);
@@ -1863,69 +1931,58 @@
       k.lineTo(b[0], b[1]);
       k.stroke();
     }
-    for (let j = -3; j <= 4; j++) {
-      const a = P([-600, -16, j * 70]);
-      const b = P([600, -16, j * 70]);
-      k.beginPath();
-      k.moveTo(a[0], a[1]);
-      k.lineTo(b[0], b[1]);
-      k.stroke();
-    }
     k.restore();
-    brilho(k, fonte[0], chao + 30, 360, 'rgba(255,196,77,.12)', 'screen');
-    brilho(k, fonte[0], fonte[1], 420, 'rgba(255,206,110,.2)', 'screen');
-    // a sombra da arca no chão
-    k.save();
-    k.filter = 'blur(16px)';
-    k.fillStyle = 'rgba(0,0,0,.8)';
-    k.fill(poligono([P([-150, -16, -95]), P([150, -16, -95]), P([150, -16, 95]), P([-150, -16, 95])]));
-    k.restore();
-    const L = 125;
-    const Z = 75;
-    const A = 150;
+    // a sombra da arca no chão: hachura cruzada, densa, sem borrão
+    const pSombra = poligono([P([-L - 70, -16, -Z - 40]), P([L + 80, -16, -Z - 40]), P([L + 100, -16, Z + 70]), P([-L - 60, -16, Z + 70])]);
+    const cs = P([10, -16, 10]);
+    const fundoSombra = (x, y) => 1.25 - Math.hypot((x - cs[0]) / 300, (y - cs[1]) / 70) * 1.1;
+    gravar(k, pSombra, cs[0], cs[1], 300, 0.06, 2.6, 2.2, fundoSombra, '#000', 0);
+    gravar(k, pSombra, cs[0], cs[1], 300, -0.6, 3.4, 1.6, (x, y) => fundoSombra(x, y) - 0.3, '#000', 0);
     const VZ = 88;
     const VY = 4;
-    // as duas varas do mesmo tamanho, saindo o mesmo tanto dos dois lados
-    const VARA = 290;
-    // uma vara: cilindro ao longo de x, em z = vz
+    // as varas, do mesmo tamanho, saindo um tanto igual dos dois lados (Êx 25.13-15): as pontas
+    // redondas, dentro da prancha
+    const VARA = 214;
     const vara = (vz, x0, x1, rr) => {
       const a = P([x0, VY, vz]);
       const b = P([x1, VY, vz]);
       const ang = Math.atan2(b[1] - a[1], b[0] - a[0]) + Math.PI / 2;
-      const ra = rr * 1.42 * a[3];
-      const rb = rr * 1.42 * b[3];
+      const ra = rr * 1.34 * a[3];
+      const rb = rr * 1.34 * b[3];
       const c = [Math.cos(ang), Math.sin(ang)];
       const pts = [[a[0] - c[0] * ra, a[1] - c[1] * ra], [b[0] - c[0] * rb, b[1] - c[1] * rb], [b[0] + c[0] * rb, b[1] + c[1] * rb], [a[0] + c[0] * ra, a[1] + c[1] * ra]];
       const p = poligono(pts);
       const g = k.createLinearGradient(a[0] - c[0] * ra, a[1] - c[1] * ra, a[0] + c[0] * ra, a[1] + c[1] * ra);
-      g.addColorStop(0, tomDeOuro(0.9));
-      g.addColorStop(0.35, tomDeOuro(0.66));
-      g.addColorStop(1, tomDeOuro(0.18));
+      g.addColorStop(0, tomDeOuro(0.88));
+      g.addColorStop(0.35, tomDeOuro(0.64));
+      g.addColorStop(1, tomDeOuro(0.16));
       k.fillStyle = g;
       k.fill(p);
       if (obj) obj.fill(p);
       gravar(k, p, (a[0] + b[0]) / 2, (a[1] + b[1]) / 2, Math.hypot(b[0] - a[0], b[1] - a[1]) / 2 + 10, Math.atan2(b[1] - a[1], b[0] - a[0]), 3.2, 1.6,
-        (x, y) => ((x - a[0]) * c[0] + (y - a[1]) * c[1]) / (ra * 2) + 0.5, TINTA_OURO, 0);
+        (x, y) => ((x - a[0]) * c[0] + (y - a[1]) * c[1]) / (ra * 2) + 0.45, TINTA_OURO, 0);
       k.strokeStyle = TINTA_OURO;
       k.lineWidth = 1.8;
       k.stroke(p);
-      // a ponta de perto, redonda
-      k.fillStyle = tomDeOuro(0.55);
-      k.beginPath();
-      k.ellipse(b[0], b[1], rb * 0.45, rb, Math.atan2(b[1] - a[1], b[0] - a[0]), 0, Math.PI * 2);
-      k.fill();
-      k.stroke();
+      // as duas pontas, redondas, com a tampa de ouro
+      const giroV = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      for (const [q, rq] of [[a, ra], [b, rb]]) {
+        const cap = new Path2D();
+        cap.ellipse(q[0], q[1], rq * 0.42, rq, giroV, 0, Math.PI * 2);
+        k.fillStyle = tomDeOuro(0.5);
+        k.fill(cap);
+        if (obj) obj.fill(cap);
+        k.stroke(cap);
+        k.strokeStyle = tomDeOuro(0.9, 0.8);
+        k.lineWidth = 1;
+        k.beginPath();
+        k.ellipse(q[0], q[1], rq * 0.26, rq * 0.62, giroV, Math.PI * 1.1, Math.PI * 1.7);
+        k.stroke();
+        k.strokeStyle = TINTA_OURO;
+        k.lineWidth = 1.8;
+      }
     };
     // uma argola: o aro em pé no plano y-z, na quina de baixo; metade de trás antes da vara
-    const argola = (x, vz, metade) => {
-      let seg = [];
-      for (let i = 0; i <= 48; i++) {
-        const a = (i / 48) * Math.PI * 2;
-        if ((Math.cos(a) >= 0) === (metade === 'frente')) seg.push(P([x, VY + Math.sin(a) * 15, vz + Math.cos(a) * 15]));
-        else { desenhaAro(seg); seg = []; }
-      }
-      desenhaAro(seg);
-    };
     const desenhaAro = (pts) => {
       if (pts.length < 2) return;
       k.save();
@@ -1943,7 +2000,16 @@
       k.stroke();
       k.restore();
     };
-    // 1) a vara de trás e as argolas de trás (aparecem dos dois lados da arca)
+    const argola = (x, vz, metade) => {
+      let seg = [];
+      for (let i = 0; i <= 48; i++) {
+        const a = (i / 48) * Math.PI * 2;
+        if ((Math.cos(a) >= 0) === (metade === 'frente')) seg.push(P([x, VY + Math.sin(a) * 15, vz + Math.cos(a) * 15]));
+        else { desenhaAro(seg); seg = []; }
+      }
+      desenhaAro(seg);
+    };
+    // 1) a vara de trás e as argolas de trás
     argola(-L + 20, -VZ, 'tras');
     argola(L - 20, -VZ, 'tras');
     vara(-VZ, -VARA, VARA, 7.5);
@@ -1958,11 +2024,10 @@
     pe(L - 14, -Z + 14);
     pe(-L + 14, Z - 14);
     pe(L - 14, Z - 14);
-    // 3) a caixa: o lado (a cabeceira da direita), a frente, a moldura e a tampa
-    const sombraFrente = (x, y) => 1.05 - luzEm([x, y - 120]) * 0.95 + (y - P([0, A, Z])[1]) / 300;
-    faceDeOuro(k, [P([L, A, Z]), P([L, A, -Z]), P([L, 0, -Z]), P([L, 0, Z])], 0.38, 0.14, Math.atan2(P([L, 0, -Z])[1] - P([L, 0, Z])[1], P([L, 0, -Z])[0] - P([L, 0, Z])[0]), 4, () => 0.85, obj);
-    faceDeOuro(k, [P([-L, A, Z]), P([L, A, Z]), P([L, 0, Z]), P([-L, 0, Z])], 0.7, 0.24, Math.PI / 2 + 0.06, 4.2, sombraFrente, obj);
-    // o painel rebaixado da frente, liso (Êx 25 só fala da coroa de ouro em volta)
+    // 3) a caixa: a cabeceira da direita, a frente com o painel, a coroa e a tampa
+    const sombraFrente = (x, y) => 1.02 - luzEm([x, y - 120]) * 0.9 + (y - P([0, A, Z])[1]) / 320;
+    faceDeOuro(k, [P([L, A, Z]), P([L, A, -Z]), P([L, 0, -Z]), P([L, 0, Z])], 0.36, 0.12, Math.atan2(P([L, 0, -Z])[1] - P([L, 0, Z])[1], P([L, 0, -Z])[0] - P([L, 0, Z])[0]), 3.6, () => 0.9, obj);
+    faceDeOuro(k, [P([-L, A, Z]), P([L, A, Z]), P([L, 0, Z]), P([-L, 0, Z])], 0.72, 0.26, Math.PI / 2 + 0.04, 4, sombraFrente, obj);
     const painel = (u0, u1, v0, v1) => [P([u0, v0, Z]), P([u1, v0, Z]), P([u1, v1, Z]), P([u0, v1, Z])];
     const pp = painel(-L + 22, L - 22, A - 26, 22);
     const pPainel = poligono(pp);
@@ -1978,11 +2043,9 @@
     k.lineTo(pp[2][0] - 2, pp[2][1] - 2);
     k.lineTo(pp[1][0] - 2, pp[1][1] + 2);
     k.stroke();
-    // a moldura em volta (a coroa de ouro), um pouco para fora, com as contas
-    const M = 6;
-    const mA = A + 16;
+    // a coroa de ouro em volta (Êx 25.11): um friso para fora, com as contas
     faceDeOuro(k, [P([L + M, mA, Z + M]), P([L + M, mA, -Z - M]), P([L + M, A, -Z - M]), P([L + M, A, Z + M])], 0.5, 0.25, 0, 3.2, () => 0.7, obj);
-    faceDeOuro(k, [P([-L - M, mA, Z + M]), P([L + M, mA, Z + M]), P([L + M, A, Z + M]), P([-L - M, A, Z + M])], 0.98, 0.5, 0, 3.2, (x, y) => 0.6 - luzEm([x, y]) * 0.55, obj);
+    faceDeOuro(k, [P([-L - M, mA, Z + M]), P([L + M, mA, Z + M]), P([L + M, A, Z + M]), P([-L - M, A, Z + M])], 0.98, 0.5, 0, 3.2, (x, y) => 0.62 - luzEm([x, y]) * 0.5, obj);
     for (let u = -L; u <= L; u += 9) {
       const q = P([u, A + 7, Z + M]);
       k.fillStyle = TINTA_OURO;
@@ -1998,20 +2061,53 @@
       k.arc(q[0] - 1, q[1] - 1, 1, 0, Math.PI * 2);
       k.fill();
     }
-    // a tampa (o propiciatório), vista de cima, acesa pela luz
-    faceDeOuro(k, [P([-L - M, mA, -Z - M]), P([L + M, mA, -Z - M]), P([L + M, mA, Z + M]), P([-L - M, mA, Z + M])], 0.8, 0.98, -0.32, 3.4, (x, y) => 0.7 - luzEm([x, y]) * 0.7, obj);
-    // 4) as asas dos querubins: as do de trás (esquerda, mais longe) antes, as do da frente depois
-    const qe = P([-L + 26, mA, 0]);
-    const qd = P([L - 26, mA, 0]);
-    asasDoQuerubim(k, qe[0], qe[1] + 4, 1.08 * qe[3], 1, luzEm, obj);
-    asasDoQuerubim(k, qd[0], qd[1] + 4, 1.08 * qd[3], -1, luzEm, obj);
-    // 5) a vara da frente, por dentro das argolas
+    // a tampa (o propiciatório), vista de cima: o meio, onde a luz pousa, quase sem riscos
+    faceDeOuro(k, [P([-L - M, mA, -Z - M]), P([L + M, mA, -Z - M]), P([L + M, mA, Z + M]), P([-L - M, mA, Z + M])], 0.74, 0.88, -0.1, 3.2, (x, y) => Math.max(0.3, 0.9 - luzEm([x, y]) * 0.65), obj);
+    // 4) a luz: riscos finos que sobem da tampa, entre as asas (gravura, não clarão)
+    k.save();
+    k.globalCompositeOperation = 'screen';
+    k.lineCap = 'round';
+    for (let i = 0; i < 41; i++) {
+      const a = Math.PI * (1.1 + (i / 40) * 0.8) + (r() - 0.5) * 0.03;
+      const r0 = 2;
+      const r1 = (i % 2 ? 110 : 170) + r() * 40;
+      const gr = k.createLinearGradient(fonte[0], fonte[1], fonte[0] + Math.cos(a) * r1, fonte[1] + Math.sin(a) * r1);
+      gr.addColorStop(0, 'rgba(255,236,180,.42)');
+      gr.addColorStop(1, 'rgba(255,236,180,0)');
+      k.strokeStyle = gr;
+      k.lineWidth = i % 2 ? 0.9 : 1.6;
+      k.beginPath();
+      k.moveTo(fonte[0] + Math.cos(a) * r0, fonte[1] + Math.sin(a) * r0);
+      k.lineTo(fonte[0] + Math.cos(a) * r1, fonte[1] + Math.sin(a) * r1);
+      k.stroke();
+    }
+    k.restore();
+    // 5) os querubins, só as asas, um em cada ponta da tampa (Êx 25.18-20): a base de ouro, de
+    // uma peça com a tampa, e o par de asas que sobe dela e se abre para o meio, as pontas
+    // quase se tocando por cima do propiciatório. O da esquerda (mais longe) antes.
+    const base = (sx) => {
+      const x0 = sx * (L - 4);
+      const x1 = sx * (L - 46);
+      const bz = 34;
+      const h = 12;
+      const [xa, xb] = sx < 0 ? [x0, x1] : [x1, x0];
+      faceDeOuro(k, [P([xb, mA + h, bz]), P([xb, mA + h, -bz]), P([xb, mA, -bz]), P([xb, mA, bz])], 0.4, 0.2, Math.PI / 2, 3, () => 0.8, obj);
+      faceDeOuro(k, [P([xa, mA + h, bz]), P([xb, mA + h, bz]), P([xb, mA, bz]), P([xa, mA, bz])], 0.85, 0.45, 0, 3, (x, y) => 0.75 - luzEm([x, y]) * 0.5, obj);
+      faceDeOuro(k, [P([xa, mA + h, -bz]), P([xb, mA + h, -bz]), P([xb, mA + h, bz]), P([xa, mA + h, bz])], 0.9, 0.75, 0, 3.2, (x, y) => 0.6 - luzEm([x, y]) * 0.5, obj);
+    };
+    base(-1);
+    base(1);
+    for (const sx of [-1, 1]) {
+      const S = P([sx * (L - 26), mA + 12, 8]);
+      const esc = Math.abs(fonte[0] - S[0]) / 150;
+      parDeAsas(k, [S[0], S[1]], -sx, esc, luzEm, obj);
+    }
+    // 6) a vara da frente, por dentro das argolas
     argola(-L + 20, VZ, 'tras');
     argola(L - 20, VZ, 'tras');
     vara(VZ, -VARA, VARA, 7.5);
     argola(-L + 20, VZ, 'frente');
     argola(L - 20, VZ, 'frente');
-    // as presilhas das argolas na arca
     for (const x of [-L + 20, L - 20]) {
       const q = P([x, VY + 16, Z]);
       k.fillStyle = tomDeOuro(0.55);
@@ -2020,42 +2116,15 @@
       k.lineWidth = 1.4;
       k.strokeRect(q[0] - 6, q[1] - 5, 12, 10);
     }
-    // 6) a luz entre as asas: o centro pequeno, os raios finos e o pó no ar
-    k.save();
-    k.globalCompositeOperation = 'screen';
-    k.lineCap = 'round';
-    for (let i = 0; i < 48; i++) {
-      // só para cima e para os lados: a luz sai de cima da tampa
-      const a = Math.PI * (1.04 + (i / 47) * 0.92) + (r() - 0.5) * 0.05;
-      const r0 = 18 + r() * 8;
-      const r1 = 70 + r() * (i % 3 === 0 ? 150 : 70);
-      const gr = k.createLinearGradient(fonte[0], fonte[1], fonte[0] + Math.cos(a) * r1, fonte[1] + Math.sin(a) * r1);
-      gr.addColorStop(0, 'rgba(255,236,180,.6)');
-      gr.addColorStop(1, 'rgba(255,236,180,0)');
-      k.strokeStyle = gr;
-      k.lineWidth = 0.9 + r() * 0.8;
-      k.beginPath();
-      k.moveTo(fonte[0] + Math.cos(a) * r0, fonte[1] + Math.sin(a) * r0);
-      k.lineTo(fonte[0] + Math.cos(a) * r1, fonte[1] + Math.sin(a) * r1);
-      k.stroke();
-    }
-    k.restore();
-    // o clarão deitado sobre a tampa (mais largo que alto) e o miolo, perto dela
-    k.save();
-    k.translate(fonte[0], fonte[1] + 14);
-    k.scale(1, 0.42);
-    brilho(k, 0, 0, 190, 'rgba(255,214,130,.55)', 'screen');
-    brilho(k, 0, 0, 80, 'rgba(255,246,220,.8)', 'screen');
-    k.restore();
-    brilho(k, fonte[0], fonte[1] + 6, 26, 'rgba(255,250,232,.9)', 'screen');
-    for (let i = 0; i < 180; i++) {
+    // o pó no ar, aceso só perto da luz
+    for (let i = 0; i < 120; i++) {
       const a = r() * Math.PI * 2;
-      const d = Math.sqrt(r()) * 300;
+      const d = Math.sqrt(r()) * 280;
       const x = fonte[0] + Math.cos(a) * d;
-      const y = fonte[1] + Math.sin(a) * d * 0.8;
-      k.fillStyle = 'rgba(255,240,200,' + (luzEm([x, y]) * (0.2 + r() * 0.5)).toFixed(3) + ')';
+      const y = fonte[1] - 40 + Math.sin(a) * d * 0.8;
+      k.fillStyle = 'rgba(255,240,200,' + (luzEm([x, y]) * (0.15 + r() * 0.4)).toFixed(3) + ')';
       k.beginPath();
-      k.arc(x, y, 0.6 + r() * 1.3, 0, Math.PI * 2);
+      k.arc(x, y, 0.6 + r() * 1.1, 0, Math.PI * 2);
       k.fill();
     }
     vinheta(k, W, H, 0.5);
@@ -6259,7 +6328,7 @@
   // Gideão: a corneta, deitada embaixo à direita; Ester: o alto do dossel, na beirada de cima; Sara: as
   // borlas do pano da tenda, no alto; Raabe: o terraço com o linho, no alto da casa; a
   // Multidão: a soleira da largada, acima do papel.
-  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95], 'candelabro': [0.5, 0.93, 0.94], 'manto-elias': [0.5, 0.86, 0.96], 'vaso-oleiro': [0.5, 0.9, 0.95], 'perola': [0.45, 0.9, 0.96], /* semeadores */ 'samaritana-cidade': [0.5, 0.94, 0.96], 'campos-maduros': [0.5, 0.8, 0.96], 'da-familia': [0.5, 0.94, 0.96] };
+  const FOCO = { 'gideao-tochas': [0.6, 0.84, 0.92], 'ester-cetro': [0.5, 0, 1], 'sara-riso': [0.4, 0.15, 0.96], 'raabe-corda': [0.5, 0.09, 0.96], 'nuvem-testemunhas': [0.5, 0.85, 0.96], /* objetos */ 'tunica-jose': [0.5, 0.94, 0.95], 'candelabro': [0.5, 0.93, 0.94], 'arca-alianca': [0.5, 0.36, 0.95], 'manto-elias': [0.5, 0.86, 0.96], 'vaso-oleiro': [0.5, 0.9, 0.95], 'perola': [0.45, 0.9, 0.96], /* semeadores */ 'samaritana-cidade': [0.5, 0.94, 0.96], 'campos-maduros': [0.5, 0.8, 0.96], 'da-familia': [0.5, 0.94, 0.96] };
   // A gravura neutra das cartas ainda sem desenho: o papel, a guilhoché e o símbolo.
   function desenhoEmBreve(k, W, H) {
     const g = k.createRadialGradient(W / 2, H / 2, 60, W / 2, H / 2, W * 0.75);
