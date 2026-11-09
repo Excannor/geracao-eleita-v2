@@ -58,6 +58,19 @@
     return { livro, cap, de };
   };
   CC.hrefDaRef = (r) => '#/biblia/' + encodeURIComponent(r.livro) + '/' + r.cap;
+  // Uma referência curta de estudo ("Gn 32.32", "Lc 14.15-24", "Êx 12.37 a Nm 33.49") vira a
+  // etiqueta que abre o capítulo no leitor (revisão de usabilidade, C7: as etiquetas tinham cara
+  // de botão e não abriam nada). Sem livro e capítulo reconhecíveis, fica a etiqueta de texto.
+  CC.refDaEtiqueta = (ref) => {
+    const cabeca = /^\D*?\d{1,3}(?:[.:]\d{1,3})?/.exec(String(ref || '').trim());
+    return cabeca ? CC.refDaBusca(cabeca[0]) : null;
+  };
+  CC.marcaRef = (ref) => {
+    const texto = CC.esc(ref).replace(/(\S) (?=\d)/g, '$1\u00a0').replace(/(\d)([-–])(?=\d)/g, '$1$2\u2060');
+    const r = CC.refDaEtiqueta(ref);
+    if (!r) return '<mark>' + texto + '</mark>';
+    return '<a class="ref-biblia" href="' + CC.hrefDaRef(r) + '" aria-label="' + CC.esc('Ler ' + r.livro + ' ' + r.cap + ' na Bíblia') + '"><mark>' + texto + '</mark></a>';
+  };
 
   // .folha-biblia: só apresentação, a folha do alto das telas da Bíblia (22-leitura.css)
   function esqueleto(alvo, titulo, voltar, seletor) {

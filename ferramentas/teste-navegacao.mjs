@@ -252,6 +252,20 @@ ok(await marcados() === 'biblia', 'o mapa aberto pela Bíblia continua marcando 
 await av('document.querySelector(".mapa-barra [data-voltar]").click()');
 ok(await esperar('location.hash === "#/biblia"'), 'e o voltar leva de volta à Bíblia');
 
+// ---------- as referências abrem a Bíblia (C7) ----------
+await ir('#/mapa/genesis', '!!document.querySelector(".mapa a.ref-biblia")', 15000);
+ok(await av('(() => { const l = [...document.querySelectorAll(".mapa mark")]; const a = l.filter((m) => m.closest("a.ref-biblia")); return a.length >= l.length * 0.9 && a.length > 10; })()'), 'no mapa de Gênesis, as etiquetas de referência são links');
+const hrefRef = await av('document.querySelector(".mapa a.ref-biblia").getAttribute("href")');
+ok(/^#\/biblia\/G%C3%AAnesis\/\d+$/.test(hrefRef), 'e abrem o capítulo de Gênesis (' + hrefRef + ')');
+await av('document.querySelector(".mapa a.ref-biblia").click()');
+ok(await esperar('!!document.querySelector(".leitor-biblia:not(.saindo)")'), 'tocar na etiqueta abre o capítulo no leitor');
+await voltar();
+ok(await esperar('location.hash === "#/mapa/genesis" && !document.querySelector(".leitor-biblia:not(.saindo)")'), 'e o voltar devolve o mapa');
+await ir('#/parabola/semeador', '!!document.querySelector(".fala-parabola, .texto-parabola")', 15000);
+ok(await av('document.querySelectorAll(".folha-parabola a.ref-biblia, .parabola a.ref-biblia").length') >= 2, 'na parábola, as referências também abrem a Bíblia');
+await ir('#/atlas/paulo-1', '!!document.querySelector(".atlas-sub")', 15000);
+ok(await av('!!document.querySelector(".atlas-sub a.ref-biblia[href=\\"#/biblia/Atos/13\\"]")'), 'no atlas, a referência do alto abre Atos 13');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');

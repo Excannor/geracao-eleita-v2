@@ -21,7 +21,8 @@
   const siglaDe = (nome) => (LIVROS.find(([l]) => l === nome) || [])[2] || nome;
   // citação que abre com palavra curta (“O nome...”, “o Filho...”) não deixa o “O sozinho no fim da linha
   const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1\u00a0');
-  const marca = (ref) => '<mark>' + nb(CC.esc(ref)) + '</mark>';
+  // a etiqueta abre o capítulo no leitor (CC.marcaRef, 04d-biblia.js)
+  const marca = (ref) => (CC.marcaRef ? CC.marcaRef(ref) : '<mark>' + nb(CC.esc(ref)) + '</mark>');
   const marcas = (refs) => (refs || []).map(marca).join(' ');
   // "Mt 1.23" por extenso: "Mateus 1.23"
   const porExtenso = (ref) => String(ref || '').replace(/^(\S+) /, (m, sigla) => (NOME_DA_SIGLA.get(sigla) || sigla) + ' ');

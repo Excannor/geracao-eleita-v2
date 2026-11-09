@@ -177,7 +177,7 @@
     const grupo = (CC.atlasDados.A.grupos.find((g) => g.id === item.grupo) || {}).nome || '';
     raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Atlas bíblico')
       + '<div class="atlas-cabeca"><span class="mapa-grupo">' + esc(grupo) + '</span><h1 class="atlas-nome">' + esc(m.titulo) + '</h1>'
-      + '<p class="atlas-sub">' + esc(m.sub) + ' · <mark>' + nb(esc(m.ref)) + '</mark></p>'
+      + '<p class="atlas-sub">' + esc(m.sub) + ' · ' + (CC.marcaRef ? CC.marcaRef(m.ref) : '<mark>' + nb(esc(m.ref)) + '</mark>') + '</p>'
       + (m.quando ? '<p class="atlas-quando">' + esc(m.quando.charAt(0).toUpperCase() + m.quando.slice(1)) + '</p>' : '') + '</div></div>'
       + (m.texto ? '<p class="atlas-texto">' + esc(m.texto) + '</p>' : '')
       + '<figure class="atlas-quadro" data-atlas-mapa="' + esc(m.slug) + '"><div class="atlas-palco" data-atlas-palco><div class="atlas-zoom">' + svg(m, { animar }) + '</div></div>'
