@@ -392,3 +392,8 @@ button.cartao-proposito:hover { background: var(--campo); }
 /* célula de menor de 18 aguardando a aprovação da liderança */
 .recado-lider.aviso-aprovacao { background: var(--amarelo-fraco); }
 .recado-lider.aviso-aprovacao p + p { margin-top: 6px; font-size: .9375rem; }
+
+/* o check-in do dia, em Discipulado: um cartão discreto no lugar da folha que abria sozinha (B5) */
+.cartao-checkin-dia { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 8px; padding: 14px 16px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.cartao-checkin-dia b { display: block; color: var(--tinta-forte); font-weight: 800; }
+.cartao-checkin-dia small { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }

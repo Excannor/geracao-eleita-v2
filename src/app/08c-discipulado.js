@@ -69,9 +69,13 @@
     if (!cache || !cache.meuDiscipulador) return;
     if (cache.meuCheckin && cache.meuCheckin.data === hoje) return;
     if (lerLocal('cc.checkin.pulado') === hoje) return;
-    if (document.querySelector('.cortina, .tela-cheia')) return;
-    folhaCheckin();
+    // Não abre mais sozinho por cima da tela (B5): fica o cartão discreto em Discipulado
+    // (cartaoCheckin), que a pessoa toca quando quiser.
   };
+  // O cartão do check-in do dia, para quem tem discipulador e ainda não contou hoje.
+  const cartaoCheckin = (d) => (d && d.meuDiscipulador && !(d.meuCheckin && d.meuCheckin.data === CC.hojeIso())
+    ? '<div class="cartao-checkin-dia"><span><b>Como você está hoje?</b><small>Corpo, mente e espírito, em três toques.</small></span>'
+      + '<button type="button" class="botao pequeno contorno" data-checkin-dia>Contar</button></div>' : '');
 
   // O check-in de hoje já foi feito? (do cache do boot; sem conta ou sem cache, "não")
   CC.checkinFeitoHoje = () => !!(cache && cache.meuCheckin && cache.meuCheckin.data === CC.hojeIso());
@@ -284,7 +288,7 @@
       + '<span class="arroba">Te acompanha desde ' + ddmm(m.desde) + '</span>'
       + '<span class="arroba">' + (m.ultimoEncontro ? 'Último encontro: ' + ddmm(m.ultimoEncontro) : 'Vocês ainda não marcaram um encontro') + '</span>'
       + '</div></div>'
-      + grupo('O que eu mostro', ORDEM_MOSTRAR.map((chave) => linhaInterruptor('mostrar-meu', chave, ROTULOS_MOSTRAR[chave], chave === 'checkin' ? mostrar.checkin !== false : mostrar[chave],
+      + grupo('O que eu mostro', ORDEM_MOSTRAR.map((chave) => linhaInterruptor('mostrar-meu', chave, ROTULOS_MOSTRAR[chave], chave === 'checkin' ? mostrar.checkin === true : mostrar[chave],
         chave === 'marcos' ? 'Só para ' + primeiroNome(m.nome) + '. Quem conduz a sua célula tem uma escolha à parte, em Minha caminhada.' : '')).join(''))
       + '<div class="pe-duplo-plano">'
       + '<button class="botao contorno" data-encontro-meu="' + CC.esc(m.id) + '">' + CC.ico('calendario') + 'Marcar que nos encontramos</button>'
@@ -353,7 +357,7 @@
   }
 
   function folhaAceitar(pedido) {
-    const estado = { passos: true, semana: true, checkin: true, marcos: false };
+    const estado = { passos: true, semana: true, checkin: false, marcos: false };
     CC.folha('<h2>O que você quer mostrar?</h2>'
       + '<p class="passo-dica">' + CC.esc(pedido.de.nome) + ' vai ver o que você deixar ligado. Você pode mudar isso quando quiser.</p>'
       + '<div class="caixa-config">' + ORDEM_MOSTRAR.map((chave) => linhaInterruptor('escolha', chave, ROTULOS_MOSTRAR[chave], estado[chave])).join('') + '</div>'
@@ -502,6 +506,7 @@
       const marcos = d.marcos || {};
       raiz.innerHTML = '<div class="folha-juntos">' + cabeca
         + '<p class="subtitulo-tela">Caminhe com alguém mais perto de Jesus.</p></div>'
+        + cartaoCheckin(d)
         + CC.tituloSecao('Minha caminhada')
         + '<p class="passo-dica pequena" data-quem-ve>' + CC.esc(quemVeCaminhada(d)) + '</p>'
         + '<div class="caixa-config">' + MARCOS.map((chave) => linhaMarco(chave, marcos[chave])).join('')
@@ -515,6 +520,8 @@
         + '<div class="acoes"><button class="botao contorno pequeno" data-convidar>' + CC.ico('mais-sinal') + 'Convidar alguém</button></div>';
 
       ligarMarcos(raiz);
+      const checkinDia = raiz.querySelector('[data-checkin-dia]');
+      if (checkinDia) checkinDia.onclick = () => folhaCheckin({ pronto: () => desenhar(cache) });
       const celula = raiz.querySelector('[data-caminhada-celula]');
       celula.onclick = async () => {
         const sim = celula.getAttribute('aria-checked') !== 'true';
