@@ -235,7 +235,11 @@
     // ainda tem vaga de membro de verdade, mesmo com a célula cheia de gente conhecendo.
     const podeChamar = p.membros.filter((m) => m.estado !== 'saiu' && m.papel !== 'visitante').length < (p.limite || (cache && cache.limiteCelula) || 20);
     const membro = eu.estado === 'ativo' && eu.papel !== 'visitante';
-    return topoDaCelula(p)
+    // No dia do encontro e no seguinte, sem presença registrada, o registro é o primeiro cartão (B7)
+    const registroNoAlto = conduzo && registroPendente(p);
+    return (registroNoAlto ? '<div class="registro-no-alto"><span class="etiqueta">' + (dataDoEncontro(p, CC.hojeIso()) === CC.hojeIso() ? 'Hoje é dia de encontro' : 'O encontro foi ontem')
+      + '</span>' + blocoEncontro(p) + '</div>' : '')
+      + topoDaCelula(p)
       + (conduzo ? oreHojePorHtml(p) : '')
       // No dia do encontro: com estudo, o caminho até ele; sem estudo, só quem prepara vê o selo.
       + (encontroHoje(p) && p.estudo ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
@@ -244,7 +248,7 @@
       // A meta ainda não foi batida e falta a minha leitura: o caminho até ela, sem rodeio.
       + (p.hoje && !p.hoje.batida && eu.estado === 'ativo' && !eu.fezHoje
         ? '<div class="acoes-missao acoes-meta"><a class="botao pequeno botao-ir-missao botao-ir-escuro" href="#/" data-ler-agora>Ler agora' + CC.ico('avancar') + '</a></div>' : '')
-      + (conduzo ? blocoEncontro(p) : '')
+      + (conduzo && !registroNoAlto ? blocoEncontro(p) : '')
       + (membro ? blocoCheckinHoje() : '')
       + (membro ? blocoCaminhadaHoje() : '')
       + '<div class="acoes">'
@@ -1234,6 +1238,14 @@
     return null;
   }
 
+  // O encontro desta semana foi hoje ou ontem e ainda não tem registro (nem "Não houve encontro").
+  function registroPendente(p) {
+    const hoje = CC.hojeIso();
+    const alvo = dataDoEncontro(p, hoje);
+    return !!alvo && (alvo === hoje || alvo === CC.somaDias(hoje, -1)) && !(p.ultimoEncontro && p.ultimoEncontro.data === alvo);
+  }
+  CC.registroPendente = registroPendente;
+
   // Botão (ou selo) de registrar o encontro: só aparece com dia de encontro marcado.
   function blocoEncontro(p) {
     const hoje = CC.hojeIso();
@@ -1364,7 +1376,10 @@
       + '<span><b>' + CC.esc(tituloDoEstudo(e)) + '</b>' + (e.dia ? '<small>Preparado em ' + ddmm(e.dia) + '</small>' : '') + '</span></label>').join('')
       + '<label class="opcao-estudo"><input type="radio" name="estudo-registro" value="-"' + (escolhido === '-' ? ' checked' : '') + '><span><b>' + NENHUM_ESTUDO + '</b></span></label>';
     const datas = opcoesDataEncontro(hoje);
-    const gente = p.membros.filter((m) => m.estado === 'ativo');
+    // quem conduz primeiro (líder, depois auxiliares), depois os membros e, no fim, os visitantes (B8)
+    const peso = (m) => (m.usuario === p.criadoPor ? 0 : m.papel === 'auxiliar' ? 1 : m.papel === 'visitante' ? 3 : 2);
+    const gente = p.membros.filter((m) => m.estado === 'ativo')
+      .sort((a, b) => peso(a) - peso(b) || String(nomeCurto(a)).localeCompare(String(nomeCurto(b)), 'pt-BR'));
     const rotuloData = (d) => (d === hoje ? 'Hoje' : d === CC.somaDias(hoje, -1) ? 'Ontem' : ddmm(d));
     // A data em destaque é a do encontro desta semana; as outras ficam atrás de "Outra data".
     const doEncontro = dataDoEncontro(p, hoje);
@@ -1380,26 +1395,47 @@
       + (estudosReg.length ? '<div class="estudo-do-registro"><span class="etiqueta">Estudo deste encontro</span><b data-estudo-escolhido></b>'
         + '<button type="button" class="botao plano pequeno" data-trocar-estudo aria-expanded="false">Trocar</button></div>'
         + '<div class="escolha-estudo" role="radiogroup" aria-label="Estudo deste encontro" data-opcoes-estudo hidden></div>' : '')
+      + '<div class="presenca-topo"><span class="etiqueta">Quem veio</span><button type="button" class="botao contorno pequeno" data-todos-vieram>' + CC.ico('certo') + 'Todos vieram</button></div>'
       + '<div class="escolha-amigos">' + gente.map((m) => '<label class="linha-amigo escolha-amigo">'
         + '<input type="checkbox" value="' + CC.esc(m.usuario) + '"' + (m.usuario === euUsuario() ? ' checked' : '') + '>' + retrato(m)
-        + '<span class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.papel === 'visitante' ? ' <small class="selo-lider">visitante</small>' : '') + '</b></span></label>').join('') + '</div>'
+        + '<span class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (m.usuario === p.criadoPor ? ' <small class="selo-lider">líder</small>' : m.papel === 'auxiliar' ? ' <small class="selo-lider">auxiliar</small>'
+          : m.papel === 'visitante' ? ' <small class="selo-lider">visitante</small>' : '') + '</b></span></label>').join('') + '</div>'
       + '<div class="conta-visitantes"><span>Pessoas sem conta que vieram</span><div class="conta-visitantes-controles">'
       + '<button type="button" class="botao-icone" data-visitantes-menos aria-label="Diminuir">−</button>'
       + '<b data-visitantes-valor>0</b>'
       + '<button type="button" class="botao-icone" data-visitantes-mais aria-label="Aumentar">+</button></div></div>'
       + '<p class="erro-proposito" role="alert" hidden></p>'
-      + '<div class="acoes"><button class="botao" data-salvar>Salvar</button>'
+      // uma rolagem só (a da folha), com o "Salvar" preso embaixo enquanto a lista passa (B8)
+      + '<div class="presenca-pe"><button class="botao" data-salvar>Salvar</button></div>'
+      + '<div class="acoes">'
       // Feriado ou imprevisto: a semana fica registrada sem encontro e ninguém conta como falta.
       + '<button class="botao contorno" data-sem-encontro>Não houve encontro nesta semana</button>'
       + '<button class="botao plano" data-fechar>Cancelar</button></div>',
     {
       rotulo: 'Quem foi ao encontro',
+      classe: 'folha-presenca',
       rolavel: true,
       ligar: (folha, fechar) => {
         let dataEscolhida = alvo;
         let n = visitantesDe(alvo);
         const valor = folha.querySelector('[data-visitantes-valor]');
         valor.textContent = n;
+        // "Salvar · 6 pessoas": quem foi marcado mais as pessoas sem conta
+        const caixas = [...folha.querySelectorAll('.escolha-amigo input')];
+        const salvarBotao = folha.querySelector('[data-salvar]');
+        const todos = folha.querySelector('[data-todos-vieram]');
+        const contar = () => {
+          const marcados = caixas.filter((i) => i.checked).length;
+          const total = marcados + n;
+          salvarBotao.textContent = total ? 'Salvar · ' + CC.plural(total, 'pessoa', 'pessoas') : 'Salvar';
+          todos.innerHTML = marcados === caixas.length ? 'Desmarcar todos' : CC.ico('certo') + 'Todos vieram';
+        };
+        caixas.forEach((i) => i.addEventListener('change', contar));
+        todos.onclick = () => {
+          const marcar = caixas.some((i) => !i.checked);
+          caixas.forEach((i) => { i.checked = marcar; });
+          contar();
+        };
         // o estudo escolhido: refeito ao trocar a data, a não ser que a pessoa já tenha escolhido
         let estudoEscolhido = escolhaDe(alvo);
         let escolheuEstudo = false;
@@ -1437,13 +1473,14 @@
               x.setAttribute('aria-pressed', String(sel));
             });
             n = visitantesDe(dataEscolhida);
-            valor.textContent = n;
+            valor.textContent = n; contar();
             if (!escolheuEstudo || !vale(estudoEscolhido, dataEscolhida)) estudoEscolhido = escolhaDe(dataEscolhida);
             pintarEstudo();
           };
         });
-        folha.querySelector('[data-visitantes-menos]').onclick = () => { n = Math.max(0, n - 1); valor.textContent = n; };
-        folha.querySelector('[data-visitantes-mais]').onclick = () => { n = Math.min(30, n + 1); valor.textContent = n; };
+        folha.querySelector('[data-visitantes-menos]').onclick = () => { n = Math.max(0, n - 1); valor.textContent = n; contar(); };
+        folha.querySelector('[data-visitantes-mais]').onclick = () => { n = Math.min(30, n + 1); valor.textContent = n; contar(); };
+        contar();
         folha.querySelector('[data-fechar]').onclick = fechar;
         folha.querySelector('[data-sem-encontro]').onclick = async () => {
           const botao = folha.querySelector('[data-sem-encontro]');

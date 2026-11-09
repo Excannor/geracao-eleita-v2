@@ -870,7 +870,15 @@
         q('[data-fechar]').onclick = fechar;
         q('[data-anterior]').onclick = () => { if (i > 0) { i--; mostrar(); } };
         q('[data-proximo]').onclick = () => { if (i < lista.length - 1) { i++; mostrar(); } };
-        q('[data-concluir]').onclick = () => { passoGuardado.delete(e.id); fechar(); };
+        // Concluir lembra da presença de quem conduz, se o encontro ainda não foi registrado (B7)
+        q('[data-concluir]').onclick = async () => {
+          passoGuardado.delete(e.id);
+          fechar();
+          if (!p.euConduzo || !(CC.registroPendente && CC.registroPendente(p))) return;
+          const sim = await CC.confirmar({ titulo: 'Registrar quem veio agora?', texto: 'A presença mostra quem precisa de atenção e a frequência da célula. Leva um minuto.',
+            acao: 'Registrar quem veio', cancelar: 'Agora não' });
+          if (sim) apoio.registrarEncontro(p, { estudo: e.id });
+        };
         mostrar();
       },
     });
