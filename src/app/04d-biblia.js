@@ -26,9 +26,16 @@
     wireVoltar(alvo);
   }
 
+  // "Ler | Explorar": o Explorar (mapas dos livros, parábolas, atlas, pessoas, lugares) mora na
+  // aba Bíblia, no alto da lista dos livros e do próprio Explorar (revisão de usabilidade, C3).
+  // Links de verdade: os endereços de sempre (#/biblia, #/explorar) continuam valendo.
+  CC.seletorBiblia = (atual) => '<nav class="segmentado seletor-biblia" aria-label="Bíblia">'
+    + [['ler', '#/biblia', 'Ler'], ['explorar', '#/explorar', 'Explorar']].map(([id, href, rotulo]) => '<a href="' + href + '"'
+      + (id === atual ? ' aria-current="page"' : '') + '>' + rotulo + '</a>').join('') + '</nav>';
+
   // .folha-biblia: só apresentação, a folha do alto das telas da Bíblia (22-leitura.css)
-  function esqueleto(alvo, titulo, voltar) {
-    alvo.innerHTML = '<div class="folha-biblia">' + (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1></div>'
+  function esqueleto(alvo, titulo, voltar, seletor) {
+    alvo.innerHTML = '<div class="folha-biblia' + (seletor ? ' com-seletor' : '') + '">' + (seletor ? CC.seletorBiblia('ler') : '') + (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1></div>'
       + CC.esqueleto('biblia');
     if (voltar) wireVoltar(alvo);
   }
@@ -75,7 +82,7 @@
         + '</a>';
       return mapa
         ? '<div class="celula-livro' + (l.length >= 12 ? ' longo' : '') + '">' + item
-          + '<a class="mapa-livro" href="#/mapa/' + mapa.slug + '" aria-label="Ver o mapa de ' + CC.esc(l) + '">' + CC.ico('mapa') + '</a></div>'
+          + '<a class="mapa-livro" href="#/mapa/' + mapa.slug + '" aria-label="Ver o mapa do livro ' + CC.esc(l) + '">' + CC.ico('ramos') + '</a></div>'
         : item;
     }).join('') + '</div>';
   }
@@ -104,14 +111,15 @@
   function listar(alvo, minha) {
     if (semTraducaoOuOffline(alvo)) return;
     const b = CC.traducao();
-    esqueleto(alvo, 'Bíblia');
+    esqueleto(alvo, 'Bíblia', null, true);
     CC.carregarBiblia(b).then((biblia) => {
       if (minha !== geracao) return;
       const livros = Object.keys(biblia.livros); // ordem canônica, do jeito que vem no arquivo
       const antigo = livros.filter((l) => !CC.ehNovoTestamento(l));
       const novo = livros.filter((l) => CC.ehNovoTestamento(l));
       // O título abre a escolha da tradução: a sigla da atual fica à vista ao lado.
-      alvo.innerHTML = '<div class="folha-biblia"><a class="botao-redondo atalho-anotacoes" href="#/perfil/anotacoes" aria-label="Minhas anotações">' + CC.ico('caderno') + '</a>'
+      alvo.innerHTML = '<div class="folha-biblia com-seletor">' + CC.seletorBiblia('ler')
+        + '<a class="botao-redondo atalho-anotacoes" href="#/perfil/anotacoes" aria-label="Minhas anotações">' + CC.ico('caderno') + '</a>'
         + '<h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
         + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '. Trocar a tradução">Bíblia<span class="sigla-versao">'
         + CC.esc(b.abreviatura || b.sigla.toUpperCase()) + CC.ico('baixo') + '</span></button></h1>'

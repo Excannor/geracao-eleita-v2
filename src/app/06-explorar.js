@@ -294,7 +294,7 @@
     const perguntas = cartaoPerguntasHonestas();
 
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css): o título, a frase e a busca.
-    raiz.innerHTML = '<div class="folha-perfil"><h1>Explorar</h1>'
+    raiz.innerHTML = '<div class="folha-perfil folha-explorar">' + (CC.seletorBiblia ? CC.seletorBiblia('explorar') : '') + '<h1>Explorar</h1>'
       + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
       + CC.campoBusca('') + '</div>'
       // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.

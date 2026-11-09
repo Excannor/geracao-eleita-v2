@@ -281,7 +281,7 @@
       const sub = feitas && lista.length ? feitas + ' de ' + lista.length + ' desafios de hoje concluídos' : 'Complete os três desafios de hoje';
       itens.push(itemPainelMais(CC.icoAba('bau'), false, 'Desafios', sub, '#/missoes'));
     }
-    itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Temas, pessoas e lugares da Bíblia', '#/explorar'));
+    itens.push(itemPainelMais(CC.icoAba('bussola'), true, 'Explorar', 'Mapas, parábolas, pessoas e lugares', '#/explorar'));
     itens.push(itemPainelMais(CC.ico('caderno'), true, 'Minhas anotações', 'Notas, orações e versículos marcados', '#/perfil/anotacoes'));
     itens.push(itemPainelMais(CC.ico('aperto'), true, 'Apoiar o app', 'Doação pelo Pix', '#/apoiar'));
     // Instalar não é uma tela: abre o passo a passo (07c-instalar.js). Quem já usa pelo ícone não vê.
@@ -441,11 +441,11 @@
     'Bíblia': (h) => h === '#/biblia',
     'Primeiros passos': (h) => h === '#/licoes',
     'Parábolas': (h) => h === '#/parabolas',
-    'Mapas bíblicos': (h) => h === '#/atlas',
+    'Atlas bíblico': (h) => h === '#/atlas',
     'Minhas anotações': (h) => h === '#/perfil/anotacoes',
   };
   const ENDERECO_DO_ROTULO = { 'Trilha': '#/', 'Perfil': '#/perfil', 'Juntos': '#/novidades', 'Explorar': '#/explorar',
-    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas', 'Mapas bíblicos': '#/atlas',
+    'Configurações': '#/config', 'Bíblia': '#/biblia', 'Primeiros passos': '#/licoes', 'Parábolas': '#/parabolas', 'Atlas bíblico': '#/atlas',
     'Minhas anotações': '#/perfil/anotacoes' };
   // Muitas telas (Discipulado, Painel, Notificações, Perfil...) só desenham o voltar DEPOIS
   // que os dados chegam, quando o roteador já tinha passado. Ligar o clique botão a botão

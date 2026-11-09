@@ -21,8 +21,8 @@
     const capa = A.itens[0];
     // fundo por CSS (e não <img>): sem a imagem, fica só o tom do cartão, sem ícone de quebrada
     return '<a class="cartao-atlas" href="#/atlas"><span class="atlas-capa" aria-hidden="true" style="background-image:url(\'./' + CC.esc(capa.imagem) + '\')"></span>'
-      + '<span class="cartao-atlas-textos"><span class="cartao-atlas-titulo">Mapas bíblicos</span>'
-      + '<span class="cartao-atlas-dica">Onde a história aconteceu</span></span>' + CC.ico('avancar') + '</a>';
+      + '<span class="cartao-atlas-textos"><span class="cartao-atlas-titulo">Atlas bíblico</span>'
+      + '<span class="cartao-atlas-dica">Mapas de onde a história aconteceu</span></span>' + CC.ico('avancar') + '</a>';
   };
 
   // ---------- os arquivos sob demanda ----------
@@ -50,8 +50,8 @@
     const pintar = () => CC.atlas.tela(raiz, item, item ? pronto(item.arquivo) : null);
     if (temTela() && (!item || pronto(item.arquivo))) { pintar(); return; }
     raiz.innerHTML = '<div class="folha-mapa"><div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="'
-      + (item ? 'Mapas bíblicos' : 'Explorar') + '" aria-label="Voltar">' + CC.ico('voltar') + '</button>'
-      + '<span class="mapa-barra-titulo">Mapas bíblicos</span><span style="width:44px"></span></div></div>' + CC.esqueleto('texto');
+      + (item ? 'Atlas bíblico' : 'Explorar') + '" aria-label="Voltar">' + CC.ico('voltar') + '</button>'
+      + '<span class="mapa-barra-titulo">Atlas bíblico</span><span style="width:44px"></span></div></div>' + CC.esqueleto('texto');
     CC.ligarVoltarDoTopo(raiz);
     if (!CC.appServido()) { raiz.querySelector('.esqueleto').outerHTML = '<div class="vazio">Não consegui abrir os mapas agora.</div>'; return; }
     const geracao = (raiz.dataset.atlasGeracao = String(Date.now()));

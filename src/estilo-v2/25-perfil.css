@@ -43,7 +43,7 @@
    do título, que se estende por trás dele: o toque na borda do círculo é do voltar. */
 .folha-perfil > .voltar { position: relative; z-index: 1; }
 .folha-perfil > .voltar:only-child { margin: 0; }
-.folha-perfil > h1:first-child { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 20px; font-size: 1.375rem; text-align: center; }
+.folha-perfil > h1:first-child, .folha-perfil > .seletor-biblia + h1 { display: flex; align-items: center; justify-content: center; min-height: 48px; margin: 0 0 20px; font-size: 1.375rem; text-align: center; }
 .folha-perfil > p { max-width: 34ch; margin: -12px auto 12px; color: var(--folha-tinta-fraca); font-size: .9375rem; font-weight: 500; line-height: 1.45; text-align: center; text-wrap: balance; }
 .folha-perfil > p:not(.passo-dica) { color: var(--folha-tinta); }
 .folha-perfil > p + p { margin-top: 0; }

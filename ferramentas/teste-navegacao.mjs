@@ -206,6 +206,27 @@ await dormir(400);
 ok(await av('(() => { const b = getComputedStyle(document.querySelector(".aba-central")); return b.backgroundColor === "rgba(0, 0, 0, 0)" || b.backgroundColor === "transparent"; })()'),
   'fora da Bíblia, o botão Bíblia não tem fundo de selecionado');
 
+// ---------- o Explorar mora na aba Bíblia (C3) ----------
+await ir('#/biblia', '!!document.querySelector(".seletor-biblia")', 15000);
+ok(await av('(() => { const a = [...document.querySelectorAll(".seletor-biblia a")]; return a.length === 2 && a[0].textContent === "Ler" && a[0].getAttribute("aria-current") === "page" && a[1].getAttribute("href") === "#/explorar"; })()'),
+  'a Bíblia tem "Ler | Explorar" no alto, com Ler marcado');
+await av('document.querySelectorAll(".seletor-biblia a")[1].click()');
+ok(await esperar('location.hash === "#/explorar" && !!document.querySelector(".cartao-mapas") && document.querySelector(".seletor-biblia a[aria-current]").textContent === "Explorar"'),
+  'tocar em Explorar abre o Explorar, com Explorar marcado');
+ok(await av('document.querySelector(".cartao-atlas-titulo").textContent') === 'Atlas bíblico' && await av('document.querySelector(".mapas-titulo").textContent') === 'Mapas dos livros',
+  'os dois cartões de mapa têm nomes diferentes: "Mapas dos livros" e "Atlas bíblico"');
+await av('document.querySelector("[data-abrir-mais]").click()');
+ok(await esperar('!!document.querySelector(".painel-mais a[href=\\"#/explorar\\"]")'), 'o Mais continua com o link do Explorar');
+await voltar();
+
+// ---------- depuração ----------
+if (process.env.DEPURAR_BUSCA) {
+  await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');
+  await av('(() => { const c = document.getElementById("campo-busca"); window.__c = c; c.focus(); c.value = "s"; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
+  await dormir(1200);
+  console.log(await av('JSON.stringify([location.hash, document.getElementById("campo-busca") === window.__c, document.activeElement && document.activeElement.id, document.activeElement && document.activeElement.className])'));
+}
+
 // ---------- fim ----------
 const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown').map((e) => e.params.exceptionDetails?.exception?.description || 'exceção');
 ok(erros.length === 0, 'nenhuma exceção de JavaScript' + (erros[0] ? ': ' + erros[0].slice(0, 120) : ''));

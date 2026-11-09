@@ -124,7 +124,7 @@
   };
   const linhaAmostra = (tipo) => '<svg class="atlas-amostra ' + tipo + '" viewBox="0 0 28 8" aria-hidden="true"><path d="M2 4h24"/></svg>';
   const barra = (voltar) => '<div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">'
-    + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Mapas bíblicos</span><span class="atlas-vaga"></span></div>';
+    + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Atlas bíblico</span><span class="atlas-vaga"></span></div>';
 
   // ---------- a lista (#/atlas) ----------
   function lista(raiz) {
@@ -139,7 +139,7 @@
         + '<span class="item-atlas-pe"><mark>' + nb(esc(it.ref)) + '</mark>' + CC.ico('avancar') + '</span></span></a>';
     };
     raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Explorar')
-      + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Mapas bíblicos</h1>'
+      + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Atlas bíblico</h1>'
       + '<p>As cidades, os caminhos e o relevo de onde a história aconteceu.</p></div></div>'
       + '<div class="lista-atlas">' + A.grupos.map((g) => '<section class="grupo-atlas"><h2>' + esc(g.nome) + '</h2>'
         + A.itens.filter((it) => it.grupo === g.id).map(cartao).join('') + '</section>').join('')
@@ -175,7 +175,7 @@
     // a linha se desenha quando a tela abre; um redesenho com o mesmo mapa na tela não repete
     const animar = !raiz.querySelector('[data-atlas-mapa="' + m.slug + '"]');
     const grupo = (CC.atlasDados.A.grupos.find((g) => g.id === item.grupo) || {}).nome || '';
-    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Mapas bíblicos')
+    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Atlas bíblico')
       + '<div class="atlas-cabeca"><span class="mapa-grupo">' + esc(grupo) + '</span><h1 class="atlas-nome">' + esc(m.titulo) + '</h1>'
       + '<p class="atlas-sub">' + esc(m.sub) + ' · <mark>' + nb(esc(m.ref)) + '</mark></p>'
       + (m.quando ? '<p class="atlas-quando">' + esc(m.quando.charAt(0).toUpperCase() + m.quando.slice(1)) + '</p>' : '') + '</div></div>'
