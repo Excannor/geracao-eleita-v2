@@ -168,6 +168,44 @@ ok(await folhas() === 0 && await av('location.hash') === '#/config', 'fechar uma
 await voltar();
 ok(await av('location.hash') === '#/perfil', 'e o voltar seguinte sai da tela');
 
+// ---------- a grade de capítulos abre no alto (C2) ----------
+await ir('#/biblia', '!!document.querySelector(".item-livro")', 15000);
+await dormir(400);
+await av('document.querySelector(".item-livro[href=\\"#/biblia/Salmos\\"]").scrollIntoView({ block: "center" })');
+await dormir(300);
+const yLista = await av('CC.rolagemY()');
+await av('document.querySelector(".item-livro[href=\\"#/biblia/Salmos\\"]").click()');
+ok(await esperar('document.querySelectorAll(".grade-capitulos a").length === 150'), 'Salmos abre com os 150 capítulos');
+await dormir(400);
+ok(yLista > 400 && await av('CC.rolagemY()') < 5 && await av('document.querySelector("#conteudo h1").getBoundingClientRect().top >= 0'),
+  'a grade de Salmos abre no alto, com o nome à vista (a lista estava em ' + Math.round(yLista) + 'px)');
+await voltar();
+await esperar('!!document.querySelector(".item-livro")');
+await dormir(500);
+ok(Math.abs(await av('CC.rolagemY()') - yLista) < 40, 'o voltar devolve a lista na altura em que estava');
+await ir('#/biblia/Salmos/23', '!!document.querySelector(".leitor-biblia")');
+await av('CC.rolarPara(300)');
+await voltar();
+ok(await esperar('!document.querySelector(".leitor-biblia:not(.saindo)")'), 'fechar o capítulo devolve a grade');
+
+// ---------- a barra marca um lugar só (C5) ----------
+const marcados = () => av('[...document.querySelectorAll(".navegacao .aba.selecionada:not(.so-trilho), .topo .selecionado")].map((b) => b.dataset.papel || (b.classList.contains("perfil-topo") ? "retrato" : "sino")).join(",")');
+const casos = [
+  ['#/', 'trilha'], ['#/biblia', 'biblia'], ['#/explorar', 'biblia'], ['#/mapa/genesis', 'biblia'], ['#/parabolas', 'biblia'],
+  ['#/atlas', 'biblia'], ['#/nota/' + encodeURIComponent('11 - Pessoas/Davi'), 'biblia'], ['#/perfil', 'retrato'], ['#/perfil/album', 'retrato'],
+  ['#/perfil/anotacoes', 'mais'], ['#/config', 'mais'], ['#/apoiar', 'mais'], ['#/avisos', 'sino'], ['#/missoes', 'desafios'], ['#/novidades', 'juntos'],
+];
+for (const [hash, esperado] of casos) {
+  await ir(hash, 'true');
+  await dormir(500);
+  const m = await marcados();
+  ok(m === esperado, hash + ' marca só ' + esperado + (m === esperado ? '' : ' (marcou: ' + (m || 'nada') + ')'));
+}
+await ir('#/', 'true');
+await dormir(400);
+ok(await av('(() => { const b = getComputedStyle(document.querySelector(".aba-central")); return b.backgroundColor === "rgba(0, 0, 0, 0)" || b.backgroundColor === "transparent"; })()'),
+  'fora da Bíblia, o botão Bíblia não tem fundo de selecionado');
+
 // ---------- fim ----------
 const erros = evs.filter((e) => e.method === 'Runtime.exceptionThrown').map((e) => e.params.exceptionDetails?.exception?.description || 'exceção');
 ok(erros.length === 0, 'nenhuma exceção de JavaScript' + (erros[0] ? ': ' + erros[0].slice(0, 120) : ''));

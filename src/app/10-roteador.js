@@ -41,37 +41,39 @@
   // null é o marcador do botão Mais: ele não é um item de dados como os outros (não tem
   // rota própria, abre um painel), então entra por fora do array de abas comuns.
 
+  // Uma tela pertence a uma aba só (revisão de usabilidade, C5): a barra marca um lugar de
+  // cada vez, e o retrato do topo e o sino só se acendem nas telas deles, sem aba nenhuma.
+  //   - O Explorar mora na aba Bíblia ("Ler | Explorar" no alto das duas telas): as seções,
+  //     as notas, a busca, os mapas dos livros, as parábolas, o atlas e as perguntas honestas
+  //     marcam a Bíblia. No trilho do computador, quem se acende é o item Explorar.
+  //   - O que mora no Mais (Minhas anotações, Apoiar, Configurações, o painel) marca o Mais.
+  //   - O Perfil (o retrato) e os Avisos (o sino) não marcam aba nenhuma.
+  const MAIS = 'mais';
   const ABA_DA_ROTA = {
     '': '#/', dia: '#/', passos: '#/', licoes: '#/', praticar: '#/missoes', missoes: '#/missoes',
     amigos: '#/novidades', novidades: '#/novidades',
     celula: '#/celula',
     discipulado: '#/discipulado',
-    // O Explorar não é mais aba própria: mora dentro do Mais, mas continua marcando o Mais
-    // como selecionado enquanto a pessoa está nele (ver maisSelecionado, abaixo).
-    explorar: '#/explorar', secao: '#/explorar', nota: '#/explorar', busca: '#/explorar',
-    // O mapa de cada livro mora no Explorar (decisão do dono, 02/10); desde 04/10 a lista da
-    // Bíblia e o fim da lição levam a ele, e ele continua marcando o Mais.
-    mapa: '#/explorar',
-    // As parábolas também moram no Explorar (cartão logo abaixo dos mapas).
-    parabolas: '#/explorar', parabola: '#/explorar',
-    // Os mapas bíblicos (o atlas geográfico) também: cartão logo abaixo das parábolas.
-    atlas: '#/explorar',
-    // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está
-    // nesse caminho); as perguntas honestas são material de consulta, como o Explorar.
-    conhecer: '#/', seguir: '#/', perguntas: '#/explorar',
+    biblia: '#/biblia',
+    explorar: '#/biblia', secao: '#/biblia', nota: '#/biblia', busca: '#/biblia',
+    mapa: '#/biblia', parabolas: '#/biblia', parabola: '#/biblia', atlas: '#/biblia', perguntas: '#/biblia',
+    // O Conhecer Jesus mora na Trilha (troca de lugar com o plano anual para quem está nesse caminho).
+    conhecer: '#/', seguir: '#/',
     // O estudo da célula aberto pelo endereço curto (a anotação em Minhas anotações) mora na célula.
     estudo: '#/celula',
-    // A caixa do sino abre do Início.
-    avisos: '#/',
-    // Apoiar também mora no Mais: marca o Mais como selecionado, como o Explorar.
-    apoiar: '#/explorar',
-    // Perfil e Config não apontam para nenhuma das abas da barra: quem marca o retrato
-    // do topo como selecionado é pintarTopo, lendo a rota direto.
-    perfil: '#/perfil', config: '#/perfil',
-    // não aponta para nenhuma aba: assim nenhuma fica marcada como selecionada enquanto a
-    // Bíblia está aberta, e o botão central cuida da sua própria marcação.
-    biblia: '#/biblia',
+    apoiar: MAIS, config: MAIS,
+    avisos: null, perfil: null,
   };
+  // As rotas do Explorar, para o trilho do computador acender o item Explorar no lugar da Bíblia.
+  const ROTAS_DO_EXPLORAR = new Set(['explorar', 'secao', 'nota', 'busca', 'mapa', 'parabolas', 'parabola', 'atlas', 'perguntas']);
+  CC.rotaDoExplorar = (rota) => ROTAS_DO_EXPLORAR.has(rota);
+  // A aba de uma rota (e do argumento dela): '#/...', MAIS ou null (nenhuma).
+  function abaDaRota(rota, arg) {
+    if ((rota === 'novidades' || rota === 'amigos') && arg && arg.startsWith('celula/')) return '#/celula';
+    if (rota === 'perfil' && arg === 'discipulado') return '#/discipulado';
+    if (rota === 'perfil' && arg === 'anotacoes') return MAIS;
+    return Object.hasOwn(ABA_DA_ROTA, rota) ? ABA_DA_ROTA[rota] : '#/';
+  }
 
   const lerLocal = (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } };
   const gravarLocal = (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* segue */ } };
@@ -116,10 +118,11 @@
   CC.pilulaDaChama = (seq, extra) => '<button class="contador ofensiva' + (seq.atual ? ' ativo' : '') + (seq.feitoHoje ? ' hoje' : '') + (extra || '')
     + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, ' + CC.estagioDaChama(seq.atual).nome + '">'
     + CC.icoChama(seq.atual) + '<span>' + seq.atual + '</span></button>';
-  CC.sinoDoTopo = () => {
+  CC.sinoDoTopo = (aceso) => {
     if (!location.protocol.startsWith('http')) return '';
     const n = CC.avisosNaoLidos ? CC.avisosNaoLidos() : 0;
-    return '<a class="botao-redondo sino-topo" href="#/avisos" data-sino aria-label="' + (n ? 'Avisos, ' + n + ' novos' : 'Avisos') + '">'
+    return '<a class="botao-redondo sino-topo' + (aceso ? ' selecionado' : '') + '" href="#/avisos" data-sino'
+      + (aceso ? ' aria-current="page"' : '') + ' aria-label="' + (n ? 'Avisos, ' + n + ' novos' : 'Avisos') + '">'
       + CC.ico('sino') + (n ? '<i class="ponto"></i>' : '') + '</a>';
   };
 
@@ -134,7 +137,8 @@
     // estado de selecionado entra no próprio HTML para o cache abaixo redesenhar ao mudar.
     const rota = partesDaRota().rota;
     const { arg: argDaRota } = partesDaRota();
-    const naContaOuConfig = rota === 'perfil' || (rota === 'config' && !String(argDaRota || '').startsWith('painel'));
+    // o retrato só se acende no Perfil e nas telas dele (Minhas anotações mora no Mais)
+    const naContaOuConfig = rota === 'perfil' && argDaRota !== 'anotacoes' && argDaRota !== 'discipulado';
     const foto = CC.foto();
     const retrato = foto ? '<img class="retrato-topo" src="' + CC.esc(foto) + '" alt="">' : CC.icoAba('pessoa');
 
@@ -142,7 +146,7 @@
     // sino com o ponto de avisos. O Início desenha a mesma peça na folha dele, com a saudação.
     const html = '<div class="estatisticas">'
       + CC.pilulaDaChama(seq, subiu ? ' subiu' : '')
-      + CC.sinoDoTopo()
+      + CC.sinoDoTopo(rota === 'avisos')
       + '</div>'
       + '<button class="perfil-topo' + (naContaOuConfig ? ' selecionado' : '') + '" data-ir="#/perfil" aria-label="Perfil"'
       + (naContaOuConfig ? ' aria-current="page"' : '') + '>' + retrato + '</button>';
@@ -314,18 +318,12 @@
     const dono = (CC.quem && CC.quem.usuario) || '';
     const chaveNova = (papel) => 'cc.novaaba.' + papel + ':' + dono;
 
-    let ativa = ABA_DA_ROTA[rota] || '#/';
-    if ((rota === 'novidades' || rota === 'amigos') && arg && arg.startsWith('celula/')) ativa = '#/celula';
-    if (rota === 'perfil' && arg === 'discipulado') ativa = '#/discipulado';
-    const naBiblia = rota === 'biblia';
+    const ativa = abaDaRota(rota, arg);
+    const naBiblia = ativa === '#/biblia';
+    const noExplorar = ROTAS_DO_EXPLORAR.has(rota);
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
-    // Minhas anotações abre pelo Mais; vindo de lá (e não do Perfil), o Mais fica aceso.
-    // Minha história com Deus mora dentro de Minhas anotações (cartão fixo no topo).
-    const anteriorNav = pilha.length >= 2 ? pilha[pilha.length - 2] : '';
-    const doMais = rota === 'perfil' && arg === 'anotacoes' && !anteriorNav.startsWith('#/perfil');
-    // O painel do administrador também abre pelo Mais (só para o admin): com ele aberto, o Mais fica aceso.
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
-    const maisSelecionado = !naBiblia && (doMais || noPainel || ativa === '#/explorar' || (!desafiosNaBarra && ativa === '#/missoes'));
+    const maisSelecionado = ativa === MAIS || (!desafiosNaBarra && ativa === '#/missoes');
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
     // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
@@ -333,7 +331,8 @@
     if (ativa === '#/discipulado') gravarLocal(chaveNova('discipulado'), '1');
 
     const aba = ([href, rotulo, icone, papel], soTrilho) => {
-      const sel = href === ativa && !(soTrilho && papel === 'explorar' && rota === 'apoiar');
+      // no trilho do computador o Explorar tem item próprio, e é ele que se acende
+      const sel = papel === 'explorar' ? soTrilho && noExplorar : href === ativa;
       const ponto = (papel === 'juntos' && pendencias) || (papel === 'celula' && pontoCelula) || (papel === 'discipulado' && pontoDiscipulado)
         ? '<i class="ponto-aba"></i>' : '';
       return '<button type="button" class="aba' + (sel ? ' selecionada' : '') + (soTrilho ? ' so-trilho' : '') + '" data-papel="' + papel + '" data-ir="' + href + '"'
@@ -352,6 +351,7 @@
 
     const lado = (itens) => itens.map((t) => (t === null ? botaoMais() : aba(t))).join('');
     const biblia = '<button type="button" class="aba aba-central' + (naBiblia ? ' selecionada' : '') + '" data-papel="biblia" data-ir="#/biblia" aria-label="Bíblia"'
+      + (noExplorar ? ' data-via-explorar' : '')
       + (naBiblia ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba('livro') + '</span>'
       + '<span class="rotulo-aba">Bíblia</span></button>';
     // Fantasmas: só existem para o trilho lateral (>= 860px), que sempre mostra Desafios e

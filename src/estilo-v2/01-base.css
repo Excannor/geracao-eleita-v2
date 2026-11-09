@@ -777,3 +777,34 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
   .aba.extra-trilho .ico-aba { width: 20px; height: 20px; }
   .aba.extra-trilho .rotulo-aba { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.875rem; font-weight: 600; }
 }
+
+/* Um lugar marcado de cada vez (revisão de usabilidade, C5). A Bíblia continua com o ícone em
+   destaque (o quadradinho sálvia-pálido), mas sem o fundo de selecionada quando a pessoa está
+   noutra aba: aceso é o mesmo de todas, o nome forte com o tracinho, e o quadradinho cheio. */
+@media (max-width: 859px) {
+  .navegacao .aba-central,
+  .navegacao.cheia .aba.aba-central,
+  .navegacao .aba-central.selecionada,
+  .navegacao .aba-central:hover { background: none; box-shadow: none; }
+  .navegacao .aba-central { justify-content: flex-start; padding-top: 2px; gap: 2px; min-height: 50px; height: auto; }
+  .navegacao .aba-central .icone-aba,
+  .navegacao .aba-central:hover .icone-aba { width: 52px; height: 30px; border-radius: 12px; background: var(--salvia-palido); color: var(--salvia-texto); }
+  .navegacao .aba-central .rotulo-aba,
+  .navegacao.cheia .aba.aba-central .rotulo-aba { color: var(--barra-rotulo); font-weight: 600; }
+  .navegacao .aba-central.selecionada .icone-aba { background: var(--salvia); color: var(--salvia-tinta); }
+  .navegacao .aba-central.selecionada .rotulo-aba { color: var(--barra-ativa); font-weight: 800; }
+  .navegacao .aba-central.selecionada .rotulo-aba::after {
+    content: ''; display: block; width: 22px; height: 3px; margin: 3px auto 0; border-radius: 3px; background: var(--barra-ativa);
+  }
+  .navegacao.cheia .aba-central .icone-aba { width: 46px; }
+  .navegacao.cheia .aba-central.selecionada .icone-aba::after {
+    content: ''; display: block; position: absolute; left: 50%; bottom: -6px; width: 18px; height: 3px; margin-left: -9px; border-radius: 3px; background: var(--barra-ativa);
+  }
+}
+/* No trilho do computador o Explorar tem item próprio: com ele aceso, a Bíblia fica apagada. */
+@media (min-width: 860px) {
+  .aba.aba-central.selecionada[data-via-explorar] { background: none; color: var(--tinta); }
+  .aba.aba-central.selecionada[data-via-explorar] .icone-aba { background: var(--salvia); color: var(--salvia-tinta); }
+}
+/* O sino aceso nos Avisos, como o retrato no Perfil. */
+.topo .sino-topo.selecionado { box-shadow: 0 0 0 2.5px var(--fundo), 0 0 0 4.5px var(--tinta-forte); }
