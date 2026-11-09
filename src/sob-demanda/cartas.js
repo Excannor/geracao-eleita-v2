@@ -21092,7 +21092,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     const legenda = opts.legenda || ('Nova! ' + (carta.album || ''));
     alvo.innerHTML = '<div class="rv" data-raridade="' + rar + '" data-fase="fechado" style="--luz:' + R.luz + ';--tinta-r:' + R.tinta
       + ';--t:' + ESCALA_TEMPO + ';--lc:' + larg + 'px;--lb:' + largBau + 'px;--yb:' + yb + 'px;--s0:' + S0 + ';--boca:' + boca + '">'
-      + '<button type="button" class="botao contorno pequeno rv-pular">Pular</button>'
+      // "Pular animação" só aparece com a animação andando: antes do toque ele parecia "pular o prêmio"
+      + '<button type="button" class="botao contorno pequeno rv-pular">Pular animação</button>'
+      + '<p class="rv-dica-toque">Toque no baú para abrir</p>'
       + '<div class="rv-palco">'
       + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-aura" aria-hidden="true"></i>'
       + '<div class="rv-bau-pecas" aria-hidden="true"><span class="rv-peca rv-boca"></span><i class="rv-luz"></i>'
@@ -21100,8 +21102,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       + '<div class="rv-saida"><div class="rv-carta"><i class="rv-anel" aria-hidden="true"></i></div></div>'
       + '<button type="button" class="rv-bau" aria-label="Abrir o baú"><span class="rv-peca rv-corpo"></span><span class="rv-peca rv-tampa"><span class="rv-dobradica"></span></span></button>'
       + '</div>'
-      + '<p class="rv-raridade">' + iconeSvg(rar) + '<span>' + R.nome + '</span></p>'
-      + '<div class="rv-fim" tabindex="-1" aria-live="polite"><p class="rv-nova">' + legendaHtml(legenda) + '</p>'
+      // a raridade só aparece (e só é lida) depois que a carta vira: a arte e o texto vêm antes
+      + '<p class="rv-raridade" aria-hidden="true">' + iconeSvg(rar) + '<span>' + R.nome + '</span></p>'
+      + '<div class="rv-fim" tabindex="-1" aria-live="polite" aria-hidden="true" inert><p class="rv-nova">' + legendaHtml(legenda) + '</p>'
       + '<p class="rv-titulo">' + CC.esc(carta.titulo) + ' <span>' + CC.esc(carta.ref) + '</span></p>'
       + '<div class="rv-botoes"></div></div></div>';
     const rv = alvo.querySelector('.rv');
@@ -21113,6 +21116,9 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     // o brilho parado espera o fim: nas fases da revelação, a luz é a da linha do tempo
     const api = cartaViva(c, { largura: larg, verso: true, parada: false });
     api.el.setAttribute('tabindex', '0');
+    // de costas, o leitor de tela não ouve a carta antes da hora
+    const nomeDaCarta = api.el.getAttribute('aria-label') || '';
+    api.el.setAttribute('aria-label', 'Carta de costas. Toque para virar');
     rv.querySelector('.rv-carta').appendChild(api.el);
     const botoes = rv.querySelector('.rv-botoes');
     const virar0 = botaoVirar(api);
@@ -21139,6 +21145,11 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       acabou = true;
       timers.forEach(clearTimeout);
       fase('fim');
+      if (nomeDaCarta) api.el.setAttribute('aria-label', nomeDaCarta);
+      const fimEl = rv.querySelector('.rv-fim');
+      fimEl.removeAttribute('aria-hidden');
+      fimEl.removeAttribute('inert');
+      rv.querySelector('.rv-raridade').removeAttribute('aria-hidden');
       api.soltar();
       api.parada(true);
       // o foco vai para o fim (a legenda é lida); "Ler a história", se houver, fica a um Tab
