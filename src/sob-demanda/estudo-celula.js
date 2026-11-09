@@ -222,7 +222,17 @@
     const naFila = proximo ? '<small class="mesa-fila">' + esc(proximo) + '</small>' : '';
     // as partes que a versão anterior guardou neste celular
     const local = p.euPreparoEstudo ? proximos.ler(p.id) : null;
+    // Quem conduz tem o que mais usa no alto, sem rolar o estudo inteiro (avaliação de 09/11, B6):
+    // o modo encontro, mandar no grupo e, para quem vê a fila, o atalho para os próximos estudos.
+    const fila = Array.isArray(p.fila) && !visitante(p) ? p.fila : null;
+    const atalhos = p.euConduzo ? '<div class="mesa-atalhos" role="group" aria-label="Para conduzir o encontro">'
+      + '<button type="button" class="botao" data-modo-encontro>' + CC.ico('livro') + 'Modo encontro</button>'
+      + '<button type="button" class="botao contorno" data-compartilhar>' + CC.ico('compartilhar') + 'Mandar no grupo</button>'
+      + (fila && fila.length ? '<button type="button" class="botao plano" data-ir-proximos>' + CC.ico('calendario') + 'Próximos estudos (' + fila.length + ')</button>'
+        : fila && p.euPreparoEstudo ? '<button type="button" class="botao plano" data-agendar-topo>' + CC.ico('mais-sinal') + 'Agendar o próximo estudo</button>' : '')
+      + '</div>' : '';
     painel.innerHTML = (linha ? '<p class="passo-dica">' + esc(linha) + '</p>' : '')
+      + atalhos
       // O estudo que já foi usado num encontro fica guardado: o caminho é preparar o próximo (o
       // servidor faz o mesmo, estudos.mjs, estudoUsado)
       + (p.euPreparoEstudo ? '<div class="mesa-lider">' + CC.ico('caneta') + '<span><b>' + (e.criadoPor === (CC.quem || {}).usuario ? 'Você preparou este estudo' : 'O estudo desta célula') + '</b>'
@@ -245,8 +255,15 @@
     ligarMais(painel);
     if (CC.inseparavel) CC.inseparavel(painel);
     ligarAnotacao(painel);
-    painel.querySelector('[data-compartilhar]').onclick = () => mandarNoGrupo(p, apoio);
-    painel.querySelector('[data-modo-encontro]').onclick = () => modoEncontro(p, apoio);
+    painel.querySelectorAll('[data-compartilhar]').forEach((b) => { b.onclick = () => mandarNoGrupo(p, apoio); });
+    painel.querySelectorAll('[data-modo-encontro]').forEach((b) => { b.onclick = () => modoEncontro(p, apoio); });
+    const agendarTopo = painel.querySelector('[data-agendar-topo]');
+    if (agendarTopo) agendarTopo.onclick = () => { location.hash = apoio.endereco(p.id, 'preparar') + '/novo'; };
+    const irProximos = painel.querySelector('[data-ir-proximos]');
+    if (irProximos) irProximos.onclick = () => {
+      const alvo = painel.querySelector('[data-proximos-ancora]');
+      if (alvo) alvo.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    };
     painel.querySelector('[data-imprimir]').onclick = () => imprimir(p, e, apoio, {
       linha: noPapel(linha, e), ws, combinadoAnterior: anterior, palavraDe: legado && e.texto ? 'Palavra de ' + (quem && quem !== 'você' ? quem : apoio.nomeDoLider(p)) : '',
     });
@@ -322,7 +339,7 @@
           : CC.ico('direita')) + '</div>';
     };
     const ajuste = lider && fila.length && R.datasPedemAjuste(fila, { hoje, encontro: p.encontro });
-    return CC.tituloSecao('Próximos estudos', fila.length ? String(fila.length) : '')
+    return '<span class="mesa-ancora" data-proximos-ancora></span>' + CC.tituloSecao('Próximos estudos', fila.length ? String(fila.length) : '')
       + (!lider ? '<p class="passo-dica pequena">Só o líder muda os próximos estudos.</p>' : '')
       + (lider && !fila.length ? '<p class="passo-dica pequena">Deixe prontos os estudos dos próximos encontros. Depois de cada encontro, o próximo entra sozinho na aba Estudo.</p>' : '')
       + (fila.length ? '<div class="mesa-proximos" data-lista-proximos>' + fila.map(linha).join('') + '</div>' : '')
