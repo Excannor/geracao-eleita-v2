@@ -40,8 +40,7 @@ a { color: var(--salvia-texto); font-weight: 700; text-decoration-thickness: 1.5
    polimento pôs em maiúsculas voltam a caixa normal, legíveis, com 13px no mínimo. */
 .etiqueta, .leitura-hoje .etiqueta, .passagem .rot, .cartao-pratica .rot, .faixa-unidade .rot,
 .cartao-continuar small, .corpo-semeador small, .leitor-titulo .rot,
-.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small,
-.pergunta-reflexao .rotulo-pergunta, .premio .cabeca {
+.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small, .premio .cabeca {
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0;
@@ -752,7 +751,7 @@ input::placeholder, textarea::placeholder { color: var(--tinta-fraca); opacity: 
    fundo de campo que o hover dá no computador. */
 .linha-config:active, .item:active, .item-licao:active, .item-livro:active, .atalho:active, .visao-item:active,
 .cartao-proposito:active, .dsf-item:active, .opcao-traducao:active, .amigo-roda:active, .corpo-faixa:active, .item-aviso:active { background: var(--campo); }
-.botao-pilula:active, .botao-redondo:active, .botao-icone:active, .guia:active, .no-bau:active, .no-marco:active { transform: scale(.96); }
+.botao-redondo:active, .botao-icone:active, .guia:active, .no-bau:active, .no-marco:active { transform: scale(.96); }
 
 
 /* Contador "n/máx" dos campos com limite (CC.contagem). */

@@ -106,19 +106,77 @@
   }
   CC.quandoCarregar(() => setTimeout(guardarNoAparelho, 5000));
 
+  // ---------- ler de verdade: o botão que enche ----------
+  // "Terminei a leitura" só destrava quando a pessoa chega ao fim do texto E passa nele pelo menos
+  // um terço do "cerca de N min" que o app já mostra (CC.FRACAO_MINIMA_DE_LEITURA). Enquanto isso o
+  // botão vai se enchendo, sem relógio e sem frase de cobrança. Só conta o tempo com a página à
+  // vista. Leitor de tela e teclado: basta o tempo (quem ouve o texto não rola a página); o clique
+  // que eles geram (event.detail === 0) passa assim que o tempo passou, e o botão já deixa de ser
+  // anunciado como indisponível. Menos movimento: sem o enchimento; o botão parece desligado e,
+  // pronto, fica pronto. O mesmo vale para o Conhecer Jesus e para os Primeiros passos.
+  CC.FRACAO_MINIMA_DE_LEITURA = 1 / 3;
+  CC.portaoDeLeitura = function ({ botao, minutos, chegouAoFim, fracaoDoFim, aoMudar }) {
+    const minimo = Math.max(1, (Number(minutos) || 3) * 60000 * CC.FRACAO_MINIMA_DE_LEITURA);
+    let tempo = 0;
+    let fim = false;
+    let antes = Date.now();
+    let pronto = false;
+    let parado = false;
+    const tempoOk = () => tempo >= minimo;
+    const pintar = () => {
+      const frac = Math.min(tempo / minimo, fim ? 1 : Math.max(0, Math.min(1, fracaoDoFim ? fracaoDoFim() : 0)));
+      botao.style.setProperty('--enchido', Math.round(Math.min(1, frac) * 1000) / 10 + '%');
+      botao.classList.toggle('enchendo', !pronto);
+      if (pronto || tempoOk()) botao.removeAttribute('aria-disabled'); else botao.setAttribute('aria-disabled', 'true');
+    };
+    const passo = () => {
+      if (parado || !botao.isConnected) { parar(); return; }
+      const agora = Date.now();
+      // só o tempo com a página à vista, e um salto grande (o aparelho dormiu) não conta inteiro
+      if (typeof document.visibilityState !== 'string' || document.visibilityState === 'visible') tempo += Math.min(1000, Math.max(0, agora - antes));
+      antes = agora;
+      if (!fim && chegouAoFim()) fim = true;
+      if (!pronto && fim && tempoOk()) { pronto = true; if (aoMudar) aoMudar(true); }
+      pintar();
+      if (pronto) parar();
+    };
+    const relogio = setInterval(passo, 250);
+    function parar() { parado = true; clearInterval(relogio); }
+    pintar();
+    return {
+      // o clique conta? sim com tudo pronto; com o tempo cumprido, também o clique do teclado e do
+      // leitor de tela (detail 0), que não passa pela rolagem
+      aceita: (ev) => { passo(); return pronto || (tempoOk() && !!ev && ev.detail === 0); },
+      pronto: () => pronto,
+      parar,
+      // para os testes: a leitura conta como feita agora
+      concluir: () => { tempo = minimo; fim = true; passo(); },
+    };
+  };
+
   // ---------- a tela ----------
   let aberto = null;
   let geracao = 0;
+  let portao = null;
 
   CC.leitorAberto = () => !!aberto;
 
   CC.fecharLeitor = function () {
-    CC.sair(document.querySelector('.leitor:not(.saindo)'));
+    if (portao) { portao.parar(); portao = null; }
+    const origem = aberto && aberto.origem;
+    CC.sair(document.querySelector('.leitor:not(.saindo)')).then(() => {
+      if (origem && origem.isConnected && !document.querySelector('.leitor:not(.saindo)')) origem.focus({ preventScroll: true });
+    });
     aberto = null;
   };
+  CC.portaoDoLeitor = () => portao;
 
+  // opcoes.papel: o que fazer quando o texto não abre e a pessoa leu na Bíblia dela (a lição do
+  // dia e o Conhecer Jesus passam a folha "Li na minha Bíblia"). opcoes.minutos(chave): o "cerca
+  // de N min" da passagem.
   CC.abrirLeitor = function (opcoes) {
-    aberto = { ...opcoes };
+    const ativo = document.activeElement;
+    aberto = { ...opcoes, origem: ativo && ativo !== document.body ? ativo : null };
     desenhar();
   };
 
@@ -145,10 +203,10 @@
     el.setAttribute('aria-label', ref);
 
     let principal = lida ? 'Voltar à lição' : 'Terminei a leitura';
-    if (seguinte) principal = (lida ? 'Ler ' : 'Terminei! Ler ') + seguinte[2];
-    // No Conhecer Jesus o botão só fecha o leitor e volta ao dia: quem marca o dia como
-    // feito é o botão "Terminei o dia" na própria tela do dia, não o leitor.
-    if (conhecer) principal = 'Terminei a leitura';
+    if (seguinte) principal = (lida ? 'Ler ' : 'Terminei, ler ') + seguinte[2];
+    // No Conhecer Jesus o botão fecha o leitor e volta ao dia, que então mostra "Terminei o dia".
+    if (conhecer) principal = lida ? 'Voltar ao dia' : 'Terminei a leitura';
+    if (portao) { portao.parar(); portao = null; }
 
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
@@ -166,15 +224,18 @@
       + '</div></div>'
       + '<div class="licao-pe"><div class="interno">'
       + '<div class="acoes-verso" hidden></div>'
-      + '<button class="botao cor" data-terminei>' + nb(CC.esc(principal)) + '</button>'
+      + '<button class="botao cor' + (lida ? '' : ' enchendo') + '" data-terminei' + (lida ? '' : ' aria-disabled="true"') + '>' + nb(CC.esc(principal)) + '</button>'
       + '</div></div>';
 
-    el.querySelector('[data-fechar-leitor]').onclick = CC.fecharLeitor;
+    const aoFechar = aberto.aoFechar;
+    el.querySelector('[data-fechar-leitor]').onclick = () => { CC.fecharLeitor(); if (aoFechar) aoFechar(); };
     el.querySelector('[data-aa]').onclick = () => folhaAa(el);
-    el.querySelector('[data-terminei]').onclick = () => {
+    el.querySelector('[data-terminei]').onclick = (ev) => {
+      // antes do fim e do tempo mínimo, o toque não faz nada: o botão ainda está enchendo
+      if (!lida && !(portao && portao.aceita(ev))) return;
       guardarPosicao(chavePosicao(), null);
-      if (conhecer) { CC.fecharLeitor(); return; }
       if (!lida) { CC.anotarDiario('leitor', 1); aberto.marcar(chave); }
+      if (conhecer) { CC.fecharLeitor(); return; }
       if (seguinte) {
         aberto.chave = seguinte[0];
         desenhar();
@@ -198,6 +259,24 @@
     }, { passive: true });
 
     preencher(el, dia, chave, atual, minha);
+    // O foco entra no leitor (no título), e não fica no botão da tela de trás.
+    const fechar = el.querySelector('[data-fechar-leitor]');
+    const titulo = el.querySelector('.leitor-titulo');
+    if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); } else if (fechar) fechar.focus({ preventScroll: true });
+  }
+
+  // O portão começa quando o texto chega (o tempo antes disso não é leitura).
+  function ligarPortao(el, chave) {
+    if (!aberto || aberto.lida(chave)) return;
+    const botao = el.querySelector('[data-terminei]');
+    const palco = el.querySelector('.licao-palco');
+    const minutos = aberto.minutos ? aberto.minutos(chave) : 3;
+    const noFim = () => palco.scrollHeight - palco.clientHeight - palco.scrollTop <= 32;
+    portao = CC.portaoDeLeitura({
+      botao, minutos,
+      chegouAoFim: noFim,
+      fracaoDoFim: () => { const total = palco.scrollHeight - palco.clientHeight; return total > 0 ? palco.scrollTop / total : 1; },
+    });
   }
 
   // O primeiro versículo visível fica guardado, para a pessoa voltar ao mesmo lugar.
@@ -222,12 +301,8 @@
   function preencher(el, dia, chave, b, minha) {
     const alvo = el.querySelector('.leitor-texto');
     const status = el.querySelector('.so-leitor');
-    if (!b) {
-      alvo.innerHTML = aviso('Não consegui abrir o texto agora. Leia na sua Bíblia e marque a passagem na lição.');
-      return;
-    }
-    if (!servido()) {
-      alvo.innerHTML = aviso('Não consegui abrir o texto agora. Leia na sua Bíblia e marque a passagem na lição.');
+    if (!b || !servido()) {
+      falhou(el, alvo, aviso('Não consegui abrir o texto agora. Leia na sua Bíblia.'));
       return;
     }
     alvo.innerHTML = CC.esqueleto('texto');
@@ -236,17 +311,70 @@
       // O Conhecer Jesus não separa Antigo e Novo Testamento como o plano: os trechos do
       // dia entram todos juntos, na ordem em que o JSON os lista.
       const trechos = aberto.conhecer ? (dia.trechos || []) : CC.trechosDaTrilha(dia, chave);
-      alvo.innerHTML = textoDe(biblia, trechos) + credito(b);
+      alvo.innerHTML = antesDoTexto(dia, chave) + textoDe(biblia, trechos) + credito(b);
+      ligarAntesDoTexto(alvo);
       status.textContent = 'Texto carregado';
+      CC.textoFalhou = false;
+      ligarPortao(el, chave);
       CC.versiculos.ligar(el);
       retomar(el);
     }).catch(() => {
       if (minha !== geracao) return;
-      alvo.innerHTML = aviso(navigator.onLine === false
-        ? 'Sem conexão. Conecte-se para abrir.'
-        : 'Não consegui abrir o texto agora.', true);
+      falhou(el, alvo, aviso(navigator.onLine === false
+        ? 'Sem conexão. Conecte-se para abrir, ou leia na sua Bíblia.'
+        : 'Não consegui abrir o texto agora.', true));
       alvo.querySelector('[data-tentar]').onclick = () => preencher(el, dia, chave, b, minha);
     });
+  }
+
+  // O contexto do dia ("Onde estamos na história" e "Enquanto lê, procure", 03c-contexto.js) mora
+  // no alto da primeira passagem, num cartão que se recolhe; recolhido ou aberto, fica assim nas
+  // próximas leituras (neste aparelho). Logo abaixo, o "Li na minha Bíblia" discreto.
+  const CHAVE_CONTEXTO = 'cc.leitor.contexto';
+  function antesDoTexto(dia, chave) {
+    if (!aberto || !aberto.contexto || aberto.conhecer || !aberto.trilhas.length || aberto.trilhas[0][0] !== chave) return '';
+    const ctx = CC.contextoDoDia ? CC.contextoDoDia(dia.numero) : null;
+    const placa = CC.cartaoOndeEstamos ? CC.cartaoOndeEstamos(dia.numero) : '';
+    const fechado = lerLocal(CHAVE_CONTEXTO) === 'fechado';
+    const titulo = ctx && ctx.titulo ? ctx.titulo : 'Antes de ler';
+    const contexto = placa || (ctx && ctx.sub)
+      ? '<details class="contexto-leitor"' + (fechado ? '' : ' open') + '><summary><span class="etiqueta">Dia ' + dia.numero + '</span>'
+        + '<b>' + CC.esc(titulo) + '</b>' + CC.ico('baixo') + '</summary>'
+        + (ctx && ctx.sub ? '<p class="sub-contexto">' + CC.esc(ctx.sub) + '</p>' : '') + placa + '</details>'
+      : '';
+    const papel = aberto.papel && !aberto.lida(chave)
+      ? '<p class="linha-papel-leitor"><button class="link-inline" data-papel-discreto>Li na minha Bíblia</button></p>' : '';
+    return contexto + papel;
+  }
+  function ligarAntesDoTexto(alvo) {
+    const d = alvo.querySelector('.contexto-leitor');
+    if (d) d.addEventListener('toggle', () => gravarLocal(CHAVE_CONTEXTO, d.open ? 'aberto' : 'fechado'));
+    const p = alvo.querySelector('[data-papel-discreto]');
+    if (p && aberto) { const papel = aberto.papel; p.onclick = () => { CC.fecharLeitor(); papel(); }; }
+  }
+
+  // Sem o texto, "Li na minha Bíblia" vem à frente (a lição também passa a mostrá-lo em destaque),
+  // e o botão de baixo só volta.
+  function falhou(el, alvo, html) {
+    CC.textoFalhou = true;
+    alvo.innerHTML = html;
+    const terminei = el.querySelector('[data-terminei]');
+    if (terminei && !(aberto && aberto.lida(aberto.chave))) {
+      terminei.textContent = aberto && aberto.conhecer ? 'Voltar ao dia' : 'Voltar à lição';
+      terminei.classList.remove('enchendo');
+      terminei.removeAttribute('aria-disabled');
+      terminei.onclick = () => CC.fecharLeitor();
+    }
+    if (aberto && aberto.papel) {
+      const caixa = alvo.querySelector('.leitor-aviso');
+      const b = document.createElement('button');
+      b.className = 'botao cor';
+      b.setAttribute('data-papel-leitor', '');
+      b.textContent = 'Li na minha Bíblia';
+      const papel = aberto.papel;
+      b.onclick = () => { CC.fecharLeitor(); papel(); };
+      (caixa || alvo).appendChild(b);
+    }
   }
 
   function retomar(el) {

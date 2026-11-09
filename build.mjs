@@ -387,7 +387,7 @@ console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'dia-lido'];
 const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
@@ -510,6 +510,7 @@ const html = molde
     + 'window.CARTAS=' + JSON.stringify(pecas.cartas) + ';'
     + 'window.ALBUM_CARTAS=' + JSON.stringify(pecas.album) + ';'
     + 'window.CARTAS_REGRAS=' + JSON.stringify(pecas['cartas-regras']) + ';'
+    + 'window.DIA_LIDO=' + JSON.stringify(pecas['dia-lido']) + ';'
     + 'window.CARTAS_INDICE=' + JSON.stringify(esqueletoCartas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'

@@ -1203,9 +1203,9 @@ p.selo-status svg { flex: 0 0 auto; margin-top: 2px; }
 .passagem .tempo { display: block; font-size: 0.85rem; font-weight: 700; color: var(--tinta-fraca); }
 .passagem.feita { border-color: color-mix(in srgb, var(--verde) 45%, transparent); background: var(--verde-fraco); }
 .passagem.feita .marca-trilha { background: var(--verde); color: var(--sobre-cor); animation: pop .35s var(--mola); }
-.acoes-passagem { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-.acoes-passagem .botao { width: 100%; min-height: 46px; }
-.botao.marcar.ligado { --b: var(--verde); --b3: var(--verde-3d); }
+
+
+
 @keyframes pop { from { transform: scale(.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
 /* campos de escrita */
@@ -1462,11 +1462,11 @@ p.selo-status svg { flex: 0 0 auto; margin-top: 2px; }
 .cartao-versiculo figcaption b { color: var(--tinta); }
 .cartao-versiculo .botao { margin-top: 12px; }
 /* guardar, pensar, orar */
-.passos-reflexao { display: flex; justify-content: center; flex-wrap: wrap; gap: 6px; margin: 4px 0 14px; padding: 0; list-style: none; counter-reset: etapa; }
-.passos-reflexao li { display: flex; align-items: center; gap: 6px; padding: 5px 12px 5px 6px; border-radius: 999px; background: var(--fundo-2); color: var(--tinta-fraca); font-size: 0.82rem; font-weight: 800; transition: background .25s ease, color .25s ease; }
-.passos-reflexao li::before { counter-increment: etapa; content: counter(etapa); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--trilho); color: var(--tinta-fraca); font-size: 0.74rem; font-weight: 900; transition: background .25s ease, color .25s ease; }
-.passos-reflexao li.ativa { background: var(--azul-fraco); color: var(--azul); }
-.passos-reflexao li.ativa::before { background: var(--azul); color: var(--sobre-cor); }
+
+
+
+
+
 .etapa-reflexao { width: 100%; text-align: left; animation: entrar-cena .45s var(--suave) both; scroll-margin-top: 16px; }
 .etapa-reflexao + .etapa-reflexao { margin-top: 22px; padding-top: 20px; border-top: 2px solid var(--borda); }
 .etapa-reflexao h2 { margin: 6px 0 12px; font-size: 1.18rem; }
@@ -1491,29 +1491,12 @@ p.selo-status svg { flex: 0 0 auto; margin-top: 2px; }
 }
 .pensamento-dia h2 { margin: 0 0 6px; color: var(--tinta-forte); font-size: 1.05rem; font-weight: 800; }
 .pensamento-dia p { margin: 0; color: var(--tinta); font-size: 1rem; font-weight: 600; line-height: 1.6; }
-.perguntas-reflexao { display: grid; gap: 10px; }
-.pergunta-reflexao {
-  display: grid;
-  gap: 4px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 2px solid var(--borda);
-  border-bottom-width: 4px;
-  border-radius: var(--raio);
-  background: var(--cartao);
-  color: var(--tinta-forte);
-  font: inherit;
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.4;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color .15s ease, background .15s ease, transform .06s ease;
-}
-.pergunta-reflexao:active { transform: translateY(2px); border-bottom-width: 2px; margin-bottom: 2px; }
-.pergunta-reflexao .rotulo-pergunta { color: var(--azul); font-size: 0.72rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
-.pergunta-reflexao[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); }
-.dica-pensar { margin: 12px 0 12px; }
+
+
+
+
+
+
 .oracao-guia { display: grid; gap: 10px; margin: 0 0 14px; padding: 0; list-style: none; }
 .oracao-guia li { padding: 12px 16px; border-radius: var(--raio); background: linear-gradient(160deg, var(--amarelo-fraco), var(--fundo-2)); color: var(--tinta-forte); font-size: 1.03rem; font-weight: 700; font-style: italic; animation: entrar-cena .45s var(--suave) both; }
 .oracao-guia li:nth-child(2) { animation-delay: .1s; }
@@ -2914,10 +2897,10 @@ button.atalho { width: 100%; border: 0; background: none; font: inherit; font-we
 .praticar-unidade svg { width: 18px; height: 18px; }
 
 /* ---------- fim da lição: reflexão e resumo ---------- */
-.retorno-lido { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 12px; padding: 6px 14px 6px 8px; border-radius: 999px; background: var(--verde-fraco); color: var(--verde-3d); font-weight: 700; font-size: 0.92rem; animation: pop .45s var(--mola) both; }
-:root[data-tema="escuro"] .retorno-lido { color: var(--verde); }
-.retorno-lido b { color: inherit; }
-.retorno-lido .ico-chama { width: 26px; height: 26px; }
+
+
+
+
 .acoes-reflexao { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 20px; margin-top: 20px; }
 .acoes-reflexao .link-nota { display: inline-flex; align-items: center; gap: 6px; }
 .acoes-reflexao .link-nota svg { width: 18px; height: 18px; }
@@ -3139,8 +3122,7 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 /* ---------- 1.6 · um rótulo em caixa-alta só; contadores em caixa normal ---------- */
 .etiqueta, .leitura-hoje .etiqueta, .passagem .rot, .cartao-pratica .rot, .faixa-unidade .rot,
 .cartao-continuar small, .corpo-semeador small, .leitor-titulo .rot,
-.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small,
-.pergunta-reflexao .rotulo-pergunta, .premio .cabeca {
+.campo-senha span, .rotulo-escolha, .etiqueta-celula, .item .sub, .dsf-selo, .dsf-stats small, .premio .cabeca {
   font-size: var(--rotulo-tam); font-weight: var(--rotulo-peso);
   letter-spacing: var(--rotulo-esp); text-transform: uppercase; line-height: 1.2;
 }

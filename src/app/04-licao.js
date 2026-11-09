@@ -26,6 +26,40 @@
     .replace(/(\d)-(?=\d)/g, '$1-\u2060');
 
   CC.abrirLicao = function (dia) { location.hash = '#/dia/' + dia; };
+  // "Ler hoje" na Trilha: o leitor abre direto na primeira passagem que falta, por cima da lição
+  // (que não é mais uma parada do caminho de hoje). A última passagem lida conclui o dia, e o
+  // leitor fecha na tela do dia lido. Fechar o leitor no meio volta para a Trilha.
+  let pedidoDireto = 0;
+  CC.lerHoje = function (dia) {
+    pedidoDireto = Number(dia);
+    if (location.hash === '#/dia/' + dia) CC.montarLicao(dia);
+    else location.hash = '#/dia/' + dia;
+  };
+
+  // ---------- as telas cheias prendem o foco ----------
+  // A lição, o dia do Conhecer Jesus, a prática e o leitor se declaram janela modal: o que está
+  // atrás deles (a Trilha, o topo, a barra de abas) fica inerte enquanto estão abertos, para o
+  // Tab e o leitor de tela não saírem para a tela escondida. Vale a camada de cima (o leitor, por
+  // cima da lição); as folhas, as telas cheias e o aviso que abrem depois ficam de fora. Refeito a
+  // cada filho que entra ou sai do body, então nenhuma tela precisa lembrar de soltar.
+  const MODAIS = '.licao:not(.saindo), .leitor:not(.saindo)';
+  const FORA_DO_INERTE = /^(SCRIPT|STYLE|LINK|TEMPLATE)$/;
+  function acertarInerte() {
+    const corpo = document.body;
+    if (!corpo || !corpo.children) return;
+    const filhos = [...corpo.children];
+    const modais = filhos.filter((x) => x.matches && x.matches(MODAIS));
+    const topo = modais[modais.length - 1] || null;
+    for (const x of filhos) {
+      const deveria = !!topo && x !== topo && filhos.indexOf(x) < filhos.indexOf(topo) && !FORA_DO_INERTE.test(x.tagName);
+      if (deveria && !x.inert) { x.inert = true; x.dataset.inerteModal = '1'; }
+      else if (!deveria && x.dataset && x.dataset.inerteModal) { x.inert = false; delete x.dataset.inerteModal; }
+    }
+  }
+  CC.acertarInerte = acertarInerte;
+  if (typeof MutationObserver === 'function' && document.body) {
+    new MutationObserver(acertarInerte).observe(document.body, { childList: true });
+  }
 
   // Só a lição do dia (.licao-dia): o dia do Conhecer Jesus e a prática também usam .licao, e
   // o roteador fecha a lição em toda rota que não é #/dia. Com o seletor largo, qualquer
@@ -82,7 +116,9 @@
         tela: 'leitura',
         modo: 'oracao',
         antes,
-        marcadas: { antigo: antes.lido || partesGuardadas(numero).antigo, novo: antes.lido || partesGuardadas(numero).novo },
+        // as passagens lidas aqui no app (um dia lido no app tem as duas; o de papel, as que a
+        // pessoa ler aqui depois)
+        marcadas: antes.lido && CC.lidoNoApp(numero) ? { antigo: true, novo: true } : { antigo: partesGuardadas(numero).antigo, novo: partesGuardadas(numero).novo },
       };
       CC.gravar('dia', numero);
       // A lição de um dia ainda não lido foi aberta: um contador por data no diário (como
@@ -90,7 +126,17 @@
       // lição e não termina, nos primeiros dias de conta.
       if (!antes.lido && CC.marcarNoDiario) CC.marcarNoDiario('abriu');
     }
+    // a tela do dia lido já vem chegando enquanto a pessoa lê
+    pedirDiaLido().catch(() => {});
+    const direto = pedidoDireto === numero;
+    pedidoDireto = 0;
+    if (direto && sessao.tela === 'leitura') sessao.direto = true;
     desenhar();
+    if (direto && sessao.tela === 'leitura' && sessao.abrirLeitor && !(CC.leitorAberto && CC.leitorAberto())) {
+      const dia = D.plano[numero - 1];
+      const falta = trilhasDe(dia).find(([k]) => !(CC.lidoNoApp(numero) || sessao.marcadas[k]));
+      if (falta) sessao.abrirLeitor(falta[0]); else sessao.direto = false;
+    }
   };
 
   const APOIO = [
@@ -116,9 +162,7 @@
     // segunda. Ela só chega ao fim ao terminar de orar, e não já cheia na hora de pensar.
     let fracao = 1;
     if (sessao.tela === 'leitura') {
-      fracao = trilhas.filter(([k]) => sessao.marcadas[k]).length / (trilhas.length * 2);
-    } else if (sessao.tela === 'festa' || sessao.tela === 'escrever' || sessao.tela === 'fundo') {
-      fracao = 0.5 + 0.5 * (ETAPAS.indexOf(sessao.etapaReflexao || 'guardar') + 1) / 4;
+      fracao = CC.leu(sessao.dia) ? 0.5 : trilhas.filter(([k]) => sessao.marcadas[k]).length / (trilhas.length * 2);
     }
 
     let el = document.querySelector('.licao-dia:not(.saindo)');
@@ -129,7 +173,7 @@
     const qualTela = sessao.dia + ':' + sessao.tela;
     const palcoAntes = el && el.dataset.tela === qualTela ? el.querySelector('.licao-palco') : null;
     const rolagemAntes = palcoAntes ? palcoAntes.scrollTop : 0;
-    const focoAntes = el && el.contains(document.activeElement) ? document.activeElement.dataset.trilha : '';
+    const focoAntes = el && el.contains(document.activeElement) ? document.activeElement.dataset.ler : '';
     if (!el) {
       el = document.createElement('div');
       el.setAttribute('role', 'dialog');
@@ -139,7 +183,7 @@
     el.className = 'licao licao-dia c-' + u.cor + ' tela-' + sessao.tela;
     el.setAttribute('aria-label', 'Dia ' + sessao.dia);
 
-    const tela = ({ leitura: telaLeitura, festa: telaFesta, resumo: telaResumo, fundo: telaFundo, escrever: telaEscrever })[sessao.tela](dia, u, trilhas);
+    const tela = ({ leitura: telaLeitura, festa: telaFesta, fundo: telaFundo, escrever: telaEscrever })[sessao.tela](dia, u, trilhas);
     el.innerHTML = (tela.semTopo ? '' : '<div class="licao-topo">'
       + '<button class="fechar" data-fechar aria-label="Fechar">' + CC.ico('fechar') + '</button>'
       + (tela.topo || CC.barra(fracao))
@@ -156,7 +200,7 @@
     if (palco) palco.scrollTop = rolagemAntes;
     // O foco vai para o título numa tela nova; no redesenho, volta ao botão de marcar que foi
     // tocado (o innerHTML trocou o elemento), sem rolar.
-    const tocado = palcoAntes && focoAntes ? el.querySelector('[data-trilha="' + focoAntes + '"]') : null;
+    const tocado = palcoAntes && focoAntes ? el.querySelector('[data-ler="' + focoAntes + '"]') : null;
     const titulo = el.querySelector('h1');
     if (tocado) tocado.focus({ preventScroll: true });
     else if (titulo) { titulo.setAttribute('tabindex', '-1'); titulo.focus({ preventScroll: true }); }
@@ -177,43 +221,90 @@
   const primeiroNome = () => String(CC.apelido() || (CC.quem || {}).nome || '').trim().split(/\s+/)[0];
 
   // ---------- leitura ----------
+  // Ler no app conta tudo; "Li na minha Bíblia" conta para a chama, o progresso, a unidade e os
+  // amigos, mas não para os baús nem para as cartas (02b-jogo.js, CC.bauLiberado). Cada passagem é
+  // um cartão inteiro que abre o leitor, com o ✓ quando foi lida. Marcar sem ler não existe mais:
+  // a passagem conta quando o leitor destrava "Terminei a leitura" (04b-leitor.js).
+  // sessao.marcadas: as passagens lidas aqui no app hoje (as partes guardadas neste aparelho).
+  const textoIndisponivel = () => !CC.traducao() || !(CC.appServido && CC.appServido())
+    || (typeof navigator !== 'undefined' && navigator.onLine === false) || !!CC.textoFalhou;
+
+  // A folha de "Li na minha Bíblia": curta, sem prova de leitura. Confirmar marca o dia como lido,
+  // com a origem 'papel'.
+  function folhaPapel(aoConfirmar) {
+    const hoje = sessao && sessao.dia === CC.diaAtual();
+    CC.folha('<h2>Li na minha Bíblia</h2>'
+      + '<p>Leu as passagens ' + (hoje ? 'de hoje' : 'do dia ' + sessao.dia) + ' na sua Bíblia? O dia conta para a sua chama. '
+      + 'O baú da semana abre com as leituras feitas aqui.</p>'
+      + '<div class="acoes"><button class="botao" data-papel-sim>Sim, li</button>'
+      + '<button class="botao plano" data-fechar>Voltar</button></div>', {
+      rotulo: 'Li na minha Bíblia',
+      classe: 'folha-papel',
+      ligar: (folha, fechar) => {
+        folha.querySelector('[data-fechar]').onclick = fechar;
+        folha.querySelector('[data-papel-sim]').onclick = () => { fechar(); aoConfirmar(); };
+      },
+    });
+  }
+  CC.folhaPapel = folhaPapel;
+
   function telaLeitura(dia, u, trilhas) {
     const marcadas = sessao.marcadas;
     const traducao = CC.traducao();
+    const lidoDia = CC.leu(sessao.dia);
+    const papel = CC.origemDoDia(sessao.dia) === 'papel';
+    // no app: as passagens lidas aqui (o dia lido no app tem todas)
+    const noApp = (k) => (lidoDia && !papel) || !!marcadas[k];
+    const semTexto = textoIndisponivel();
 
     const cartoes = trilhas.map(([chave, rot, ref]) => {
-      const feita = !!marcadas[chave];
+      const feita = lidoDia || !!marcadas[chave];
       const minutos = CC.minutosDoDia({ trechos: CC.trechosDaTrilha(dia, chave) });
-      return '<div class="passagem' + (feita ? ' feita' : '') + '">'
-        + '<div class="cabeca-passagem">'
-        + '<span class="marca-trilha">' + CC.ico(feita ? 'certo' : (chave === 'antigo' ? 'marcador' : 'livro')) + '</span>'
+      const sub = papel && !marcadas[chave] ? 'lida na sua Bíblia' : 'cerca de ' + minutos + ' min';
+      const etiqueta = rot + ', ' + ref + ', ' + sub + (feita ? ', lida' : '');
+      const dentro = '<span class="cabeca-passagem">'
+        + '<span class="marca-trilha" aria-hidden="true">' + CC.ico(feita ? 'certo' : (chave === 'antigo' ? 'marcador' : 'livro')) + '</span>'
         + '<span class="textos"><span class="rot">' + rot + '</span>'
         + '<span class="ref">' + nb(CC.esc(ref)) + '</span>'
-        + '<span class="tempo">cerca de ' + minutos + ' min</span></span>'
-        + '</div>'
-        + '<div class="acoes-passagem">'
-        + (traducao ? '<button class="botao pequeno cor" data-ler="' + chave + '">' + CC.ico('folha') + 'Ler aqui</button>' : '')
-        + '<button class="botao pequeno marcar' + (feita ? ' ligado' : ' contorno') + '" data-trilha="' + chave + '" '
-        + 'aria-pressed="' + feita + '">' + (feita ? CC.ico('certo') + 'Lido' : 'Marcar como lido') + '</button>'
-        + '</div></div>';
+        + '<span class="tempo">' + sub + '</span></span>'
+        + (traducao ? '<span class="seta-passagem" aria-hidden="true">' + CC.ico('avancar') + '</span>' : '')
+        + '</span>';
+      return traducao
+        ? '<button class="passagem tocavel' + (feita ? ' feita' : '') + '" data-ler="' + chave + '" aria-label="' + CC.esc(etiqueta) + '">' + dentro + '</button>'
+        : '<div class="passagem' + (feita ? ' feita' : '') + '">' + dentro + '</div>';
     }).join('');
 
-    const faltam = trilhas.filter(([k]) => !marcadas[k]);
-    const todas = !faltam.length;
+    const faltam = trilhas.filter(([k]) => !noApp(k));
+    const algumaLida = trilhas.some(([k]) => noApp(k));
+    const todas = lidoDia || !faltam.length;
     // Antes de ler: o título do dia e a placa "Onde estamos" (03c-contexto.js), com o mapa da
-    // história, o contexto e o que procurar. Sem eles o dia 1 abria em "Leitura de hoje" e
-    // caía, sem aviso, na genealogia de Mateus 1.
+    // história, o contexto e o que procurar.
     const ctx = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;
     const titulo = sessao.antes.lido ? 'Revisar o dia ' + sessao.dia : (ctx && ctx.titulo ? ctx.titulo : 'Leitura de hoje');
-    const dica = ctx && ctx.sub && !sessao.antes.lido ? ctx.sub
-      : (traducao ? 'Leia aqui ou na sua Bíblia e marque ao terminar.' : 'Abra a sua Bíblia, leia as passagens e marque ao terminar.');
+    let dica;
+    if (papel) dica = 'Você leu este dia na sua Bíblia. Lido aqui, ele conta também para o baú.';
+    else if (sessao.antes.lido) dica = 'Toque numa passagem para ler de novo.';
+    else if (!traducao) dica = 'Abra a sua Bíblia, leia as passagens e conclua o dia.';
+    else dica = trilhas.length === 1 ? 'Leia a passagem e conclua o dia.' : 'Leia as duas passagens e conclua o dia.';
 
-    const marcar = (k, valor) => {
-      marcadas[k] = valor;
-      guardarPartes(sessao.dia, marcadas);
-      CC.marcarLido(sessao.dia, trilhas.every(([c]) => marcadas[c]));
-      desenhar();
+    // "Sim, li": o dia conta na hora e a tela do dia lido vem em seguida (sem baú)
+    const marcarPapel = () => {
+      CC.vibrar('conquista');
+      CC.marcarLido(sessao.dia, 'papel');
+      iniciarCelebracao();
     };
+    // "Li na minha Bíblia": um link discreto; sem o texto (sem rede, sem tradução ou o texto que
+    // não abriu), à frente, como botão.
+    const linkPapel = lidoDia ? ''
+      : (semTexto
+        ? '<button class="botao contorno papel-destaque" data-papel>' + CC.ico('livro') + 'Li na minha Bíblia</button>'
+        : '<p class="linha-papel"><button class="link-inline" data-papel>Li na minha Bíblia</button></p>');
+
+    let pe;
+    if (todas) pe = botao(sessao.antes.lido ? 'Ver a reflexão do dia' : 'Concluir o dia', 'data-concluir');
+    else if (!traducao) pe = '';
+    else if (!algumaLida) pe = '<button class="botao cor" data-ler-pe="' + faltam[0][0] + '">' + CC.ico('folha') + 'Começar a leitura</button>';
+    else pe = '<button class="botao cor" data-ler-pe="' + faltam[0][0] + '">' + CC.ico('folha') + 'Continuar: ' + nb(CC.esc(faltam[0][2])) + '</button>';
 
     return {
       // .cabeca-licao: só apresentação, a folha do alto de cada passo (22-leitura.css)
@@ -222,34 +313,38 @@
         + '<p class="passo-dica">' + CC.esc(dica) + '</p></div>'
         + (CC.cartaoOndeEstamos ? CC.cartaoOndeEstamos(sessao.dia) : '')
         + cartoes
-        + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : ''),
-      // O rodapé diz a próxima leitura que falta e abre o texto dela; depois da última, vira
-      // "Concluir o dia". Antes era um botão cinza parado ("Falta marcar…") e o "Ler aqui"
-      // ficava abaixo da dobra. Sem tradução no app, a pessoa lê na Bíblia dela e só marca.
-      pe: todas || !traducao
-        ? botao(todas ? 'Concluir o dia' : 'Falta marcar ' + faltam.map(([, , r]) => nb(r)).join(' e '), 'data-concluir', todas)
-        : '<button class="botao cor" data-ler-pe="' + faltam[0][0] + '">' + CC.ico('folha') + 'Ler ' + nb(CC.esc(faltam[0][2])) + '</button>',
+        + (trilhas.length === 1 ? '<p class="passo-dica">Hoje é mais leve: uma leitura só!</p>' : '')
+        + linkPapel,
+      pe,
       ligar(el) {
         const abrir = (chave) => CC.abrirLeitor({
           dia,
           chave,
           trilhas,
           cor: u.cor,
-          lida: (k) => !!marcadas[k],
-          marcar: (k) => { if (!marcadas[k]) marcar(k, true); },
+          // no leitor, "lida" é lida aqui: o dia de papel ainda pode ser lido no app
+          lida: (k) => noApp(k),
+          minutos: (k) => CC.minutosDoDia({ trechos: CC.trechosDaTrilha(dia, k) }),
+          // a última passagem lida conclui o dia na hora: o leitor fecha direto na tela do dia lido
+          marcar: (k) => {
+            if (marcadas[k]) return;
+            marcadas[k] = true;
+            guardarPartes(sessao.dia, marcadas);
+            if (trilhas.every(([c]) => marcadas[c])) { CC.marcarLido(sessao.dia, 'app'); CC.vibrar('conquista'); iniciarCelebracao(); return; }
+            desenhar();
+          },
+          contexto: true,
+          aoFechar: sessao.direto ? () => { sair(); } : null,
+          papel: lidoDia ? null : () => folhaPapel(marcarPapel),
         });
-        el.querySelectorAll('[data-ler]').forEach((b) => { b.onclick = () => abrir(b.dataset.ler); });
+        sessao.abrirLeitor = abrir;
+        el.querySelectorAll('[data-ler]').forEach((b) => { b.onclick = () => { sessao.direto = false; abrir(b.dataset.ler); }; });
         const lerPe = el.querySelector('[data-ler-pe]');
-        if (lerPe) lerPe.onclick = () => abrir(lerPe.dataset.lerPe);
-        el.querySelectorAll('[data-trilha]').forEach((b) => {
-          b.onclick = () => {
-            const ligando = !marcadas[b.dataset.trilha];
-            CC.vibrar(ligando ? 'certo' : 'leve');
-            marcar(b.dataset.trilha, ligando);
-          };
-        });
+        if (lerPe) lerPe.onclick = () => { sessao.direto = false; abrir(lerPe.dataset.lerPe); };
+        const papelBt = el.querySelector('[data-papel]');
+        if (papelBt) papelBt.onclick = () => folhaPapel(marcarPapel);
         const concluir = el.querySelector('[data-concluir]');
-        if (concluir && !concluir.disabled) concluir.onclick = () => { CC.vibrar('conquista'); iniciarCelebracao(); };
+        if (concluir) concluir.onclick = () => { CC.vibrar('conquista'); iniciarCelebracao(); };
       },
     };
   }
@@ -259,13 +354,10 @@
   // toque, entre marcar a leitura e chegar à reflexão, e o mesmo sétimo dia era comemorado
   // três vezes. Agora: a leitura conta na hora de marcar, a reflexão vem em seguida, e no
   // fim uma tela só junta tudo o que o dia trouxe.
-  const ETAPAS = ['guardar', 'pensar', 'orar'];
-
   function iniciarCelebracao() {
     const dia = D.plano[sessao.dia - 1];
     const u = CC.unidadeDoDia(sessao.dia);
     const ganhou = CC.leu(sessao.dia) && !sessao.antes.lido;
-    sessao.etapaReflexao = 'guardar';
     if (!ganhou) { ir('festa'); return; }
 
     const seq = CC.sequencia();
@@ -292,364 +384,29 @@
     ir('festa');
   }
 
-  // A semana em volta de hoje: cinco dias para trás, hoje e amanhã.
-  function faixaDaSemana() {
-    const hoje = CC.hojeIso();
-    const feitas = CC.datasFeitas();
-    const protegidos = CC.sequencia().protegidos;
-    const dias = [-5, -4, -3, -2, -1, 0, 1].map((n) => {
-      const d = CC.somaDias(hoje, n);
-      const estado = n > 0 ? 'futuro' : (feitas.has(d) ? 'feito' : (protegidos.includes(d) ? 'escudo' : 'vazio'));
-      return { d, n, estado };
-    });
-    // a faixa acesa cobre a corrida que termina hoje
-    let inicio = 5;
-    while (inicio > 0 && dias[inicio - 1].estado !== 'vazio') inicio--;
-    const nome = (d) => CC.diaDaSemana(d).replace(/^./, (c) => c.toUpperCase());
-    return '<div class="semana-ofensiva" style="--de:' + inicio + ';--ate:6">'
-      + '<div class="nomes">' + dias.map((x) => '<span class="' + (x.n === 0 ? 'hoje' : '') + '">' + nome(x.d) + '</span>').join('') + '</div>'
-      + '<div class="trilho"><i class="aceso"></i>' + dias.map((x, i) => '<span class="marca-dia ' + x.estado + '" style="--i:' + i + '">'
-        + (x.estado === 'feito' ? CC.ico('certo') : (x.estado === 'escudo' ? CC.ico('escudo') : '')) + '</span>').join('') + '</div></div>';
-  }
-
-  // ---------- a reflexão: guardar, pensar, orar ----------
-  // Um botão principal só, que muda a cada etapa, e "Pular por hoje" discreto. O que é do dia
-  // fica dentro da etapa (escrever no cartão do versículo, ir mais fundo logo abaixo do
-  // contexto); o que leva a outro dia ("Ler o dia N") só aparece no fim.
-  const ICONE_ETAPA = { guardar: 'marcador', pensar: 'lupa', orar: 'oracao' };
-  // O título da etapa leva o ícone dela, no mesmo círculo sálvia dos passos do topo.
-  const tituloEtapa = (etapa, texto) => '<h2 class="titulo-etapa"><span class="ico-etapa">' + CC.ico(ICONE_ETAPA[etapa]) + '</span>'
-    + '<span>' + CC.esc(texto) + '</span></h2>';
-  // As frases de oração terminam em reticências: é um começo para a pessoa completar.
-  const comReticencias = (f) => (/(…|\.\.\.)$/.test(f) ? f : f + '…');
-  const semReticencias = (f) => f.replace(/\s*(…|\.\.\.)$/, '');
-
-  function telaFesta(dia) {
-    const lido = CC.leu(sessao.dia);
-    const ganhou = lido && !sessao.antes.lido && !!sessao.celebracao;
-    const proximo = sessao.dia + 1;
-    const etapa = sessao.etapaReflexao || 'guardar';
-    const r = CC.reflexaoDoDia(sessao.dia);
-    const seq = CC.sequencia();
-    const escrever = CC.temRegistro(sessao.dia) ? 'Escrever mais' : 'Escrever';
-    const apoio = totalApoio(dia);
-    const escolhida = Number.isInteger(sessao.pergunta) ? sessao.pergunta : -1;
-    // ao passar para orar, pensar encolhe e fica só a pergunta escolhida, como lembrete
-    const encolhida = etapa === 'orar';
-    const textoPergunta = (p) => (Array.isArray(p) ? p[1] : p);
-
-    const avancar = { guardar: ['Pensar sobre isso', 'lupa'], pensar: ['Transformar em oração', 'oracao'], orar: ['Terminar', 'certo'] }[etapa];
-
-    return {
-      corpo: '<div class="festa"><div class="cabeca-licao">'
-        + (ganhou ? '<p class="retorno-lido" role="status">' + CC.icoChama(seq.atual) + '<span><b>Dia ' + sessao.dia + ' lido.</b> Sua chama está acesa.</span></p>' : '')
-        + '<h1>' + (ganhou ? 'Para levar com você' : 'Revisão do dia ' + sessao.dia) + '</h1>'
-        + '<ol class="passos-reflexao" aria-label="Guardar, pensar e orar">'
-        + ['Guardar', 'Pensar', 'Orar'].map((nome, i) => '<li' + (i <= ETAPAS.indexOf(etapa) ? ' class="ativa"' : '')
-          + (i === ETAPAS.indexOf(etapa) ? ' aria-current="step"' : '') + '>' + nome + '</li>').join('') + '</ol></div>'
-        // guardar: o versículo do dia, ou a nota nos dias em que um versículo solto confunde.
-        // O botão de escrever fica no cartão, com o mesmo nome em todo lugar.
-        + '<section class="etapa-reflexao" data-etapa-bloco="guardar">'
-        + '<div id="festa-versiculo">' + (r.ref
-          ? CC.esqueleto('texto')
-          : '<figure class="cartao-versiculo nota-reflexao"><span class="etiqueta">Para entender hoje</span><p>' + CC.esc(r.nota) + '</p>'
-            + '<div class="acoes-verso no-cartao"><div class="botoes-verso"><button class="botao pequeno contorno" data-escrever>'
-            + CC.ico('caneta') + escrever + '</button></div></div></figure>') + '</div>'
-        + (r.contexto ? '<p class="contexto-reflexao"><b>Contexto:</b> ' + CC.esc(r.contexto)
-          + ' <button class="link-inline" data-nota-reflexao>Ler a nota</button></p>' : '')
-        + (apoio ? '<button class="linha-fundo" data-fundo><span class="ico-linha">' + CC.ico('camadas') + '</span>'
-          + '<span class="rotulo-linha">Ir mais fundo</span><span class="conta-linha">' + CC.plural(apoio, 'nota', 'notas') + '</span>'
-          + CC.ico('direita') + '</button>' : '')
-        + '</section>'
-        // pensar: uma pergunta, escolhida pela pessoa
-        + '<section class="etapa-reflexao etapa-pensar' + (encolhida ? ' encolhida' : '') + '" data-etapa-bloco="pensar"'
-        + (ETAPAS.indexOf(etapa) >= 1 ? '' : ' hidden') + '>'
-        + (encolhida
-          ? '<div class="pensar-lembrete">' + tituloEtapa('pensar', 'Para pensar')
-            + (escolhida >= 0 ? '<p class="lembrete-pergunta">' + CC.esc(textoPergunta(r.perguntas[escolhida])) + '</p>' : '') + '</div>'
-          : '')
-        + '<div class="pensar-inteiro" id="pensar-inteiro">'
-        + '<span class="etiqueta">' + nb(CC.esc(r.pensamento ? (r.ref || r.passagem) : r.passagem + ' · ' + r.nomeGenero)) + '</span>'
-        // a reflexão escrita para o dia, sobre o que acontece na leitura
-        // recolhida no título, com "Ver o texto": as perguntas sobem para o alto da etapa
-        + (r.pensamento
-          ? '<figure class="pensamento-dia recolhivel"><div class="cabeca-pensamento">'
-            + '<h2>' + CC.esc(r.titulo || 'A reflexão de hoje') + '</h2>'
-            + '<button class="ver-texto-reflexao" data-ver-texto aria-expanded="false" aria-controls="texto-reflexao">'
-            + '<span>Ver o texto</span>' + CC.ico('baixo') + '</button></div>'
-            + '<p id="texto-reflexao" hidden>' + CC.esc(r.pensamento) + '</p></figure>'
-          : '')
-        + tituloEtapa('pensar', r.pensamento ? 'Para pensar' : 'Escolha uma pergunta')
-        // As reflexões escritas trazem só a pergunta; as genéricas por gênero ainda vêm como
-        // [rótulo, pergunta]. Sem rótulo não sai a etiqueta em cima. São opções: um círculo
-        // marca a escolhida, e só uma fica escolhida por vez.
-        + '<div class="perguntas-reflexao" role="group" aria-label="Perguntas para pensar">' + r.perguntas.map((p, i) => {
-          const [rotulo, pergunta] = Array.isArray(p) ? p : ['', p];
-          return '<button class="pergunta-reflexao" data-pergunta="' + i + '" aria-pressed="' + (i === escolhida) + '">'
-            + '<span class="marca-escolha" aria-hidden="true"></span><span class="texto-pergunta">'
-            + (rotulo ? '<span class="rotulo-pergunta">' + CC.esc(rotulo) + '</span>' : '') + '<span>' + CC.esc(pergunta) + '</span></span></button>';
-        }).join('') + '</div>'
-        + '<p class="passo-dica pequena dica-pensar"' + (escolhida >= 0 ? '' : ' hidden') + '>Fique um minuto com essa pergunta. Se ajudar, volte ao texto.</p>'
-        + '</div>'
-        // encolhida, só o título e a pergunta escolhida; o botão do fim abre tudo de novo
-        + (encolhida
-          ? '<button class="abrir-pensar" data-abrir-pensar aria-expanded="false" aria-controls="pensar-inteiro">'
-            + '<span>' + (escolhida >= 0 ? 'Ver a reflexão e as perguntas' : 'Ver as perguntas') + '</span>' + CC.ico('baixo') + '</button>'
-          : '')
-        + '</section>'
-        // orar: começos de frase para a pessoa completar, nunca uma oração pronta. Tocar numa
-        // frase abre a escrita da oração já começando por ela.
-        + '<section class="etapa-reflexao painel-orar" data-etapa-bloco="orar"' + (etapa === 'orar' ? '' : ' hidden') + '>'
-        + tituloEtapa('orar', 'Ore com as suas palavras')
-        + '<ul class="oracao-guia">' + r.oracao.map((frase, i) => '<li><button class="frase-oracao" data-frase-oracao="' + i + '">'
-          + '<span>' + CC.esc(comReticencias(frase)) + '</span>' + CC.ico('caneta') + '</button></li>').join('') + '</ul>'
-        + '<div class="pe-duplo-plano"><button class="botao contorno" data-orar-escrevendo>' + CC.ico('caneta') + 'Escrever</button>'
-        + '<button class="botao plano" data-orei>Orei</button></div>'
-        + '<p class="amem" hidden>Amém!</p>'
-        + '</section>'
-        + '</div>',
-      pe: '<button class="botao cor" data-avancar>' + CC.ico(avancar[1]) + CC.esc(avancar[0]) + '</button>'
-        + (etapa !== 'orar' ? '<button class="botao plano" data-pular>Pular por hoje</button>'
-          // na revisão de um dia já lido, o próximo dia é a ação de quem terminou
-          : (proximo <= D.plano.length && !ganhou ? '<button class="botao plano" data-proximo>' + CC.ico('avancar') + 'Ler o dia ' + proximo + '</button>' : '')),
-      ligar(el) {
-        const terminar = () => {
-          if (ganhou) { ir('resumo'); return; }
-          sair();
-          setTimeout(() => CC.rolarAteAtual(true), 120);
-        };
-        const irPara = (bloco, suave) => {
-          const alvo = document.querySelector('.licao [data-etapa-bloco="' + bloco + '"]');
-          if (alvo) requestAnimationFrame(() => alvo.scrollIntoView({ block: 'start', behavior: suave && !CC.semMovimento() ? 'smooth' : 'auto' }));
-        };
-        el.querySelector('[data-avancar]').onclick = () => {
-          const i = ETAPAS.indexOf(etapa);
-          if (i < ETAPAS.length - 1) {
-            sessao.etapaReflexao = ETAPAS[i + 1];
-            desenhar();
-            irPara(sessao.etapaReflexao, true);
-            return;
-          }
-          terminar();
-        };
-        const pular = el.querySelector('[data-pular]');
-        if (pular) pular.onclick = terminar;
-        // o botão de escrever do cartão chega depois (o versículo carrega à parte)
-        el.querySelector('.festa').addEventListener('click', (ev) => {
-          if (ev.target.closest('[data-escrever]')) ir('escrever');
-        });
-        const fundo = el.querySelector('[data-fundo]');
-        if (fundo) fundo.onclick = () => ir('fundo');
-        const prox = el.querySelector('[data-proximo]');
-        if (prox) prox.onclick = () => { CC.fecharLicao(); CC.abrirLicao(proximo); };
-        if (r.ref) pintarVersiculo(el.querySelector('#festa-versiculo'), r.ref, { escrever, rotuloCor: true });
-
-        el.querySelectorAll('[data-pergunta]').forEach((b) => {
-          b.onclick = () => {
-            sessao.pergunta = Number(b.dataset.pergunta);
-            el.querySelectorAll('[data-pergunta]').forEach((x) => x.setAttribute('aria-pressed', x === b));
-            el.querySelector('.dica-pensar').hidden = false;
-          };
-        });
-        const verTexto = el.querySelector('[data-ver-texto]');
-        if (verTexto) {
-          verTexto.onclick = () => {
-            const texto = el.querySelector('#texto-reflexao');
-            texto.hidden = !texto.hidden;
-            verTexto.setAttribute('aria-expanded', !texto.hidden);
-            verTexto.querySelector('span').textContent = texto.hidden ? 'Ver o texto' : 'Recolher';
-          };
-        }
-        const abrirPensar = el.querySelector('[data-abrir-pensar]');
-        if (abrirPensar) {
-          abrirPensar.onclick = () => {
-            const bloco = el.querySelector('.etapa-pensar');
-            const aberto = bloco.classList.toggle('encolhida') === false;
-            abrirPensar.setAttribute('aria-expanded', aberto);
-            abrirPensar.querySelector('span').textContent = aberto ? 'Recolher'
-              : (escolhida >= 0 || Number.isInteger(sessao.pergunta) ? 'Ver a reflexão e as perguntas' : 'Ver as perguntas');
-          };
-        }
-        const notaReflexao = el.querySelector('[data-nota-reflexao]');
-        if (notaReflexao) notaReflexao.onclick = () => CC.folhaNota(r.idNota);
-        const escreverOracao = (frase) => {
-          sessao.modo = 'oracao';
-          sessao.escolheu = true;
-          sessao.dicaOracao = r.oracao.join('\n');
-          sessao.frasePronta = frase || '';
-          sessao.voltarPara = 'orar';
-          ir('escrever');
-        };
-        el.querySelector('[data-orar-escrevendo]').onclick = () => escreverOracao('');
-        el.querySelectorAll('[data-frase-oracao]').forEach((b) => {
-          b.onclick = () => escreverOracao(semReticencias(r.oracao[Number(b.dataset.fraseOracao)]) + ' ');
-        });
-        el.querySelector('[data-orei]').onclick = (ev) => {
-          ev.currentTarget.disabled = true;
-          CC.marcarOrei();
-          el.querySelector('.amem').hidden = false;
-        };
-        // de volta da escrita da oração: a tela reabre na etapa de orar, e não no alto
-        if (sessao.voltarPara && etapa === 'orar') { const b = sessao.voltarPara; sessao.voltarPara = ''; irPara(b, false); }
-      },
-    };
-  }
-
-  // ---------- o resumo do dia ----------
-  // Uma tela só, no fim: o fogo no estágio de hoje, a semana, e o que o dia trouxe
-  // como destaque dentro dela (meta, chama que cresceu, conquista, livro, unidade, peça do
-  // quadro, baú). O XP não aparece: ele é só um número para a própria pessoa, no Perfil.
-  function telaResumo(dia, u) {
-    const c = sessao.celebracao;
-    const seq = CC.sequencia();
-    const nome = primeiroNome();
-    const subiuHoje = !sessao.antes.feitoHoje && seq.feitoHoje;
-    // guardados aqui: os temporizadores de baixo podem disparar depois de a lição fechar,
-    // e nesse momento a sessão já foi zerada
-    const ofensivaAntes = sessao.antes.ofensiva;
-    const diaDaSessao = sessao.dia;
-    const estAntes = CC.estagioDaChama(sessao.antes.ofensiva);
-    const est = CC.estagioDaChama(seq.atual);
-    const lidos = CC.ler('lidos', []).length;
-
-    const destaques = [];
-    const item = (arte, titulo, sub, extra) => destaques.push('<li class="destaque-dia' + (extra ? ' ' + extra : '') + '">'
-      + '<span class="arte-destaque">' + arte + '</span><span class="texto-destaque"><b>' + titulo + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</span></li>');
-
-    if (subiuHoje && est.nivel > estAntes.nivel) {
-      item(CC.icoChama(seq.atual), 'Sua chama agora é ' + est.nome, CC.esc(est.frase) + ' (' + est.ref + ')', 'chama');
-    }
-    if (CC.MARCOS_OFENSIVA.includes(seq.atual) && seq.atual > sessao.antes.ofensiva) {
-      const proximoMarco = CC.MARCOS_OFENSIVA[CC.MARCOS_OFENSIVA.indexOf(seq.atual) + 1];
-      item(CC.arte.calendario(seq.atual, 'agora'), 'Meta de ' + seq.atual + ' dias de ofensiva', proximoMarco ? 'Próxima meta: ' + proximoMarco + ' dias' : '', 'marco');
-    }
-    for (const q of c.subiram.slice(0, 3)) {
-      const def = CC.CONQUISTAS.find((x) => x.id === q.id);
-      item(CC.arte.medalha(q, false), (q.nivel === 1 ? 'Conquista nova: ' : 'Subiu de nível: ') + CC.esc(q.titulo), CC.esc(def.texto(def.niveis[q.nivel - 1])), 'conquista');
-    }
-    for (const l of c.livros.slice(0, 2)) item('<span class="arte-livro">' + CC.ico('livro') + '</span>', 'Você terminou ' + CC.esc(l) + '!', 'Fica marcado em Livros da Bíblia', 'livro');
-    if (c.unidade) item(CC.arte.trofeu(u.cor, true), 'Unidade ' + u.numero + ' concluída!', CC.esc(u.titulo), 'unidade');
-    if (CC.temBau(sessao.dia) && !CC.bauAberto(sessao.dia)) item(CC.arte.bau('pronto', 'madeira'), 'O baú do dia ' + sessao.dia + ' está pronto', 'Abra na trilha para ver o que tem dentro', 'bau');
-    // O segundo dia seguido é o que mais decide: merece a sua própria festa, pequena.
-    if (subiuHoje && seq.atual === 2) item('<span class="arte-volta">' + CC.ico('broto') + '</span>', 'Você voltou!', 'Voltar no dia seguinte é a parte mais difícil. Você voltou.', 'volta');
-    // O gancho de amanhã: a passagem, o tempo de verdade e uma frase do que vem (escrita para os
-    // primeiros dias; depois, o título da reflexão do dia seguinte). Sem isto o dia terminava em
-    // "Até amanhã" sem dizer o que amanhã tem.
-    const proximoDia = D.plano[sessao.dia];
-    if (proximoDia && !CC.leu(proximoDia.numero)) {
-      const ctxHoje = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;
-      const escritaAmanha = CC.reflexaoEscrita ? CC.reflexaoEscrita(proximoDia.numero) : null;
-      const gancho = (ctxHoje && ctxHoje.amanha) || (escritaAmanha && escritaAmanha.titulo ? escritaAmanha.titulo + '.' : '');
-      item('<span class="arte-amanha">' + CC.ico('avancar') + '</span>',
-        'Amanhã: ' + CC.esc(CC.colarRef(CC.passagemDe(proximoDia))) + ', uns ' + CC.minutosDoDia(proximoDia) + ' min', CC.esc(gancho), 'amanha');
-    }
-    const feitas = c.missoes.lista.filter((m) => m.feita).length;
-    item(CC.arte.bau(feitas === c.missoes.lista.length ? 'aberto' : 'travado', feitas === c.missoes.lista.length ? 'madeira' : ''),
-      'Desafios do dia: ' + feitas + ' de ' + c.missoes.lista.length, feitas === c.missoes.lista.length ? 'Todos feitos' : '<a href="#/missoes" data-ver-desafios>Ver os desafios</a>', 'desafios');
-
-    // A frase do fim do dia é uma das frases da ofensiva (as mesmas do carimbo), sorteada,
-    // com a referência quando a frase tem uma.
-    const f = CC.fraseDaOfensiva({ comTexto: true });
-    const frase = CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '');
-
+  // ---------- depois de ler: uma tela só ----------
+  // A tela do dia lido mora na peça src/sob-demanda/dia-lido.js (o index.html tem teto de 1 MB),
+  // pedida assim que a lição abre e guardada pelo service worker. Enquanto ela chega, a casca
+  // mostra "Dia N lido" com o esqueleto; sem ela (sem rede na primeira vez), o dia já contou e a
+  // casca fica com o "Voltar à trilha".
+  const pedirDiaLido = () => CC.pedirPeca(window.DIA_LIDO, () => !!CC.telaDiaLido);
+  CC.pedirDiaLido = pedirDiaLido;
+  // e é pedida também logo depois da abertura do app, para o service worker já guardá-la
+  if (CC.quandoCarregar) CC.quandoCarregar(() => setTimeout(() => { if (CC.appServido && CC.appServido()) pedirDiaLido().catch(() => {}); }, 6000));
+  const pontes = { sessao: () => sessao, ir, sair, botao, nb, primeiroNome, totalApoio, pintarVersiculo };
+  function telaFesta(dia, u) {
+    if (CC.telaDiaLido) return CC.telaDiaLido(pontes, dia, u);
+    const numero = sessao.dia;
+    let falhou = false;
+    pedirDiaLido().then(() => { if (sessao && sessao.dia === numero && sessao.tela === 'festa') desenhar(); }, () => { falhou = true; });
     return {
       semTopo: true,
-      corpo: '<div class="resumo-dia"><div class="cabeca-licao">'
-        + '<div class="chama-palco">' + CC.arte.faiscas() + CC.icoChama(seq.atual) + '</div>'
-        + '<b class="numero-ofensiva" data-de="' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '">' + (subiuHoje ? sessao.antes.ofensiva : seq.atual) + '</b>'
-        + '<h1 class="rotulo-ofensiva">' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + '</h1>'
-        + '<p class="passo-dica">Dia ' + sessao.dia + ' · ' + nb(CC.esc(CC.passagemDe(dia))) + '</p>'
-        + faixaDaSemana() + '</div>'
-        + '<p class="frase-cena">' + frase + '</p>'
-        + '<ul class="destaques">' + destaques.join('') + '</ul>'
-        + linhaDoMapa(dia)
-        + '<div id="resumo-amigos"></div>'
-        + '<div class="progresso-plano"><span>' + lidos + ' de ' + D.plano.length + ' dias lidos</span>' + CC.barra(lidos / D.plano.length, 'fina') + '</div>'
-        + '</div>',
-      pe: '<div class="pe-duplo"><button class="botao contorno quadrado" data-compartilhar aria-label="Compartilhar">' + CC.ico('compartilhar') + '</button>'
-        + botao(nome ? 'Até amanhã, ' + nome + '!' : 'Voltar à trilha', 'data-voltar-trilha') + '</div>',
-      ligar(el) {
-        CC.arte.confete(el, 26);
-        const numero = el.querySelector('.numero-ofensiva');
-        if (subiuHoje) setTimeout(() => {
-          if (!numero.isConnected) return;
-          numero.classList.add('subindo');
-          CC.contar(numero, ofensivaAntes, seq.atual, 500);
-        }, 600);
-        el.querySelector('[data-voltar-trilha]').onclick = () => {
-          CC.recemFeito = diaDaSessao;
-          sair();
-          setTimeout(() => CC.rolarAteAtual(true), 120);
-          // conta nova que acabou de ler pela primeira vez: agora sim, instalar e lembretes
-          if (CC.depoisDoPrimeiroDia) CC.depoisDoPrimeiroDia();
-        };
-        const verMapa = el.querySelector('[data-ver-mapa]');
-        if (verMapa) verMapa.onclick = (ev) => { ev.preventDefault(); CC.recemFeito = diaDaSessao; CC.fecharLicao(); location.hash = verMapa.getAttribute('href'); };
-        const desafios = el.querySelector('[data-ver-desafios]');
-        if (desafios) desafios.onclick = (ev) => { ev.preventDefault(); CC.fecharLicao(); location.hash = '#/missoes'; };
-        // Compartilhar gera a imagem de story da ofensiva com a frase que está na tela (f),
-        // a mesma do parágrafo acima, e não uma sorteada de novo (01d-story.js).
-        const compartilhar = el.querySelector('[data-compartilhar]');
-        const pedido = { tipo: 'ofensiva', dias: seq.atual, frase: { linhas: f.linhas, ref: f.ref || '' } };
-        setTimeout(() => { if (compartilhar.isConnected) CC.story.preparar(pedido).catch(() => null); }, 1200);
-        compartilhar.onclick = async () => {
-          compartilhar.disabled = true;
-          await CC.imagemStory(pedido);
-          compartilhar.disabled = false;
-        };
-        const alvo = el.querySelector('#resumo-amigos');
-        if (c.amigos === undefined) c.pedidoAmigos.then(() => { if (alvo.isConnected) pintarAmigosDoResumo(alvo, c); });
-        else pintarAmigosDoResumo(alvo, c);
-      },
+      corpo: '<div class="resumo-dia"><div class="cabeca-licao"><div class="chama-palco">' + CC.icoChama(CC.sequencia().atual) + '</div>'
+        + '<h1 class="rotulo-ofensiva">' + (CC.leu(numero) ? 'Dia ' + numero + ' lido' : 'Dia ' + numero) + '</h1></div>'
+        + (falhou ? '' : CC.esqueleto('texto')) + '</div>',
+      pe: botao('Voltar à trilha', 'data-voltar-trilha'),
+      ligar(el) { el.querySelector('[data-voltar-trilha]').onclick = () => { sair(); }; },
     };
-  }
-
-  // No fim do dia, o mapa do livro que a pessoa acabou de ler, quando ele já foi publicado
-  // (conteudo/mapas/indice.json): os mapas moravam só no fim do Explorar (item 10).
-  function linhaDoMapa(dia) {
-    const mapa = CC.mapaDoLivro ? (dia.livros || []).map((l) => CC.mapaDoLivro(l)).find(Boolean) : null;
-    if (!mapa) return '';
-    return '<a class="linha-fundo linha-mapa" href="#/mapa/' + mapa.slug + '" data-ver-mapa><span class="ico-linha">' + CC.ico('mapa') + '</span>'
-      + '<span class="rotulo-linha">Ver o mapa de ' + CC.esc(mapa.nome) + '<small>A história do livro numa tela</small></span>' + CC.ico('direita') + '</a>';
-  }
-
-  // Amigos no resumo: quem também leu hoje, e um botão pequeno para encorajar quem ainda não
-  // leu. Nada de número de dias ao lado de um zero, nem ação principal empurrando a cobrar.
-  function pintarAmigosDoResumo(alvo, c) {
-    if (!c.amigos) { alvo.innerHTML = ''; return; }
-    const amigos = c.amigos.amigos || [];
-    // Sem amigo ainda: o convite de Juntos aqui mesmo, no fim do dia, que é quando se chama
-    // alguém. "Com seus amigos" é a promessa da entrada, e nada nos primeiros dias a cumpria.
-    if (!amigos.length) {
-      alvo.innerHTML = '<div class="amigos-resumo"><button class="botao contorno pequeno" data-chamar>' + CC.ico('pessoas') + 'Chamar alguém para ler junto</button></div>';
-      alvo.querySelector('[data-chamar]').onclick = () => { if (CC.convidar) CC.convidar(); };
-      return;
-    }
-    for (const a of amigos) CC.anotarProposito(a.dias);
-    const leram = amigos.filter((a) => a.leuHoje);
-    if (leram.length) CC.marcarNoDiario('juntos');
-    const semLer = amigos.find((a) => !a.leuHoje && !a.toqueEnviado);
-    const primeiro = (a) => CC.esc(String(a.nome).split(' ')[0]);
-    alvo.innerHTML = '<div class="amigos-resumo">'
-      + (leram.length ? '<p class="lendo-junto-linha"><span class="rostos">' + leram.slice(0, 3).map((a) => CC.retratoAmigo(a, 'mini')).join('') + '</span>'
-        + (leram.length === 1 ? primeiro(leram[0]) + ' também leu hoje' : leram.length + ' amigos também leram hoje') + '</p>' : '')
-      + (semLer ? '<button class="botao contorno pequeno" data-encorajar="' + CC.esc(semLer.usuario) + '">' + CC.ico('aperto') + 'Dar um toque em ' + primeiro(semLer) + '</button>' : '')
-      + '</div>';
-    const b = alvo.querySelector('[data-encorajar]');
-    if (b) {
-      b.onclick = async () => {
-        b.disabled = true;
-        try {
-          await CC.salvarNoServidor();
-          await CC.api('api/toques', { para: semLer.usuario });
-          semLer.toqueEnviado = true;
-          b.innerHTML = CC.ico('certo') + 'Toque enviado para ' + primeiro(semLer);
-        } catch (e) {
-          b.disabled = false;
-          CC.avisar(e.message);
-        }
-      };
-    }
   }
 
   // O versículo vem da tradução escolhida, para a pessoa guardar a mesma redação que leu.
@@ -727,15 +484,21 @@
     const refDoDia = CC.reflexaoDoDia(sessao.dia).ref;
     const notasVerso = refDoDia && CC.lerRef(refDoDia) ? CC.versiculos.notasDoTrecho(CC.lerRef(refDoDia)) : [];
     const temNotaVerso = notasVerso.length > 0;
+    const perguntas = CC.reflexaoDoDia(sessao.dia).perguntas || [];
+    const p = Number.isInteger(sessao.pergunta) ? perguntas[sessao.pergunta] : null;
+    const pergunta = p ? (Array.isArray(p) ? p[1] : p) : '';
 
     return {
       topo: '<span class="salvo" id="salvo" role="status"></span>',
       corpo: '<div class="cabeca-licao"><span class="etiqueta">' + nb(CC.esc(CC.passagemDe(dia))) + '</span>'
         + '<h1 class="passo-titulo">Escrever sobre hoje</h1></div>'
+        // a pergunta que a pessoa tocou em "Pensar" fica em cima do que ela escreve
+        + (pergunta ? '<p class="pergunta-escolhida"><span class="etiqueta">Para pensar</span>' + CC.esc(pergunta) + '</p>' : '')
         + '<div class="segmentado" role="group" aria-label="Como escrever">'
         + '<button data-modo="oracao" aria-pressed="' + (sessao.modo === 'oracao') + '">Oração</button>'
-        + '<button data-modo="oia" aria-pressed="' + (sessao.modo === 'oia') + '">OIA completo</button>'
+        + '<button data-modo="oia" aria-pressed="' + (sessao.modo === 'oia') + '">Observar, entender, aplicar</button>'
         + '</div>'
+        + (sessao.modo === 'oia' ? '<p class="passo-dica pequena ajuda-oia">O que o texto diz, o que ele quis dizer a quem leu primeiro e o que muda na sua vida hoje.</p>' : '')
         + campos.map((chave) => {
           const [rotulo, dica, exemplo] = CAMPOS[chave];
           return '<div class="campo"><label for="campo-' + chave + '">' + rotulo + '</label>'
@@ -749,6 +512,18 @@
       ligar(el) {
         const salvo = el.querySelector('#salvo');
         el.querySelectorAll('[data-campo]').forEach((ta) => {
+          // com o teclado aberto, o que se digita fica à vista, acima do "Pronto"
+          const cursorAVista = () => {
+            if (!ta.isConnected) return;
+            const pe = el.querySelector('.licao-pe');
+            const vv = window.visualViewport;
+            const baixo = Math.min(vv ? vv.offsetTop + vv.height : innerHeight, pe ? pe.getBoundingClientRect().top : innerHeight) - 12;
+            const r = ta.getBoundingClientRect();
+            const palco = el.querySelector('.licao-palco');
+            if (r.bottom > baixo && palco) palco.scrollTop += Math.min(r.bottom - baixo, r.top - 80);
+          };
+          ta.addEventListener('focus', () => setTimeout(cursorAVista, 320));
+          if (window.visualViewport) window.visualViewport.addEventListener('resize', () => { if (document.activeElement === ta) cursorAVista(); });
           ta.addEventListener('input', () => {
             const atual = { ...CC.registro(sessao.dia) };
             atual[ta.dataset.campo] = ta.value;

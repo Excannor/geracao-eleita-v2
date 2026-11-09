@@ -401,32 +401,39 @@
         ? '<div class="fim-da-licao" id="fim-da-licao">'
           + (feita
             ? '<p class="conquista-linha">' + CC.ico('certo') + 'Lição concluída</p>'
-            : '<p class="passo-dica" data-leia-ate-o-fim>Leia até o fim para concluir esta lição.</p>'
-              + '<button class="botao" data-concluir hidden>Concluí esta lição</button>')
+            : '<button class="botao enchendo" data-concluir aria-disabled="true">Concluí esta lição</button>')
           + '</div>'
         : '')
       + fimDoComece(id)
       + '<div data-notas-contexto="nota:' + CC.esc(id) + '"></div>'
       + citada;
 
-    // A lição só conta quando a pessoa chega ao fim do texto: o botão aparece ali.
+    // A lição só conta quando a pessoa chega ao fim do texto e passa nele um terço do tempo
+    // estimado (CC.portaoDeLeitura, 04b-leitor.js): o botão, no fim, vai se enchendo.
     const bt = raiz.querySelector('[data-concluir]');
     if (bt) {
       const fim = raiz.querySelector('#fim-da-licao');
-      const mostrar = () => {
-        bt.hidden = false;
-        const dica = raiz.querySelector('[data-leia-ate-o-fim]');
-        if (dica) dica.hidden = true;
-      };
-      if ('IntersectionObserver' in window) {
+      let viuOFim = !('IntersectionObserver' in window);
+      if (!viuOFim) {
         const olho = new IntersectionObserver((entradas) => {
-          if (entradas.some((e) => e.isIntersecting)) { mostrar(); olho.disconnect(); }
+          if (entradas.some((e) => e.isIntersecting)) { viuOFim = true; olho.disconnect(); }
         });
         olho.observe(fim);
-      } else {
-        mostrar();
       }
-      bt.onclick = () => {
+      const artigo = raiz.querySelector('.nota-artigo');
+      const portao = CC.portaoDeLeitura({
+        botao: bt,
+        minutos: CC.minutosDaLicao(n),
+        chegouAoFim: () => viuOFim,
+        fracaoDoFim: () => {
+          if (!artigo) return 0;
+          const r = artigo.getBoundingClientRect();
+          return r.height ? Math.max(0, Math.min(1, (innerHeight - r.top) / r.height)) : 0;
+        },
+      });
+      CC.portaoDaLicao = portao;
+      bt.onclick = (ev) => {
+        if (!portao.aceita(ev)) return;
         CC.marcarLicao(id, true);
         CC.guardarConquistas();
         CC.avisar('Lição concluída!');

@@ -106,29 +106,30 @@
   }
 
   // O cartão ao lado do nó de hoje: a passagem e o botão de seguir.
+  // Só informação: a entrada do dia é o botão "Ler hoje" da folha do alto (um caminho só para a
+  // mesma leitura). Lido o dia, o nó seguinte descansa: "Amanhã · Dia N", sem a estrela.
   function cartaoDoNoDeHoje(numero, feito, lado) {
     const jaLeuHoje = !feito && !!diaLidoHoje();
     const dia = D.plano[numero - 1];
-    const { lidas } = partesDoDia(numero);
-    const acao = feito ? 'Revisar' : (lidas ? 'Continuar' : 'Começar');
-    return '<section class="cartao-no-hoje lado-' + lado + '" aria-label="' + (jaLeuHoje ? 'Próxima leitura' : 'Leitura de hoje') + '">'
-      + '<span class="rot-hoje">' + (jaLeuHoje ? 'Próximo' : 'Hoje') + ' · Dia ' + numero + '</span>'
+    return '<section class="cartao-no-hoje lado-' + lado + (jaLeuHoje ? ' descanso' : '') + '" aria-hidden="true">'
+      + '<span class="rot-hoje">' + (jaLeuHoje ? 'Amanhã' : 'Hoje') + ' · Dia ' + numero + '</span>'
       // abreviada, como nos rótulos dos outros dias: o cartão é baixo para caber no passo da
       // trilha, e a passagem por extenso está no balão do dia
       + '<b>' + refHtml(abreviar(passagemDe(dia))) + '</b>'
       + '<span class="sub-hoje">' + (feito ? 'Leitura feita' : 'cerca de ' + CC.minutosDoDia(dia) + ' min') + '</span>'
-      + '<button class="botao-pilula" data-abrir-dia="' + numero + '" aria-label="' + acao + ' o dia ' + numero + '">' + CC.ico('avancar') + '</button>'
       + '</section>';
   }
 
 
   // ---------- nós ----------
+  // Os dias que ainda vêm não levam cadeado: eles abrem ("Ler mesmo assim"), e o cadeado dizia o
+  // contrário. Ficam apagados, com o número do dia. Lido o dia de hoje, o próximo descansa (lua).
   function iconeDoDia(numero, feito, atual) {
     if (FECHA_LIVRO.has(numero) && (feito || atual)) return 'livro';
     if (feito && CC.temRegistro(numero)) return 'caneta';
     if (feito) return 'certo';
-    // o de hoje é a estrela; os que ainda vêm levam cadeado, para não parecer que tocar abre
-    return atual ? 'estrela' : 'cadeado';
+    if (atual) return diaLidoHoje() ? 'lua' : 'estrela';
+    return '';
   }
 
   function no(numero, passo, atual) {
@@ -162,15 +163,16 @@
       + '<button class="' + classes.join(' ') + '" data-dia="' + numero + '" '
       + 'aria-label="' + CC.esc(legenda) + '"' + (atual ? ' aria-current="step"' : '') + '>'
       + (atual ? '<span class="anel-atual" aria-hidden="true" style="--parte:' + Math.round((CC.fracaoDoDia ? CC.fracaoDoDia(numero) : 0) * 100) + '%"></span>' : '')
-      + '<span class="face">' + CC.ico(iconeDoDia(numero, feito, atual)) + '</span></button>'
+      + '<span class="face">' + (iconeDoDia(numero, feito, atual) ? CC.ico(iconeDoDia(numero, feito, atual)) : '<span class="numero-no" aria-hidden="true">' + numero + '</span>') + '</span></button>'
       + '</div>' + rotulo + '</div>';
   }
 
   function noBau(numero, passo) {
     const aberto = CC.bauAberto(numero);
-    const pronto = !aberto && CC.leu(numero);
+    const pronto = !aberto && CC.bauLiberado(numero);
     const estado = aberto ? 'aberto' : (pronto ? 'pronto' : 'travado');
-    const legenda = aberto ? 'Baú aberto do dia ' + numero : (pronto ? 'Abrir o baú do dia ' + numero : 'Baú do dia ' + numero + ', ainda fechado');
+    const legenda = aberto ? 'Baú aberto do dia ' + numero : (pronto ? 'Abrir o baú do dia ' + numero
+      : 'Baú do dia ' + numero + ', ainda fechado. Abre com os dias ' + Math.max(1, numero - 6) + ' a ' + numero + ' lidos aqui no app');
     // Fechado em cinza e pronto em madeira, com o balão "Abrir": antes os dois saíam de
     // madeira, e o baú do dia 7 passava sem ninguém notar que já podia ser aberto.
     // O "Abrir" vai ao lado do baú (do lado onde sobra estrada), não em cima: em cima ele
@@ -350,23 +352,36 @@
       + '<span>Dia ' + numero + ' de ' + D.plano.length + ' do plano</span></div>'
       // a mesma pílula da chama e o mesmo sino do topo das outras abas (10-roteador.js); o
       // balão do Juntos saiu daqui: a aba Juntos, com o ponto de novidade, fica logo abaixo
-      + CC.pilulaDaChama(seq) + CC.sinoDoTopo()
+      // a chama já está no cartão logo abaixo: aqui fica só o sino (a pílula segue nas outras abas)
+      + CC.sinoDoTopo()
       + '</header>';
 
-    const rotuloLeitura = feito
-      ? 'Leitura de hoje feita. Rever o dia ' + numero
-      : 'Leitura de hoje, dia ' + numero + ': ' + passagemDe(dia) + ', ' + lidas + ' de ' + total + ' lidas';
-    const cartoes = '<div class="cartoes-hoje leitura-hoje">'
-      + '<button class="cartao-salvia" data-abrir-dia="' + numero + '" aria-label="' + CC.esc(rotuloLeitura) + '">'
-      + '<span class="textos-salvia"><b>' + lidas + ' de ' + total + '</b>'
-      + '<span>' + (total === 1 ? 'leitura hoje' : 'leituras hoje') + '</span></span>'
-      + '<span class="redondo-preto" aria-hidden="true">' + CC.ico(feito ? 'certo' : 'avancar') + '</span></button>'
-      + '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, '
-      + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
-      + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
-      + '<span>de ofensiva</span></span>'
-      + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>'
-      + '</div>';
+    // Uma entrada só para a leitura do dia: "Ler hoje", que abre o leitor direto na primeira
+    // passagem que falta (CC.lerHoje). Lido o dia, o botão vira a revisão, sem pressa.
+    const minutos = CC.minutosDoDia(dia);
+    const leitura = feito
+      ? '<button class="ler-hoje feito" data-rever-dia="' + numero + '" aria-label="Dia ' + numero + ' lido. Rever o dia">'
+        + '<span class="redondo-preto" aria-hidden="true">' + CC.ico('certo') + '</span>'
+        + '<span class="textos-ler"><b>Dia ' + numero + ' lido</b><span>Rever a reflexão do dia</span></span></button>'
+      : '<button class="ler-hoje" data-ler-hoje="' + numero + '" aria-label="' + CC.esc((lidas ? 'Continuar a leitura de hoje: ' : 'Ler hoje: ') + passagemDe(dia) + ', cerca de ' + minutos + ' minutos') + '">'
+        + '<span class="redondo-preto" aria-hidden="true">' + CC.ico('folha') + '</span>'
+        + '<span class="textos-ler"><b>' + (lidas ? 'Continuar' : 'Ler hoje') + '</b>'
+        + '<span>' + refHtml(passagemDe(dia)) + ' · cerca de ' + minutos + ' min' + (total > 1 && lidas ? ' · ' + lidas + ' de ' + total : '') + '</span></span>'
+        + CC.ico('avancar') + '</button>';
+    // A chama: com a ofensiva em zero, o cartão mostra o que não se perdeu (o recorde ou os dias
+    // lidos), e não um zero grande.
+    const zerada = seq.atual === 0 && (seq.recorde > 0 || CC.ler('lidos', []).length > 0);
+    const chama = zerada
+      ? '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.esc(seq.recorde ? 'Seu recorde: ' + CC.plural(seq.recorde, 'dia seguido', 'dias seguidos') : CC.plural(CC.ler('lidos', []).length, 'dia lido', 'dias lidos')) + '. Abrir a chama">'
+        + '<span class="textos-salvia"><b>' + (seq.recorde ? CC.plural(seq.recorde, 'dia', 'dias') : CC.plural(CC.ler('lidos', []).length, 'dia', 'dias')) + '</b>'
+        + '<span>' + (seq.recorde ? 'seu recorde' : 'lidos até aqui') + '</span></span>'
+        + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(0) + '</span></button>'
+      : '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + ' com a chama acesa, '
+        + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
+        + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
+        + '<span>' + (seq.atual === 1 ? 'de chama acesa' : 'seguidos de chama') + '</span></span>'
+        + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>';
+    const cartoes = leitura + '<div class="cartoes-hoje leitura-hoje">' + chama + '</div>';
 
     return '<section class="folha-topo" aria-label="Hoje">'
       + saudacao
@@ -443,8 +458,11 @@
         CC.redesenhar();
       };
     });
-    raiz.querySelectorAll('[data-abrir-dia]').forEach((el) => {
-      el.onclick = () => CC.abrirLicao(Number(el.dataset.abrirDia));
+    raiz.querySelectorAll('[data-abrir-dia], [data-rever-dia]').forEach((el) => {
+      el.onclick = () => CC.abrirLicao(Number(el.dataset.abrirDia || el.dataset.reverDia));
+    });
+    raiz.querySelectorAll('[data-ler-hoje]').forEach((el) => {
+      el.onclick = () => CC.lerHoje(Number(el.dataset.lerHoje));
     });
     const dispensar = raiz.querySelector('[data-dispensar-novo]');
     if (dispensar) {
@@ -581,9 +599,24 @@
   };
 
   // ---------- balão do nó ----------
+  // Fechar com o foco dentro do balão (Esc, ou o teclado) devolve o foco ao nó que o abriu.
   function fecharPop() {
+    const comFoco = [...document.querySelectorAll('.pop-no')].some((p) => p.contains(document.activeElement));
+    const origem = document.querySelector('.no.aberto, .no-bau.aberto');
     document.querySelectorAll('.pop-no').forEach((p) => CC.sair(p, 140));
-    document.querySelectorAll('.no.aberto').forEach((n) => n.classList.remove('aberto'));
+    document.querySelectorAll('.no.aberto, .no-bau.aberto').forEach((n) => n.classList.remove('aberto'));
+    if (comFoco && origem && origem.isConnected) origem.focus({ preventScroll: true });
+  }
+  // O foco entra no balão (no primeiro botão dele), e sair dele com o Tab o fecha: assim quem usa
+  // teclado ou leitor de tela não fica com um balão aberto para trás.
+  function focarPop(pop, botao) {
+    const primeiro = pop.querySelector('button');
+    if (primeiro) primeiro.focus({ preventScroll: true });
+    pop.addEventListener('focusout', (ev) => {
+      if (!ev.relatedTarget || pop.contains(ev.relatedTarget) || ev.relatedTarget === botao) return;
+      CC.sair(pop, 140);
+      botao.classList.remove('aberto');
+    });
   }
   CC.fecharPopNo = fecharPop;
   document.addEventListener('click', (ev) => {
@@ -678,23 +711,42 @@
     const adiante = !feito && !atual;
     const fala = atual && !feito ? '<p class="fala-bento">' + CC.esc(CC.falaDoDia(CC.amigosEmCache && CC.amigosEmCache())) + '</p>' : '';
     const pop = montarPop(botao, adiante ? 'adiante' : 'c-' + u.cor,
-      '<b class="titulo-pop">' + refHtml(passagemDe(dia)) + '</b>'
+      '<b class="titulo-pop" id="titulo-pop-' + numero + '">' + refHtml(passagemDe(dia)) + '</b>'
       + '<span class="sub-pop">Dia ' + numero + ' de ' + D.plano.length + ' · uns ' + CC.minutosDoDia(dia) + ' min</span>'
       + fala
       + (adiante ? '<span class="sub-pop">Este dia vem mais adiante, mas pode ler agora se quiser.</span>' : '')
       + '<button class="botao' + (adiante ? ' contorno' : '') + '" data-comecar="' + numero + '">'
       + (feito ? 'Revisar' : (adiante ? 'Ler mesmo assim' : 'Começar')) + '</button>');
     if (!pop) return;
-    pop.querySelector('[data-comecar]').onclick = () => { fecharPop(); CC.abrirLicao(numero); };
+    // o nome do balão: "Dia 27, Êxodo 17-19"
+    pop.setAttribute('aria-label', 'Dia ' + numero + ', ' + passagemDe(dia));
+    pop.querySelector('[data-comecar]').onclick = () => { fecharPop(); if (feito) CC.abrirLicao(numero); else CC.lerHoje(numero); };
+    focarPop(pop, botao);
   }
 
+  // O baú abre com a semana lida aqui no app (CC.bauLiberado). Antes disso, o toque diz o que
+  // falta, com um atalho para cada dia que ainda não foi lido no app (os de "Li na minha Bíblia"
+  // entram: lidos aqui, passam a contar).
   function tocarBau(numero, botao) {
     if (CC.bauAberto(numero)) return;
-    if (CC.leu(numero)) { fecharPop(); CC.telaBau(numero); return; }
-    const pop = montarPop(botao, 'adiante',
-      '<b class="titulo-pop">Um baú na estrada</b>'
-      + '<span class="sub-pop">Leia o dia ' + numero + ' para abrir.</span>');
-    if (pop) pop.onclick = (ev) => ev.stopPropagation();
+    if (CC.bauLiberado(numero)) { fecharPop(); CC.telaBau(numero); return; }
+    const de = Math.max(1, numero - 6);
+    const faltam = CC.faltamParaOBau(numero);
+    const precisa = Math.min(CC.DIAS_NO_APP_PARA_O_BAU, CC.diasDoBau(numero).length);
+    const quantos = Math.max(precisa - CC.diasNoAppDoBau(numero), CC.leu(numero) ? 0 : 1);
+    const pop = montarPop(botao, 'adiante pop-bau',
+      '<b class="titulo-pop" id="titulo-bau-' + numero + '">Um baú na estrada</b>'
+      + '<span class="sub-pop">Leia os dias ' + de + ' a ' + numero + ' aqui no app para abrir.</span>'
+      + (faltam.length ? '<span class="sub-pop pequena">' + (quantos === 1 ? 'Falta 1 dia' : 'Faltam ' + quantos + ' dias') + ' destes:</span>'
+        + '<span class="atalhos-bau">' + faltam.map((n) => '<button class="botao contorno pequeno" data-ir-dia="' + n + '" aria-label="Abrir o dia ' + n
+          + (CC.origemDoDia(n) === 'papel' ? ', lido na sua Bíblia' : '') + '">Dia ' + n + '</button>').join('') + '</span>' : ''));
+    if (!pop) return;
+    pop.setAttribute('aria-labelledby', 'titulo-bau-' + numero);
+    pop.onclick = (ev) => ev.stopPropagation();
+    pop.querySelectorAll('[data-ir-dia]').forEach((b) => {
+      b.onclick = () => { fecharPop(); CC.abrirLicao(Number(b.dataset.irDia)); };
+    });
+    focarPop(pop, botao);
   }
 
   // ---------- baú ----------
@@ -712,7 +764,8 @@
     if (CC.story) CC.story.prepararFontes();
     CC.telaCheia('<div class="cena-bau">'
       + '<h1>Um baú na estrada!</h1>'
-      + '<button class="bau-grande" data-abrir-bau aria-label="Abrir o baú">' + CC.faiscasDoBau() + CC.arte.bau('pronto', 'madeira') + '</button></div>', {
+      + '<button class="bau-grande" data-abrir-bau aria-label="Abrir o baú">' + CC.faiscasDoBau() + CC.arte.bau('pronto', 'madeira') + '</button>'
+      + '<p class="passo-dica dica-toque-bau">Toque no baú para abrir</p></div>', {
       classe: 'tela-bau c-' + u.cor,
       rotulo: 'Baú do dia ' + numero,
       ligar: (el, fechar) => {
@@ -743,6 +796,7 @@
         botao.onclick = async () => {
           botao.disabled = true;
           const bau = CC.abrirBau(numero);
+          if (!bau) { fechar(); CC.redesenhar(); return; }
           CC.vibrar('conquista');
           // Com as peças prontas, a arte faz a abertura inteira (CC.cartas.revelar): o baú não
           // anima duas vezes. Esperando por elas, este balança.

@@ -1,0 +1,30 @@
+/* A tela do dia lido (dia-lido.js). */
+.dia-lido .linha-chama { margin: 0; color: var(--tinta); font-weight: 700; }
+.dia-lido .linha-chama .numero-ofensiva { display: inline; font-size: 1.5rem; }
+.dia-lido .compartilhar-chama { width: auto; margin-top: 10px; }
+.dia-lido .titulo-guardar { margin: 4px 0 10px; font-size: 1.125rem; }
+.bau-do-dia { display: flex; align-items: center; gap: 14px; width: 100%; margin: 0 0 16px; padding: 14px 18px; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta); font: inherit; text-align: left; }
+.bau-do-dia > svg, .bau-do-dia > .arte-bau { flex: none; width: 56px; height: 52px; }
+.bau-do-dia span { display: grid; gap: 2px; }
+.bau-do-dia b { color: var(--tinta-forte); }
+.bau-do-dia small { color: var(--tinta-fraca); font-size: .875rem; }
+button.bau-do-dia { cursor: pointer; }
+.cartao-opcional { margin: 0 0 12px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.cartao-opcional > summary { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 18px; list-style: none; cursor: pointer; }
+.cartao-opcional > summary::-webkit-details-marker { display: none; }
+.cartao-opcional > summary > svg { width: 20px; height: 20px; margin-left: auto; color: var(--tinta-fraca); transition: transform .2s ease; }
+.cartao-opcional[open] > summary > svg { transform: rotate(180deg); }
+.cartao-opcional .rot-opcional { display: grid; }
+.cartao-opcional .rot-opcional b { color: var(--tinta-forte); font-size: 1.0625rem; }
+.cartao-opcional .rot-opcional small { color: var(--tinta-fraca); font-size: .875rem; }
+.cartao-opcional .ico-etapa { display: flex; flex: none; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--salvia-palido); color: var(--salvia-texto); }
+.cartao-opcional .ico-etapa svg { width: 20px; height: 20px; }
+.corpo-opcional { display: grid; gap: 12px; padding: 0 18px 18px; }
+.corpo-opcional .texto-reflexao { margin: 0; color: var(--tinta); line-height: 1.6; }
+.corpo-opcional .campo { margin: 0; }
+.corpo-opcional .campo textarea { min-height: 120px; background: var(--campo); border-color: var(--campo); }
+.perguntas-leitura { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pergunta-leitura { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 14px 16px; border: 0; border-radius: 18px; background: var(--campo); color: var(--tinta-forte); font: inherit; font-weight: 600; text-align: left; cursor: pointer; }
+.pergunta-leitura small { display: block; color: var(--tinta-fraca); font-size: .75rem; font-weight: 700; }
+.pergunta-leitura svg { flex: none; width: 18px; height: 18px; margin-left: auto; color: var(--tinta-fraca); }
+@media (prefers-reduced-motion: reduce) { .cartao-opcional > summary > svg { transition: none; } }
