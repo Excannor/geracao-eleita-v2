@@ -288,7 +288,8 @@
         ev.preventDefault();
         CC.vibrar('leve');
         // Instalar abre a folha do passo a passo por cima: fecha o Mais como o voltar fecha.
-        if (a.dataset.irMais === '#instalar') { fecharPainelMais(); CC.tutorialInstalar(); return; }
+        // A folha reaproveita a entrada do painel no histórico: o voltar fecha a folha e pronto.
+        if (a.dataset.irMais === '#instalar') { fecharPainelMais(true); CC.tutorialInstalar(); return; }
         painelMaisAberto = false;
         document.querySelectorAll('.veu-mais, .painel-mais').forEach((el) => CC.sair(el, 200));
         irSemFantasma(a.dataset.irMais);
@@ -741,6 +742,8 @@
   addEventListener('keydown', (ev) => {
     if (ev.key !== 'Escape') return;
     if (document.querySelector('.painel-mais')) { fecharPainelMais(); return; }
+    // a folha (ou a tela cheia) de cima fecha como no voltar do celular
+    if (CC.fecharSobreposicaoDoTopo()) return;
     const cortinas = document.querySelectorAll('.cortina');
     const cortina = cortinas[cortinas.length - 1];
     if (cortina) { if (!cortina.dataset.presa) cortina.remove(); return; }
