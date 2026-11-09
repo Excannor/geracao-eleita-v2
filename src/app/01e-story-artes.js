@@ -2242,7 +2242,7 @@
     }
     S.chama(ctx, x0 + wc / 2, base, hc, !dias, tema.apagada);
     S.escrever(ctx, String(dias), x0 + wc + vao, base - 4 * k, S.Mn(800, tam), dias ? tema.numero : tema.apagada, { alinhar: 'left', espaco: -6 * k });
-    const rotulo = dias === 1 ? 'dia de ofensiva' : 'dias de ofensiva';
+    const rotulo = dias === 1 ? 'dia seguido' : 'dias seguidos';
     const yr = base + 62 * k;
     const fr = S.Mn(700, 44 * k);
     if (tema.alinhar === 'esquerda') S.escrever(ctx, rotulo, x0, yr, fr, tema.rotulo, { alinhar: 'left' });

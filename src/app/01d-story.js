@@ -259,7 +259,7 @@
     y += hc + 48 * g + capa;
     escrever(ctx, String(dias), L / 2, y, Mn(800, tamNumero), dias ? '#ff9a7a' : '#a4a99d', { espaco: -8 });
     y += 86;
-    escrever(ctx, dias === 1 ? 'dia de ofensiva' : 'dias de ofensiva', L / 2, y, Mn(700, 56), '#eef0ea');
+    escrever(ctx, dias === 1 ? 'dia seguido' : 'dias seguidos', L / 2, y, Mn(700, 56), '#eef0ea');
     y += 64;
     escrever(ctx, est.nome.toUpperCase(), L / 2, y, Mn(800, 30), '#c9d98f', { espaco: 30 * 0.16 });
     y += 104;

@@ -110,7 +110,7 @@
   // A pílula da chama (abre a folha da ofensiva) e o sino (abre os avisos), iguais no topo das
   // abas e na folha do Início. O ponto do sino vem do último número que 07f-avisos.js contou.
   CC.pilulaDaChama = (seq, extra) => '<button class="contador ofensiva' + (seq.atual ? ' ativo' : '') + (seq.feitoHoje ? ' hoje' : '') + (extra || '')
-    + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia', 'dias') + ' de ofensiva, ' + CC.estagioDaChama(seq.atual).nome + '">'
+    + '" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + ' com a chama acesa, ' + CC.estagioDaChama(seq.atual).nome + '">'
     + CC.icoChama(seq.atual) + '<span>' + seq.atual + '</span></button>';
   CC.sinoDoTopo = () => {
     if (!location.protocol.startsWith('http')) return '';
@@ -177,7 +177,7 @@
     const lema = CC.fraseDaOfensiva();
     CC.folha('<div class="folha-ofensiva">'
       + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
-      + '<span>' + (seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva') + (seq.atual ? '!' : '') + '</span></div>'
+      + '<span>' + (seq.atual === 1 ? 'dia seguido' : 'dias seguidos') + (seq.atual ? '!' : '') + '</span></div>'
       // O carimbo vem logo abaixo da contagem, na arte do onboarding: uma frase sorteada
       // (CC.FRASES_OFENSIVA), com a referência em cima quando é versículo, como no portal.
       // Só o carimbo, sem texto corrido embaixo: o dono quer a frase sozinha, motivando.
@@ -190,7 +190,7 @@
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
-      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias de ofensiva.</span></p>'
+      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
       + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">Seu recorde guarda até onde você já chegou. Até aqui o Senhor nos ajudou! (1Sm 7.12)</p>' : '')
       + (amigos.length
@@ -203,7 +203,7 @@
       + '<button class="botao contorno" data-ver-amigos>Ver amigos</button></div>'
       + '</div>',
     {
-      rotulo: 'Ofensiva',
+      rotulo: 'Sua chama',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-ver-amigos]').onclick = () => { fechar(); location.hash = '#/novidades'; };
         // A imagem leva exatamente a frase sorteada para esta abertura (lema), não outra; e
@@ -638,7 +638,7 @@
     const dono = (CC.quem && CC.quem.usuario) || '';
     if (seq.protegidos.includes(ontem) && lerLocal('cc.aviso.escudo') !== dono + ':' + ontem) {
       gravarLocal('cc.aviso.escudo', dono + ':' + ontem);
-      CC.avisar('Seu escudo cobriu ontem. A ofensiva segue em ' + seq.atual + '!');
+      CC.avisar('Seu escudo cobriu ontem. A chama segue acesa: ' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + '!');
       return;
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
