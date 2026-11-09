@@ -119,12 +119,14 @@
   .consentimento span { font-size: .88rem; font-weight: 600; line-height: 1.5; color: var(--tinta); }
   .consentimento:has(input[aria-invalid="true"]) { outline: 2px solid var(--erro); }
   .convite { padding: 12px 14px; border-radius: 16px; background: var(--azul-fraco); font-weight: 700; color: var(--forte); }
-  /* A pergunta "Você já segue Jesus?": duas opções lado a lado, uma sempre marcada (o
-     padrão é "Sim"), sem exigir resposta, como um segmentado simples. */
+  /* A pergunta "Você já segue Jesus?": duas opções lado a lado, nenhuma marcada de saída. Ela
+     decide o caminho (o plano de um ano ou os 14 dias do Conhecer Jesus): o "Continuar" pede a
+     resposta, com o erro logo abaixo, como nos outros campos. */
   .caminho-escolha { display: flex; gap: 10px; }
   .opcao-caminho { flex: 1; min-height: 54px; padding: 10px; border: 2px solid var(--borda); border-radius: 16px;
     background: var(--cartao); color: var(--tinta); font-family: inherit; font-size: 0.92rem; font-weight: 700; cursor: pointer; }
   .opcao-caminho[aria-pressed="true"] { border-color: var(--azul); background: var(--azul-fraco); color: var(--forte); }
+  .caminho-escolha[aria-invalid="true"] .opcao-caminho { border-color: var(--erro); }
   :focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
   .faixa-fora { display: grid; gap: 10px; margin: 0 0 14px; padding: 14px 16px; border-radius: 20px;
     background: var(--inverso); color: var(--inverso-tinta); font-weight: 700; font-size: .92rem; line-height: 1.45; }
@@ -697,7 +699,7 @@
         <div class="campo" style="margin-top:16px" id="campo-caminho">
           <label id="rotulo-caminho">Você já segue Jesus?</label>
           <div class="caminho-escolha" role="group" aria-labelledby="rotulo-caminho">
-            <button type="button" class="opcao-caminho" data-caminho="plano" aria-pressed="true">Sim</button>
+            <button type="button" class="opcao-caminho" data-caminho="plano" aria-pressed="false">Sim</button>
             <button type="button" class="opcao-caminho" data-caminho="conhecer" aria-pressed="false">Estou conhecendo</button>
           </div>
         </div>
@@ -802,9 +804,9 @@
   var convite = params.get('convite');
   var celula = params.get('celula');
   var passo = 1;
-  // "Sim" é o padrão: a pergunta não obriga resposta, só existe para quem quer dizer que
-  // ainda está conhecendo Jesus.
-  var caminhoEscolhido = 'plano';
+  // Sem resposta marcada de saída: quem preenchia rápido caía no plano de 365 dias sem perceber
+  // que tinha escolhido. O convite para conhecer Jesus já responde (e esconde a pergunta).
+  var caminhoEscolhido = '';
   // Com link de célula, a pessoa escolhe entre entrar de vez ou só conhecer (visitante) antes
   // de criar a conta; sem link de célula, o valor não é usado (fica sempre false).
   var celulaVisitante = false;
@@ -812,6 +814,8 @@
     b.addEventListener('click', function () {
       caminhoEscolhido = b.dataset.caminho;
       document.querySelectorAll('.opcao-caminho').forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
+      var grupo = document.querySelector('.caminho-escolha');
+      if (grupo.getAttribute('aria-invalid') === 'true') { grupo.removeAttribute('aria-invalid'); grupo.removeAttribute('aria-describedby'); $('erro-cadastro').textContent = ''; }
     });
   });
   $('botao-entrar-celula').addEventListener('click', function () { celulaVisitante = false; });
@@ -963,6 +967,13 @@
       var hoje = new Date().toISOString().slice(0, 10);
       if (!d || d >= hoje) return erro($('nascimento'), 'Confira a data no formato DD/MM/AAAA.');
       if (d > somaAnos(hoje, -12)) return erro($('nascimento'), 'O Geração Eleita é para quem tem 12 anos ou mais.');
+      if (!caminhoEscolhido && !$('campo-caminho').hidden) {
+        var grupo = document.querySelector('.caminho-escolha');
+        erro(grupo.querySelector('.opcao-caminho'), 'Escolha uma resposta: ela decide por onde você começa.');
+        grupo.setAttribute('aria-invalid', 'true');
+        grupo.querySelector('.opcao-caminho').removeAttribute('aria-invalid');
+        return false;
+      }
     }
     if (n === 2 && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test($('email').value.trim())) return erro($('email'), 'Esse e-mail não parece certo.');
     if (n === 3) {
@@ -1002,7 +1013,7 @@
       body: JSON.stringify({ nome: $('nome').value.trim(), nascimento: dataIso($('nascimento').value), email: $('email').value.trim(),
         usuario: $('usuario').value, senha: $('senha-nova').value, fuso: fuso, convite: convite || '', celula: celula || '',
         celulaVisitante: celula ? celulaVisitante : false,
-        consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido }),
+        consentimento: $('consentimento-cadastro').checked, caminho: caminhoEscolhido || 'plano' }),
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (d) {
         if (r.ok) {
