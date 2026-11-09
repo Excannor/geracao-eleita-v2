@@ -461,7 +461,12 @@
     const anterior = anteriorNaPilha();
     const confere = DESTINO_DO_ROTULO[rotulo];
     if (anterior && confere && !confere(anterior)) {
-      // Vai voltar para outra tela: o nome fixo mentiria.
+      // Vai voltar para outra tela: o nome fixo mentiria. No botão redondo (só o ícone, com o
+      // nome escondido para o leitor de tela, como o do mapa do livro), muda só o nome
+      // escondido: escrever "Voltar" nele deixava a palavra vazando para fora do círculo.
+      const escondido = el.querySelector('.so-leitor');
+      if (el.hasAttribute('aria-label')) el.setAttribute('aria-label', 'Voltar');
+      if (escondido) { escondido.textContent = 'Voltar'; return; }
       [...el.childNodes].forEach((n) => { if (n.nodeType === 3) n.remove(); });
       el.append('Voltar');
     }

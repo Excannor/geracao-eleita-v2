@@ -241,6 +241,17 @@ ok(await av('document.querySelector("#testamento-novo .titulo-secao span").textC
 await av('(() => { const c = document.getElementById("busca-livro"); c.value = ""; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
 ok(await av('document.querySelector("#testamento-novo .titulo-secao span").textContent') === '27 livros' && await av('document.querySelector("#busca-livro-ref").innerHTML') === '', 'apagar a busca volta aos 27 livros, sem o cartão');
 
+// ---------- o voltar do mapa aberto pela Bíblia (C6) ----------
+await ir('#/biblia', '!!document.querySelector("a.mapa-livro[href=\\"#/mapa/genesis\\"]")', 15000);
+await av('document.querySelector("a.mapa-livro[href=\\"#/mapa/genesis\\"]").click()');
+ok(await esperar('!!document.querySelector(".mapa-nome")'), 'o ícone ao lado de Gênesis abre o mapa do livro');
+await dormir(500);
+ok(await av('(() => { const b = document.querySelector(".mapa-barra [data-voltar]"); const r = b.getBoundingClientRect(); return [...b.childNodes].every((n) => n.nodeType !== 3 || !n.nodeValue.trim()) && b.scrollWidth <= r.width + 1 && b.getAttribute("aria-label") === "Voltar"; })()'),
+  'o voltar do mapa não escreve "Voltar" fora do círculo e diz "Voltar" ao leitor de tela');
+ok(await marcados() === 'biblia', 'o mapa aberto pela Bíblia continua marcando a Bíblia');
+await av('document.querySelector(".mapa-barra [data-voltar]").click()');
+ok(await esperar('location.hash === "#/biblia"'), 'e o voltar leva de volta à Bíblia');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');
