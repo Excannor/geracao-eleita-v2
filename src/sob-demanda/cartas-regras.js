@@ -200,9 +200,12 @@
   R.FONTES = {
     bau: { ativa: true, premio: 'carta' },
     album: { ativa: true, premio: 'marco' },
+    // a unidade e os dias contam só o que foi lido aqui no app: o dia de "Li na minha Bíblia" conta
+    // para a chama e o progresso, não para as cartas (seção 3)
     unidade: { ativa: true, premio: 'marco',
-      detectar: (e) => (D().unidades || []).filter((u) => CC.unidadeCompletaEm && CC.unidadeCompletaEm(u.numero, e)).map((u) => 'unidade:' + u.numero) },
-    dias: { ativa: true, premio: 'marco', detectar: (e) => [100, 365].filter((n) => (e.lidos || []).length >= n).map((n) => 'dias:' + n) },
+      detectar: (e) => (D().unidades || []).filter((u) => CC.unidadeCompletaEm && CC.unidadeCompletaEm(u.numero, e)
+        && (!CC.lidoNoApp || Array.from({ length: u.ate - u.de + 1 }, (_, i) => u.de + i).every((n) => CC.lidoNoApp(n, e)))).map((u) => 'unidade:' + u.numero) },
+    dias: { ativa: true, premio: 'marco', detectar: (e) => [100, 365].filter((n) => (e.lidos || []).filter((d) => !CC.lidoNoApp || CC.lidoNoApp(d, e)).length >= n).map((n) => 'dias:' + n) },
     conhecer: { ativa: true, premio: 'carta', detectar: (e) => (Object.keys(e.conhecidos || {}).length >= 14 ? ['conhecer:14'] : []) },
     passos: { ativa: true, premio: 'carta',
       detectar: (e) => ((D().licoes || []).length && (e.licoes || []).length >= D().licoes.length ? ['passos:todos'] : []) },
@@ -331,6 +334,7 @@
       if (r.resultado && !r.resultado.repetido) novos.push({ fonte, chave, ...r.resultado });
       for (const x of r.extra || []) { novos.push(x); t++; }
     };
+    // o baú só entra em bausAbertos liberado (CC.abrirBau confere a semana lida no app, 02b-jogo.js)
     if (bau > 0 && (e.bausAbertos || {})['dia:' + bau]) {
       const chave = R.chaveDoBau(bau, e);
       const ev = c.eventos[chave];

@@ -274,7 +274,8 @@ secao('mapas dos livros');
   const foraDoExplorar = ['04b-leitor.js', '03-trilha.js', '03c-contexto.js']
     .filter((f) => /vistaMapa|#\/mapa|secaoMapas|cartaoMapas|mapaDoLivro/.test(app(f)));
   checar(foraDoExplorar.length === 0, 'o leitor e a trilha não ganharam nada do mapa' + (foraDoExplorar.length ? ' (' + foraDoExplorar.join(', ') + ')' : ''));
-  const soLink = ['04d-biblia.js', '04-licao.js'].filter((f) => /vistaMapa|secaoMapas|cartaoMapas/.test(app(f)) || !/CC\.mapaDoLivro/.test(app(f)));
+  // o fim da lição (a tela do dia lido) mora na peça src/sob-demanda/dia-lido.js
+  const soLink = ['04d-biblia.js', '../sob-demanda/dia-lido.js'].filter((f) => /vistaMapa|secaoMapas|cartaoMapas/.test(app(f)) || !/CC\.mapaDoLivro/.test(app(f)));
   checar(soLink.length === 0, 'a Bíblia e o fim da lição só levam ao mapa publicado, com um link' + (soLink.length ? ' (' + soLink.join(', ') + ')' : ''));
   const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
   checar(roteador.includes("mapa: '#/explorar'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca o Explorar');
@@ -353,6 +354,8 @@ secao('peças sob demanda');
     // no index ficam o esqueleto do catálogo, a fusão (02-estado.js) e as cascas
     ['cartas-regras', 'CARTAS_REGRAS', 'PESO_NOVA_ATUAL', '', 'a regra das cartas'],
     ['album', 'ALBUM_CARTAS', 'album-sem-arte', '', 'o álbum das cartas'],
+    // a tela do dia lido (depois de ler): a casca e a lição ficam em 04-licao.js
+    ['dia-lido', 'DIA_LIDO', 'cc.diaLido.abertos', '', 'a tela do dia lido'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -778,12 +781,25 @@ s = CC.simularOfensiva(dias('2026-03-01', 2), '2026-03-03');
 checar(s.atual === 2, 'a ofensiva sobrevive ao dia de hoje ainda não lido');
 s = CC.simularOfensiva(['2026-03-01', '2026-03-02', '2026-03-04'], '2026-03-04');
 checar(s.atual === 3 && s.protegidos.join() === '2026-03-03', 'um dia em branco gasta o escudo e a ofensiva segue');
-s = CC.simularOfensiva(['2026-03-01', '2026-03-02', '2026-03-05'], '2026-03-05');
-checar(s.atual === 1 && !s.protegidos.length && s.escudos === 1, 'buraco maior que os escudos zera sem gastar escudo');
+// (depois da primeira semana: nela vale também o escudo do iniciante, logo abaixo)
+s = CC.simularOfensiva([...dias('2026-02-20', 11), '2026-03-06'], '2026-03-06');
+checar(s.atual === 1 && !s.protegidos.length && s.escudos === 2, 'buraco maior que os escudos zera sem gastar escudo');
 s = CC.simularOfensiva([...dias('2026-03-01', 7), '2026-03-10'], '2026-03-10');
 checar(s.atual === 8 && s.protegidos.length === 2, 'sete dias seguidos rendem um escudo a mais, no máximo dois');
-s = CC.simularOfensiva(dias('2026-03-01', 3), '2026-03-06');
-checar(s.atual === 0 && s.recorde === 3 && s.zerouEm, 'sem ler e sem escudos bastantes, zera e o recorde fica');
+s = CC.simularOfensiva(dias('2026-02-20', 11), '2026-03-06');
+checar(s.atual === 0 && s.recorde === 11 && s.zerouEm, 'sem ler e sem escudos bastantes, zera e o recorde fica');
+// escudo do iniciante (docs/retencao-primeiros-dias.md): na primeira semana, um buraco de até 2
+// dias é coberto uma vez, sem gastar os escudos de sempre
+s = CC.simularOfensiva(['2026-03-01', '2026-03-04'], '2026-03-04');
+checar(s.atual === 2 && s.iniciante === '2026-03-02' && s.protegidos.join() === '2026-03-02,2026-03-03' && s.escudos === 1, 'escudo do iniciante: leu no dia 1, faltou 2 dias e voltou no 4º: a chama segue');
+s = CC.simularOfensiva(dias('2026-03-01', 1), '2026-03-04');
+checar(s.atual === 1 && !s.zerouEm, 'escudo do iniciante: a volta depois do fim de semana não mostra a chama em zero');
+s = CC.simularOfensiva(['2026-03-01', '2026-03-04', '2026-03-07'], '2026-03-07');
+checar(s.atual === 1 && s.zerouEm === '2026-03-05', 'escudo do iniciante: vale uma vez só');
+s = CC.simularOfensiva(['2026-03-01', '2026-03-05'], '2026-03-05');
+checar(s.atual === 1 && !s.iniciante, 'escudo do iniciante: um buraco de 3 dias não é coberto');
+s = CC.simularOfensiva([...dias('2026-03-01', 9), '2026-03-12'], '2026-03-12');
+checar(!s.iniciante && s.atual === 10, 'escudo do iniciante: depois da primeira semana, só os escudos de sempre');
 s = CC.simularOfensiva([...dias('2026-03-01', 3), ...dias('2026-03-10', 3)], '2026-03-12');
 checar(s.recomeco, 'três dias depois de zerar contam como recomeço');
 s = CC.simularOfensiva(['2026-02-27', '2026-02-28', '2026-03-03'], '2026-03-03');
@@ -819,6 +835,42 @@ checar(ordenado(CC.fundir(celular, computador)) === ordenado(CC.fundir(computado
 const zerado = { atualizadoEm: 200, zeradoEm: 200, dia: 1, lidos: [], licoes: [], oia: {}, anotacoes: {}, marcadoEm: {}, licoesEm: {} };
 checar(CC.fundir(celular, zerado).lidos.length === 0, 'um zeramento mais novo apaga o que veio antes');
 checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 'o que foi feito depois do zeramento sobrevive');
+// --- ler de verdade: a origem de cada dia, a data mais antiga e o baú da semana (docs/cartas.md) ---
+{
+  const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
+  const a = base({ atualizadoEm: 10, lidos: [1, 2], marcadoEm: { 1: '2026-03-01', 2: '2026-03-03' }, origens: { 1: 'papel', 2: 'app' } });
+  const b = base({ atualizadoEm: 20, lidos: [1, 2], marcadoEm: { 1: '2026-03-02', 2: '2026-03-02' }, origens: { 1: 'app', 2: 'papel' } });
+  const ab = CC.fundir(a, b);
+  const ba = CC.fundir(b, a);
+  checar(ab.marcadoEm[1] === '2026-03-01' && ab.marcadoEm[2] === '2026-03-02' && JSON.stringify(ab.marcadoEm) === JSON.stringify(ba.marcadoEm),
+    'a fusão guarda a data mais antiga de cada dia lido, nos dois sentidos (revisar não traz o dia para hoje)');
+  checar(ab.origens[1] === 'app' && ab.origens[2] === 'app' && ba.origens[1] === 'app', 'a fusão da origem: lido no app vence "Li na minha Bíblia"');
+  checar(CC.fundir(base({ lidos: [3], licoesEm: { x: '2026-03-05' } }), base({ lidos: [3], licoesEm: { x: '2026-03-01' } })).licoesEm.x === '2026-03-01',
+    'os Primeiros passos também guardam a data mais antiga');
+  const limpo = CC.normalizarEstado({ lidos: [1, 2], origens: { 1: 'papel', 2: 'qualquer', 3: 'app', x: 'app' } });
+  checar(JSON.stringify(limpo.origens) === '{"1":"papel"}', 'a origem só aceita app ou papel, e só para um dia lido (o servidor passa pelo mesmo normalizar)');
+  checar(CC.origemDoDia(1, base({ lidos: [1] })) === 'app' && CC.origemDoDia(1, base({ lidos: [1], origens: { 1: 'papel' } })) === 'papel' && CC.origemDoDia(2, base({ lidos: [1] })) === '',
+    'dia lido sem origem (de antes da regra) conta como lido no app');
+}
+// --- marcar não se desmarca, e a data e a origem andam como devem ---
+{
+  CC.carregarLocal();
+  CC.zerarLocal();
+  CC.marcarLido(5, 'papel');
+  const data = CC.estado().marcadoEm[5];
+  CC.marcarLido(5, false);
+  checar(CC.leu(5) && CC.origemDoDia(5) === 'papel', 'não existe mais desmarcar: marcarLido(dia, false) não tira a leitura');
+  CC.estado().marcadoEm[5] = '2026-01-01';
+  CC.marcarLido(5, 'app');
+  checar(CC.origemDoDia(5) === 'app' && CC.estado().marcadoEm[5] === '2026-01-01', 'ler no app depois de "Li na minha Bíblia" muda a origem, e não a data');
+  CC.marcarLido(5, 'papel');
+  checar(CC.origemDoDia(5) === 'app', 'e não volta para papel');
+  CC.marcarLicao('l1', true);
+  CC.marcarLicao('l1', false);
+  checar(CC.fezLicao('l1'), 'lição dos Primeiros passos também não se desmarca');
+  void data;
+  CC.zerarLocal();
+}
 // "Zerar progresso" recomeça só a trilha: foto, nome, o que foi escrito e marcado ficam
 {
   CC.carregarLocal();
@@ -1667,6 +1719,23 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   const estado = (extra) => ({ ...CC.normalizarEstado({}), dono: 'ana', ...extra });
   const e1 = estado({ bausAbertos: { 'dia:14': { em: '2026-03-14', ref: 'Gênesis 50.20' }, 'dia:7': { em: '2026-03-07', ref: 'Gênesis 12.3' } } });
   // baús abertos antes das cartas: nada é pago calado; cada um volta a ficar pronto e paga no toque
+  {
+  const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
+  // o baú do dia 7: o dia 7 lido e pelo menos 5 dos dias 1 a 7 lidos aqui no app
+  const semana = (papel, faltam = []) => base({ lidos: [1, 2, 3, 4, 5, 6, 7].filter((n) => !faltam.includes(n)), origens: Object.fromEntries(papel.map((n) => [n, 'papel'])) });
+  checar(CC.bauLiberado(7, semana([])) && CC.bauLiberado(7, semana([1, 2])), 'o baú abre com 5 ou mais dos 7 dias lidos no app');
+  checar(!CC.bauLiberado(7, semana([1, 2, 3])) && CC.faltamParaOBau(7, semana([1, 2, 3])).join() === '1,2,3', 'com 3 dias de papel, o baú não abre e diz quais dias faltam');
+  checar(!CC.bauLiberado(7, semana([], [7])) && CC.bauLiberado(14, base({ lidos: [8, 9, 10, 11, 12, 13, 14] })), 'o dia do baú precisa estar lido; cada baú vale a semana dele');
+  checar(!CC.bauLiberado(7, semana([], [1, 2, 3])), 'adiantar não abre baú: a semana tem de estar lida');
+  checar(CC.bauLiberado(7, base({ lidos: [1, 2, 3, 4, 5, 6, 7] })), 'os dias marcados antes da regra (sem origem) abrem o baú como antes');
+  // a unidade e os 100 dias pagam carta só com o que foi lido no app
+  const u1 = D.unidades[0];
+  const todos = Array.from({ length: 100 }, (_, i) => i + 1);
+  const fontesDe = (e) => [...RC.FONTES.unidade.detectar(e), ...RC.FONTES.dias.detectar(e)];
+  checar(fontesDe(base({ lidos: todos })).includes('unidade:1') && fontesDe(base({ lidos: todos })).includes('dias:100'), 'a unidade e os 100 dias lidos no app pagam a carta de marco');
+  const comPapel = base({ lidos: todos, origens: { [u1.de]: 'papel' } });
+  checar(!fontesDe(comPapel).includes('unidade:1') && !fontesDe(comPapel).includes('dias:100') && CC.unidadeCompletaEm(1, comPapel), 'com um dia de papel, a unidade conta como concluída, mas não paga carta');
+  }
   checar(!RC.emDia(e1, { dono: 'ana', em: 100 }).novos.length && !CC.bauAberto(7, e1) && !CC.bauAberto(14, e1) && !!e1.bausAbertos['dia:7'],
     'baú aberto antes das cartas não é pago calado: fica pronto para abrir de novo (bausAbertos não muda)');
   const r1 = RC.emDia(e1, { dono: 'ana', em: 100, bau: 7 });

@@ -167,6 +167,26 @@
   // ler, e não um brinde avulso. A referência de cada dia já existe em CC.reflexaoDoDia.
   CC.temBau = (numero) => numero % 7 === 0;
   CC.chaveBau = (numero) => 'dia:' + numero;
+  // O baú do dia N é da semana dele (os dias N-6 a N) e abre com a semana lida aqui no app: o
+  // dia N lido e pelo menos 5 dos 7 dias lidos no leitor do app. "Li na minha Bíblia" conta para
+  // a chama e para o progresso, mas não abre baú: a recompensa mais desejada fica com a leitura
+  // de verdade (docs/cartas.md, seção 3). Os dias lidos antes desta regra contam como lidos aqui.
+  CC.DIAS_NO_APP_PARA_O_BAU = 5;
+  CC.diasDoBau = (numero) => {
+    const dias = [];
+    for (let n = Math.max(1, numero - 6); n <= numero; n++) dias.push(n);
+    return dias;
+  };
+  CC.diasNoAppDoBau = (numero, e) => CC.diasDoBau(numero).filter((n) => CC.lidoNoApp(n, est(e))).length;
+  CC.bauLiberado = (numero, e) => {
+    const s = est(e);
+    const dias = CC.diasDoBau(numero);
+    return CC.temBau(numero) && s.lidos.includes(numero)
+      && CC.diasNoAppDoBau(numero, s) >= Math.min(CC.DIAS_NO_APP_PARA_O_BAU, dias.length);
+  };
+  // Os dias da semana do baú que ainda não foram lidos aqui (os de papel entram: lidos no app,
+  // passam a contar).
+  CC.faltamParaOBau = (numero, e) => CC.diasDoBau(numero).filter((n) => !CC.lidoNoApp(n, est(e)));
   // O baú só conta como aberto na Trilha quando a carta dele foi vista (docs/cartas.md, seção 6):
   // os baús abertos antes das cartas, e os que tiveram a carta paga sem revelação, voltam a ficar
   // prontos para abrir. bausAbertos não muda (a fusão por união traria tudo de volta): o que decide
@@ -212,6 +232,7 @@
     const E = CC.estado();
     const chave = CC.chaveBau(numero);
     if ((E.bausAbertos || {})[chave]) return E.bausAbertos[chave];
+    if (!CC.bauLiberado(numero, E)) return null;
     const bau = { em: CC.hojeIso(), ref: CC.versiculoDoBau(numero) };
     CC.gravar('bausAbertos', { ...(E.bausAbertos || {}), [chave]: bau });
     return bau;
@@ -254,7 +275,7 @@
   // ---------- conquistas com níveis ----------
   CC.CONQUISTAS = [
     { id: 'chama', titulo: 'Chama acesa', icone: 'chama', cor: 'vermelho', niveis: [3, 7, 30, 100, 365],
-      texto: (n) => 'Chegue a ' + n + ' dias de ofensiva',
+      texto: (n) => 'Chegue a ' + n + ' dias seguidos de chama acesa',
       valor: (e, hoje) => CC.simularOfensiva(CC.datasFeitas(e), hoje).recorde },
     { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'dia-visto', cor: 'verde', niveis: [10, 50, 100, 200, 365],
       texto: (n) => 'Leia ' + n + ' dias do plano', valor: (e) => e.lidos.length },

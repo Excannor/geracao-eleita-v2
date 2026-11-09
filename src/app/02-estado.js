@@ -17,6 +17,11 @@
     oia: {},
     anotacoes: {},
     marcadoEm: {},
+    // De onde veio cada dia do plano lido: 'app' (lido no leitor, até o fim e com o tempo mínimo)
+    // ou 'papel' ("Li na minha Bíblia"). O dia de papel conta para o progresso, a chama, a unidade
+    // e os amigos, mas não para os baús nem para as cartas. Dia lido sem origem (de antes desta
+    // regra) conta como 'app'.
+    origens: {},
     licoesEm: {},
     // Conhecer Jesus: número do dia (1 a 14) → data ISO em que a pessoa o terminou. Vive
     // separado de "licoesEm" porque não é primeiro passo nem lição do plano, mas conta
@@ -272,9 +277,26 @@
   // Conhecer Jesus, ofensiva, XP, conquistas, baús, desafios do dia, prática). O que a pessoa
   // escreveu, marcou ou é dela (reflexões, anotações, notas, marca-texto, Minha história, foto,
   // nome, orações marcadas, desafios de vários dias, último capítulo) fica.
-  const PROGRESSO_DA_TRILHA = ['dia', 'lidos', 'licoes', 'marcadoEm', 'licoesEm', 'conhecidos', 'pratica', 'xpLegado',
+  const PROGRESSO_DA_TRILHA = ['dia', 'lidos', 'licoes', 'marcadoEm', 'origens', 'licoesEm', 'conhecidos', 'pratica', 'xpLegado',
     'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos'];
   CC.PROGRESSO_DA_TRILHA = PROGRESSO_DA_TRILHA;
+
+  // A data de cada dia lido: vale a mais antiga dos dois lados. Uma leitura não se desmarca, e a
+  // data em que ela aconteceu de verdade é a primeira; um aparelho que regravasse a data (o
+  // "Revisar" de antes, que desmarcava e marcava de novo) não pode mudar a chama de outro dia.
+  function fundirDatas(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [k, d] of Object.entries(b || {})) if (d && (!saida[k] || d < saida[k])) saida[k] = d;
+    return saida;
+  }
+  // A origem de cada dia: 'app' vence 'papel' (quem leu no papel e depois leu no app leu no app).
+  function fundirOrigens(a, b) {
+    const saida = { ...(a || {}) };
+    for (const [k, o] of Object.entries(b || {})) if (!saida[k] || o === 'app') saida[k] = o;
+    return saida;
+  }
+  CC.fundirDatas = fundirDatas;
+  CC.fundirOrigens = fundirOrigens;
 
   // Nunca perde uma marcação: conjuntos são unidos, e só os campos únicos seguem
   // o carimbo de tempo mais recente.
@@ -317,8 +339,9 @@
       licoes: uniao(a.licoes, b.licoes),
       oia,
       anotacoes,
-      marcadoEm: { ...(a.marcadoEm || {}), ...(b.marcadoEm || {}) },
-      licoesEm: { ...(a.licoesEm || {}), ...(b.licoesEm || {}) },
+      marcadoEm: fundirDatas(a.marcadoEm, b.marcadoEm),
+      origens: fundirOrigens(a.origens, b.origens),
+      licoesEm: fundirDatas(a.licoesEm, b.licoesEm),
       conhecidos: fundirConhecidos(a.conhecidos, b.conhecidos),
       // a mesma regra do Conhecer: união por slug, vale a data mais antiga
       parabolasLidas: fundirConhecidos(a.parabolasLidas, b.parabolasLidas),
@@ -359,6 +382,15 @@
   }
   CC.fundir = fundir;
 
+  // Só 'app' ou 'papel', e só para um dia do plano que está entre os lidos.
+  function limparOrigens(x, lidos) {
+    const saida = {};
+    const tem = new Set(lidos || []);
+    if (!x || typeof x !== 'object') return saida;
+    for (const [k, o] of Object.entries(x)) if ((o === 'app' || o === 'papel') && tem.has(Number(k))) saida[Number(k)] = o;
+    return saida;
+  }
+
   // Estados gravados num formato antigo guardavam as lições em "trilha" e tinham meta e protetor.
   function normalizar(bruto) {
     if (!bruto || typeof bruto !== 'object' || bruto.vazio) return null;
@@ -368,6 +400,7 @@
     delete e.meta;
     delete e.protegidos;
     e.lidos = (e.lidos || []).map(Number).filter((n) => n >= 1 && n <= D.plano.length);
+    e.origens = limparOrigens(e.origens, e.lidos);
     e.cartas = limparCartas(e.cartas);
     return migrarNotas(e);
   }
@@ -510,19 +543,39 @@
   // O dia em que a pessoa marcou o dia do plano como lido ('' se não leu). Fica no aparelho dela:
   // o "Você leu em" do estudo da célula é só para ela, e nada disso vai para a célula.
   CC.lidoEm = (dia) => (CC.leu(dia) && E.marcadoEm[Number(dia)]) || '';
-  CC.marcarLido = (dia, marcar) => {
+  // De onde veio a leitura do dia: 'app', 'papel' ou '' (não lido). Sem origem guardada, 'app'.
+  CC.origemDoDia = (dia, estado) => {
+    const e = estado || E;
     const n = Number(dia);
-    const i = E.lidos.indexOf(n);
-    if (marcar && i === -1) { E.lidos.push(n); E.marcadoEm[n] = CC.hojeIso(); }
-    if (!marcar && i !== -1) { E.lidos.splice(i, 1); delete E.marcadoEm[n]; }
+    if (!(e.lidos || []).includes(n)) return '';
+    return (e.origens || {})[n] === 'papel' ? 'papel' : 'app';
+  };
+  CC.lidoNoApp = (dia, estado) => CC.origemDoDia(dia, estado) === 'app';
+  // Marca o dia do plano como lido. origem: 'app' (o padrão; true também vale) ou 'papel'. Uma
+  // leitura não se desmarca, e a data dela não muda depois: revisar um dia não o traz para hoje.
+  // O único que muda é a origem, de 'papel' para 'app', quando a pessoa lê o dia aqui depois.
+  CC.marcarLido = (dia, origem) => {
+    if (origem === false) return;
+    const n = Number(dia);
+    if (!(n >= 1 && n <= D.plano.length)) return;
+    const o = origem === 'papel' ? 'papel' : 'app';
+    E.origens ||= {};
+    if (E.lidos.includes(n)) {
+      if (o === 'app' && E.origens[n] === 'papel') { E.origens[n] = 'app'; CC.gravar('origens', E.origens); }
+      return;
+    }
+    E.lidos.push(n);
+    E.marcadoEm[n] ||= CC.hojeIso();
+    E.origens[n] = o;
     CC.gravar('lidos', E.lidos);
   };
 
   CC.fezLicao = (id) => E.licoes.includes(id);
+  // Também não se desmarca: a lição conta quando a pessoa a lê até o fim, com o tempo mínimo.
   CC.marcarLicao = (id, marcar) => {
-    const i = E.licoes.indexOf(id);
-    if (marcar && i === -1) { E.licoes.push(id); (E.licoesEm ||= {})[id] = CC.hojeIso(); }
-    if (!marcar && i !== -1) { E.licoes.splice(i, 1); delete (E.licoesEm || {})[id]; }
+    if (marcar === false || E.licoes.includes(id)) return;
+    E.licoes.push(id);
+    (E.licoesEm ||= {})[id] ||= CC.hojeIso();
     CC.gravar('licoes', E.licoes);
   };
 
@@ -535,7 +588,8 @@
   // ---------- conhecer jesus ----------
   CC.conhecido = (n) => !!(E.conhecidos || {})[n];
   CC.marcarConhecido = (n) => {
-    (E.conhecidos ||= {})[n] = CC.hojeIso();
+    if ((E.conhecidos ||= {})[n]) return;
+    E.conhecidos[n] = CC.hojeIso();
     CC.gravar('conhecidos', E.conhecidos);
   };
   CC.conhecidos = () => Object.keys(E.conhecidos || {}).map(Number);
@@ -556,11 +610,17 @@
   // cada 7 dias seguidos, guarda no máximo 2. Um buraco de dias em branco é coberto
   // inteiro se houver escudos para todos eles; se não houver, a ofensiva zera e nenhum
   // escudo é gasto à toa. Hoje nunca é buraco: o dia ainda não acabou.
+  // Escudo do iniciante (docs/retencao-primeiros-dias.md, seção 8): na primeira semana, contada
+  // do primeiro dia lido, um buraco de até 2 dias é coberto uma vez sem gastar os escudos de
+  // sempre. O fim de semana é o buraco mais comum, e chega quando o hábito ainda não existe.
+  CC.ESCUDO_INICIANTE = 2;
   CC.simularOfensiva = function (datas, hoje) {
     const feitas = new Set(datas);
-    const r = { atual: 0, recorde: 0, escudos: 1, protegidos: [], feitoHoje: feitas.has(hoje), zerouEm: null, recomeco: false };
+    const r = { atual: 0, recorde: 0, escudos: 1, protegidos: [], feitoHoje: feitas.has(hoje), zerouEm: null, recomeco: false, iniciante: null };
     const ordenadas = [...feitas].filter((d) => d <= hoje).sort();
     if (!ordenadas.length) return r;
+    const fimDaPrimeiraSemana = CC.somaDias(ordenadas[0], 7);
+    let inicianteUsado = false;
 
     const mesDe = (d) => d.slice(0, 7);
     const ganhar = () => { r.escudos = Math.min(2, r.escudos + 1); };
@@ -588,7 +648,11 @@
         tamanho++;
         fim = CC.somaDias(fim, 1);
       }
-      if (corrida > 0 && tamanho <= r.escudos) {
+      if (corrida > 0 && !inicianteUsado && tamanho <= CC.ESCUDO_INICIANTE && d < fimDaPrimeiraSemana) {
+        inicianteUsado = true;
+        r.iniciante = d;
+        for (let i = 0, c = d; i < tamanho; i++, c = CC.somaDias(c, 1)) r.protegidos.push(c);
+      } else if (corrida > 0 && tamanho <= r.escudos) {
         r.escudos -= tamanho;
         for (let i = 0, c = d; i < tamanho; i++, c = CC.somaDias(c, 1)) r.protegidos.push(c);
       } else {
