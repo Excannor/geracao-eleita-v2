@@ -79,11 +79,13 @@
       + '<div class="textos"><b class="placar-missoes">' + feitas + '<small> de ' + lista.length + '</small></b>'
       + '<p>Complete os três desafios de hoje.</p></div>'
       + '<span class="bau-cabeca">' + CC.arte.bau(feitas === lista.length ? 'aberto' : 'pronto') + '</span></div></div>'
+      // Os três do dia logo abaixo do resumo que fala deles; os de consagração (vários dias)
+      // depois. Sem relógio de horas: o dia vale até o fim, sem pressa.
+      + '<section class="bloco-missoes">'
+      + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">até o fim do dia</span></div>'
+      + '<div class="lista-missoes">' + lista.map((m) => CC.linhaMissao(m)).join('') + '</div></section>'
       + '<section class="bloco-missoes" id="desafios-grupo"' + (CC.blocoDesafiosDoGrupo() ? '' : ' hidden') + '>' + CC.blocoDesafiosDoGrupo() + '</section>'
       + '<section class="bloco-missoes" id="desafios-longos">' + CC.blocoDesafiosLongos() + '</section>'
-      + '<section class="bloco-missoes">'
-      + '<div class="titulo-bloco"><h2>Desafios do dia</h2><span class="relogio">' + CC.ico('calendario') + CC.plural(CC.horasAteAmanha(), 'hora', 'horas') + '</span></div>'
-      + '<div class="lista-missoes">' + lista.map((m) => CC.linhaMissao(m)).join('') + '</div></section>'
       // Praticar mora aqui: guardar versículos é o mesmo trabalho do "Guardar" da reflexão
       + '<a class="cartao-praticar" href="#/praticar"><span class="icone-praticar">' + CC.ico('alvo') + '</span>'
       + '<span class="textos"><b>Praticar</b><small>Guarde os versículos das unidades num quiz rápido</small></span>'
