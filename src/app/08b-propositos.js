@@ -848,7 +848,8 @@
 
   // ---------- a célula por dentro: encontro, recado e estudo do líder ----------
   const DIAS_ENCONTRO = ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'];
-  const encontroHoje = (p) => p.encontro >= 0 && new Date(CC.hojeIso() + 'T12:00:00').getDay() === p.encontro;
+  const encontroDeHojeFeito = (p) => !!p.ultimoRegistro && p.ultimoRegistro === CC.hojeIso();
+  const encontroHoje = (p) => p.encontro >= 0 && new Date(CC.hojeIso() + 'T12:00:00').getDay() === p.encontro && !encontroDeHojeFeito(p);
   const nomeDoEncontro = (d) => (d === 0 || d === 6 ? 'aos ' + DIAS_ENCONTRO[d] + 's' : 'às ' + DIAS_ENCONTRO[d] + 's-feiras');
   const nomeDoLider = (p) => { const l = p.membros.find((m) => m.usuario === p.criadoPor); return l ? l.nome : 'o líder'; };
   const ddmm = (iso) => iso.slice(8, 10) + '/' + iso.slice(5, 7);
@@ -1146,14 +1147,16 @@
 
   // O próximo encontro: o dia e a hora do recado quando houver; senão, o próximo dia da semana
   // marcado (hoje inclusive). { iso, hora } ou null.
-  function proximoEncontro(p) {
+  // Com o encontro de hoje já registrado, o próximo é o da semana que vem (pularHoje).
+  function proximoEncontro(p, pularHoje = encontroDeHojeFeito(p)) {
+    const hoje = CC.hojeIso();
     if (quandoValendo(p)) {
       const [a, m, d, h, mi] = partesQuando(p.recadoQuando);
-      return { iso: a + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0'), hora: horaCurta(h, mi) };
+      const iso = a + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      if (!(pularHoje && iso === hoje)) return { iso, hora: horaCurta(h, mi) };
     }
     if (!(p.encontro >= 0)) return null;
-    const hoje = CC.hojeIso();
-    for (let i = 0; i < 7; i++) {
+    for (let i = pularHoje ? 1 : 0; i < 8; i++) {
       const dia = CC.somaDias(hoje, i);
       if (new Date(dia + 'T12:00:00').getDay() === p.encontro) return { iso: dia, hora: '' };
     }
@@ -1168,7 +1171,9 @@
     return '<div class="cartao-encontro"><span class="textos"><b>Próximo encontro</b><span>' + CC.esc(texto) + '</span></span>' + CC.ico('calendario') + '</div>';
   }
   // "quinta, 22/10": a linha do estudo ("Para o encontro de quinta, 22/10") e o texto do grupo.
-  const dataDoProximo = (p) => { const x = proximoEncontro(p); return x ? DIAS_ENCONTRO[new Date(x.iso + 'T12:00:00').getDay()] + ', ' + ddmm(x.iso) : ''; };
+  // A legenda do estudo atual conta o encontro de hoje mesmo registrado: ele foi o estudo de hoje
+  // (o próximo da fila só entra amanhã, docs/a-mesa-fila.md, 4.1).
+  const dataDoProximo = (p) => { const x = proximoEncontro(p, false); return x ? DIAS_ENCONTRO[new Date(x.iso + 'T12:00:00').getDay()] + ', ' + ddmm(x.iso) : ''; };
 
   // O evento para a agenda do celular (.ics): hora local, sem fuso (o encontro é na cidade de
   // quem lê), duas horas de duração e um lembrete 1 hora antes. Função pura, testada no navegador.
@@ -1463,7 +1468,9 @@
           }
           fechar();
           // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, 3.6)
-          CC.avisar(r && r.promovido ? 'Encontro registrado. O próximo estudo já está na aba Estudo.' : 'Encontro registrado');
+          // o de hoje só põe o próximo amanhã: registrar no começo do encontro não troca o estudo
+          CC.avisar(r && r.promovido ? 'Presença salva. O próximo estudo já está na aba Estudo.'
+            : r && r.amanha ? 'Presença salva. Amanhã, o próximo estudo entra na aba Estudo.' : 'Presença salva', { tipo: 'certo' });
           if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
           // quem não veio, com a mensagem pronta: quem conduz decide se manda (o app não avisa ninguém)
           const faltaram = (r && r.faltaram) || [];

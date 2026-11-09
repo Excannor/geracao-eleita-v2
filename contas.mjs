@@ -1903,6 +1903,17 @@ export class Contas {
     return this.promoverEstudo(p, cabeca, agora);
   }
 
+  // O primeiro da fila, se a promoção o puser na célula amanhã (sem nada mudar até lá), ou null.
+  entraAmanha(p, agora = new Date()) {
+    if (!p || !p.celula || p.encerradoEm) return null;
+    const cabeca = this.filaDe(p.id)[0];
+    if (!cabeca) return null;
+    const diaDe = this.diaNaCelula(p);
+    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+    const amanha = somaDias(diaDe(agora.toISOString()), 1);
+    return devePromover({ atual, cabeca, hoje: amanha, encontro: p.encontro, encontros: p.encontros, diaDe }) ? cabeca : null;
+  }
+
   // Um estudo da fila desta célula, ou 404 "esse estudo já não está nos próximos estudos".
   estudoDaFila(p, estudoId) {
     const e = String(estudoId || '').length <= 64 ? this.estudo(estudoId) : null;
@@ -2050,9 +2061,11 @@ export class Contas {
     if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
     const quemConduz = this.ativosDe(p).map((m) => m.usuario).filter((u) => podeConduzir(p, u));
-    // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, seção 4)
+    // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, seção 4): o
+    // encontro de um dia que já acabou o promove agora; o de hoje, só amanhã (amanha: quem entra)
     const promovido = this.promoverDaFila(p, agora);
-    return { p, registro, promovido, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
+    const amanha = promovido ? null : this.entraAmanha(p, agora);
+    return { p, registro, promovido, amanha, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
   }
 
   // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem

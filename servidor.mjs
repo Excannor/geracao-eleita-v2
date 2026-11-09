@@ -845,7 +845,11 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const doEstudo = convidado ? { combinadoAnterior: null, temAnteriores: false, daMae: null }
     : CONTAS.dadosDoEstudo(p, { membro: membroLe, eu, conduz: conduzo, hoje: hojeDe(eu) });
   const extra = {
-    encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
+    encontro: Number.isInteger(p.encontro) ? p.encontro : -1,
+    // o dia do último encontro registrado (só a data): o cartão "Próximo encontro" pula o de hoje
+    // quando ele já foi registrado
+    ultimoRegistro: (p.encontros || []).reduce((m, x) => (x && x.data > m ? x.data : m), ''),
+    recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.
@@ -2024,7 +2028,7 @@ const servidor = createServer(async (req, res) => {
           const faltaram = [];
           for (const u of r.faltaram) faltaram.push({ usuario: u, nome: await nomeDeExibicao(u) });
           faltaram.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.usuario.localeCompare(b.usuario));
-          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram, promovido: resumoDoEstudo(r.promovido) };
+          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram, promovido: resumoDoEstudo(r.promovido), amanha: resumoDoEstudo(r.amanha) };
         }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {

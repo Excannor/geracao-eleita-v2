@@ -2731,7 +2731,11 @@ secao('próximos estudos: as regras da fila (estudos.mjs, docs/a-mesa-fila.md)')
   const B = { id: 'eB', agendadoPara: '2026-10-29' };
   const pode = (hoje, extra = {}) => devePromover({ atual: A, cabeca: B, hoje, encontro: Q, encontros: [], diaDe: diaSP, ...extra });
   checar(!pode('2026-10-21') && !pode('2026-10-22') && pode('2026-10-23'), 'devePromover(): o atual de 22/10 ainda espera o encontro dele; na sexta, com a quinta passada, B (29/10) entra');
-  checar(pode('2026-10-22', { encontros: [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T23:00:00Z' }] }), 'devePromover(): registrado o encontro com o atual, B entra na hora');
+  const hojeReg = [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T20:00:00Z' }];
+  checar(!pode('2026-10-22', { encontros: hojeReg }) && pode('2026-10-23', { encontros: hojeReg }),
+    'devePromover(): registrado o encontro de hoje com o atual, B espera o dia acabar (a célula ainda pode estar reunida); no dia seguinte, entra');
+  checar(pode('2026-10-24', { encontros: [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-24T13:00:00Z' }] }) && jaTeveEncontro({ id: 'eA', criadoEm: A.criadoEm, nasceu: '2026-10-20', hoje: '2026-10-22', encontro: Q, encontros: hojeReg }),
+    'devePromover(): o encontro de um dia que já acabou, registrado depois, deixa B entrar na hora; jaTeveEncontro() sem diaAcabou ainda conta o de hoje');
   checar(!pode('2026-10-29', { encontros: sem }) && !pode('2026-10-23', { encontros: outro }) && pode('2026-10-30', { encontros: sem }),
     'devePromover(): a semana sem encontro e a feita com outro estudo seguram a fila; passada a quinta seguinte, a fila segue');
   checar(!pode('2026-10-23', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }) && pode('2026-10-30', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }),
@@ -2857,10 +2861,12 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
 
   // --- a promoção pelo registro ---
   const r29 = await ce.registrarEncontro('lider', ID, { data: '2026-10-29', presentes: ['lider', 'ana'], visitantes: 0, estudo: B }, '2026-10-29', quando('10-29', 21));
-  checar(r29.promovido && r29.promovido.id === D1 && p().estudoId === D1 && !ce.filaDe(ID).length, 'registrado o encontro com B, C entra na hora');
+  checar(!r29.promovido && r29.amanha && r29.amanha.id === D1 && p().estudoId === B && ce.promoverDaFila(p(), quando('10-29', 23)) === null && p().estudoId === B,
+    'registrado o encontro de hoje com B, C não entra no meio do encontro: a resposta diz que ele entra amanhã');
+  checar(ce.promoverDaFila(p(), quando('10-30', 8)).id === D1 && p().estudoId === D1 && !ce.filaDe(ID).length, 'no dia seguinte, na primeira leitura, C entra');
 
   // --- a semana sem encontro segura a fila ---
-  const E = (await ce.salvarEstudo('lider', ID, estudo('Estudo E', { agendar: true }), opcoes, quando('10-29', 22))).estudo.id;
+  const E = (await ce.salvarEstudo('lider', ID, estudo('Estudo E', { agendar: true }), opcoes, quando('10-30', 9))).estudo.id;
   checar(fila() === 'Estudo E@2026-11-12', 'com C esperando o encontro dele (5/11), o novo vai para 12/11');
   await ce.registrarEncontro('lider', ID, { data: '2026-11-05', semEncontro: true, presentes: [], visitantes: 0 }, '2026-11-05', quando('11-05', 21));
   checar(ce.promoverDaFila(p(), quando('11-06', 8)) === null && p().estudoId === D1, 'com "Não houve encontro" em 5/11, C não teve o encontro dele, e E espera');

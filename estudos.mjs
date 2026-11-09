@@ -542,13 +542,15 @@ export function ajustarDatasDaFila(fila, primeira, encontro = -1) {
 // Na dúvida (sem data que se leia), não: a fila espera.
 //   id, criadoEm: o estudo; nasceu, hoje: 'AAAA-MM-DD' no fuso do líder; encontro: o dia da semana
 //   (0 a 6, ou -1); encontros: os registrados ({ data, em, semEncontro, estudo }).
-export function jaTeveEncontro({ id = '', criadoEm = '', nasceu, hoje, encontro = -1, encontros = [] } = {}) {
+//   diaAcabou: só conta o encontro cujo dia já acabou (data antes de hoje). É o que a promoção usa:
+//   registrar a presença no começo do encontro não pode trocar o estudo no meio dele.
+export function jaTeveEncontro({ id = '', criadoEm = '', nasceu, hoje, encontro = -1, encontros = [], diaAcabou = false } = {}) {
   if (!ehDia(nasceu) || !ehDia(hoje)) return false;
   const doDia = new Map();
   for (const x of encontros || []) {
     if (!x || !ehDia(x.data)) continue;
     doDia.set(x.data, x);
-    if (x.semEncontro) continue;
+    if (x.semEncontro || (diaAcabou && x.data >= hoje)) continue;
     const ligado = x.estudo || '';
     if (ligado && id && ligado === id) return true;
     if (!ligado && x.em && x.em > criadoEm && x.data >= nasceu && x.data <= hoje) return true;
@@ -566,8 +568,9 @@ export function jaTeveEncontro({ id = '', criadoEm = '', nasceu, hoje, encontro 
 }
 
 // A promoção (docs/a-mesa-fila.md, seção 4.1): o primeiro da fila (cabeca) entra na célula agora?
-// Quando o estudo atual já teve o encontro dele (ou não há estudo atual) e o primeiro da fila é do
-// próximo encontro (a data dele até limiteDaFila). Nunca passa por cima de um atual que a célula
+// Quando o estudo atual já teve o encontro dele, com o dia desse encontro já acabado (ou não há
+// estudo atual), e o primeiro da fila é do próximo encontro (a data dele até limiteDaFila). O
+// encontro registrado hoje só conta amanhã: a célula ainda pode estar reunida com o estudo. Nunca passa por cima de um atual que a célula
 // ainda não viveu: isso só o líder faz, confirmando ("Usar agora").
 //   atual: o estudo atual (estudoDaLinha) ou null; cabeca: o primeiro da fila (com agendadoPara ou
 //   data); hoje: 'AAAA-MM-DD' no fuso do líder; diaDe(iso): o dia local de um instante.
@@ -575,7 +578,7 @@ export function devePromover({ atual = null, cabeca = null, hoje, encontro = -1,
   const data = dataDe(cabeca);
   if (!ehDia(data) || !ehDia(hoje) || data > limiteDaFila({ hoje, encontro })) return false;
   if (!atual) return true;
-  return jaTeveEncontro({ id: atual.id, criadoEm: atual.criadoEm, nasceu: diaDe(atual.criadoEm), hoje, encontro, encontros });
+  return jaTeveEncontro({ id: atual.id, criadoEm: atual.criadoEm, nasceu: diaDe(atual.criadoEm), hoje, encontro, encontros, diaAcabou: true });
 }
 
 // A data que veio num pedido: um dia que existe, de hoje até um ano para a frente.

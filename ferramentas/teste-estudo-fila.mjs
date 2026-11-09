@@ -10,7 +10,8 @@
 //   D. a migração: o celular que ainda guarda a parte 2 de um estudo dividido mostra o cartão, e
 //      "Pôr nos próximos estudos" a leva para a fila do servidor.
 // O dia do encontro de cada célula é o dia da semana de hoje: o primeiro da fila é sempre de daqui a
-// 7 dias, e o encontro registrado hoje o promove, em qualquer dia em que o teste rodar.
+// 7 dias. O encontro registrado hoje só o promove amanhã (a célula ainda pode estar reunida); o
+// teste confere isso e põe o próximo pelo "Usar agora", em qualquer dia em que rodar.
 // Uso: CHROME=<chrome> node ferramentas/teste-estudo-fila.mjs
 //   PORTA=<porta do servidor> (8396), PORTAS=<faixa> para o Chrome, FOTOS=<pasta> guarda as capturas,
 //   RAPIDO=1 pula as medidas nos quatro tamanhos e temas, SO_API=1 roda só a parte A.
@@ -153,7 +154,11 @@ const semConfirmar = await pedir('api/celula', { acao: 'filaUsar', id: ID, estud
 ok(semConfirmar.status === 409 && semConfirmar.dado.precisaConfirmar === true && (await celulaDe(lider, ID)).estudo.id === A, 'A. "Usar agora" por cima do atual sem uso pede confirmação (409), e nada muda');
 
 const reg = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: HOJE, presentes: ['lider', 'ana'], visitantes: 0, estudo: A }, lider);
-ok(reg.status === 200 && reg.dado.promovido && reg.dado.promovido.id === B, 'A. registrado o encontro com o atual, a resposta diz que B entrou na célula');
+ok(reg.status === 200 && reg.dado.promovido === null && reg.dado.amanha && reg.dado.amanha.id === B, 'A. registrado o encontro de hoje com o atual, B não entra no meio do encontro: a resposta diz que ele entra amanhã');
+ok((await celulaDe(ana, ID)).estudo.id === A, 'A. a Ana continua vendo A durante o encontro');
+// o líder pode pôr o próximo já, de propósito ("Usar agora"): o atual já teve o encontro, sem confirmar
+const usar = await pedir('api/celula', { acao: 'filaUsar', id: ID, estudo: B }, lider);
+ok(usar.status === 200 && usar.dado.promovido && usar.dado.promovido.id === B, 'A. "Usar agora" depois do registro põe B sem pedir confirmação');
 const depois = await celulaDe(ana, ID);
 ok(depois.estudo.id === B && depois.estudo.titulo === 'Estudo B', 'A. a Ana já vê B como o estudo da célula');
 ok((await pedir('api/estudos?celula=' + encodeURIComponent(ID), null, ana)).dado.estudos.map((x) => x.id).join() === A, 'A. e A em Estudos anteriores');
@@ -418,7 +423,16 @@ ok(await esperar(existe('.cortina [data-salvar]')), 'B. a folha "Quem foi ao enc
 ok((await textoDe('.cortina [data-estudo-escolhido]')) === TA, 'B. com o estudo atual escolhido, e nada da fila na folha');
 ok(!(await textoDe('.cortina .folha')).includes(TC), 'B. a folha não oferece um estudo da fila');
 await clicar('.cortina [data-salvar]');
-ok(await esperar('/O próximo estudo já está na aba Estudo/.test(document.getElementById("aviso-flutuante")?.textContent || "")', 15000), 'B. o aviso: "Encontro registrado. O próximo estudo já está na aba Estudo."');
+ok(await esperar('/Amanhã, o próximo estudo entra na aba Estudo/.test(document.getElementById("aviso-flutuante")?.textContent || "")', 15000), 'B. o aviso: "Presença salva. Amanhã, o próximo estudo entra na aba Estudo."');
+await como(marcos, rota('estudo'), { limpar: false });
+ok(await esperar('/' + TA + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'B. no dia do encontro, ' + TA + ' continua na aba');
+const cartaoEnc = await textoDe('.cartao-encontro');
+ok(!/Hoje/.test(cartaoEnc) && cartaoEnc.includes(Number(D7.slice(8, 10)) + '/' + Number(D7.slice(5, 7))), 'B. com o encontro de hoje registrado, "Próximo encontro" mostra o da semana que vem (' + cartaoEnc + ')');
+const naAba = await textoDe('#conteudo');
+ok(naAba.includes('Para o encontro de ' + longa(HOJE)) && !naAba.includes('Encontro hoje · veja o estudo'), 'B. a legenda do estudo segue a de hoje, e o selo "Encontro hoje" some');
+// o dia seguinte não se simula aqui: o líder põe o próximo de propósito ("Usar agora")
+const cabecaJ = (await celulaDe(marcos, JD)).fila[0];
+ok(cabecaJ.titulo === TC && (await pedir('api/celula', { acao: 'filaUsar', id: JD, estudo: cabecaJ.id }, marcos)).status === 200, 'B. "Usar agora" põe ' + TC);
 await como(marcos, rota('estudo'), { limpar: false });
 ok(await esperar('/' + TC + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'B. ' + TC + ' é o estudo da aba');
 ok(await esperar(existe('.mesa-anterior'), 15000) && (await textoDe('.mesa-anteriores')).includes(TA), 'B. ' + TA + ' está em Estudos anteriores');
