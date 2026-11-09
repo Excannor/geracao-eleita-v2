@@ -2655,7 +2655,11 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 5 · atualizada em 22 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5, com o ajuste de 22 de outubro');
+  checar(/<p class="atualizada">Versão 6 · atualizada em 9 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a política está na versão 6 (9 de novembro), a mais nova no histórico');
+  checar(/<tr><td>Se leu hoje<\/td><td>[^<]*visitantes da célula veem só quantas pessoas leram, sem nomes/.test(pol)
+    && /<tr><td>Etapa de Minha caminhada<\/td><td>[^<]*só se você ligar "Quem conduz a minha célula vê"/.test(pol),
+    'o quadro de quem vê: a visitante vê só o número de quem leu, e a etapa de Minha caminhada só vai para quem conduz se a pessoa ligar');
   checar(/conquistas e pontos, cartas e álbuns\)/.test(pol) && /as suas anotações e as suas cartas continuam guardadas/.test(pol)
     && historico.indexOf('<b>Ajuste da versão 5, 22 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 5,') < historico.indexOf('<b>Versão 5,'),
     'a política lista cartas e álbuns no progresso, diz que ficam ao zerar e tem o ajuste no histórico');

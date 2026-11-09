@@ -755,10 +755,15 @@ async function retratoDoProposito(p, eu, { verTudo = false } = {}) {
     };
   });
   const minha = p.membros.find((m) => m.usuario === eu) || {};
+  // A visitante da célula vê só quantos leram hoje, nunca quem (avaliação de 09/11, B4): o "leu
+  // hoje" de cada um sai do retrato dela, e vai a conta pronta.
+  const soNumero = !!p.celula && !verTudo && minha.papel === 'visitante';
+  const contagemHoje = soNumero ? { leramHoje: membros.filter((m) => m.papel !== 'visitante' && m.fezHoje).length, pessoasHoje: membros.filter((m) => m.papel !== 'visitante' && m.estado === 'ativo').length } : {};
+  const membrosVistos = soNumero ? membros.map((m) => (m.usuario === eu ? m : { ...m, fezHoje: null, extraHoje: false })) : membros;
   return {
     id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
     criadoPor: p.criadoPor, criadoEm: p.criadoEm,
-    dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
+    dias, hoje, membros: membrosVistos, ...contagemHoje, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
     ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia, verTudo) : {}),
   };
 }
@@ -933,7 +938,10 @@ function painelDaCelula(p, info, ativos, referencia) {
   return {
     chama: { ...termometro(pessoasChama.map((x) => x.acesa)), pessoas: pessoasChama },
     frequencia: { ...freq, presencas },
-    funil: funil(ativos.map((m) => {
+    // a etapa de Minha caminhada, com o nome, só de quem ligou "Quem conduz a minha célula vê"
+    // (avaliação de 09/11, B3); quem não ligou não entra em etapa nenhuma, só na conta de quem não mostra
+    caminhadaOculta: ativos.filter((m) => !info.get(m.usuario).conta.caminhadaCelula).length,
+    funil: funil(ativos.filter((m) => info.get(m.usuario).conta.caminhadaCelula).map((m) => {
       const x = info.get(m.usuario);
       return {
         usuario: m.usuario, nome: nomeDe(m.usuario),
@@ -2096,12 +2104,12 @@ const servidor = createServer(async (req, res) => {
       // aparece em nenhuma das listas acima).
       const algumVinculo = CONTAS.discipuladosDe(eu).some((x) => x.estado === 'ativo' || x.estado === 'convidado');
       const meuCheckin = CONTAS.ultimoCheckin(eu);
-      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, algumVinculo, meuCheckin });
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, caminhadaCelula: !!conta.caminhadaCelula, algumVinculo, meuCheckin });
       return;
     }
 
     if (rota === '/api/discipulado') {
-      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave, corpo, mente, espirito }) => {
+      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave, corpo, mente, espirito, sim }) => {
         const hoje = hojeDe(eu);
         if (qual === 'checkin') return { checkin: await CONTAS.registrarCheckin(eu, hoje, { corpo, mente, espirito }) };
         if (qual === 'convidar') {
@@ -2120,6 +2128,7 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'encontro') { await CONTAS.registrarEncontroDiscipulado(eu, id, data, hoje); return {}; }
         if (qual === 'encerrar') { await CONTAS.encerrarDiscipulado(eu, id, hoje); return {}; }
         if (qual === 'marco') { const marcos = await CONTAS.definirMarco(eu, chave, data); return { marcos }; }
+        if (qual === 'caminhadaCelula') return { caminhadaCelula: await CONTAS.definirCaminhadaCelula(eu, sim === true) };
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;

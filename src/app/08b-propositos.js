@@ -379,21 +379,26 @@
     // O líder primeiro, depois quem já leu hoje, depois os outros: quem faltou não vira lista à parte.
     const ordem = gente.slice().sort((a, b) => (b.usuario === p.criadoPor) - (a.usuario === p.criadoPor)
       || (b.fezHoje - a.fezHoje) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
-    const leram = gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
-    const ativosSemVisitante = gente.filter((m) => m.estado === 'ativo').length;
+    // a visitante recebe só a conta pronta (p.leramHoje), sem o "leu hoje" de cada um (B4)
+    const souVisitante = eu.papel === 'visitante';
+    const leram = souVisitante && p.leramHoje != null ? p.leramHoje : gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
+    const ativosSemVisitante = souVisitante && p.pessoasHoje != null ? p.pessoasHoje : gente.filter((m) => m.estado === 'ativo').length;
     // Líder menor de 18 à espera da aprovação da liderança: ainda não tira gente, não marca
     // auxiliar e não multiplica (pode encerrar a própria célula).
     const gere = souLider && p.aguardandoAprovacao !== 'lider';
     return '<p class="passo-dica">' + leram + ' de ' + CC.plural(ativosSemVisitante, 'pessoa leu', 'pessoas leram') + ' hoje.</p>'
+      // quem é da célula sabe que o "leu hoje" é compartilhado, e com quem (B4)
+      + (souVisitante ? '' : '<p class="passo-dica pequena" data-quem-ve-leitura>Quem é membro da célula vê quem já leu hoje, o seu também. Visitantes veem só o número.</p>')
       + '<div class="lista-pedidos">' + ordem.map((m) => {
+        // sem "Ainda não leu hoje": quem não leu só não ganha a marca (sem comparação nem cobrança)
         const situacao = m.estado === 'convidado' ? 'Ainda não aceitou'
           : m.fezHoje ? 'Leu hoje' + (m.extraHoje ? ' e fez o extra' : '')
-            : m.extraHoje ? 'Fez o extra hoje' : 'Ainda não leu hoje';
+            : m.extraHoje ? 'Fez o extra hoje' : '';
         const selo = m.usuario === p.criadoPor ? ' <small class="selo-lider">líder</small>'
           : m.papel === 'auxiliar' ? ' <small class="selo-lider">auxiliar</small>' : '';
         return '<div class="linha-amigo' + (m.estado === 'convidado' ? ' enviado' : '') + '">' + retrato(m)
           + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + selo + '</b>'
-          + '<span class="arroba">' + situacao + '</span></div>'
+          + (situacao ? '<span class="arroba">' + situacao + '</span>' : '') + '</div>'
           + (m.fezHoje ? '<span class="selo-status leu">' + CC.ico('certo') + '</span>' : '')
           // Tirar da célula é sério: fica separado, em vermelho, e ainda pede confirmação.
           + (gere && m.usuario !== p.criadoPor ? '<div class="acoes-pessoa">'
@@ -408,7 +413,7 @@
         + (gere ? '<div class="acoes-pessoa">' + botaoTirar(m) + '</div>' : '')
         + '</div>').join('') + '</div>' : '')
       + '<div class="acoes">'
-      + (eu.fezHoje && faltam.length ? '<button class="botao" data-notificar>' + CC.ico('sino')
+      + (!souVisitante && eu.fezHoje && faltam.length ? '<button class="botao" data-notificar>' + CC.ico('sino')
         + (faltam.length === 1 ? 'Notificar ' + CC.esc(faltam[0].nome) : 'Notificar quem falta (' + faltam.length + ')') + '</button>' : '')
       + (gente.length < limite && !p.celulaAguardando ? '<button class="botao contorno" data-chamar>' + CC.ico('mais-sinal') + 'Chamar um amigo</button>' : '')
       + (gere && p.membros.some((m) => m.estado === 'ativo' && m.papel === 'auxiliar')
@@ -987,7 +992,12 @@
   function blocoFunil(p, comAcoes) {
     const etapas = (p.painel && p.painel.funil) || [];
     const total = etapas.reduce((s, e) => s + e.pessoas, 0);
-    if (!total) return '';
+    // só entra quem ligou "Quem conduz a minha célula vê" em Minha caminhada (B3)
+    const ocultos = (p.painel && p.painel.caminhadaOculta) || 0;
+    const naoMostram = ocultos ? CC.plural(ocultos, 'pessoa não mostra', 'pessoas não mostram') + ' a caminhada para quem conduz. ' : '';
+    const pedir = comAcoes && (ocultos || (etapas.find((e) => e.etapa === 'comecando') || {}).pessoas)
+      ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quem quiser, marque no app o que já aconteceu na sua caminhada: decisão, batismo, célula. Fica em Minha caminhada, no Discipulado. Se quiser que eu veja, ligue "Quem conduz a minha célula vê". Ajuda a gente a cuidar melhor de cada um.' + enderecoApp('#/perfil/discipulado'), 'Pedir para a célula marcar', 'data-pedir-caminhada') + '</div>' : '';
+    if (!total) return ocultos ? CC.tituloSecao('Caminhada da célula') + '<div class="funil-celula"><p class="passo-dica pequena">' + CC.esc(naoMostram) + 'Cada um escolhe, em Minha caminhada, se quem conduz vê.</p>' + pedir + '</div>' : '';
     const maior = Math.max(1, ...etapas.map((e) => e.pessoas));
     const comeco = etapas.find((e) => e.etapa === 'comecando') || {};
     const nota = [
@@ -998,9 +1008,9 @@
       + '<div class="funil-celula">' + etapas.map((e) => '<div class="funil-linha"><span>' + CC.esc(e.rotulo) + '</span>'
         + '<span class="painel-trilho" aria-hidden="true"><i style="width:' + Math.round((e.pessoas / maior) * 100) + '%"></i></span><b>' + e.pessoas + '</b></div>'
         + (e.nomes && e.nomes.length ? '<p class="funil-nomes">' + nomeLista(e.nomes) + '</p>' : '')).join('')
-      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada.</p>'
+      + '<p class="passo-dica pequena">' + (nota ? CC.esc(nota) + '. ' : '') + 'Pelo que cada um marcou em Minha caminhada. ' + CC.esc(naoMostram) + '</p>'
       // Quem ainda não marcou nada não sabe onde marcar: o líder manda o caminho no grupo.
-      + (comAcoes && comeco.pessoas ? '<div class="acoes-missao">' + botaoZap('Oi, gente! Quem puder, marque no app o que já aconteceu na sua caminhada: decisão, batismo, célula. Fica em Minha caminhada, no Discipulado. Ajuda a gente a cuidar melhor de cada um.' + enderecoApp('#/perfil/discipulado'), 'Pedir para a célula marcar', 'data-pedir-caminhada') + '</div>' : '')
+      + pedir
       + '</div>';
   }
 

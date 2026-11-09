@@ -2378,6 +2378,15 @@ export class Contas {
     return marcos;
   }
 
+  // Quem conduz a minha célula vê a minha etapa de Minha caminhada no painel? Vem desligado, como o
+  // "Minha caminhada" do discipulado: decisão de fé e batismo só saem com o nome se a pessoa ligar.
+  async definirCaminhadaCelula(eu, sim) {
+    const a = this.exigirCompleto(eu);
+    if (sim === true) a.caminhadaCelula = true; else delete a.caminhadaCelula;
+    await this.salvar();
+    return !!a.caminhadaCelula;
+  }
+
   // ---------- cuidado mútuo (Atos 2.42, 2.44-45) ----------
   // O pedido é do autor; os outros só respondem com um gesto sem texto. As regras (limites,
   // quem vê, o que esconde) moram em cuidado.mjs; aqui só o estado é guardado.
