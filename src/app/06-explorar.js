@@ -440,7 +440,7 @@
   // ---------- busca ----------
   CC.campoBusca = function (valor) {
     return '<div class="busca-caixa">' + CC.ico('lupa')
-      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, temas…" aria-label="Buscar" '
+      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, parábolas, João 3…" aria-label="Buscar no Explorar e na Bíblia" '
       + 'autocomplete="off" spellcheck="false" enterkeyhint="search" value="' + CC.esc(valor) + '"></div>';
   };
 
@@ -458,8 +458,52 @@
     });
   };
 
+  // ---------- o que a busca acha além dos textos ----------
+  // As parábolas, os mapas dos livros e os mapas do atlas (revisão de usabilidade, C4): cada
+  // palavra digitada precisa começar uma palavra do título, da linha ou da referência ("viagem"
+  // acha "viagens", "prodigo" acha "pródigo"); as palavrinhas (de, o, a...) não contam.
+  const MIUDAS = new Set(['a', 'o', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'e', 'em', 'no', 'na', 'um', 'uma']);
+  const palavras = (t) => CC.semAcento(t).split(/[^a-z0-9]+/).filter((p) => p && !MIUDAS.has(p));
+  const casa = (pergunta, alvo) => {
+    const ps = palavras(pergunta);
+    if (!ps.length) return false;
+    const ws = palavras(alvo);
+    return ps.every((p) => ws.some((w) => w.startsWith(p) || (p.length >= 5 && w.startsWith(p.slice(0, -1)))));
+  };
+  function achadosVisuais(consulta) {
+    const saida = [];
+    const P = window.PARABOLAS || { itens: [] };
+    for (const p of P.itens) {
+      if (casa(consulta, [p.titulo, p.linha, p.ref, 'parábola'].join(' '))) {
+        saida.push({ selo: 'Parábola', titulo: p.titulo, linha: p.linha, ref: p.ref, href: '#/parabola/' + p.slug });
+      }
+    }
+    for (const m of window.MAPAS || []) {
+      if (casa(consulta, m.nome + ' mapa livro') && palavras(consulta).some((p) => CC.semAcento(m.nome).replace(/\s+/g, '').startsWith(p) || /^\d$/.test(p))) {
+        saida.push({ selo: 'Mapa do livro', titulo: 'Mapa de ' + m.nome, linha: m.grupo + ' · ' + CC.plural(m.capitulos, 'capítulo', 'capítulos'), href: '#/mapa/' + m.slug });
+      }
+    }
+    const A = window.ATLAS || { itens: [], grupos: [] };
+    for (const m of A.itens) {
+      const grupo = (A.grupos.find((g) => g.id === m.grupo) || {}).nome || '';
+      if (casa(consulta, [m.titulo, m.linha, m.ref, grupo, 'mapa atlas'].join(' '))) {
+        saida.push({ selo: 'Atlas bíblico', titulo: m.titulo, linha: m.linha, ref: m.ref, href: '#/atlas/' + m.slug });
+      }
+    }
+    return saida;
+  }
+  const itemVisual = (x) => '<a class="item item-visual" href="' + x.href + '"><span class="sub">' + CC.esc(x.selo) + '</span>'
+    + '<b>' + CC.esc(x.titulo) + '</b>' + (x.linha ? '<span class="resumo">' + CC.esc(x.linha) + (x.ref ? ' · ' + CC.esc(x.ref) : '') + '</span>' : '') + '</a>';
+  // "Abrir João 3 na Bíblia": o cartão grande do alto, na busca do Explorar e na da Bíblia.
+  CC.cartaoAbrirRef = (r) => '<a class="cartao-continuar cartao-abrir-ref" href="' + CC.hrefDaRef(r) + '">'
+    + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
+    + '<span class="textos"><small>Abrir na Bíblia</small><b>' + CC.esc(r.livro + ' ' + r.cap + (r.de ? '.' + r.de : '')) + '</b></span>'
+    + CC.ico('avancar') + '</a>';
+
   CC.vistaBusca = function (raiz, consulta) {
     const q = CC.semAcento(consulta);
+    const ref = CC.refDaBusca ? CC.refDaBusca(consulta) : null;
+    const visuais = q.length < 2 ? [] : achadosVisuais(consulta);
     const achados = q.length < 2 ? [] : Object.keys(D.notas)
       .filter((id) => D.notas[id].t.includes(q) && !CC.notaInterna(id))
       .sort((a, b) => {
@@ -471,7 +515,12 @@
 
     const meus = q.length < 2 ? [] : CC.meusTextos().filter((x) => CC.semAcento(x.texto).includes(q));
 
-    const resultados = (meus.length
+    const resultados = (ref ? CC.cartaoAbrirRef(ref) : '')
+      + (visuais.length
+        ? CC.tituloSecao('Mapas e parábolas', CC.plural(visuais.length, 'achado', 'achados'))
+          + '<div class="grade">' + visuais.slice(0, 12).map(itemVisual).join('') + '</div>'
+        : '')
+      + (meus.length
         ? CC.tituloSecao('No que você escreveu', CC.plural(meus.length, 'trecho', 'trechos'))
           + '<div class="grade">' + meus.slice(0, 12).map((x) =>
             '<a class="item" href="' + x.href + '"><span class="sub">' + CC.esc(x.onde) + '</span>'
@@ -482,7 +531,7 @@
         ? CC.tituloSecao('Nos textos', CC.plural(achados.length, 'texto', 'textos'))
           + '<div class="grade">' + achados.map(CC.itemNota).join('') + '</div>'
         : (q.length < 2 ? '<div class="vazio">Digite pelo menos duas letras.</div>'
-          : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>'));
+          : (ref || visuais.length || meus.length ? '' : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>')));
 
     // No celular, trocar o innerHTML da tela destruía o input que estava focado. O Android
     // fechava o teclado já na primeira letra. Na passagem Explorar → Busca e nas letras

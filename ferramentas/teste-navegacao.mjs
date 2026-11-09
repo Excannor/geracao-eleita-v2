@@ -219,6 +219,28 @@ await av('document.querySelector("[data-abrir-mais]").click()');
 ok(await esperar('!!document.querySelector(".painel-mais a[href=\\"#/explorar\\"]")'), 'o Mais continua com o link do Explorar');
 await voltar();
 
+// ---------- a busca do Explorar acha parábolas, mapas e referências (C4) ----------
+const buscar = async (q, pronto) => ir('#/busca/' + encodeURIComponent(q), pronto);
+ok(await buscar('semeador', '!!document.querySelector(".item-visual[href=\\"#/parabola/semeador\\"]")'), '"semeador" acha a parábola do semeador');
+ok(await buscar('filho pródigo', '!!document.querySelector(".item-visual[href=\\"#/parabola/filho-prodigo\\"]")'), '"filho pródigo" acha a parábola');
+ok(await buscar('viagem missionária', '["paulo-1", "paulo-2", "paulo-3"].every((s) => !!document.querySelector(".item-visual[href=\\"#/atlas/" + s + "\\"]"))'), '"viagem missionária" acha os três mapas das viagens de Paulo no atlas');
+ok(await av('document.querySelector(".item-visual[href=\\"#/atlas/paulo-1\\"] .sub").textContent') === 'Atlas bíblico', 'o mapa do atlas vem com o selo "Atlas bíblico"');
+ok(await buscar('romanos', '!!document.querySelector(".item-visual[href=\\"#/mapa/romanos\\"]")'), '"romanos" acha o mapa do livro de Romanos');
+ok(await buscar('joao 3', '(document.querySelector(".cartao-abrir-ref") || {}).getAttribute?.("href") === "#/biblia/Jo%C3%A3o/3"'), '"joao 3" mostra no alto "Abrir João 3"');
+ok(await buscar('jo 3:16', '(document.querySelector(".cartao-abrir-ref") || {}).getAttribute?.("href") === "#/biblia/Jo%C3%A3o/3"'), '"jo 3:16" também abre João 3');
+ok(await buscar('1co 13', '(document.querySelector(".cartao-abrir-ref") || {}).getAttribute?.("href") === "#/biblia/1%20Cor%C3%ADntios/13"'), '"1co 13" abre 1 Coríntios 13');
+await av('document.querySelector(".cartao-abrir-ref").click()');
+ok(await esperar('!!document.querySelector(".leitor-biblia:not(.saindo)")'), 'tocar no cartão abre o capítulo no leitor');
+ok(await buscar('zzzqq', '!!document.querySelector(".vazio")'), 'sem nada, a busca diz que não achou');
+
+// ---------- a busca da Bíblia mostra o capítulo (C8) ----------
+await ir('#/biblia', '!!document.querySelector("#busca-livro")', 15000);
+await av('(() => { const c = document.getElementById("busca-livro"); c.value = "joao 3"; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
+ok(await esperar('!!document.querySelector("#busca-livro-ref .cartao-abrir-ref")'), 'na Bíblia, "joao 3" mostra o cartão "Abrir João 3"');
+ok(await av('document.querySelector("#testamento-novo .titulo-secao span").textContent') === '4 livros', 'e a contagem acompanha o que está à vista (4 livros)');
+await av('(() => { const c = document.getElementById("busca-livro"); c.value = ""; c.dispatchEvent(new Event("input", { bubbles: true })); })()');
+ok(await av('document.querySelector("#testamento-novo .titulo-secao span").textContent') === '27 livros' && await av('document.querySelector("#busca-livro-ref").innerHTML') === '', 'apagar a busca volta aos 27 livros, sem o cartão');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');

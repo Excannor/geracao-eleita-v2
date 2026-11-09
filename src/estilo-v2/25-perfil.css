@@ -342,3 +342,9 @@ a.painel-celula-linha { color: inherit; text-decoration: none; }
 [data-rota=config] .painel-barra { flex-wrap: nowrap; }
 [data-rota=config] .painel-barra > span:first-child { flex: 1 1 auto; min-width: 0; }
 [data-rota=config] .painel-barra .valor { flex: 0 0 auto; }
+
+/* A busca do Explorar: "Abrir João 3 na Bíblia" no alto (o cartão de continuar da Bíblia,
+   04d-biblia.js) e os achados de parábola, mapa do livro e atlas com o selo em cima. */
+.cartao-abrir-ref { display: flex; align-items: center; margin: 0 0 18px; }
+.cartao-abrir-ref .textos { flex: 1 1 auto; display: grid; }
+.item-visual .sub { color: var(--salvia-texto); }

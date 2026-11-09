@@ -33,6 +33,32 @@
     + [['ler', '#/biblia', 'Ler'], ['explorar', '#/explorar', 'Explorar']].map(([id, href, rotulo]) => '<a href="' + href + '"'
       + (id === atual ? ' aria-current="page"' : '') + '>' + rotulo + '</a>').join('') + '</nav>';
 
+  // Uma referência como a pessoa digita numa busca: "joao 3", "jo 3", "1co 13", "Salmo 23",
+  // "joão 3:16", "gen 1". Devolve { livro, cap, de } ou null. O nome sem acento e a sigla valem
+  // com o capítulo sozinho (CC.lerRefLivre só aceita a sigla com versículo), e um começo de nome
+  // com pelo menos três letras também ("gen", "sal"). O capítulo precisa existir.
+  let capitulosConhecidos = null;
+  CC.refDaBusca = (texto) => {
+    const t = String(texto || '').replace(/\s+/g, ' ').trim();
+    const m = /^(.*?\D)\s*(\d{1,3})(?:\s*[:.,]\s*(\d{1,3})(?:\s*[-–]\s*\d{1,3})?)?$/.exec(t);
+    if (!m || !m[1].trim()) return null;
+    capitulosConhecidos ||= CC.capitulosDoPlano(CC.D.plano);
+    const cap = Number(m[2]);
+    const de = m[3] ? Number(m[3]) : 0;
+    const r = CC.lerRefLivre(m[1].trim() + ' ' + cap + '.' + (de || 1), capitulosConhecidos);
+    let livro = r && r.livro;
+    if (!livro) {
+      const chave = (x) => CC.semAcento(x).replace(/[^a-z0-9]/g, '');
+      const k = chave(m[1]);
+      if (k.length < 3) return null;
+      const nomes = CC.LIVROS.map(([nome]) => nome);
+      livro = nomes.find((n) => chave(n) === k) || nomes.find((n) => chave(n).startsWith(k));
+    }
+    if (!livro || !(cap >= 1 && cap <= (capitulosConhecidos[livro] || 0))) return null;
+    return { livro, cap, de };
+  };
+  CC.hrefDaRef = (r) => '#/biblia/' + encodeURIComponent(r.livro) + '/' + r.cap;
+
   // .folha-biblia: só apresentação, a folha do alto das telas da Bíblia (22-leitura.css)
   function esqueleto(alvo, titulo, voltar, seletor) {
     alvo.innerHTML = '<div class="folha-biblia' + (seletor ? ' com-seletor' : '') + '">' + (seletor ? CC.seletorBiblia('ler') : '') + (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1></div>'
@@ -126,6 +152,7 @@
         + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'
         + cartaoContinuar(biblia) + '</div>'
         + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
+        + '<div id="busca-livro-ref"></div>'
         + '<p class="passo-dica" id="busca-livro-vazia" hidden>Nenhum livro com esse nome.</p>'
         + '<div id="testamento-antigo">' + CC.tituloSecao('Antigo Testamento', CC.plural(antigo.length, 'livro', 'livros')) + gradeLivros(antigo) + '</div>'
         + '<div id="testamento-novo">' + CC.tituloSecao('Novo Testamento', CC.plural(novo.length, 'livro', 'livros')) + gradeLivros(novo) + '</div>';
@@ -137,7 +164,9 @@
 
   // Busca pelo nome, sem acento e sem espaço ("1co", "joao"): primeiro o nome exato, depois os
   // que começam assim, depois os que contêm.
-  // Com número depois do nome ("joão 3"), o Enter abre direto o capítulo.
+  // Com número depois do nome ("joão 3"), aparece no alto o cartão "Abrir João 3", e o Enter
+  // abre direto o capítulo (antes só o Enter abria, e nada na tela dizia isso). A contagem de
+  // cada testamento acompanha o que está à vista.
   function ligarBuscaLivro(alvo, biblia) {
     const campo = alvo.querySelector('#busca-livro');
     if (!campo) return;
@@ -159,9 +188,14 @@
       });
       ['#testamento-antigo', '#testamento-novo'].forEach((sel) => {
         const bloco = alvo.querySelector(sel);
-        bloco.hidden = !bloco.querySelector('.item-livro:not([hidden])');
+        const n = bloco.querySelectorAll('.item-livro:not([hidden])').length;
+        bloco.hidden = !n;
+        const conta = bloco.querySelector('.titulo-secao span');
+        if (conta) conta.textContent = CC.plural(n, 'livro', 'livros');
       });
-      alvo.querySelector('#busca-livro-vazia').hidden = vistos.size > 0;
+      const ref = /\d/.test(campo.value) && CC.refDaBusca ? CC.refDaBusca(campo.value) : null;
+      alvo.querySelector('#busca-livro-ref').innerHTML = ref && CC.cartaoAbrirRef ? CC.cartaoAbrirRef(ref) : '';
+      alvo.querySelector('#busca-livro-vazia').hidden = vistos.size > 0 || !!ref;
     };
     campo.onkeydown = (ev) => {
       if (ev.key !== 'Enter') return;
