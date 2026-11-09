@@ -84,9 +84,13 @@
   // Conhecer Jesus, o capítulo da Bíblia sobre a grade: fechar devolve a tela como estava), a
   // busca (o endereço muda a cada letra) e as abas da célula (trocar de aba não é sair dela).
   let ultimaTela = null;
-  const SOBRE_A_TELA = new Set(['dia', 'conhecer', 'biblia', 'busca']);
+  const SOBRE_A_TELA = new Set(['dia', 'conhecer', 'busca']);
   function telaDe(rota, arg) {
     if (SOBRE_A_TELA.has(rota)) return rota;
+    // Na Bíblia, a lista e a grade de cada livro são telas diferentes: a grade abre no alto
+    // (abria herdando a rolagem da lista, Salmos já no 43, sem o nome nem o voltar). O capítulo
+    // abre por cima da grade do mesmo livro, e fechar devolve a grade como estava.
+    if (rota === 'biblia') return 'biblia/' + CC.semAcento(arg.split('/')[0] || '');
     // ...menos um estudo anterior (…/estudo/<id>), que é outra tela: abre no alto, e o voltar
     // devolve a lista na altura em que estava.
     if (arg.startsWith('celula/')) { const s = arg.split('/'); return rota + '/' + s.slice(0, s[2] === 'estudo' && s[3] ? 4 : 2).join('/'); }
