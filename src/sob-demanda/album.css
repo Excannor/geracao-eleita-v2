@@ -107,3 +107,16 @@ button.carta-versao { cursor: pointer; }
   .ct-giro { transition: none; }
   .carta-texto.entrando, .album-pe-entra { animation: none; }
 }
+
+/* O álbum vazio diz como ganhar a primeira carta; "Como as cartas chegam" em linguagem simples,
+   com os números atrás de "Ver os números" (revisão de usabilidade, C9 e C10). */
+.album-vazio { display: grid; gap: 8px; margin: 0 0 14px; padding: 18px; }
+.album-vazio p { margin: 0; color: var(--v2-tinta-fraca); }
+.album-vazio .botao { justify-self: start; }
+.album-como li { padding-top: 6px; padding-bottom: 6px; }
+.album-versoes-lista { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 8px 0 0; padding: 0; list-style: none; }
+.album-versoes-lista li { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: .9rem; }
+.album-versoes-lista svg { width: 22px; height: 22px; }
+.album-voce { margin: 16px 0 0; }
+.album-detalhes { margin: 16px 0 0; }
+.album-detalhes summary { min-height: 44px; display: flex; align-items: center; font-weight: 700; color: var(--salvia-texto); cursor: pointer; }

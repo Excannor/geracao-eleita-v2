@@ -54,7 +54,7 @@
     el.setAttribute('aria-label', 'Carta ' + carta.album + ', ' + NOMES[carta.raridade] + ': ' + carta.titulo + '. Você sabia? ' + carta.sabia + ' ' + carta.ref);
     el.innerHTML = '<div class="ct-giro"><div class="ct-face ct-frente"><span class="ct-rar">' + icone(carta.raridade) + NOMES[carta.raridade] + '</span>'
       + '<b class="ct-titulo">' + CC.esc(carta.titulo) + '</b><span class="ct-sabia"><small>Você sabia?</small>' + CC.esc(carta.sabia) + '</span>'
-      + '<span class="ct-ref">' + CC.esc(carta.ref) + '</span><span class="ct-album">' + CC.esc(carta.album) + ' · ' + carta.numero + '/' + carta.total + '</span></div>'
+      + '<span class="ct-ref">' + CC.esc(carta.ref) + '</span><span class="ct-album">' + CC.esc(carta.album) + ' · nº ' + carta.numero + '</span></div>'
       + '<div class="ct-face ct-verso"></div></div>';
     if (CC.cartas && CC.cartas.desenharVerso) {
       const verso = CC.cartas.desenharVerso({ largura: Math.min(1000, Math.round(largura * 2)), raridade: carta.raridade });
@@ -125,8 +125,8 @@
     pratica: 'Prática sem nenhum erro', proposito: 'Sete dias num propósito', celula: 'Seu primeiro encontro da célula', discipulado: 'Seu primeiro encontro de discipulado',
     convite: 'Amigos que chegaram pelo seu convite', convidado: 'Boas-vindas',
   };
-  // O título da revelação: a origem; nos marcos, "Marco: ..." (o sorteio de marco tem chance maior
-  // de Ouro e de Glória).
+  // O título da revelação: a origem; nos marcos, "Marco: ..." (a carta especial do marco vem
+  // sempre em Prata, Ouro ou Glória).
   const origem = (x) => {
     const [fonte, arg] = String(x.chave || x.fonte || '').split(':');
     if (fonte === 'album') return 'Marco: ' + albumDe(arg).nome + ' completo';
@@ -172,7 +172,7 @@
       pe.classList.add('album-pe-entra');
       palco.innerHTML = '<div class="album-fim">' + (kicker ? '<p class="album-origem">' + CC.esc(kicker) + '</p>' : '')
         + '<div class="album-fim-carta"></div><p class="album-legenda" aria-live="polite">' + texto + '</p>'
-        + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Ganhou um sorteio de marco.</span></p>' : '')
+        + (x.completou ? '<p class="album-completo">' + icone('gloria') + '<span>Álbum completo! Vem aí uma carta especial.</span></p>' : '')
         + '<div class="album-fim-acoes"><button type="button" class="botao contorno pequeno" data-ler>' + CC.ico('livro') + 'Ler a história</button></div></div>';
       // a carta ocupa a altura que sobra
       const resto = palco.querySelector('.album-fim').getBoundingClientRect().height;
@@ -316,13 +316,13 @@
     const atual = r.albuns.find((a) => a.id === r.atual);
     const secoes = r.albuns.map((a) => '<section class="album-secao" data-album="' + a.id + '">'
       + CC.tituloSecao(a.nome, a.tem + ' de ' + a.total + ' cartas')
-      + '<p class="album-versoes">Coleção: ' + a.versoes + ' de ' + a.totalVersoes + ' versões</p>'
       + '<div class="album-grade">' + doAlbum(a.id).map((c) => itemDaGrade(c, tem, largura)).join('') + '</div></section>').join('');
     const quem = (CC.quem || {}).cartasServidor;
     const semeadores = doAlbum('semeadores');
     const secSemeadores = '<section class="album-secao album-especial" data-album="semeadores">'
-      + CC.tituloSecao('Semeadores', plural(semeadores.filter((c) => tem[c.id]).length, 'carta', 'cartas'))
-      + (quem ? '<p class="album-versoes">' + (quem.amigos === 1 ? '1 amigo chegou' : quem.amigos + ' amigos chegaram') + ' pelo seu convite.</p>' : '')
+      + CC.tituloSecao('Semeadores', semeadores.filter((c) => tem[c.id]).length + ' de ' + semeadores.length + ' cartas')
+      + '<p class="album-versoes">Chegam quando amigos entram no app pelo seu convite.'
+      + (quem ? ' ' + (quem.amigos === 1 ? '1 amigo já chegou.' : quem.amigos + ' amigos já chegaram.') : '') + '</p>'
       + '<div class="album-grade">' + semeadores.map((c, i) => {
         // limiar alcançado cuja carta ainda não tem desenho: fica anotado e a carta vem depois
         const alcancado = !tem[c.id] && r.alcancados.includes('convite:tier:' + (i + 1));
@@ -332,10 +332,15 @@
     const boas = doAlbum('boas-vindas').filter((c) => tem[c.id]);
     const secBoas = boas.length ? '<section class="album-secao album-especial" data-album="boas-vindas">' + CC.tituloSecao('Boas-vindas')
       + '<div class="album-grade">' + boas.map((c) => itemDaGrade(c, tem, largura)).join('') + '</div></section>' : '';
+    // Vazio, o álbum diz como ganhar a primeira carta, antes das vagas (revisão de usabilidade, C9).
+    const vazio = !r.cartas && !Object.keys(tem).length;
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Cartas</h1>'
       + '<p class="passo-dica">' + r.cartas + ' de ' + r.totalCartas + ' cartas' + (r.repetidas ? ' · ' + plural(r.repetidas, 'repetida', 'repetidas') : '') + '</p></div>'
-      + '<div class="album-acoes"><button class="botao contorno pequeno" data-pode-vir>' + CC.ico('info') + 'O que pode vir</button>'
-      + (atual ? '<span>Álbum atual: <b>' + CC.esc(atual.nome) + '</b></span>' : '') + '</div>'
+      + (vazio ? '<div class="cartao album-vazio" data-album-vazio><b>Seu álbum começa na Trilha</b>'
+        + '<p>A cada 7 dias de leitura do plano, um baú se abre na Trilha com uma carta. Terminar um desafio, ler parábolas e completar etapas também traz cartas.</p>'
+        + '<a class="botao" href="#/">Ir para a Trilha</a></div>' : '')
+      + '<div class="album-acoes"><button class="botao contorno pequeno" data-pode-vir>' + CC.ico('info') + 'Como as cartas chegam</button>'
+      + (atual ? '<span>Álbum de agora: <b>' + CC.esc(atual.nome) + '</b></span>' : '') + '</div>'
       + secoes + secSemeadores + secBoas;
     raiz.style.setProperty('--album-mini', largura + 'px');
     raiz.querySelectorAll('[data-mini]').forEach((m) => {
@@ -386,34 +391,43 @@
   }
 
   // ---------- O que pode vir ----------
-  // As chances são públicas: as do sorteio comum e as do sorteio de marco, as proteções e os
-  // números da própria pessoa.
+  // Em linguagem de gente (revisão de usabilidade, C10): como as cartas chegam, as cinco versões
+  // e que as raras vêm com o tempo, sem falar de sorteio, chance nem "proteções". Os números
+  // continuam públicos, em "Ver os números", para quem quiser (a mecânica é a mesma de sempre:
+  // cartas-regras.js e docs/cartas.md, seção 4).
   function oQuePodeVir() {
     const P = R().PESOS;
     const r = R().resumo(estado(), CC.hojeIso());
     const M = R().chancesDeMarco(r.marcosSemGloria);
     const atual = r.albuns.find((a) => a.id === r.atual);
     const linha = (rar, texto) => '<li>' + icone(rar) + '<span><b>' + NOMES[rar] + '</b> ' + texto + '</span></li>';
-    CC.folha('<h2>O que pode vir</h2>'
-      + '<p class="passo-dica pequena">Cada baú sorteia uma raridade e depois a carta.</p>'
+    CC.folha('<h2>Como as cartas chegam</h2>'
+      + '<ul class="album-regras album-como">'
+      + '<li>A cada 7 dias de leitura do plano, um baú se abre na Trilha, e cada baú traz uma carta.</li>'
+      + '<li>Também chegam cartas quando você termina o Conhecer Jesus, os Primeiros passos ou um desafio, lê parábolas no Explorar e acerta tudo na prática.</li>'
+      + '<li>As cartas que você ainda não tem aparecem mais' + (atual ? ', principalmente as de ' + CC.esc(atual.nome) + ', o álbum que está enchendo agora' : '') + '.</li>'
+      + '</ul>'
+      + '<h3 class="album-sub">As cinco versões</h3>'
+      + '<p class="passo-dica pequena">Cada carta existe em cinco versões. Linho e Bronze são as que mais aparecem; Prata, Ouro e Glória vão chegando com o tempo de leitura. A sua primeira carta já vem em Prata.</p>'
+      + '<ul class="album-versoes-lista">' + ORDEM.map((v) => '<li>' + icone(v) + '<span>' + NOMES[v] + '</span></li>').join('') + '</ul>'
+      + '<h3 class="album-sub">Cartas especiais</h3>'
+      + '<p class="passo-dica pequena">Completar um álbum, terminar uma unidade da Trilha e chegar a 100 e a 365 dias de leitura traz uma carta especial, sempre em Prata, Ouro ou Glória.</p>'
+      + (atual ? '<p class="album-voce">Álbum de agora: <b>' + CC.esc(atual.nome) + '</b>, ' + atual.tem + ' de ' + atual.total + ' cartas.</p>' : '')
+      + '<details class="album-detalhes"><summary>Ver os números</summary>'
+      + '<p class="passo-dica pequena">De cada 100 cartas comuns, em média:</p>'
       + '<ul class="album-chances" data-tabela="comum">' + ORDEM.map((v) => linha(v, P[v] + '%')).join('') + '</ul>'
-      + '<h3 class="album-sub">Nos marcos</h3>'
-      + '<p class="passo-dica pequena">Álbum completo, fim de uma unidade da Trilha, 100 e 365 dias de leitura: um sorteio a mais, sem Linho nem Bronze.</p>'
+      + '<p class="passo-dica pequena">Nas cartas especiais (sem Linho nem Bronze), a sua próxima:</p>'
       + '<ul class="album-chances" data-tabela="marco">' + ['prata', 'ouro', 'gloria'].map((v) => linha(v, M[v] + '%')).join('') + '</ul>'
-      + '<h3 class="album-sub">Proteções</h3><ul class="album-regras">'
+      + '<ul class="album-regras">'
       + '<li>A primeira carta é uma Prata.</li>'
-      + '<li>No máximo ' + R().MAX_SEM_ALTA + ' seguidas sem Prata ou melhor.</li>'
-      + '<li>A partir do ' + R().OURO_SOBE_EM + 'º sorteio sem Ouro, a chance dele sobe ' + R().OURO_PASSO + ' pontos a cada um, e o ' + R().OURO_ATE + 'º é Ouro.</li>'
-      + '<li>A cada marco sem Glória, a chance dela no marco seguinte sobe ' + R().MARCO_PASSO + ' pontos.</li>'
-      + '<li>As cartas que você ainda não tem saem mais, principalmente as do álbum atual.</li>'
-      + (r.lancadas < r.totalCartas ? '<li>Hoje podem sair ' + r.lancadas + ' das ' + r.totalCartas + ' cartas.</li>' : '') + '</ul>'
-      + '<h3 class="album-sub">Você</h3><ul class="album-regras">'
-      + (atual ? '<li>Álbum atual: ' + CC.esc(atual.nome) + ', ' + atual.tem + ' de ' + atual.total + ' cartas.</li>' : '')
-      + '<li>Desde o último Ouro: ' + plural(r.semOuro, 'sorteio', 'sorteios') + '.</li>'
-      + '<li>Desde a última Prata ou melhor: ' + plural(r.semAlta, 'sorteio', 'sorteios') + '.</li>'
-      + '<li>No seu próximo marco, a Glória tem ' + M.gloria + '%.</li></ul>'
+      + '<li>Nunca passam mais de ' + R().MAX_SEM_ALTA + ' cartas seguidas sem uma Prata ou melhor.</li>'
+      + '<li>Depois de ' + (R().OURO_SOBE_EM - 1) + ' cartas sem Ouro, o Ouro fica um pouco mais perto a cada carta (+' + R().OURO_PASSO + ' em 100), e a ' + R().OURO_ATE + 'ª é Ouro.</li>'
+      + '<li>A cada carta especial sem Glória, a Glória fica mais perto na especial seguinte (+' + R().MARCO_PASSO + ' em 100).</li>'
+      + (r.lancadas < r.totalCartas ? '<li>Hoje podem chegar ' + r.lancadas + ' das ' + r.totalCartas + ' cartas; as outras vêm aos poucos.</li>' : '')
+      + '<li>Cartas desde o último Ouro: ' + r.semOuro + '. Desde a última Prata ou melhor: ' + r.semAlta + '.</li>'
+      + '</ul></details>'
       + '<div class="acoes"><button class="botao plano" data-fechar>Fechar</button></div>', {
-      rotulo: 'O que pode vir',
+      rotulo: 'Como as cartas chegam',
       classe: 'folha-pode-vir',
       rolavel: true,
       ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; },

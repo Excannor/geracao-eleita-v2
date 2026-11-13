@@ -266,6 +266,17 @@ ok(await av('document.querySelectorAll(".folha-parabola a.ref-biblia, .parabola 
 await ir('#/atlas/paulo-1', '!!document.querySelector(".atlas-sub")', 15000);
 ok(await av('!!document.querySelector(".atlas-sub a.ref-biblia[href=\\"#/biblia/Atos/13\\"]")'), 'no atlas, a referência do alto abre Atos 13');
 
+// ---------- o álbum vazio e "Como as cartas chegam" (C9, C10, C1) ----------
+await ir('#/perfil/album', '!!document.querySelector("[data-pode-vir]")', 20000);
+ok(await av('(() => { const v = document.querySelector("[data-album-vazio]"); return !!v && /7 dias de leitura/.test(v.textContent) && !!v.querySelector("a[href=\\"#/\\"]"); })()'),
+  'o álbum vazio explica como ganhar cartas, com o botão para a Trilha');
+ok(await av('!document.querySelector(".album-versoes") || ![...document.querySelectorAll(".album-versoes")].some((p) => /versões/.test(p.textContent))'), 'o álbum não mostra a segunda contagem de "versões"');
+ok(/0 de \d+ cartas/.test(await av('document.querySelector("[data-album=semeadores] .titulo-secao").textContent')), 'Semeadores diz "0 de N cartas"');
+await av('document.querySelector("[data-pode-vir]").click()');
+ok(await esperar('!!document.querySelector(".folha-pode-vir")'), '"Como as cartas chegam" abre');
+await voltar();
+ok(await folhas() === 0 && await av('location.hash') === '#/perfil/album', 'o voltar fecha a folha e o álbum continua na tela (era o caso da avaliação)');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');
