@@ -111,7 +111,9 @@
 
   // O título que o estudo mostra. O escrito de antes da v19 (livre) não tinha título.
   function titulo(e) {
-    if (e.tipo === 'semana') return 'A leitura da semana';
+    // com a semana do plano guardada, os dias no título: duas leituras da semana não ficam iguais
+    // na fila nem nos anteriores (avaliação de 09/11, B22)
+    if (e.tipo === 'semana') return 'A leitura da semana' + (Number(e.planoAte) > 0 ? PONTO + 'dias ' + (Math.max(7, Number(e.planoAte)) - 6) + ' a ' + Math.max(7, Number(e.planoAte)) : '');
     if (e.tipo === 'trecho') return e.titulo || e.ref || '';
     return e.titulo || '';
   }

@@ -1440,6 +1440,8 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   const fila = [{ id: 'b', tipo: 'blocos', titulo: 'Batalha espiritual', data: '2026-10-29' }, { id: 'c', tipo: 'semana', titulo: '', data: '2026-11-05' }];
   checar(R.linhaDoProximo(fila) === 'Próximo: Batalha espiritual · qui 29/10' && R.linhaDoProximo(fila.slice(1)) === 'Próximo: A leitura da semana · qui 05/11'
     && R.linhaDoProximo([]) === '' && R.linhaDoProximo(null) === '', 'linhaDoProximo(): o que o cartão do líder diz; com a fila vazia, nada');
+  checar(R.titulo({ tipo: 'semana', planoAte: 21 }) === 'A leitura da semana · dias 15 a 21' && R.titulo({ tipo: 'semana', planoAte: 3 }) === 'A leitura da semana · dias 1 a 7'
+    && R.titulo({ tipo: 'semana', planoAte: 0 }) === 'A leitura da semana', 'titulo(): a leitura da semana com a semana guardada leva os dias do plano (B22)');
   checar(R.quandoNaFila(fila[0], '2026-10-25') === 'Para quinta, 29/10' && R.quandoNaFila(fila[0], '2026-10-29') === 'Para quinta, 29/10'
     && R.quandoNaFila(fila[0], '2026-10-30') === 'Para quinta, 29/10 · a data já passou', 'quandoNaFila(): a data da linha, e "a data já passou" sem culpa');
   checar(JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, -1)) === '["b","a","c"]' && JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, 1)) === '["a","c","b"]'

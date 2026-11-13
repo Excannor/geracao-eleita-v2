@@ -242,8 +242,8 @@ await na((t) => { const c = document.querySelector('[data-fonte]'); c.value = t;
 await clicar('[data-ver]');
 ok(await esperar(existe('[data-aviso-dividir]'), 15000), '1. o estudo de 101 partes mostra o aviso de dividir no passo 2');
 const aviso = await texto('[data-aviso-dividir]');
-ok(aviso.includes('Este estudo rende 2 encontros') && aviso.includes('Ele tem 101 partes, e cada encontro leva até 80.') && aviso.includes('A parte 2 começa no Tópico 5: Amabilidade e bondade: o jeito de tratar, perto do meio.'),
-  '1. o aviso diz quantas partes, o teto e onde começa a parte 2 (' + aviso + ')');
+ok(aviso.includes('Este estudo rende 2 encontros') && aviso.includes('Ele é longo para um encontro só.') && !/\d+ partes/.test(aviso) && aviso.includes('A parte 2 começa no Tópico 5: Amabilidade e bondade: o jeito de tratar, perto do meio.'),
+  '1. o aviso diz que o estudo é longo para um encontro, sem contar partes, e onde começa a parte 2 (' + aviso + ')');
 ok(await texto('[data-dividir]') === 'Dividir em 2 encontros', '1. o botão principal: "Dividir em 2 encontros"');
 ok(!(await texto('[data-erro]')).includes(MSG_PARTES) && await av(q('[data-continuar]') + '.disabled === true'), '1. o aviso das 80 partes sai (o botão resolve), e Continuar segue desligado');
 await emTodosOsTamanhos('1. o aviso de dividir');

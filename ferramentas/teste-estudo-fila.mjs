@@ -334,7 +334,9 @@ async function agendarPelaTela(titulo, data, rotuloFoto) {
   ok(await esperar(existe('[data-agendar]'), 15000), 'B. a seção tem "Agendar um estudo"');
   await clicar('[data-agendar]');
   ok(await esperar(existe('[data-fonte]') + ' && /\\/preparar\\/novo$/.test(location.hash)', 15000), 'B. "Agendar um estudo" abre o preparo de um estudo novo (…/preparar/novo)');
+  const descartarAntes = await na(() => document.querySelector('[data-descartar]').hidden);
   await na((t) => { const c = document.querySelector('[data-fonte]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, texto(titulo));
+  ok(descartarAntes === true && await na(() => document.querySelector('[data-descartar]').hidden) === false, 'B22. "Descartar o rascunho" só aparece depois que o líder escreve');
   await clicar('[data-ver]');
   ok(await esperar(existe('[data-continuar]') + ' && !' + q('[data-continuar]') + '.disabled', 15000), 'B. as partes conferidas');
   await clicar('[data-continuar]');
@@ -345,6 +347,7 @@ async function agendarPelaTela(titulo, data, rotuloFoto) {
     botao: document.querySelector('[data-salvar]').textContent.trim(),
     ws: !!document.querySelector('.mesa-ws'),
   }));
+  ok((await na(() => document.querySelector('#conteudo').textContent.split('ntra na aba Estudo depois do encontro anterior.').length - 1)) === 1, 'B22. "Entra na aba Estudo depois do encontro anterior." aparece uma vez só');
   ok(quando.marcado === 'agendar' && quando.botao === 'Agendar o estudo' && !quando.ws, 'B. vem marcado "Agendar", o botão diz "Agendar o estudo", e sem o cartão dos 4 Ws (' + JSON.stringify(quando) + ')');
   if (data) {
     await na((d) => { const c = document.querySelector('[data-data-fila]'); c.value = d; c.dispatchEvent(new Event('change', { bubbles: true })); return true; }, data);
