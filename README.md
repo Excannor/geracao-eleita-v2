@@ -85,8 +85,8 @@ só abre quando todos os dias dela foram lidos. Unidades fechadas ficam recolhid
 
 Cada nó conta o que houve naquele dia: visto verde para o dia lido, estrela a cada sete dias,
 caneta onde você escreveu o registro e um nó dourado no dia que fecha um livro da Bíblia. O
-dia atual mostra um anel que se enche conforme você marca as passagens; os que ainda não
-chegaram ficam com cadeado. As doze lições de primeiros passos ficam no começo da trilha,
+dia atual mostra um anel que se enche conforme você lê as passagens; os que ainda não
+chegaram ficam apagados, com o número do dia (abrem com "Ler mesmo assim"). As doze lições de primeiros passos ficam no começo da trilha,
 antes do dia 1.
 
 **Desafios**: os desafios do dia e o quiz de memorização (**Praticar**), oito perguntas por
@@ -121,20 +121,27 @@ o próximo estágio.
 
 ## O dia como uma lição
 
-Tocar num nó abre a tela cheia, com barra de progresso no topo, e passa por:
+O caminho de todo dia tem quatro toques: **Ler hoje** (no alto da Trilha) → a primeira
+passagem no leitor → a segunda → **Dia lido**.
 
-1. **Leitura**: as passagens do dia, uma por trilha (Antigo e Novo Testamento). Marcar as
-   duas conta o dia e acende a ofensiva. **Ler o texto aqui** abre os capítulos no próprio
-   aplicativo. Parar no meio não perde nada: o aplicativo lembra o que já foi marcado.
-2. **Apoio**: o que o material tem sobre os livros de hoje (versículos, conexões, pessoas,
-   eventos, lugares, temas), numa folha por cima, sem tirar você do passo.
-3. **Para levar com você**: logo depois da leitura, sem tela de festa no meio. Um versículo
-   para guardar, uma pergunta e a mesma coisa virada em oração. Dá para pular, e dá para abrir
-   **Escrever sobre hoje**, onde ficam o método OIA completo e a oração.
-4. **Resumo**: o fogo e os dias de ofensiva, a semana, e o que mudou hoje: estágio novo
-   da chama, marco, conquista, livro terminado, unidade fechada, baú pronto e
-   desafios do dia. Mostra quem leu hoje junto com você, com um botão para encorajar quem
-   ainda não leu.
+1. **Leitura**: "Ler hoje" abre o leitor direto na primeira passagem que falta. O contexto do
+   dia ("Onde estamos na história" e "Enquanto lê, procure") fica no alto da primeira passagem,
+   num cartão que se recolhe. **Terminei a leitura** só destrava no fim do texto e depois de
+   um terço do "cerca de N min" que o app mostra; o botão vai se enchendo enquanto a pessoa lê,
+   sem relógio. Com leitor de tela ou teclado, basta o tempo. Entre as passagens, "Terminei,
+   ler Mateus 1"; a última conclui o dia. Parar no meio não perde nada.
+2. **Li na minha Bíblia**: um link discreto (em destaque sem rede ou quando o texto não abre).
+   O dia conta para a chama, o progresso, a unidade e os amigos, mas não abre baú nem dá carta.
+   Cada dia guarda a origem (`app` ou `papel`, `origens` em `02-estado.js`).
+3. **Dia lido**: uma tela só. "Dia N lido", a chama e a semana, o baú quando há; o versículo
+   para guardar (com cor, nota e Escrever); **Pensar** e **Orar** como cartões opcionais que
+   abrem ali mesmo (a oração se escreve no próprio cartão; **Escrever sobre hoje** tem a oração
+   e o Observar, entender, aplicar); o que mudou hoje (estágio da chama, marco, conquista,
+   livro, unidade, amanhã, desafios do dia) e quem leu junto. Um botão só: "Voltar à trilha".
+   A tela é a peça sob demanda `src/sob-demanda/dia-lido.js`.
+
+A lição do dia (`#/dia/N`) continua para revisar um dia: os cartões das passagens abrem o
+leitor e mostram o ✓. Uma leitura não se desmarca, e revisar não muda a data dela.
 
 A leitura é para todo dia. Escrever, não: o aplicativo diz isso e não penaliza quem só lê.
 
@@ -200,10 +207,12 @@ vez conta um dia de ofensiva. Ler ontem e hoje conta dois. Ficar dois dias sem l
 ofensiva. O recorde fica, e o plano continua exatamente de onde parou. A chama é fogo de
 verdade, e cresce por estágios (`ESTAGIOS` em `src/app/01c-arte.js`): cada estágio tem uma
 frase, uma referência bíblica e um carimbo de pincel próprio, que aparece na folha da
-ofensiva. Um dia esquecido não derruba tudo: uma vez por mês o aplicativo cobre sozinho um
-único dia em branco, e mostra um escudo no lugar da chama naquele dia. Serve para quem
-esqueceu, não para quem parou: ele só cobre o dia de ontem, e só se havia uma sequência viva
-antes dele.
+ofensiva. Um dia esquecido não derruba tudo: os escudos (começa com 1, ganha 1 por mês e 1 a
+cada 7 dias seguidos, guarda até 2) cobrem dias em branco, e um escudo aparece no lugar da
+chama naquele dia. Na primeira semana, contada do primeiro dia lido, vale também o **escudo do
+iniciante**: um buraco de até 2 dias é coberto uma vez, sem gastar os outros (o fim de semana
+chega quando o hábito ainda não existe). Na tela, os textos falam em "dias seguidos" e na
+chama acesa, não em "ofensiva".
 
 ## Sem mascote
 
@@ -228,7 +237,8 @@ tradução padrão.
 **Ler o texto aqui** abre uma tela por cima da lição, com um versículo por linha, sem
 parágrafos nem títulos de seção inventados. No topo ficam a troca de tradução e o botão
 **Aa**, com quatro tamanhos de letra; as escolhas valem para o aparelho. No pé, **Terminei a
-leitura** marca a passagem e abre a seguinte, se houver. A tela de Bíblia livre usa o mesmo
+leitura** (que destrava no fim do texto e com o tempo mínimo) conta a passagem e abre a
+seguinte, se houver; a última conclui o dia. A tela de Bíblia livre usa o mesmo
 leitor, sem a marcação de lida.
 
 Cada tradução é um arquivo à parte em `dist/` (uns 4 MB cada), não dentro do `index.html`,
@@ -456,6 +466,7 @@ node ferramentas/contraste.mjs        mede o contraste das cores nos dois temas
 node ferramentas/teste-pratica.mjs    joga uma rodada inteira do quiz
 node ferramentas/teste-unidades.mjs   confere que as 12 unidades abrem e guardam resultado
 node ferramentas/teste-leitor.mjs     abre o texto, troca tradução e letra, marca pelo leitor, lê sem rede
+node ferramentas/teste-fluxo-dia.mjs  da Trilha ao Dia lido em 4 toques, ler de verdade, Li na minha Bíblia e o baú da semana
 node ferramentas/teste-redesenho.mjs  contas, Feed, Desafios e Perfil de ponta a ponta
 node ferramentas/teste-conta-gerir.mjs   trocar a senha, apagar a conta e derrubar os outros aparelhos
 node ferramentas/teste-troca-pessoa.mjs  aparelho compartilhado: uma conta não herda o que era da outra

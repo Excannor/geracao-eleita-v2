@@ -384,7 +384,10 @@ em 3 passos.
 
 ## 8. Decisões para o dono
 
-- [ ] **Escudo do iniciante.** Na primeira semana de conta, um buraco de até 2 dias é coberto
+- [x] **Escudo do iniciante** (aprovado e feito em 11/2026, na correção da avaliação de UX, A4:
+  `CC.ESCUDO_INICIANTE`, uma vez na primeira semana, sem gastar os outros escudos; a volta não
+  mostra mais o zero grande: o cartão da chama mostra o recorde ou os dias lidos).
+  Proposta original: Na primeira semana de conta, um buraco de até 2 dias é coberto
   (hoje: 1 escudo, buraco de 2 dias zera a chama e o recorde fica em 1). Muda `CC.simularOfensiva`
   (vale no aparelho e no servidor, que carregam o mesmo arquivo) e o README ("uma vez por mês o
   aplicativo cobre sozinho um único dia em branco").

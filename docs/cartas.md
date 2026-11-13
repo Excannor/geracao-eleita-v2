@@ -140,7 +140,7 @@ e o que ele pagou nunca muda.
 
 | Fonte | Gatilho | Chave | Prêmio | Quanto | Por que é saudável |
 |---|---|---|---|---|---|
-| `bau` | abrir o baú do dia N (a cada 7 dias do plano lidos) | `bau:dia:N@<zeradoEm>` | sorteio | ~52 por ano | recompensa leitura feita, sem prazo |
+| `bau` | abrir o baú do dia N: o dia N lido e pelo menos 5 dos dias N-6 a N lidos **no app** (ver "Ler de verdade", abaixo) | `bau:dia:N@<zeradoEm>` | sorteio | ~52 por ano | recompensa leitura feita, sem prazo |
 | `conhecer` | terminar os 14 dias do Conhecer Jesus | `conhecer:14` | sorteio | 1 na vida | a primeira carta de quem está começando |
 | `passos` | ler os 12 Primeiros passos | `passos:todos` | sorteio | 1 na vida | fecha o percurso de fundamentos |
 | `desafio` | concluir um desafio de vários dias | `desafio:<id>` | sorteio | 1 por desafio (4 hoje) | hábito concreto, com pausa e sem perda ao falhar um dia |
@@ -205,6 +205,35 @@ Fontes avaliadas e **recusadas**:
 | `Contas.cartasDoServidor(usuario)` | teste.mjs (contas): convite aceito sem a primeira lição não dá nada; feita a lição, limiar 1 para quem convidou e Boas-vindas para quem veio; os limiares valem em 1, 5, 15, 40 e 100 e nada além; presença e encontro dão a carta a quem esteve |
 | `conferirCartasDoServidor(atual, junto, permitidas)` | teste.mjs: um limiar inventado sai com a cópia; o confirmado, o já gravado e o baú ficam |
 | fontes do servidor no `emDia` | teste.mjs: só paga o que `/api/quem` confirma, e só chave conhecida; pular limiares paga cada um; nada paga duas vezes |
+
+
+### Ler de verdade (dono, 11/2026; avaliação de UX, A1 e A2)
+
+Marcar sem ler entregava a recompensa toda em três toques, e adiantar dias abria baús em
+segundos. A regra agora:
+
+- **Ler no app conta tudo.** O "Terminei a leitura" do leitor só destrava no fim do texto e
+  depois de um terço do "cerca de N min" estimado (`CC.portaoDeLeitura`, `04b-leitor.js`). Vale
+  também para o Conhecer Jesus e os Primeiros passos.
+- **"Li na minha Bíblia"** conta para o progresso, a chama, a unidade e os amigos, mas **não**
+  para os baús nem para as cartas. Cada dia guarda a origem em `E.origens[N]` (`'app'` ou
+  `'papel'`); na fusão, `'app'` vence. Dia lido antes da regra, sem origem, conta como `'app'`.
+- **O baú do dia N** abre com o dia N lido e pelo menos 5 dos 7 dias da semana dele (N-6 a N)
+  lidos no app (`CC.bauLiberado`, `CC.DIAS_NO_APP_PARA_O_BAU`, `02b-jogo.js`). Antes disso, o
+  toque no baú diz "Leia os dias X a N aqui no app para abrir." e lista os dias que faltam,
+  com atalho. Ler no app um dia de papel muda a origem dele (a data não muda) e passa a contar.
+- **Os marcos de unidade e de 100/365 dias** (`unidade`, `dias`) contam só os dias lidos no app.
+- **Não existe desmarcar.** A data de um dia lido não muda (revisar não o traz para hoje), e a
+  fusão entre aparelhos guarda a data mais antiga (`CC.fundirDatas`).
+- "Ler mesmo assim" num dia adiante continua, mas exige a leitura de verdade.
+- A raridade sorteada continua como estava; só a apresentação mudou: o nome da raridade
+  aparece depois que a carta vira, e o leitor de tela não ouve a carta antes da revelação.
+
+| Função | Teste |
+|---|---|
+| `CC.origemDoDia`, `CC.lidoNoApp`, `CC.marcarLido(dia, origem)`, `CC.fundirDatas`, `CC.fundirOrigens` | teste.mjs: a origem, a fusão pela data mais antiga, o "app" que vence, a limpeza, sem desmarcar |
+| `CC.bauLiberado`, `CC.faltamParaOBau` | teste.mjs: 5 de 7 no app, o dia do baú lido, adiantar não abre; teste-fluxo-dia: o baú travado com os atalhos |
+| `R.FONTES.unidade`, `R.FONTES.dias` | teste.mjs: com um dia de papel, a unidade conclui mas não paga carta |
 
 ## 4. O sorteio, as chances e as proteções
 
