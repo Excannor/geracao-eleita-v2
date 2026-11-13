@@ -277,7 +277,7 @@ secao('mapas dos livros');
   const soLink = ['04d-biblia.js', '04-licao.js'].filter((f) => /vistaMapa|secaoMapas|cartaoMapas/.test(app(f)) || !/CC\.mapaDoLivro/.test(app(f)));
   checar(soLink.length === 0, 'a Bíblia e o fim da lição só levam ao mapa publicado, com um link' + (soLink.length ? ' (' + soLink.join(', ') + ')' : ''));
   const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
-  checar(roteador.includes("mapa: '#/explorar'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca o Explorar');
+  checar(roteador.includes("mapa: '#/biblia'") && roteador.includes("rota === 'mapa'"), 'a rota #/mapa/<slug> existe e marca a aba Bíblia, onde o Explorar mora');
 }
 
 // =========================================================================
@@ -323,7 +323,7 @@ secao('parábolas');
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   checar(/PARABOLA_COM_RESUMO\.test\(rota\)/.test(servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0]), 'o servidor entrega as parábolas sem sessão e com cache longo, como os mapas');
   const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
-  checar(roteador.includes("rota === 'parabolas'") && roteador.includes("rota === 'parabola'") && roteador.includes("parabolas: '#/explorar'"), 'as rotas #/parabolas e #/parabola/<slug> existem e marcam o Explorar');
+  checar(roteador.includes("rota === 'parabolas'") && roteador.includes("rota === 'parabola'") && roteador.includes("parabolas: '#/biblia'"), 'as rotas #/parabolas e #/parabola/<slug> existem e marcam a aba Bíblia, onde o Explorar mora');
   checar(readFileSync(join(AQUI, 'src', 'app', '06-explorar.js'), 'utf8').includes('CC.cartaoParabolas()'), 'o Explorar tem o cartão das parábolas');
 }
 

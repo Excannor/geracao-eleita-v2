@@ -185,7 +185,8 @@
   // O que vem de fora (o servidor também passa por aqui). Lido do banco sem abrir (amigos,
   // célula, painel), texto e tags chegam cifrados ({ v, k, iv, tag, dado }, cofre.mjs): o
   // envelope passa inteiro, sem ser cortado nem trocado por vazio.
-  const CONTEXTO = /^(nota|secao|conhecer|parabola|estudo):/;
+  // mapa e atlas: as anotações no fim do mapa do livro e do mapa do atlas (revisão, C26)
+  const CONTEXTO = /^(nota|secao|conhecer|parabola|estudo|mapa|atlas):/;
   const cifra = (x) => !!x && typeof x === 'object' && !Array.isArray(x);
   // Título opcional (o mesmo versículo pode ter várias notas, cada uma com um estudo): uma
   // linha só, sem espaço sobrando, até 60 letras; nota antiga, sem título, fica com ''.

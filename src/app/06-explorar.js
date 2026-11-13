@@ -54,6 +54,8 @@
     if (tipo === 'conhecer') return 'Conhecer Jesus · dia ' + alvo;
     if (tipo === 'parabola') return 'Parábola · ' + (CC.tituloDaParabola ? CC.tituloDaParabola(alvo) : alvo);
     if (tipo === 'estudo') return 'Estudo da célula';
+    if (tipo === 'mapa') { const m = CC.mapaDoLivro && (window.MAPAS || []).find((x) => x.slug === alvo); return 'Mapa do livro · ' + (m ? m.nome : alvo); }
+    if (tipo === 'atlas') { const m = ((window.ATLAS || {}).itens || []).find((x) => x.slug === alvo); return 'Atlas bíblico · ' + (m ? m.titulo : alvo); }
     return tipo === 'nota' ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo) : ((secaoDe(alvo) || {}).rotulo || alvo);
   };
   CC.hrefDoContexto = (chave) => '#/' + chave.slice(0, chave.indexOf(':')) + '/' + encodeURIComponent(chave.slice(chave.indexOf(':') + 1));

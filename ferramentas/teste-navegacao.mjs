@@ -277,6 +277,29 @@ ok(await esperar('!!document.querySelector(".folha-pode-vir")'), '"Como as carta
 await voltar();
 ok(await folhas() === 0 && await av('location.hash') === '#/perfil/album', 'o voltar fecha a folha e o álbum continua na tela (era o caso da avaliação)');
 
+// ---------- mapa e ficha não viram ciclo (C19) ----------
+await ir('#/mapa/genesis', '!!document.querySelector(".mapa-ficha")', 15000);
+await av('document.querySelector(".mapa-ficha").click()');
+ok(await esperar('!!document.querySelector(".nota-corpo a.link-mapa")'), 'o mapa leva à ficha do livro');
+ok(await av('(() => { const a = document.querySelector(".nota-corpo a.link-mapa"); return a.hasAttribute("data-voltar") && /Voltar ao mapa do livro/.test(a.textContent); })()'), 'vindo do mapa, a ficha oferece "Voltar ao mapa do livro"');
+ok(await av('[...document.querySelectorAll(".nota-corpo thead")].every((t) => getComputedStyle(t).display === "none")'), 'a tabela da ficha não mostra a linha de cabeçalho vazia');
+await av('document.querySelector(".nota-corpo a.link-mapa").click()');
+ok(await esperar('location.hash === "#/mapa/genesis"'), 'e o toque volta ao mapa');
+await voltar();
+ok(await av('location.hash') !== '#/nota/' + encodeURIComponent('03 - Livros da Bíblia/Gênesis'), 'sem empilhar a ficha de novo no histórico');
+
+// ---------- anotações no fim do mapa e do atlas (C26) e o nome dos cartões do atlas (C14) ----------
+await ir('#/mapa/romanos', '!!document.querySelector(".mapa-anotacoes [data-escrever-contexto]")', 15000);
+ok(true, 'o mapa do livro termina com "Escrever nota", como a parábola');
+await ir('#/atlas/abraao', '!!document.querySelector(".atlas-anotacoes [data-escrever-contexto]")', 15000);
+ok(true, 'o mapa do atlas também');
+await av('document.querySelector(".atlas-anotacoes [data-escrever-contexto]").click()');
+ok(await esperar('!!document.querySelector(".folha-editor #campo-nota")') && /Atlas bíblico · Abraão/.test(await av('document.querySelector(".folha-editor").textContent')), 'a nota nova fica ligada ao mapa do atlas');
+await av('document.querySelector(".folha-editor [data-cancelar]").click()');
+await dormir(400);
+await ir('#/atlas', '!!document.querySelector(".item-atlas")', 15000);
+ok(await av('[...document.querySelectorAll(".item-atlas")].every((a) => /^[^.]+\\. /.test(a.getAttribute("aria-label") || "") && a.querySelector(".item-atlas-mapa").getAttribute("aria-hidden") === "true")'), 'cada cartão do atlas tem o título como nome, e o desenho fica escondido do leitor de tela');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');
