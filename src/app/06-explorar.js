@@ -332,7 +332,16 @@
     const s = secaoDe(pasta);
     if (!s) return CC.vazio(raiz, 'Não encontrei essa seção.');
     const [icone, cor] = estilo(pasta);
-    const ids = filtro ? s.ids.filter((id) => D.notas[id].filtro === filtro) : s.ids;
+    let ids = filtro ? s.ids.filter((id) => D.notas[id].filtro === filtro) : s.ids;
+    // Lista em ordem alfabética (Pessoas, Lugares...): sem contar o artigo, "A mulher samaritana"
+    // fica no M, não antes de Abel. Listas em outra ordem (os acontecimentos) ficam como estão (C23).
+    const nomeDe = (id) => CC.semPrefixo(D.notas[id].nome);
+    const semArtigo = (id) => CC.semAcento(nomeDe(id)).replace(/^(o|a|os|as|um|uma) /, '');
+    if (ids.every((id, i) => !i || nomeDe(ids[i - 1]).localeCompare(nomeDe(id), 'pt-BR') <= 0)) {
+      ids = ids.slice().sort((a, b) => semArtigo(a).localeCompare(semArtigo(b), 'pt-BR'));
+    }
+    // lista longa ganha a busca dentro dela
+    const comBusca = ids.length >= 20;
 
     const filtros = s.filtros.length
       ? '<div class="filtros">'
@@ -348,6 +357,8 @@
       + '<div><h1>' + CC.esc(s.rotulo) + '</h1><p>' + CC.esc(s.descricao) + '</p></div></div></div>'
       + CC.tituloSecao(filtro ? FILTRO_LEGIVEL[filtro] || filtro : 'Tudo', CC.plural(ids.length, 'texto', 'textos'))
       + filtros
+      + (comBusca ? '<div class="busca-caixa busca-na-lista">' + CC.ico('lupa') + '<input type="search" data-buscar-lista placeholder="Buscar nesta lista" aria-label="Buscar nesta lista" autocomplete="off" spellcheck="false"></div>'
+        + '<p class="passo-dica" data-lista-vazia hidden>Nada com esse nome nesta lista.</p>' : '')
       + (ids.length ? '<div class="grade">' + ids.map(CC.itemNota).join('') + '</div>'
         : '<div class="vazio">Nada por aqui com esse filtro.</div>')
       + '<div data-notas-contexto="secao:' + CC.esc(pasta) + '"></div>';
@@ -358,6 +369,18 @@
         location.hash = '#/secao/' + encodeURIComponent(pasta) + (f ? '?' + encodeURIComponent(f) : '');
       };
     });
+    const campo = raiz.querySelector('[data-buscar-lista]');
+    if (campo) {
+      campo.oninput = () => {
+        const q = CC.semAcento(campo.value.trim());
+        let vistos = 0;
+        raiz.querySelectorAll('.grade .item').forEach((a) => {
+          a.hidden = !!q && !CC.semAcento(a.textContent).includes(q);
+          if (!a.hidden) vistos++;
+        });
+        raiz.querySelector('[data-lista-vazia]').hidden = vistos > 0;
+      };
+    }
     CC.notasDoContexto(raiz);
     CC.inseparavel(raiz);
   };

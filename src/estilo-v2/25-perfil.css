@@ -350,3 +350,4 @@ a.painel-celula-linha { color: inherit; text-decoration: none; }
 .item-visual .sub { color: var(--salvia-texto); }
 /* A tabela da ficha do livro vem do material com um cabeçalho vazio: some (revisão, C19). */
 .nota-corpo thead:not(:has(th:not(:empty))) { display: none; }
+.busca-na-lista { margin: 0 0 14px; }
