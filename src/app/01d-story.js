@@ -480,7 +480,8 @@
       CC.avisar('Não consegui salvar a imagem agora.');
       return 'falhou';
     }
-    CC.avisar(avisoBaixado || 'Imagem salva. Poste pela galeria no story do Instagram ou no status do WhatsApp.');
+    // diz onde a imagem foi parar: sem a folha do sistema, ela é baixada, não vai para a galeria (C22)
+    CC.avisar(avisoBaixado || 'Imagem baixada: ela fica nos Downloads. De lá, poste no story do Instagram ou no status do WhatsApp.');
     return 'baixado';
   };
 

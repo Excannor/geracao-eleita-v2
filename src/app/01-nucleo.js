@@ -464,6 +464,11 @@ window.CC = window.CC || {};
       el.setAttribute('role', 'status');
       document.body.appendChild(el);
     }
+    // Com uma tela cheia aberta (a carta, o baú), o aviso sobe para cima dos botões dela, em vez
+    // de cobrir o próprio botão que a pessoa acabou de tocar (revisão de usabilidade, C22).
+    const pe = document.querySelector('.tela-cheia:not(.saindo) .tela-cheia-pe:not([hidden])');
+    const topoDoPe = pe ? pe.getBoundingClientRect().top : 0;
+    el.style.bottom = topoDoPe > 0 && topoDoPe < innerHeight ? Math.round(innerHeight - topoDoPe + 10) + 'px' : '';
     el.innerHTML = (tipo ? '<i class="aviso-ico aviso-' + tipo + '">' + CC.ico(tipo === 'erro' ? 'info' : 'certo') + '</i>' : '') + '<span>' + CC.esc(texto) + '</span>';
     // um aviso trocou o outro: bate de leve, para a troca não passar despercebida
     if (!novo) { el.classList.remove('bate'); void el.offsetWidth; el.classList.add('bate'); }
