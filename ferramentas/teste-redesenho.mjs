@@ -371,7 +371,7 @@ await esperar(existe('.tela-toque [data-enviar-toque]'));
 await dormir(700);
 await foto('5a-toque');
 await clicar('.tela-toque [data-enviar-toque]');
-ok(await esperar('/notificado/i.test(' + q('.tela-toque') + '.innerText)'), 'o toque é enviado na tela cheia (botão vira Notificado)');
+ok(await esperar('/toque enviado/i.test(' + q('.tela-toque') + '.innerText)'), 'o toque é enviado na tela cheia (botão vira Toque enviado)');
 ok(((await api('/api/amigos', null, bruno.cookie)).dado.toques || []).some((t) => t.usuario === 'ana.teste'), 'o Bruno recebe o toque');
 await clicar('.tela-toque [data-fechar-tela]');
 await dormir(300);

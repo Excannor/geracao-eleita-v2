@@ -247,6 +247,7 @@ function paraLinhas(d) {
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
       encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '', recado_quando: p.recadoQuando || '',
+      encontro_hora: p.encontroHora || '', encontro_lugar: p.encontroLugar || '',
       // O estudo mora em celula_estudos desde a v19; a célula guarda só o ponteiro. estudo_id tem
       // de estar aqui: sincronizar regrava a linha inteira (INSERT OR REPLACE) só com estas
       // colunas, e sem ele a primeira gravação zeraria o estudo de todas as células. As quatro
@@ -343,6 +344,7 @@ function deLinhas(t, versao) {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
       encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
+      encontroHora: l.encontro_hora || '', encontroLugar: l.encontro_lugar || '',
       estudoId: l.estudo_id || '',
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
       mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '', multiplicadaInstante: l.multiplicada_instante || '',
@@ -1385,10 +1387,22 @@ export class Contas {
     return p;
   }
 
-  async definirEncontro(eu, id, dia) {
+  // hora ('HH:MM' ou '') e lugar (até 80 letras, uma linha) são opcionais: sem o campo no pedido
+  // (o app antigo), ficam como estavam.
+  async definirEncontro(eu, id, dia, { hora, lugar } = {}) {
     const p = this.celulaDeQuemConduz(eu, id);
     const n = Number(dia);
     if (!Number.isInteger(n) || n < -1 || n > 6) throw erro('escolha um dia da semana');
+    if (hora !== undefined && hora !== null) {
+      const h = String(hora);
+      if (h && !/^([01]\d|2[0-3]):[0-5]\d$/.test(h)) throw erro('escolha uma hora válida');
+      p.encontroHora = h;
+    }
+    if (lugar !== undefined && lugar !== null) {
+      const l = String(lugar).replace(/\s+/g, ' ').trim();
+      if (l.length > 80) throw erro('o lugar tem no máximo 80 letras');
+      p.encontroLugar = l;
+    }
     p.encontro = n;
     await this.salvar();
     return p;

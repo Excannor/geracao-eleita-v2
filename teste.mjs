@@ -381,6 +381,9 @@ secao('peças sob demanda');
     checar(celula.includes('mesa-anteriores') && celula.includes('paraQuemFaltou') && celula.includes('@media print') && !html.includes('mesa-anteriores') && !html.includes('mesa-impressao'),
       'os estudos anteriores, "Quem não veio" e a impressão estão na peça estudo-celula, fora do index.html');
     checar(preparo.includes('data-combinado') && !html.includes('data-combinado'), 'o campo do combinado está na peça do preparo, fora do index.html');
+    // As folhas de quem conduz (celula-conduz.js) vão na peça do estudo, para a folga do index
+    checar(celula.includes('CC.celulaConduz =') && celula.includes('Quem foi ao encontro?') && celula.includes('data-todos-vieram') && !html.includes('data-todos-vieram') && !html.includes('data-confirmar-multiplicar'),
+      'as folhas de quem conduz (presença, dia do encontro, recado, multiplicar) estão na peça estudo-celula, fora do index.html');
     checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
       'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
@@ -2795,6 +2798,19 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
   await ce.definirEncontro('lider', ID, 4);
   const OUTRA = (await ce.criarCelula('outro', { titulo: 'Outra' }, '2026-10-01')).id;
   const p = () => ce.proposito(ID);
+  // B12: a hora e o lugar do encontro são opcionais; sem o campo (o app antigo), ficam como estavam
+  {
+    await ce.definirEncontro('lider', ID, 4, { hora: '19:30', lugar: '  Casa   da Ana ' });
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'o encontro guarda a hora e o lugar (uma linha, sem espaço sobrando)');
+    await ce.definirEncontro('lider', ID, 4);
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'marcar o dia sem os campos não apaga a hora nem o lugar');
+    const falha = async (extra) => { try { await ce.definirEncontro('lider', ID, 4, extra); return false; } catch { return true; } };
+    checar(await falha({ hora: '25:00' }) && await falha({ hora: '7h' }) && await falha({ lugar: 'x'.repeat(81) }), 'hora que não existe e lugar com mais de 80 letras são recusados');
+    ce = await new Contas(join(pasta, 'contas.json')).carregar();
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'a hora e o lugar voltam do banco');
+    await ce.definirEncontro('lider', ID, 4, { hora: '', lugar: '' });
+    checar(p().encontroHora === '' && p().encontroLugar === '', 'e podem ser apagados');
+  }
   const fila = () => ce.filaDe(ID).map((x) => x.titulo + '@' + x.agendadoPara).join(' ');
   const linha = (id) => ce.banco().prepare('SELECT * FROM celula_estudos WHERE id = ?').get(id);
 

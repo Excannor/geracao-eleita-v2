@@ -854,6 +854,8 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     // o dia do último encontro registrado (só a data): o cartão "Próximo encontro" pula o de hoje
     // quando ele já foi registrado
     ultimoRegistro: (p.encontros || []).reduce((m, x) => (x && x.data > m ? x.data : m), ''),
+    // a hora e o lugar do encontro, para todos da célula (B12)
+    encontroHora: p.encontroHora || '', encontroLugar: p.encontroLugar || '',
     recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
@@ -1992,7 +1994,7 @@ const servidor = createServer(async (req, res) => {
         }
         if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id, hoje); return {}; }
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
-        if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
+        if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia, { hora: corpo.hora, lugar: corpo.lugar }); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
         if (qual === 'estudo') {
           // Só o líder prepara (contas.mjs, salvarEstudo, dá 403 aos outros). A leitura da semana
@@ -2449,7 +2451,8 @@ const servidor = createServer(async (req, res) => {
     // para a mesma pessoa (a conta fica em memória: reiniciar o servidor só libera de novo).
     if (rota === '/api/cutucar') {
       await acao(async ({ para, tema }) => {
-        const TEMAS = { cafe: 'cutucadaCafe', oracao: 'cutucadaOracao', treino: 'cutucadaTreino' };
+        // falta: o toque de quem conduz para quem faltou ao encontro (pergunta como a pessoa está)
+        const TEMAS = { cafe: 'cutucadaCafe', oracao: 'cutucadaOracao', treino: 'cutucadaTreino', falta: 'cutucadaFalta' };
         if (!TEMAS[tema]) throw Object.assign(new Error('escolha café, oração ou treino'), { publico: true });
         const outro = CONTAS.achar(String(para || ''));
         if (!outro || CONTAS.relacao(eu, outro.usuario) !== 'amigos') throw Object.assign(new Error('só dá para chamar um amigo'), { publico: true, codigo: 403 });

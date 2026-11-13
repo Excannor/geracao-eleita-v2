@@ -397,3 +397,14 @@ button.cartao-proposito:hover { background: var(--campo); }
 .cartao-checkin-dia { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 8px; padding: 14px 16px; border-radius: var(--raio-cartao); background: var(--cartao); }
 .cartao-checkin-dia b { display: block; color: var(--tinta-forte); font-weight: 800; }
 .cartao-checkin-dia small { display: block; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+
+/* "Comece por aqui" do líder de uma célula nova (B10) */
+.comece-aqui { display: grid; gap: 8px; margin-bottom: 14px; padding: 16px; border-radius: var(--raio-cartao); background: var(--cartao); }
+.comece-aqui ol { display: grid; gap: 4px; margin: 0; padding: 0; list-style: none; }
+.comece-aqui li { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; }
+.comece-aqui li + li { border-top: 1px solid var(--contorno); }
+.comece-marca { display: grid; place-items: center; width: 26px; height: 26px; border: 2px solid var(--contorno); border-radius: 50%; }
+.comece-marca svg { width: 16px; height: 16px; }
+.comece-aqui li.feito .comece-marca { border-color: var(--salvia); background: var(--salvia); color: var(--salvia-tinta); }
+.comece-texto { color: var(--tinta-forte); font-weight: 700; line-height: 1.3; }
+.comece-aqui li.feito .comece-texto { color: var(--tinta-fraca); text-decoration: line-through; }
