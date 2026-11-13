@@ -279,6 +279,8 @@ ok(await esperar('location.hash === "#/" && !!document.querySelector(".no, .tril
 await abrir(rotaCelula(), '!!' + q('[data-marcar-caminhada]'));
 await clicar('[data-marcar-caminhada]');
 ok(await esperar('location.hash === "#/perfil/discipulado" && document.querySelectorAll("[data-marco][role=checkbox]").length === 4'), 'C4/D1: o atalho abre Minha caminhada, com 4 caixas de marcar');
+ok(await av('document.querySelector("[data-marco=\\"celula\\"]").getAttribute("aria-checked") === "true" && document.querySelector("[data-marco=\\"batismo\\"]").getAttribute("aria-checked") === "false"'),
+  'B21: "Entrei numa célula" já vem marcado para quem é membro; os outros, não');
 await clicar('[data-marco="batismo"]');
 ok(await esperar('!!' + q('.folha [data-quando]')), 'D1: tocar na caixa abre "Quando foi?"');
 ok(/Só você vê o que marca aqui\./.test(await av('document.querySelector(".folha").textContent')), 'B3: a folha de marcar diz quem vê ("Só você vê o que marca aqui.")');

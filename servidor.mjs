@@ -947,7 +947,7 @@ function painelDaCelula(p, info, ativos, referencia) {
       const x = info.get(m.usuario);
       return {
         usuario: m.usuario, nome: nomeDe(m.usuario),
-        marcos: x.conta.marcos || {}, acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
+        marcos: CONTAS.marcosDe(m.usuario), acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
         caminho: x.conta.caminho || 'plano', passos: new Set((x.estado && x.estado.licoes) || []).size,
       };
     })),
@@ -2085,7 +2085,7 @@ const servidor = createServer(async (req, res) => {
         meusDiscipulos.push({
           id: x.id, usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
           // O último check-in, se for desta semana: um estado de dias atrás já não diz nada.
-          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha,
+          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: CONTAS.marcosDe(outro.usuario), acompanha,
             checkin: ((c) => (c && c.data >= somaDias(referencia, -6) ? c : null))(CONTAS.ultimoCheckin(x.discipulo)) }),
         });
       }
@@ -2106,7 +2106,7 @@ const servidor = createServer(async (req, res) => {
       // aparece em nenhuma das listas acima).
       const algumVinculo = CONTAS.discipuladosDe(eu).some((x) => x.estado === 'ativo' || x.estado === 'convidado');
       const meuCheckin = CONTAS.ultimoCheckin(eu);
-      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, caminhadaCelula: !!conta.caminhadaCelula, algumVinculo, meuCheckin });
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: CONTAS.marcosDe(eu), caminhadaCelula: !!conta.caminhadaCelula, algumVinculo, meuCheckin });
       return;
     }
 

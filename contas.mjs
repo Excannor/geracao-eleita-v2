@@ -2380,6 +2380,21 @@ export class Contas {
   // ---------- minha caminhada (marcos pessoais) ----------
   // Vivem soltos no extra da conta (campo "marcos"), sem coluna própria: é só uma data opcional
   // por marco, e o discipulador só os vê se a pessoa ligar "mostrar marcos".
+  // Os marcos como saem para a tela e para quem a pessoa escolheu mostrar. "Entrei numa célula"
+  // não depende de a pessoa lembrar de marcar: quem é membro ativo de uma célula (visitante não)
+  // já tem a data, a da entrada mais antiga (avaliação de 09/11, B21). A data que a pessoa marcou vale.
+  marcosDe(usuario) {
+    const a = this.achar(usuario);
+    const marcos = { ...((a && a.marcos) || {}) };
+    if (a && !marcos.celula) {
+      const desde = this.propositosDe(a.usuario).filter((p) => p.celula && !p.encerradoEm)
+        .map((p) => p.membros.find((m) => m.usuario === a.usuario && m.estado === 'ativo' && m.papel !== 'visitante'))
+        .filter(Boolean).map((m) => String(m.tornouMembroEm || m.entrouEm || '').slice(0, 10)).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0];
+      if (desde) marcos.celula = desde;
+    }
+    return marcos;
+  }
+
   async definirMarco(eu, chave, data) {
     const a = this.exigirCompleto(eu);
     if (!MARCOS.includes(chave)) throw erro('marco desconhecido');
@@ -2389,7 +2404,7 @@ export class Contas {
     if (d) marcos[chave] = d; else delete marcos[chave];
     a.marcos = marcos;
     await this.salvar();
-    return marcos;
+    return this.marcosDe(a.usuario);
   }
 
   // Quem conduz a minha célula vê a minha etapa de Minha caminhada no painel? Vem desligado, como o

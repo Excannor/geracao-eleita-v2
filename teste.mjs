@@ -381,6 +381,9 @@ secao('peças sob demanda');
     checar(celula.includes('mesa-anteriores') && celula.includes('paraQuemFaltou') && celula.includes('@media print') && !html.includes('mesa-anteriores') && !html.includes('mesa-impressao'),
       'os estudos anteriores, "Quem não veio" e a impressão estão na peça estudo-celula, fora do index.html');
     checar(preparo.includes('data-combinado') && !html.includes('data-combinado'), 'o campo do combinado está na peça do preparo, fora do index.html');
+    // B16 e B17: quem não entrou no desafio em grupo não aparece apagado nem pelo nome, e o convite tem botão
+    checar(!/\.dsf-membro\.fora/.test(html) && !html.includes('Ainda não entrou') && html.includes('data-escolher-desafio-grupo') && html.includes("'convidado', 'convidados'"),
+      'o desafio em grupo conta os convidados sem nome nem opacidade, e o convite leva até a lista de desafios');
     // As folhas de quem conduz (celula-conduz.js) vão na peça do estudo, para a folga do index
     checar(celula.includes('CC.celulaConduz =') && celula.includes('Quem foi ao encontro?') && celula.includes('data-todos-vieram') && !html.includes('data-todos-vieram') && !html.includes('data-confirmar-multiplicar'),
       'as folhas de quem conduz (presença, dia do encontro, recado, multiplicar) estão na peça estudo-celula, fora do index.html');
@@ -2812,6 +2815,14 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
     checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'a hora e o lugar voltam do banco');
     await ce.definirEncontro('lider', ID, 4, { hora: '', lugar: '' });
     checar(p().encontroHora === '' && p().encontroLugar === '', 'e podem ser apagados');
+  }
+  // B21: "Entrei numa célula" já vem com a data da entrada para quem é membro; visitante não
+  {
+    checar(ce.marcosDe('ana').celula === '2026-10-01' && ce.marcosDe('lider').celula === '2026-10-01' && !ce.marcosDe('vera').celula,
+      'quem é membro da célula já tem o marco "Entrei numa célula", com a data da entrada; a visitante não');
+    await ce.definirMarco('ana', 'celula', '2025-03-09');
+    checar(ce.marcosDe('ana').celula === '2025-03-09' && !ce.achar('lider').marcos?.celula, 'a data que a pessoa marcou vale, e nada é gravado por ela');
+    await ce.definirMarco('ana', 'celula', '');
   }
   const fila = () => ce.filaDe(ID).map((x) => x.titulo + '@' + x.agendadoPara).join(' ');
   const linha = (id) => ce.banco().prepare('SELECT * FROM celula_estudos WHERE id = ?').get(id);

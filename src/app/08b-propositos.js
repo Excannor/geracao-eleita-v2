@@ -1068,9 +1068,10 @@
   // Minha caminhada: o atalho fica até a pessoa marcar alguma coisa.
   function blocoCaminhadaHoje() {
     const marcos = CC.meusMarcos ? CC.meusMarcos() : null;
-    if (!marcos || Object.values(marcos).some(Boolean)) return '';
+    // "Entrei numa célula" já vem marcado para quem é membro (B21): o convite olha os outros marcos
+    if (!marcos || Object.entries(marcos).some(([k, v]) => k !== 'celula' && v)) return '';
     return '<div class="bloco-acao bloco-caminhada"><h3>Sua caminhada</h3>'
-      + '<p class="passo-dica pequena">Batismo, decisão, célula: marque o que já aconteceu com você.</p>'
+      + '<p class="passo-dica pequena">Decisão, batismo, discipulado: marque o que já aconteceu com você.</p>'
       + '<div class="acoes-missao"><a class="botao pequeno contorno botao-ir-missao" href="#/perfil/discipulado" data-marcar-caminhada>Marcar minha caminhada' + CC.ico('avancar') + '</a></div></div>';
   }
 
