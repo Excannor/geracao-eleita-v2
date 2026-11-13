@@ -366,7 +366,7 @@
       : '<button class="ler-hoje" data-ler-hoje="' + numero + '" aria-label="' + CC.esc((lidas ? 'Continuar a leitura de hoje: ' : 'Ler hoje: ') + passagemDe(dia) + ', cerca de ' + minutos + ' minutos') + '">'
         + '<span class="redondo-preto" aria-hidden="true">' + CC.ico('folha') + '</span>'
         + '<span class="textos-ler"><b>' + (lidas ? 'Continuar' : 'Ler hoje') + '</b>'
-        + '<span>' + refHtml(passagemDe(dia)) + ' · cerca de ' + minutos + ' min' + (total > 1 && lidas ? ' · ' + lidas + ' de ' + total : '') + '</span></span>'
+        + '<span>' + refHtml(passagemDe(dia)) + '</span><span>cerca de ' + minutos + ' min' + (total > 1 && lidas ? ' · ' + lidas + ' de ' + total + ' lidas' : '') + '</span></span>'
         + CC.ico('avancar') + '</button>';
     // A chama: com a ofensiva em zero, o cartão mostra o que não se perdeu (o recorde ou os dias
     // lidos), e não um zero grande.
@@ -379,7 +379,7 @@
       : '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + ' com a chama acesa, '
         + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
         + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
-        + '<span>' + (seq.atual === 1 ? 'de chama acesa' : 'seguidos de chama') + '</span></span>'
+        + '<span>' + (seq.atual === 0 ? 'Leia hoje para acender' : seq.atual === 1 ? 'de chama acesa' : 'seguidos de chama acesa') + '</span></span>'
         + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>';
     const cartoes = leitura + '<div class="cartoes-hoje leitura-hoje">' + chama + '</div>';
 
