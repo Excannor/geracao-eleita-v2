@@ -607,7 +607,8 @@
       frase = 'O grupo <b>' + CC.esc(d.titulo || 'de vocês') + '</b> chegou a <b>' + CC.plural(Number(d.dias) || 0, 'dia', 'dias') + '</b> de meta batida!';
       arte = CC.icoChama();
     }
-    const reacao = '<button class="botao-reagir' + (ev.euReagi ? ' ligado' : '') + '" data-celebrar="' + CC.esc(ev.id) + '" aria-pressed="' + ev.euReagi + '">'
+    // Ninguém celebra a si mesmo: no próprio cartão fica só quem celebrou (avaliação de 09/11, B20)
+    const reacao = meu ? '' : '<button class="botao-reagir' + (ev.euReagi ? ' ligado' : '') + '" data-celebrar="' + CC.esc(ev.id) + '" aria-pressed="' + ev.euReagi + '">'
       + CC.ico('aperto') + '<b>' + (ev.total || '') + '</b><span class="so-leitor">Celebrar</span></button>';
     const nomes = (ev.quem || []);
     const celebrado = ev.total
@@ -698,7 +699,9 @@
         // O recado e o estudo da célula saíram do Feed: a célula tem aba própria agora, e
         // é lá (Hoje/Estudo) que eles aparecem.
         const eventos = m.eventos || [];
-        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
+        // "Você aceitou o convite de…" não é novidade para a própria pessoa (B20)
+        const euNoFeed = (CC.quem || {}).usuario;
+        const linhaDoTempo = eventos.filter((e) => !(e.tipo === 'novoProposito' && e.autor.usuario === euNoFeed)).map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
             + '<p>Ofensiva, livros terminados, conquistas e os versículos que você compartilhar.</p>'

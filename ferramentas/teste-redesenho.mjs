@@ -428,7 +428,9 @@ ok((await api('/api/novidades/reagir', { id: eventoVersiculo && eventoVersiculo.
 await irPara('#/');
 await dormir(300);
 await irPara('#/novidades');
-ok(await esperar(existe('.mural [data-celebrar]') + ' && /Bruno/.test(' + q('.mural') + '.innerText)'), 'a Ana vê quem celebrou');
+ok(await esperar(existe('.mural .quem-celebrou') + ' && /Bruno/.test(' + q('.mural') + '.innerText)'), 'a Ana vê quem celebrou');
+ok(await av('[...document.querySelectorAll(".mural .item-mural")].every((a) => !/^Você/.test(a.querySelector(".cabeca-mural b").textContent) || (!a.querySelector("[data-celebrar]") && !/Você aceitou/.test(a.textContent)))'),
+  'B20: nos próprios cartões não há "Celebrar", e "Você aceitou o convite" não aparece');
 await dormir(600);
 await foto('5-novidades');
 
