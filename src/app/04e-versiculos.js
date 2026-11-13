@@ -199,6 +199,8 @@
       + '<label class="so-leitor" for="campo-nota">Sua nota</label>'
       + '<textarea id="campo-nota" class="campo-nota" rows="6" maxlength="5000" autocapitalize="sentences">' + CC.esc(st.texto) + '</textarea>'
       + '<p class="ajuda-nota" data-ajuda>' + AJUDA[st.tipo] + '</p>'
+      // aberta de um lugar de todos (o estudo da célula): a nota continua só de quem escreve (B18)
+      + (st.contexto ? '<p class="ajuda-nota" data-so-voce>Só você vê esta anotação.</p>' : '')
       + '<p class="rotulo-editor">Cor</p><div class="cores-marca" role="group" aria-label="Cor da nota" data-cores>' + corHtml() + '</div>'
       + '<p class="rotulo-editor">Tags</p>' + lista('tags', 'tag', 'Nova tag', 'Ex.: graça', ' list="tags-usadas"')
       + '<datalist id="tags-usadas">' + todasAsTags().map((t) => '<option value="' + CC.esc(t) + '">').join('') + '</datalist>'
