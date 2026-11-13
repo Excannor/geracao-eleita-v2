@@ -581,15 +581,28 @@ window.CC = window.CC || {};
   const comHistorico = typeof history !== 'undefined' && typeof addEventListener === 'function';
   const estadoAtual = () => (comHistorico && history.state && typeof history.state === 'object' ? history.state : {});
   const nDoEstado = (st) => (st.sobre && st.sobreSessao === SESSAO_SOBRE ? st.sobre : 0);
+  // Cada entrada do histórico ganha um carimbo crescente (t), na ordem em que foi criada, que é
+  // a ordem dela no histórico: ao cair numa entrada fantasma, o carimbo da entrada de onde se
+  // veio diz o sentido (voltando, pula para trás; avançando, para frente).
+  let ultimoT = 0;
+  let tAtual = 0;
+  const novoT = () => (ultimoT = Math.max(Date.now(), ultimoT + 1));
+  const carimbar = () => {
+    const st = estadoAtual();
+    if (comHistorico && !st.t) { try { history.replaceState({ ...st, t: novoT() }, ''); } catch (e) { /* segue */ } }
+    tAtual = estadoAtual().t || 0;
+  };
   CC.empilharSobreposicao = (el, fecharSemVoltar) => {
     const n = ++contaSobre;
     const st = estadoAtual();
-    const novo = { ...st, sobre: n, sobreSessao: SESSAO_SOBRE };
+    const novo = { ...st, sobre: n, sobreSessao: SESSAO_SOBRE, t: novoT() };
     delete novo.painelMais;
     // a entrada de uma folha que acabou de fechar, ou a do painel do Mais que abriu esta, é reaproveitada
     const reaproveitar = (voltaPendente && nDoEstado(st) === voltaPendente.n) || st.painelMais;
     if (voltaPendente && nDoEstado(st) === voltaPendente.n) { clearTimeout(voltaPendente.timer); voltaPendente = null; }
+    if (reaproveitar && st.t) novo.t = st.t;
     try { if (reaproveitar) history.replaceState(novo, ''); else history.pushState(novo, ''); } catch (e) { /* segue sem histórico */ }
+    tAtual = novo.t;
     const item = { n, href: location.href, fechar: fecharSemVoltar };
     sobrepostas.push(item);
     // link interno de dentro dela: troca a entrada da folha pelo destino
@@ -633,15 +646,18 @@ window.CC = window.CC || {};
     const n = nDoEstado(st);
     // uma entrada de folha que não está mais aberta (fantasma, ou de antes de recarregar): pula
     const fantasma = !!st.sobre && !sobrepostas.some((x) => x.n === n);
+    const deDepois = tAtual > (st.t || 0);
+    tAtual = st.t || 0;
     for (let i = sobrepostas.length - 1; i >= 0; i--) {
       const x = sobrepostas[i];
       if (!fantasma && x.n <= n) continue;
       sobrepostas.splice(i, 1);
       x.fechar();
     }
-    if (fantasma) history.back();
+    if (fantasma) { if (deDepois) history.back(); else history.forward(); }
   });
   if (comHistorico) addEventListener('hashchange', () => {
+    carimbar();
     for (let i = sobrepostas.length - 1; i >= 0; i--) {
       const x = sobrepostas[i];
       if (x.href === location.href) continue;
@@ -651,7 +667,7 @@ window.CC = window.CC || {};
   });
   // Recarregada com uma folha aberta, a página abre na entrada dela: volta para a de baixo,
   // que tem o mesmo endereço (senão o primeiro voltar parecia não fazer nada).
-  if (estadoAtual().sobre) { try { history.back(); } catch (e) { /* segue */ } }
+  if (estadoAtual().sobre) { try { history.back(); } catch (e) { /* segue */ } } else carimbar();
 
   // Substitui o confirm() do navegador, que num aplicativo instalado parece um erro.
   // cancelar: o nome do segundo botão. Com nome próprio ("Sair"), ele vira contorno: as duas

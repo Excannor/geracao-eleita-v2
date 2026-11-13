@@ -138,6 +138,11 @@ await dormir(300);
 await voltar();
 await dormir(300);
 ok(await av('location.hash') === '#/config' && await folhas() === 0, 'fechar e mudar de tela por código: o voltar volta à tela anterior');
+await av('history.forward()');
+await dormir(700);
+ok(await av('location.hash') === '#/explorar', 'e o avançar do navegador passa por cima da entrada fantasma até o Explorar');
+await voltar();
+await dormir(300);
 await voltar();
 ok(await av('location.hash') === '#/perfil/anotacoes', 'e o voltar seguinte não fica preso na mesma tela');
 // trocar de tela pelo endereço fecha a folha
@@ -311,6 +316,21 @@ await ir('#/xyz', '!!document.querySelector(".saidas-vazio")');
 ok(true, 'a página não encontrada também');
 await ir('#/livro/genesis', 'location.hash.startsWith("#/nota/") && !!document.querySelector(".nota-corpo")');
 ok(await av('decodeURIComponent(location.hash)') === '#/nota/03 - Livros da Bíblia/Gênesis', '#/livro/genesis abre a ficha de Gênesis');
+
+// ---------- o aviso não cobre os botões da tela cheia (C22) ----------
+await ir('#/perfil', 'true');
+await av('CC.telaCheia("<p>teste</p>", { pe: "<button class=\\"botao\\">Compartilhar carta</button><button class=\\"botao\\">Continuar</button>", fecharAoNavegar: true }); CC.avisar("Imagem baixada: ela fica nos Downloads."); 0');
+await dormir(400);
+ok(await av('document.getElementById("aviso-flutuante").getBoundingClientRect().bottom <= document.querySelector(".tela-cheia .tela-cheia-pe").getBoundingClientRect().top + 1'), 'com uma tela cheia aberta, o aviso fica acima dos botões dela');
+await voltar();
+ok(await folhas() === 0, 'e o voltar fecha a tela cheia');
+
+// ---------- listas longas do Explorar (C23) ----------
+await ir('#/secao/' + encodeURIComponent('11 - Pessoas'), '!!document.querySelector("[data-buscar-lista]")', 15000);
+const nomesPessoas = await av('[...document.querySelectorAll(".grade .item b")].map((b) => b.textContent)');
+ok(nomesPessoas.indexOf('Abel') > -1 && nomesPessoas.indexOf('A mulher samaritana') > nomesPessoas.indexOf('Abel'), 'em Pessoas, "A mulher samaritana" vem depois de Abel (a ordem ignora o artigo)');
+await av('(() => { const c = document.querySelector("[data-buscar-lista]"); c.value = "davi"; c.dispatchEvent(new Event("input")); })()');
+ok(await av('[...document.querySelectorAll(".grade .item")].filter((a) => !a.hidden).length') >= 1 && await av('[...document.querySelectorAll(".grade .item")].filter((a) => !a.hidden).every((a) => /davi/i.test(a.textContent))'), '"Buscar nesta lista" filtra as pessoas');
 
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
