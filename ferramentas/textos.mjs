@@ -78,9 +78,10 @@ await dormir(600);
 await av('(document.querySelector(".no.atual").click(), document.querySelector(".pop-no [data-comecar]").click())');
 await dormir(700);
 mostrar('LIÇÃO 1 · leitura', await av('document.querySelector(".licao").innerText'));
-await av('document.querySelectorAll("[data-trilha]").forEach((b) => b.click())');
-await dormir(400);
-await av('document.querySelector("[data-concluir]").click()');
+// a lição não marca mais sem ler: "Li na minha Bíblia" conta o dia e abre o dia lido
+await av('document.querySelector(".licao-dia [data-papel]")?.click()');
+await dormir(600);
+await av('document.querySelector(".folha-papel [data-papel-sim]")?.click()');
 await dormir(900);
 mostrar('LIÇÃO 2 · celebração', await av('document.querySelector(".licao").innerText'));
 await av('(async () => { for (let i = 0; i < 14 && !document.querySelector("[data-voltar-trilha]"); i++) { const b = document.querySelector("[data-seguir]"); if (b) b.click(); await new Promise((r) => setTimeout(r, 350)); } return !!document.querySelector(".festa"); })()');

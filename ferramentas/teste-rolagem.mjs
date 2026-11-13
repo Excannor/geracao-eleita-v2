@@ -134,28 +134,25 @@ ok(await esperar('!!(window.CC && CC.quem)', 15000), 'o app abre com a conta');
 console.log('\n  A lição pelo "Reavivar hoje" (o relato do dono)\n');
 ok(await esperar(existe('.cortina [data-ler]'), 15000), 'sem a ofensiva de hoje, a abertura oferece "Reavivar hoje"');
 await clicar('.cortina [data-ler]');
-ok(await esperar(existe('.licao-dia [data-trilha="novo"]') + ' && location.hash === "#/dia/4"'), '"Reavivar hoje" abre a lição do dia 4');
+ok(await esperar(existe('.licao-dia [data-ler="novo"]') + ' && location.hash === "#/dia/4"'), '"Reavivar hoje" abre a lição do dia 4');
 await dormir(400);
-await conferir('marcar a passagem de baixo como lida não leva a lição ao topo', '.licao-dia [data-trilha="novo"]',
-  { palco: '.licao-dia > .licao-palco', pronto: '.licao-dia [data-trilha="novo"][aria-pressed="true"]' });
-await conferir('desmarcar também não', '.licao-dia [data-trilha="novo"]',
-  { palco: '.licao-dia > .licao-palco', pronto: '.licao-dia [data-trilha="novo"][aria-pressed="false"]' });
-await conferir('marcar a de cima, com a lição rolada, não leva ao topo', '.licao-dia [data-trilha="antigo"]',
-  { palco: '.licao-dia > .licao-palco', pronto: '.licao-dia [data-trilha="antigo"][aria-pressed="true"]', minimo: 40 });
-// Terminar a leitura no leitor marca a passagem por baixo: fechado o leitor, a lição está
-// onde a pessoa deixou.
-if (await av(existe('.licao-dia [data-ler="novo"]'))) {
-  const antesLeitor = await descerAte('.licao-dia [data-ler="novo"]', '.licao-dia > .licao-palco');
-  await clicar('.licao-dia [data-ler="novo"]');
-  ok(await esperar(existe('.leitor [data-terminei]')), 'o leitor abre a passagem de baixo');
-  await dormir(400);
-  await clicar('.leitor [data-terminei]');
+// Ler a passagem de baixo no leitor (a leitura cumprida pela porta de teste do portão): fechado o
+// leitor, a passagem ganha o ✓ e a lição está onde a pessoa deixou.
+const lerNoLeitor = async (chave, nome, minimo = 40) => {
+  const antesLeitor = await descerAte('.licao-dia [data-ler="' + chave + '"]', '.licao-dia > .licao-palco');
+  await clicar('.licao-dia [data-ler="' + chave + '"]');
+  await esperar('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())');
+  await dormir(300);
+  await av('CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); 1');
   await esperar('!' + existe('.leitor:not(.saindo)'));
-  await esperar(existe('.licao-dia [data-trilha="novo"][aria-pressed="true"]'));
   await dormir(600);
-  const depoisLeitor = await rolagem('.licao-dia > .licao-palco');
-  ok(antesLeitor > 40 && perto(antesLeitor, depoisLeitor), '"Terminei a leitura" no leitor marca a passagem sem levar a lição ao topo (rolagem ' + Math.round(antesLeitor) + ' → ' + Math.round(depoisLeitor) + ')');
-} else console.log('  --    sem tradução no app, a lição não tem o leitor');
+  if (nome) {
+    const depoisLeitor = await rolagem('.licao-dia > .licao-palco');
+    ok(antesLeitor >= minimo && perto(antesLeitor, depoisLeitor), nome + ' (rolagem ' + Math.round(antesLeitor) + ' → ' + Math.round(depoisLeitor) + ')');
+  }
+};
+await lerNoLeitor('novo', '"Terminei a leitura" no leitor dá o ✓ à passagem sem levar a lição ao topo');
+ok(await av(existe('.licao-dia .passagem.feita[data-ler="novo"]')), 'a passagem lida mostra o ✓');
 // A sincronização com o servidor também redesenha (02-estado.js): a lição continua onde estava.
 const antesSync = await av('(() => { const p = ' + q('.licao-dia > .licao-palco') + '; p.scrollTop = p.scrollHeight; return p.scrollTop; })()');
 await av('CC.redesenhar(), true');
@@ -167,15 +164,13 @@ await av('location.hash = "#/"');
 await esperar('!' + existe('.licao:not(.saindo)'));
 await dormir(500);
 await av('location.hash = "#/dia/5"');
-ok(await esperar(existe('.licao-dia [data-trilha="novo"]') + ' && location.hash === "#/dia/5"'), 'a lição do dia 5 abre');
+ok(await esperar(existe('.licao-dia [data-ler="novo"]') + ' && location.hash === "#/dia/5"'), 'a lição do dia 5 abre');
 ok(await av('(' + q('.licao-dia > .licao-palco') + '.scrollTop) === 0'), 'uma lição nova abre no topo');
-await conferir('marcar a passagem de baixo como lida não leva ao topo', '.licao-dia [data-trilha="novo"]',
-  { palco: '.licao-dia > .licao-palco', pronto: '.licao-dia [data-trilha="novo"][aria-pressed="true"]' });
-await conferir('marcar a de cima e acender o "Concluir o dia" também não', '.licao-dia [data-trilha="antigo"]',
-  { palco: '.licao-dia > .licao-palco', pronto: existe('.licao-dia [data-concluir]:not([disabled])'), minimo: 40 });
-await clicar('.licao-dia [data-concluir]');
-ok(await esperar(existe('.licao-dia.tela-festa')), '"Concluir o dia" passa à reflexão');
-ok(await av(q('.licao-dia > .licao-palco') + '.scrollTop === 0'), 'a reflexão (outra tela da lição) começa no topo');
+await lerNoLeitor('novo', 'ler a passagem de baixo não leva ao topo');
+// a última passagem lida conclui o dia: a lição passa à tela do dia lido
+await lerNoLeitor('antigo', '');
+ok(await esperar(existe('.licao-dia.tela-festa .dia-lido')), 'a última passagem lida passa ao dia lido');
+ok(await av(q('.licao-dia > .licao-palco') + '.scrollTop === 0'), 'o dia lido (outra tela da lição) começa no topo');
 
 
 console.log('\n  O dia do Conhecer Jesus\n');
@@ -228,6 +223,8 @@ const licao = await av('CC.D.licoes[0]');
 await ir('#/nota/' + encodeURIComponent(licao), existe('#fim-da-licao'));
 await descerAte('#fim-da-licao');
 await esperar(existe('[data-concluir]:not([hidden])'));
+// fim do texto e tempo mínimo (CC.portaoDeLeitura): a porta de teste cumpre o tempo
+await av('CC.portaoDaLicao && CC.portaoDaLicao.concluir(); 1');
 await conferir('"Concluí esta lição" no fim do texto', '[data-concluir]', { pronto: existe('#fim-da-licao .conquista-linha') });
 await ir('#/explorar', existe('.cartao-mapas [data-abrir-mapas]'));
 if (await av(existe('[data-comece]:not([open])'))) {

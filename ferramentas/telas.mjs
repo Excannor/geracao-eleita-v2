@@ -142,9 +142,10 @@ for (tema of TEMAS) {
   await ir('#/dia/13', 2500);
   await foto('12-licao-leitura', 'Lição do dia: leitura');
   // a lição inteira: marcar como lido, concluir, as três etapas da reflexão e a celebração
-  await av('document.querySelector("[data-trilha]")?.click()');
+  // a lição não marca mais sem ler: "Li na minha Bíblia" conta o dia e abre o dia lido
+  await av('document.querySelector(".licao-dia [data-papel]")?.click()');
   await dormir(600);
-  await av('document.querySelector("[data-concluir]")?.click()');
+  await av('document.querySelector(".folha-papel [data-papel-sim]")?.click()');
   await dormir(1500);
   await foto('15-licao-guardar', 'Lição: reflexão, guardar o versículo');
   await av('document.querySelector("[data-avancar]")?.click()');
