@@ -353,6 +353,8 @@ secao('peças sob demanda');
     // no index ficam o esqueleto do catálogo, a fusão (02-estado.js) e as cascas
     ['cartas-regras', 'CARTAS_REGRAS', 'PESO_NOVA_ATUAL', '', 'a regra das cartas'],
     ['album', 'ALBUM_CARTAS', 'album-sem-arte', '', 'o álbum das cartas'],
+    // a casca (09d-apoiar.js) fica no index: a tela com o Pix sai
+    ['apoiar', 'APOIAR_TELA', 'br.gov.bcb.pix', '', 'a tela de Apoiar o app'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
