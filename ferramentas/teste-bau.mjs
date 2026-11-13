@@ -380,6 +380,8 @@ try {
   await av('CC.telaBau(56)');
   await esperar('!!document.querySelector(".tela-bau .rv-bau")');
   ok(/Um baú na estrada!/.test(await texto('.tela-bau .album-titulo-bau')), 'fechado, o título "Um baú na estrada!" aparece por cima do baú');
+  ok(await texto('.tela-bau .album-dica-bau') === 'Toque no baú para abrir', 'e logo abaixo, "Toque no baú para abrir"');
+  await capturar('09-bau-fechado', 'claro');
   await terminar('.tela-bau');
   ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva')) && await av('!!CC.estado().bausAbertos["dia:56"] && !!CC.estado().cartas.eventos["bau:dia:56"]'),
     '"Pular" antes do toque vai ao fim e guarda o baú e a carta');

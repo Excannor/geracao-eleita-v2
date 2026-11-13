@@ -187,7 +187,10 @@
     };
     if (temArte(carta)) {
       // a raridade é a da cópia (a Glória também sai por sorte, mais nos marcos)
-      palco.innerHTML = (titulo ? '<h1 class="album-titulo-bau">' + CC.esc(titulo) + '</h1>' : '') + '<div class="album-revela"></div>';
+      // o baú que espera o toque diz que é para tocar (revisão de usabilidade, C24); ele já
+      // chama balançando de tempos em tempos (cartas.css, rv-chama), menos com menos movimento
+      palco.innerHTML = (titulo ? '<h1 class="album-titulo-bau">' + CC.esc(titulo)
+        + (abrir === 'toque' ? '<small class="album-dica-bau">Toque no baú para abrir</small>' : '') + '</h1>' : '') + '<div class="album-revela"></div>';
       const rv = CC.cartas.revelar(palco.querySelector('.album-revela'), carta, { raridade: carta.raridade, legenda: texto.replace(/<[^>]+>/g, ''), abrir,
         largura: Math.round(Math.max(170, Math.min(300, innerWidth - 80, (innerHeight - 300) / 1.4))), aoLer: ler });
       if (abrir === 'toque') {
