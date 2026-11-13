@@ -52,7 +52,7 @@
 .campo-titulo-nota { display: block; width: 100%; min-height: 48px; margin-bottom: 10px; padding: 0 16px; font-weight: 700; }
 .campo-nota:focus, .por-nota input:focus, .campo-titulo-nota:focus { border-color: var(--salvia-texto); outline: none; }
 .ajuda-nota { margin: 8px 0 0; font-size: .875rem; font-weight: 600; }
-.folha p.rotulo-editor { margin: 18px 0 8px; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
+.folha p.rotulo-editor, .folha label.rotulo-editor { display: block; margin: 18px 0 8px; color: var(--tinta-forte); font-size: .9375rem; font-weight: 700; }
 .folha-editor .cores-marca { gap: 12px; }
 .folha-editor [data-apagar] { width: 100%; margin-top: 8px; }
 
