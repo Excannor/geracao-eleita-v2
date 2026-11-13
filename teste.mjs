@@ -355,6 +355,7 @@ secao('peças sob demanda');
     ['album', 'ALBUM_CARTAS', 'album-sem-arte', '', 'o álbum das cartas'],
     // a casca (09d-apoiar.js) fica no index: a tela com o Pix sai
     ['apoiar', 'APOIAR_TELA', 'br.gov.bcb.pix', '', 'a tela de Apoiar o app'],
+    ['historia', 'HISTORIA_TELA', 'campo-historia-', '', 'Minha história com Deus'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {

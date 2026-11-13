@@ -518,6 +518,21 @@ window.CC = window.CC || {};
     }
     return pecas.get(arquivo);
   };
+  // A casca de uma tela que mora numa peça (Apoiar, Minha história com Deus): o título e o
+  // esqueleto até ela chegar, a tela quando chega e, na falha, o recado com "Tentar de novo".
+  // { peca: window.<NOME>, pronta: () => CC.<tela>, titulo, voltar, rota }
+  CC.cascaDaPeca = (raiz, o) => {
+    if (o.pronta()) return o.pronta()(raiz);
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar(o.voltar) + '<h1>' + CC.esc(o.titulo) + '</h1></div>' + CC.esqueleto('cartoes');
+    CC.ligarVoltarDoTopo(raiz);
+    const ainda = () => location.hash.startsWith(o.rota) && raiz.querySelector('.folha-perfil + .esqueleto');
+    CC.pedirPeca(o.peca, () => !!o.pronta()).then(() => { if (ainda()) o.pronta()(raiz); }, () => {
+      if (!ainda()) return;
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir esta tela');
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = () => CC.cascaDaPeca(raiz, o);
+    });
+  };
   // A falha de uma peça, no azulejo das parábolas: o que houve e o "Tentar de novo".
   CC.estadoSemPeca = (titulo) => {
     const semRede = navigator.onLine === false;
