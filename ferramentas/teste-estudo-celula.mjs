@@ -614,6 +614,34 @@ const hoje = await av('new Date(CC.hojeIso() + "T12:00:00").getDay()');
 await pedir('api/celula', { acao: 'encontro', id: ID, dia: hoje }, lider);
 await como(ana, rota());
 ok(await esperar('/Encontro hoje · veja o estudo/.test(document.querySelector(".painel-celula")?.textContent || "")', 15000), '15. com estudo, a Ana vê "Encontro hoje · veja o estudo"');
+// B7 e B8: o registro no alto no dia do encontro, a folha de presença e o lembrete do "Concluir"
+await como(lider, rota());
+ok(await esperar(existe('.registro-no-alto [data-registrar-encontro]'), 15000) && await av('document.querySelector(".registro-no-alto").getBoundingClientRect().top < 500'),
+  '15. no dia do encontro, sem registro, "Registrar o encontro" é o primeiro cartão da aba Hoje');
+await clicar('.registro-no-alto [data-registrar-encontro]');
+ok(await esperar(existe('.folha-presenca [data-todos-vieram]')), '15. a folha de presença tem "Todos vieram"');
+const pres = await na(() => {
+  const f = document.querySelector('.folha-presenca');
+  const lista = f.querySelector('.escolha-amigos');
+  f.querySelector('[data-todos-vieram]').click();
+  const caixas = [...f.querySelectorAll('.escolha-amigo input')];
+  return { umaRolagem: getComputedStyle(lista).overflowY === 'visible', todos: caixas.every((i) => i.checked), n: caixas.length,
+    salvar: f.querySelector('[data-salvar]').textContent, pe: getComputedStyle(f.querySelector('.presenca-pe')).position,
+    primeiro: f.querySelector('.escolha-amigo .selo-lider')?.textContent || '' };
+});
+ok(pres.umaRolagem && pres.todos && pres.salvar === 'Salvar · ' + pres.n + ' pessoas' && pres.pe === 'sticky' && pres.primeiro === 'líder',
+  '15. uma rolagem só, "Todos vieram" marca todos, o "Salvar" fica preso embaixo e conta as pessoas, e o líder vem primeiro (' + JSON.stringify(pres) + ')');
+await clicar('.folha-presenca [data-fechar]');
+await esperar('!document.querySelector(".folha-presenca")');
+await como(lider, rota('estudo'));
+await esperar(existe('[data-modo-encontro]'), 15000);
+await clicar('[data-modo-encontro]');
+await esperar(existe('.tela-cheia [data-indice]'), 15000);
+for (let i = 0; i < 20 && await av('!' + q('.tela-cheia [data-proximo]') + '.hidden'); i++) await clicar('.tela-cheia [data-proximo]');
+await clicar('.tela-cheia [data-concluir]');
+ok(await esperar('/Registrar quem veio agora\\?/.test(document.querySelector(".cortina h2")?.textContent || "")'), '15. "Concluir" do líder, sem o encontro registrado, pergunta "Registrar quem veio agora?"');
+await clicar('.cortina [data-nao]');
+await esperar('!document.querySelector(".cortina")');
 await como(lider, rota('estudo'));
 await esperar(existe('[data-mudar]'), 15000);
 // um rascunho da mesma base, mas de antes de uma gravação feita em outro aparelho, não volta

@@ -272,7 +272,6 @@
   }
 
   function estadoMembro(m, g) {
-    if (!m.entrou) return 'Ainda não entrou';
     if (m.concluido) return 'Concluiu os ' + g.dias + ' dias';
     if (m.venceuHoje) return CC.ico('certo') + 'Venceu hoje';
     if (m.escapou) return 'Escapou ontem';
@@ -286,11 +285,16 @@
     const membros = g.membros.map((m) => (m.eu ? euAgora(m, g) : m));
     const eu = membros.find((m) => m.eu) || euAgora({}, g);
     const numero = Math.min(g.dias, eu.vencidos + (eu.venceuHoje ? 0 : 1));
-    const linhas = membros.map((m) => '<li class="dsf-membro' + (m.venceuHoje ? ' venceu' : '') + (m.entrou ? '' : ' fora') + (m.escapou && !m.venceuHoje ? ' escapou' : '') + '">'
+    // Só quem já entrou aparece com o nome; quem ainda não entrou vira uma conta no fim
+    // ("e mais 6 convidados"), sem nome e sem opacidade (avaliação de 09/11, B16).
+    const dentro = membros.filter((m) => m.entrou);
+    const convidados = membros.length - dentro.length;
+    const linhas = dentro.map((m) => '<li class="dsf-membro' + (m.venceuHoje ? ' venceu' : '') + (m.escapou && !m.venceuHoje ? ' escapou' : '') + '">'
       + CC.retratoAmigo(m, 'mini') + '<span class="dsf-membro-txt"><b>' + CC.esc(String(m.nome).split(' ')[0]) + (m.eu ? ' (você)' : '') + '</b>'
       + '<small>' + estadoMembro(m, g) + (m.entrou && m.escapados ? ' · ' + CC.plural(m.escapados, 'dia escapado', 'dias escapados') : '') + '</small></span>'
-      + '<span class="dsf-membro-n">' + m.vencidos + '/' + g.dias + '</span></li>').join('');
-    const venceram = membros.filter((m) => m.venceuHoje).length;
+      + '<span class="dsf-membro-n">' + m.vencidos + '/' + g.dias + '</span></li>').join('')
+      + (convidados ? '<li class="dsf-membro dsf-convidados"><span class="dsf-membro-txt"><small>' + (dentro.length ? 'E mais ' : '') + CC.plural(convidados, 'convidado', 'convidados') + (dentro.length ? '' : ', ninguém entrou ainda') + '</small></span></li>' : '');
+    const venceram = dentro.filter((m) => m.venceuHoje).length;
     const acao = eu.concluido ? '<span class="dsf-acao feito">' + CC.ico('trofeu') + 'Você concluiu</span>'
       : eu.venceuHoje ? '<span class="dsf-acao feito">' + vencido() + '</span>'
         : eu.entrou || registro(g.desafio)?.concluidoEm ? '<button type="button" class="dsf-acao" data-vencer-grupo="' + g.desafio + '">Vencer o dia de hoje</button>'
@@ -299,7 +303,7 @@
       + '<span class="dsf-topo"><span class="dsf-linha"><span class="dsf-selo">' + CC.ico(gr.tipo === 'celula' ? 'pessoas' : 'aperto') + CC.esc(gr.nome) + '</span>'
       + '<span class="dsf-dias">Dia ' + Math.max(1, g.dia) + ' de ' + g.dias + '</span></span>'
       + '<b class="dsf-nome">' + nb(g.titulo) + '</b></span>'
-      + '<span class="dsf-corpo"><span class="dsf-placar">' + venceram + ' de ' + membros.length + ' venceram hoje</span>'
+      + '<span class="dsf-corpo"><span class="dsf-placar">' + (dentro.length ? venceram + ' de ' + dentro.length + (venceram === 1 ? ' venceu hoje' : ' venceram hoje') : 'O desafio está esperando o primeiro') + '</span>'
       + '<ul class="dsf-membros">' + linhas + '</ul>' + acao
       + (eu.entrou && !eu.concluido ? '<a class="link-nota dsf-estudo-link" href="' + CC.hrefDoVerso(d.estudos[numero - 1][0]) + '">' + CC.ico('livro') + 'Estudo do dia ' + numero + ': ' + nb(d.estudos[numero - 1][0]) + '</a>' : '')
       + (g.podeEncerrar ? '<button type="button" class="link-nota dsf-encerrar" data-encerrar-grupo="' + CC.esc(g.id) + '" data-tipo="' + gr.tipo + '" data-grupo="' + CC.esc(gr.grupo) + '">Encerrar o desafio do grupo</button>' : '')
@@ -316,11 +320,22 @@
     return '<div class="titulo-bloco"><h2>Desafios em grupo</h2></div>' + abertos.map(cartaoGrupo).join('')
       + (podeComecar.length ? '<div class="missao-convite"><span class="icone-missao">' + CC.ico('pessoas') + '</span>'
         + '<p>Faça um desafio de consagração junto com ' + (podeComecar.length === 1 ? CC.esc(nomeDoGrupo(podeComecar[0])) : 'a sua célula ou o seu discipulado')
-        + '.</p></div>' : '');
+        + '.</p><button type="button" class="botao pequeno contorno" data-escolher-desafio-grupo>' + CC.ico('bandeira') + 'Escolher um desafio</button></div>' : '');
   };
   const nomeDoGrupo = (g) => (g.tipo === 'celula' ? (/^c[ée]lula\b/i.test(g.nome) ? 'a ' : 'a célula ') + g.nome : g.nome.replace(/^Você e /, ''));
 
   CC.ligarDesafiosDoGrupo = function (raiz, redesenhar) {
+    // o caminho até "Fazer junto": desce até a lista de desafios e diz o próximo passo (B17)
+    raiz.querySelectorAll('[data-escolher-desafio-grupo]').forEach((b) => {
+      b.onclick = () => {
+        const lista = document.querySelector('#desafios-longos .dsf-lista') || document.getElementById('desafios-longos');
+        if (!lista) return;
+        lista.scrollIntoView({ behavior: CC.semMovimento && CC.semMovimento() ? 'auto' : 'smooth', block: 'start' });
+        const primeiro = lista.querySelector('button, a');
+        if (primeiro) primeiro.focus({ preventScroll: true });
+        CC.avisar('Abra um desafio e escolha com quem em "Fazer junto".');
+      };
+    });
     const marcar = (id, ativar) => {
       const hoje = CC.hojeIso();
       gravarRegistro(id, (r) => {

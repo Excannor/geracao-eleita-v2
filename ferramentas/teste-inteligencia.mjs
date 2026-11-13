@@ -331,6 +331,9 @@ try {
   await pedir('/api/discipulado', { acao: 'marco', chave: 'decisao', data: HOJE }, ana.cookie);
   await pedir('/api/discipulado', { acao: 'marco', chave: 'batismo', data: '2024-05-05' }, bia.cookie);
   await pedir('/api/discipulado', { acao: 'marco', chave: 'discipula', data: '2025-01-10' }, lider.cookie);
+  // quem conduz só vê a etapa de quem ligou "Quem conduz a minha célula vê" (B3 da avaliação de
+  // 09/11); a Dora não liga
+  for (const c of [ana, bia, caio, lider]) await pedir('/api/discipulado', { acao: 'caminhadaCelula', sim: true }, c.cookie);
   // dois encontros e uma semana sem encontro
   await pedir('/api/celula', { acao: 'registrarEncontro', id, data: somaDias(HOJE, -6), presentes: ['lider', 'ana', 'bia', 'caio'], visitantes: 0 }, lider.cookie);
   await pedir('/api/celula', { acao: 'registrarEncontro', id, data: somaDias(HOJE, -3), semEncontro: true }, lider.cookie);
@@ -349,8 +352,10 @@ try {
     'a frequência: 4 pessoas, semana sem encontro, 6 pessoas (5 com conta, inclusive a visitante, mais 1 sem conta)');
   ok(pc.frequencia.tendencia === 'subindo' && pc.frequencia.diferenca === 2, 'tendência: 2 a mais que o encontro anterior');
   const funilPor = Object.fromEntries(pc.funil.map((x) => [x.etapa, x.pessoas]));
-  ok(funilPor.comecando === 2 && funilPor.decidiu === 1 && funilPor.batizado === 1 && funilPor.acompanha === 1, 'o funil: 2 começando (Caio, Dora), 1 decidiu (Ana), 1 batizada (Bia), 1 acompanha (o líder)');
-  ok(pc.funil.find((x) => x.etapa === 'comecando').nomes.map((x) => x.nome).join(',') === 'caio,dora' && pc.funil.find((x) => x.etapa === 'batizado').nomes[0].usuario === 'bia', 'cada etapa do funil leva os nomes de quem está nela');
+  ok(funilPor.comecando === 1 && funilPor.decidiu === 1 && funilPor.batizado === 1 && funilPor.acompanha === 1 && pc.caminhadaOculta === 1,
+    'o funil: 1 começando (Caio), 1 decidiu (Ana), 1 batizada (Bia), 1 acompanha (o líder); a Dora, que não ligou "Quem conduz a minha célula vê", só na conta de quem não mostra');
+  ok(pc.funil.find((x) => x.etapa === 'comecando').nomes.map((x) => x.nome).join(',') === 'caio' && pc.funil.find((x) => x.etapa === 'batizado').nomes[0].usuario === 'bia'
+    && !JSON.stringify(pc.funil).includes('dora'), 'cada etapa do funil leva os nomes de quem está nela, e o de quem não mostra não aparece');
   ok(pc.saude && !pc.saude.suficiente && pc.saude.base === 0 && pc.saude.minimo === 3, 'o check-in da célula somado: sem check-in ainda, só a base e o mínimo');
   // Todos entraram na célula hoje: quem chega no dia não "faltou" ao encontro de hoje (regra de
   // propositos.mjs), então aqui só valem os gatilhos de leitura.
@@ -428,7 +433,7 @@ try {
   const cabCelulas = linhasCsv.find((l) => l.startsWith('Células;Célula;'));
   ok(cabCelulas && cabCelulas.startsWith('Células;Célula;Líder;Pessoas;Chama acesa;Chama (%);Frequência média (4 semanas);Dando os primeiros passos;Decidiram seguir Jesus;Já se batizaram;Acompanham alguém na fé;Check-in: pessoas;Corpo em baixa'), 'o bloco das células tem as colunas esperadas');
   // Caio acabou de ler hoje (o PUT acima): a chama da célula está em 4 de 5.
-  ok(linhasCsv.includes('Células;Célula de quinta;lider;6;4;80;5;2;1;1;1;5;1;3;1'), 'a linha da célula: líder, 6 pessoas, 4 acesos (80%), 5 por encontro, funil 2·1·1·1 e o check-in somado (5 pessoas; 1, 3 e 1 em baixa)');
+  ok(linhasCsv.includes('Células;Célula de quinta;lider;6;4;80;5;1;1;1;1;5;1;3;1'), 'a linha da célula: líder, 6 pessoas, 4 acesos (80%), 5 por encontro, funil 1·1·1·1 (a Dora não mostra a caminhada) e o check-in somado (5 pessoas; 1, 3 e 1 em baixa)');
   const linhaBia = linhasCsv.find((l) => l.startsWith('Pessoas;Célula de quinta;bia;'));
   ok(linhaBia && /^Pessoas;Célula de quinta;bia;apagada;0;Já se batizaram;.*presente;perdeu uma ofensiva de 40 dias e não lê há 4 dias$/.test(linhaBia), 'uma linha por pessoa: chama, dias, etapa, presença e o alerta');
   ok(!/segredo|"oia"|corpo"/.test(csv) && linhasCsv.filter((l) => l.startsWith('Pessoas;')).every((l) => l.split(';').length === 8), 'nada do que alguém escreveu no CSV, e a linha de cada pessoa não leva check-in (só as 8 colunas)');

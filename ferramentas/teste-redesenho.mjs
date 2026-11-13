@@ -371,7 +371,7 @@ await esperar(existe('.tela-toque [data-enviar-toque]'));
 await dormir(700);
 await foto('5a-toque');
 await clicar('.tela-toque [data-enviar-toque]');
-ok(await esperar('/notificado/i.test(' + q('.tela-toque') + '.innerText)'), 'o toque é enviado na tela cheia (botão vira Notificado)');
+ok(await esperar('/toque enviado/i.test(' + q('.tela-toque') + '.innerText)'), 'o toque é enviado na tela cheia (botão vira Toque enviado)');
 ok(((await api('/api/amigos', null, bruno.cookie)).dado.toques || []).some((t) => t.usuario === 'ana.teste'), 'o Bruno recebe o toque');
 await clicar('.tela-toque [data-fechar-tela]');
 await dormir(300);
@@ -428,7 +428,9 @@ ok((await api('/api/novidades/reagir', { id: eventoVersiculo && eventoVersiculo.
 await irPara('#/');
 await dormir(300);
 await irPara('#/novidades');
-ok(await esperar(existe('.mural [data-celebrar]') + ' && /Bruno/.test(' + q('.mural') + '.innerText)'), 'a Ana vê quem celebrou');
+ok(await esperar(existe('.mural .quem-celebrou') + ' && /Bruno/.test(' + q('.mural') + '.innerText)'), 'a Ana vê quem celebrou');
+ok(await av('[...document.querySelectorAll(".mural .item-mural")].every((a) => !/^Você/.test(a.querySelector(".cabeca-mural b").textContent) || (!a.querySelector("[data-celebrar]") && !/Você aceitou/.test(a.textContent)))'),
+  'B20: nos próprios cartões não há "Celebrar", e "Você aceitou o convite" não aparece');
 await dormir(600);
 await foto('5-novidades');
 

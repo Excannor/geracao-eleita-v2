@@ -388,7 +388,7 @@ console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
 const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album'];
-const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
+const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js', 'celula-conduz.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = (PARTES_PECA[nome] || [nome + '.js']).map((f) => enxugarJs(readFileSync(src('sob-demanda', f), 'utf8'), f)).join('\n');

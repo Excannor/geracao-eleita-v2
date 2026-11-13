@@ -30,12 +30,13 @@ const somaDias = (texto, n) => {
 };
 
 // O que o discípulo escolhe mostrar: só os três interruptores, nunca outra chave e nunca texto.
-// O check-in (Corpo, Mente, Espírito) vem ligado, inclusive nos vínculos antigos que ainda não
-// têm a chave: só sai se o discípulo desligar.
-export const MOSTRAR_PADRAO = { passos: true, semana: true, marcos: false, checkin: true };
+// O check-in (Corpo, Mente, Espírito) é dado emocional: vem desligado e só sai se o discípulo
+// ligar, no aceite ou em "O que eu mostro" (avaliação de 09/11, B5). O vínculo antigo sem a chave
+// também fica desligado.
+export const MOSTRAR_PADRAO = { passos: true, semana: true, marcos: false, checkin: false };
 export function mostrarValido(m) {
   const o = m || {};
-  return { passos: !!o.passos, semana: !!o.semana, marcos: !!o.marcos, checkin: o.checkin !== false };
+  return { passos: !!o.passos, semana: !!o.semana, marcos: !!o.marcos, checkin: o.checkin === true };
 }
 
 // Em quantos dos últimos 7 dias (hoje incluso) a pessoa fez alguma leitura. O "Power of 4" só

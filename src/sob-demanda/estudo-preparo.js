@@ -310,9 +310,10 @@
     // Por que o estudo não cabe num encontro, em uma frase, ou '' quando cabe.
     function porQueNaoCabe(r) {
       const cartoes = r.blocos.filter((b) => b.t === 'versiculo').length;
-      if (r.blocos.length > BLOCOS_MAX) return 'Ele tem ' + r.blocos.length + ' partes, e cada encontro leva até ' + BLOCOS_MAX + '.';
+      // na língua de quem conduz, sem contar "partes" (avaliação de 09/11, B13)
+      if (r.blocos.length > BLOCOS_MAX) return 'Ele é longo para um encontro só.';
       if (cartoes > CARTOES_MAX) return 'Ele tem ' + cartoes + ' versículos, e cada encontro leva até ' + CARTOES_MAX + '.';
-      if (r.fonte.length > ESTUDO_MAX || st.fonte.length > ESTUDO_BRUTO_MAX) return 'Ele tem ' + Math.max(r.fonte.length, st.fonte.length).toLocaleString('pt-BR') + ' caracteres, e cada encontro leva até ' + ESTUDO_MAX.toLocaleString('pt-BR') + '.';
+      if (r.fonte.length > ESTUDO_MAX || st.fonte.length > ESTUDO_BRUTO_MAX) return 'Ele é longo para um encontro só.';
       return '';
     }
     // A prévia da divisão, numa folha: cada encontro com o título, onde começa e o tamanho. Só em
@@ -410,7 +411,9 @@
         + '<button class="botao plano" data-cancelar>Cancelar</button>'
         + (p.estudo && !st.deBase && !modo ? '<button class="botao plano perigo" data-tirar>Tirar o estudo</button>' : '')
         + (modo === 'fila' ? '<button class="botao plano perigo" data-tirar-da-fila>Tirar dos próximos</button>' : '')
-        + (st.deBase || modo === 'novo' ? '<button class="botao plano perigo" data-descartar>Descartar o rascunho</button>' : '') + '</div>');
+        // o estudo novo ainda em branco não tem rascunho para descartar: o botão aparece ao escrever (B22)
+        + (st.deBase || modo === 'novo' ? '<button class="botao plano perigo" data-descartar' + (st.deBase || st.fonte.trim() || st.palavra.trim() || st.tipo !== 'blocos' ? '' : ' hidden') + '>Descartar o rascunho</button>' : '') + '</div>');
+      painel.addEventListener('input', () => { const d = painel.querySelector('[data-descartar]'); if (d) d.hidden = false; });
       ligarDivisao(painel);
       const q = (s) => painel.querySelector(s);
       painel.querySelectorAll('[data-tipo]').forEach((b) => {
@@ -910,7 +913,10 @@
           : '<div class="mesa-ws"><header><b>Acolhida, adoração e testemunho</b><button type="button" class="botao pequeno contorno" data-mudar-ws>Mudar</button></header><dl>'
           + [['acolhida', 'Acolhida'], ['adoracao', 'Adoração'], ['testemunho', 'Testemunho']].map(([k, r]) => '<dt>' + r + '</dt><dd>' + esc(valorW(k) || sugestaoW[k]()) + '</dd>').join('') + '</dl></div>')
         + quandoHtml()
-        + '<p class="mesa-nota">' + CC.ico(naFila() ? 'calendario' : 'pessoas') + (naFila() ? 'Ele entra na aba Estudo depois do encontro anterior.' : 'Ao salvar, a célula vê o estudo na aba Estudo.') + '</p>'
+        // escolhido "Agendar", a opção já diz quando ele entra: a nota não repete (B22)
+        + (modo !== 'fila' && st.quando === 'agendar' ? '' : '<p class="mesa-nota">' + CC.ico(naFila() ? 'calendario' : 'pessoas') + (naFila() ? 'Ele entra na aba Estudo depois do encontro anterior.'
+          : st.divisao ? 'Ao salvar, a célula vê a parte 1 na aba Estudo. ' + (st.divisao.total === 2 ? 'A parte 2 fica' : 'As outras partes ficam') + ' nos próximos estudos, para ' + (st.divisao.total === 2 ? 'o encontro seguinte.' : 'os encontros seguintes.')
+          : 'Ao salvar, a célula vê o estudo na aba Estudo.') + '</p>')
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico(st.quando === 'agendar' ? 'calendario' : 'certo') + (st.quando === 'agendar' ? 'Agendar o estudo' : 'Salvar o estudo') + '</button>'
         + '<button class="botao plano" data-voltar-partes>Voltar às partes</button></div>';

@@ -10,7 +10,8 @@
 //   D. a migração: o celular que ainda guarda a parte 2 de um estudo dividido mostra o cartão, e
 //      "Pôr nos próximos estudos" a leva para a fila do servidor.
 // O dia do encontro de cada célula é o dia da semana de hoje: o primeiro da fila é sempre de daqui a
-// 7 dias, e o encontro registrado hoje o promove, em qualquer dia em que o teste rodar.
+// 7 dias. O encontro registrado hoje só o promove amanhã (a célula ainda pode estar reunida); o
+// teste confere isso e põe o próximo pelo "Usar agora", em qualquer dia em que rodar.
 // Uso: CHROME=<chrome> node ferramentas/teste-estudo-fila.mjs
 //   PORTA=<porta do servidor> (8396), PORTAS=<faixa> para o Chrome, FOTOS=<pasta> guarda as capturas,
 //   RAPIDO=1 pula as medidas nos quatro tamanhos e temas, SO_API=1 roda só a parte A.
@@ -153,7 +154,11 @@ const semConfirmar = await pedir('api/celula', { acao: 'filaUsar', id: ID, estud
 ok(semConfirmar.status === 409 && semConfirmar.dado.precisaConfirmar === true && (await celulaDe(lider, ID)).estudo.id === A, 'A. "Usar agora" por cima do atual sem uso pede confirmação (409), e nada muda');
 
 const reg = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: HOJE, presentes: ['lider', 'ana'], visitantes: 0, estudo: A }, lider);
-ok(reg.status === 200 && reg.dado.promovido && reg.dado.promovido.id === B, 'A. registrado o encontro com o atual, a resposta diz que B entrou na célula');
+ok(reg.status === 200 && reg.dado.promovido === null && reg.dado.amanha && reg.dado.amanha.id === B, 'A. registrado o encontro de hoje com o atual, B não entra no meio do encontro: a resposta diz que ele entra amanhã');
+ok((await celulaDe(ana, ID)).estudo.id === A, 'A. a Ana continua vendo A durante o encontro');
+// o líder pode pôr o próximo já, de propósito ("Usar agora"): o atual já teve o encontro, sem confirmar
+const usar = await pedir('api/celula', { acao: 'filaUsar', id: ID, estudo: B }, lider);
+ok(usar.status === 200 && usar.dado.promovido && usar.dado.promovido.id === B, 'A. "Usar agora" depois do registro põe B sem pedir confirmação');
 const depois = await celulaDe(ana, ID);
 ok(depois.estudo.id === B && depois.estudo.titulo === 'Estudo B', 'A. a Ana já vê B como o estudo da célula');
 ok((await pedir('api/estudos?celula=' + encodeURIComponent(ID), null, ana)).dado.estudos.map((x) => x.id).join() === A, 'A. e A em Estudos anteriores');
@@ -329,7 +334,9 @@ async function agendarPelaTela(titulo, data, rotuloFoto) {
   ok(await esperar(existe('[data-agendar]'), 15000), 'B. a seção tem "Agendar um estudo"');
   await clicar('[data-agendar]');
   ok(await esperar(existe('[data-fonte]') + ' && /\\/preparar\\/novo$/.test(location.hash)', 15000), 'B. "Agendar um estudo" abre o preparo de um estudo novo (…/preparar/novo)');
+  const descartarAntes = await na(() => document.querySelector('[data-descartar]').hidden);
   await na((t) => { const c = document.querySelector('[data-fonte]'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, texto(titulo));
+  ok(descartarAntes === true && await na(() => document.querySelector('[data-descartar]').hidden) === false, 'B22. "Descartar o rascunho" só aparece depois que o líder escreve');
   await clicar('[data-ver]');
   ok(await esperar(existe('[data-continuar]') + ' && !' + q('[data-continuar]') + '.disabled', 15000), 'B. as partes conferidas');
   await clicar('[data-continuar]');
@@ -340,6 +347,7 @@ async function agendarPelaTela(titulo, data, rotuloFoto) {
     botao: document.querySelector('[data-salvar]').textContent.trim(),
     ws: !!document.querySelector('.mesa-ws'),
   }));
+  ok((await na(() => document.querySelector('#conteudo').textContent.split('ntra na aba Estudo depois do encontro anterior.').length - 1)) === 1, 'B22. "Entra na aba Estudo depois do encontro anterior." aparece uma vez só');
   ok(quando.marcado === 'agendar' && quando.botao === 'Agendar o estudo' && !quando.ws, 'B. vem marcado "Agendar", o botão diz "Agendar o estudo", e sem o cartão dos 4 Ws (' + JSON.stringify(quando) + ')');
   if (data) {
     await na((d) => { const c = document.querySelector('[data-data-fila]'); c.value = d; c.dispatchEvent(new Event('change', { bubbles: true })); return true; }, data);
@@ -418,11 +426,27 @@ ok(await esperar(existe('.cortina [data-salvar]')), 'B. a folha "Quem foi ao enc
 ok((await textoDe('.cortina [data-estudo-escolhido]')) === TA, 'B. com o estudo atual escolhido, e nada da fila na folha');
 ok(!(await textoDe('.cortina .folha')).includes(TC), 'B. a folha não oferece um estudo da fila');
 await clicar('.cortina [data-salvar]');
-ok(await esperar('/O próximo estudo já está na aba Estudo/.test(document.getElementById("aviso-flutuante")?.textContent || "")', 15000), 'B. o aviso: "Encontro registrado. O próximo estudo já está na aba Estudo."');
+ok(await esperar('/Amanhã, o próximo estudo entra na aba Estudo/.test(document.getElementById("aviso-flutuante")?.textContent || "")', 15000), 'B. o aviso: "Presença salva. Amanhã, o próximo estudo entra na aba Estudo."');
+await como(marcos, rota('estudo'), { limpar: false });
+ok(await esperar('/' + TA + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'B. no dia do encontro, ' + TA + ' continua na aba');
+const cartaoEnc = await textoDe('.cartao-encontro');
+ok(!/Hoje/.test(cartaoEnc) && cartaoEnc.includes(Number(D7.slice(8, 10)) + '/' + Number(D7.slice(5, 7))), 'B. com o encontro de hoje registrado, "Próximo encontro" mostra o da semana que vem (' + cartaoEnc + ')');
+const naAba = await textoDe('#conteudo');
+ok(naAba.includes('Para o encontro de ' + longa(HOJE)) && !naAba.includes('Encontro hoje · veja o estudo'), 'B. a legenda do estudo segue a de hoje, e o selo "Encontro hoje" some');
+// o dia seguinte não se simula aqui: o líder põe o próximo de propósito ("Usar agora")
+const cabecaJ = (await celulaDe(marcos, JD)).fila[0];
+ok(cabecaJ.titulo === TC && (await pedir('api/celula', { acao: 'filaUsar', id: JD, estudo: cabecaJ.id }, marcos)).status === 200, 'B. "Usar agora" põe ' + TC);
 await como(marcos, rota('estudo'), { limpar: false });
 ok(await esperar('/' + TC + '/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), 'B. ' + TC + ' é o estudo da aba');
 ok(await esperar(existe('.mesa-anterior'), 15000) && (await textoDe('.mesa-anteriores')).includes(TA), 'B. ' + TA + ' está em Estudos anteriores');
 ok((await textoDe('.mesa-lider .mesa-fila')) === 'Próximo: ' + TB + ' · ' + curta(D14) && (await na(() => document.querySelectorAll('.mesa-proximo').length)) === 1, 'B. a fila fica com ' + TB);
+const atalhos = await na(() => { const a = document.querySelector('.mesa-atalhos'); if (!a) return null; const y = (el) => el.getBoundingClientRect().top + scrollY;
+  return { y: Math.round(y(a)), estudo: Math.round(y(document.querySelector('.mesa-estudo'))), texto: a.textContent.replace(/\s+/g, ' ').trim() }; });
+ok(atalhos && atalhos.y < 700 && atalhos.y < atalhos.estudo && /Modo encontro/.test(atalhos.texto) && /Mandar no grupo/.test(atalhos.texto) && /Próximos estudos \(1\)/.test(atalhos.texto),
+  'B. no alto da aba, antes do estudo, os atalhos de quem conduz: Modo encontro, Mandar no grupo e Próximos estudos (1) (' + JSON.stringify(atalhos) + ')');
+await clicar('[data-ir-proximos]');
+ok(await esperar('(() => { const t = document.querySelector("[data-proximos-ancora]").getBoundingClientRect().top; return scrollY > 300 && t >= 0 && t < innerHeight * 0.7; })()', 5000), 'B. "Próximos estudos" desce até a lista');
+await av('scrollTo(0, 0); true');
 await emTodosOsTamanhos('B. a aba depois do encontro');
 await fotoClaroEscuro('05-promovido-depois-do-encontro', false, rolarAte('.mesa-lider'));
 await fotoClaroEscuro('05b-anteriores-depois-do-encontro', false, rolarAte('[data-lista-proximos]'));
@@ -435,6 +459,7 @@ await esperar(existe('.mesa-secao-anteriores .titulo-secao'), 10000);
 const daBia = await textoDe('#conteudo');
 ok(!daBia.includes('Próximos estudos') && !daBia.includes('Próximo:') && !daBia.includes(TB) && !(await av(existe('.mesa-proximos'))), 'C. sem a seção "Próximos estudos", sem a linha "Próximo" e sem o título do estudo da fila');
 ok(!('fila' in (await celulaDe(bia, JD))), 'C. o retrato dela não traz a fila');
+ok(!(await av(existe('.mesa-atalhos'))), 'C. o membro não tem os atalhos de quem conduz');
 await emTodosOsTamanhos('C. a aba do membro');
 await fotoClaroEscuro('06-membro-sem-a-fila', false, rolarAte('.mesa-secao-anteriores'));
 await como(bia, rota('estudo') + '/' + encodeURIComponent(filaJ[0].id), { limpar: false });

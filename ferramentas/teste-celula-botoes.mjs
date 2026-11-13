@@ -1,6 +1,6 @@
 // Célula num Chrome sem interface: toda frase que pede uma ação tem o botão que leva até onde ela
 // se faz (o mesmo critério dos Desafios). Confere, com contas criadas pela API num servidor próprio:
-//   C1 "Ore hoje por": "Orei" (anota no diário e some) e "Mandar uma mensagem" (WhatsApp pronto)
+//   C1 "Ore hoje por": "Orei" (anota no diário e some) e "Escrever no WhatsApp" (mensagem pronta)
 //   C2 o check-in de Corpo, Mente e Espírito de um membro SEM discipulador: botão na aba Hoje,
 //      aceito pelo servidor e somado no Painel (só a soma); "Lembrar a célula" para quem conduz
 //   C3 "Registrar o encontro" no Painel vazio, e a folha com a data do encontro em destaque (C12)
@@ -143,7 +143,7 @@ ok(await esperar(q('.painel-celula .lista-ore-hoje')), 'C1: quem conduz vê "Ore
 const linhasOre = await av('[...document.querySelectorAll("[data-ore-hoje]")].map((l) => l.dataset.oreHoje).sort().join(",")');
 ok(linhasOre === 'ana,bia', 'C1: uma linha por pessoa do rodízio (' + linhasOre + ')');
 ok(await av('[...document.querySelectorAll("[data-ore-hoje]")].every((l) => l.querySelector("[data-orei]") && l.querySelector("a.botao-whatsapp[href^=\\"https://wa.me/?text=\\"]")) && [...document.querySelectorAll("[data-ore-hoje] [data-orei], [data-ore-hoje] .botao-whatsapp")].every((b) => b.getBoundingClientRect().height >= 44)'),
-  'C1: cada linha tem "Orei" e "Mandar uma mensagem", com 44px de toque');
+  'C1: cada linha tem "Orei" e "Escrever no WhatsApp", com 44px de toque');
 ok(await av('decodeURIComponent(' + q('[data-mensagem-oracao="ana"]') + '.href).includes("Oi, ana! Hoje eu orei por você.")'), 'C1: a mensagem do WhatsApp já vem pronta com o nome');
 await clicar('[data-orei="ana"]');
 ok(await esperar('!document.querySelector("[data-ore-hoje=\\"ana\\"]") && !!CC.diaDoDiario()["orei_ana"]'), 'C1: "Orei" anota orei_ana no diário de hoje e a linha some');
@@ -153,7 +153,10 @@ ok(await esperar('!!document.querySelector("[data-ore-hoje=\\"bia\\"]") && !docu
 ok(await av('!!' + q('.cabeca-celula .cartao-encontro') + ' && /Próximo encontro/.test(' + q('.cartao-encontro') + '.textContent) && /^(Hoje|Quarta, \\d+\\/\\d+)$/.test(' + q('.cartao-encontro .textos > span') + '.textContent)'),
   'C8: o cartão "Próximo encontro" no alto, com o dia marcado (quarta)');
 ok(await av('!/Encontro às|encontro às/.test(' + q('#conteudo') + '.textContent)'), 'C8: a linha repetida "Encontro às quartas-feiras" saiu');
-ok(await av('/com a célula inteira lendo/.test(' + q('.cabeca-celula .dias-cartao small') + '.textContent)'), 'C9: a contagem diz "com a célula inteira lendo"');
+// B10: "Comece por aqui" enquanto falta um dos três primeiros passos (aqui, o estudo)
+ok(await av('document.querySelectorAll(".comece-aqui li.feito").length === 2 && !!' + q('.comece-aqui [data-comeco-estudo]') + ' && !' + q('.comece-aqui [data-comeco-dia]')),
+  'B10: o líder vê "Comece por aqui", com o dia e o convite feitos e o botão de preparar o estudo');
+ok(await av('/com a célula inteira lendo|^de \\d+ leram? hoje$/.test(' + q('.cabeca-celula .dias-cartao small') + '.textContent)'), 'C9: a contagem diz "com a célula inteira lendo" ou, sem dia inteiro ainda, quantos leram hoje (B11)');
 
 // ---------- o líder: Painel (C2, C3, C12, C4) ----------
 await abrir(rotaCelula('painel'), '!!' + q('.cartao-saude'));
@@ -194,6 +197,32 @@ ok(veioAux && /registrar quem veio, junto com você\. O estudo continua só com 
 await clicar('.cortina [data-nao]');
 await esperar('!document.querySelector(".cortina")');
 await dormir(400);
+// B4 e B15: o aviso de quem vê o "leu hoje" e a prévia do toque antes de mandar
+ok(/Quem é membro da célula vê quem já leu hoje, o seu também\. Visitantes veem só o número\./.test(await av('document.querySelector("[data-quem-ve-leitura]")?.textContent || ""'))
+  && !/Ainda não leu hoje/.test(await av('document.querySelector(".painel-celula").textContent')), 'B4: Pessoas diz quem vê o "leu hoje", sem "Ainda não leu hoje"');
+{
+  const hojeLider = await av('CC.hojeIso()');
+  await pedir('api/estado', { atualizadoEm: Date.now(), lidos: [1], marcadoEm: { 1: hojeLider } }, lider);
+  // B12: a hora e o lugar do encontro, ao lado do dia
+  ok((await pedir('api/celula', { acao: 'encontro', id: ID, dia: 3, hora: '25:00' }, lider)).status === 400, 'B12: o servidor recusa hora que não existe no dia do encontro');
+  ok((await pedir('api/celula', { acao: 'encontro', id: ID, dia: 3, hora: '19:30', lugar: '  Casa   da Ana ' }, lider)).status === 200, 'B12: o servidor aceita a hora e o lugar');
+  // B14: o toque de quem faltou tem tema próprio, uma vez por dia
+  ok((await pedir('api/cutucar', { para: 'bia', tema: 'falta' }, lider)).dado.resultado === 'enviado' && (await pedir('api/cutucar', { para: 'bia', tema: 'falta' }, lider)).dado.resultado === 'ja',
+    'B14: o toque "falta" vai uma vez por dia para a mesma pessoa');
+  await como(lider, rotaCelula('pessoas'));
+  await esperar('!!' + q('[data-notificar]'));
+  ok(/, às 19h30 · Casa da Ana$/.test(await av('(' + q('.cartao-encontro .textos > span') + ' || {}).textContent || ""')), 'B12: o cartão "Próximo encontro" mostra a hora e o lugar');
+  ok(/às 19h30 · Casa da Ana/.test(((await pedir('api/propositos', null, ana)).dado.propositos.find((x) => x.id === ID) || {}).encontroHora === '19:30' ? 'às 19h30 · Casa da Ana' : ''), 'B12: o membro também recebe a hora');
+  await pedir('api/celula', { acao: 'encontro', id: ID, dia: 3, hora: '', lugar: '' }, lider);
+  const rotuloToque = await av('(' + q('[data-notificar]') + ' || {}).textContent || ""');
+  ok(rotuloToque === 'Dar um toque em quem falta (2)', 'B14: o mesmo nome da ação, "Dar um toque em quem falta (2)" (' + rotuloToque + ')');
+  await clicar('[data-notificar]');
+  ok(await esperar('!!' + q('.folha [data-enviar-toques]')) && await av(q('.folha [data-enviar-toques]') + '.textContent === "Enviar para 2 pessoas" && /lembrou de você/.test(' + q('.folha .previa-toque') + '.textContent) && document.querySelectorAll(".folha .linha-amigo").length === 2'),
+    'B15: antes de mandar, a folha mostra para quem vai, o aviso que chega e "Enviar para 2 pessoas"');
+  await clicar('.folha [data-fechar]');
+  await esperar('!document.querySelector(".cortina")');
+  ok(((await pedir('api/amigos', null, ana)).dado.toques || []).length === 0, 'B15: cancelar não manda nada');
+}
 
 // ---------- C7: o recado com dia e hora ----------
 // a próxima quinta, de 3 a 9 dias para a frente (sempre no futuro, em qualquer fuso)
@@ -250,10 +279,23 @@ ok(await esperar('location.hash === "#/" && !!document.querySelector(".no, .tril
 await abrir(rotaCelula(), '!!' + q('[data-marcar-caminhada]'));
 await clicar('[data-marcar-caminhada]');
 ok(await esperar('location.hash === "#/perfil/discipulado" && document.querySelectorAll("[data-marco][role=checkbox]").length === 4'), 'C4/D1: o atalho abre Minha caminhada, com 4 caixas de marcar');
+ok(await av('document.querySelector("[data-marco=\\"celula\\"]").getAttribute("aria-checked") === "true" && document.querySelector("[data-marco=\\"batismo\\"]").getAttribute("aria-checked") === "false"'),
+  'B21: "Entrei numa célula" já vem marcado para quem é membro; os outros, não');
 await clicar('[data-marco="batismo"]');
 ok(await esperar('!!' + q('.folha [data-quando]')), 'D1: tocar na caixa abre "Quando foi?"');
+ok(/Só você vê o que marca aqui\./.test(await av('document.querySelector(".folha").textContent')), 'B3: a folha de marcar diz quem vê ("Só você vê o que marca aqui.")');
 await clicar('.folha [data-salvar]');
 ok(await esperar('document.querySelector("[data-marco=\\"batismo\\"]").getAttribute("aria-checked") === "true" && /^Em \\d{2}\\/\\d{2}\\/\\d{4}$/.test(document.querySelector("[data-marco=\\"batismo\\"] small").textContent)'), 'D1: marcado, a caixa fica cheia e mostra a data');
+const funilDe = async () => { const pn = (await celulaDe(lider, ID)).painel; return { nomes: JSON.stringify(pn.funil), ocultos: pn.caminhadaOculta }; };
+let fu = await funilDe();
+ok(!fu.nomes.includes('"ana"') && fu.ocultos >= 1, 'B3: com "Quem conduz a minha célula vê" desligado (o padrão), o batismo da Ana não aparece no Painel do líder');
+ok(await av('document.querySelector("[data-caminhada-celula]").getAttribute("aria-checked") === "false"'), 'B3: Minha caminhada tem "Quem conduz a minha célula vê", desligado');
+await clicar('[data-caminhada-celula]');
+ok(await esperar('/Quem vê o que você marca aqui: você e quem conduz a sua célula/.test(document.querySelector("[data-quem-ve]").textContent)'), 'B3: ligado, a frase diz que quem conduz a célula vê');
+fu = await funilDe();
+ok(/"etapa":"batizado"[^\]]*"ana"/.test(fu.nomes), 'B3: ligado, o líder vê a Ana em "Já se batizaram"');
+await clicar('[data-caminhada-celula]');
+ok(await esperar('/Só você vê/.test(document.querySelector("[data-quem-ve]").textContent)') && !(await funilDe()).nomes.includes('"ana"'), 'B3: desligado de novo, some do Painel');
 await abrir(rotaCelula(), '!!' + q('.painel-celula .recado-lider'));
 ok(await av('!document.querySelector("[data-marcar-caminhada]")'), 'C4: depois de marcar, o atalho sai da aba Hoje');
 

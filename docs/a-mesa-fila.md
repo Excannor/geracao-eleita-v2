@@ -22,7 +22,7 @@ Este documento vai do macro ao micro: o que vale (0), os dados (1), as regras pu
 | F2 | Quem conduz (líder e **auxiliar**) **vê** a fila e abre cada estudo dela. Só o **líder** mexe nela. Conferir. | O pedido diz que a fila aparece "a todo líder, co-líder incluído, pelo modelo de papéis que existir". O modelo que existe é líder e auxiliar, e a decisão de 17/10 diz que o auxiliar não prepara estudo. Ver é conduzir (o auxiliar também conduz o encontro); mexer é preparar. Se o dono quiser o auxiliar mexendo, é trocar `celulaDeQuemPrepara` por `celulaDeQuemConduz` nas ações da fila. |
 | F3 | A ordem da fila é a ordem das datas: uma data por estudo, sem repetir. Reordenar troca os estudos de lugar e **as datas ficam onde estavam**. | Uma fonte da verdade só (a data), sem coluna de ordem que possa discordar dela. "Passar para antes" quer dizer "usar num encontro mais cedo". |
 | F4 | A promoção é do servidor, avaliada a cada leitura da célula, a cada registro de encontro e a cada mudança na fila. Sem relógio, sem tarefa agendada. | "No começo do dia" vira "na primeira vez que alguém abre a célula naquele dia", e o que cada um vê é sempre o que a regra manda naquele instante, em qualquer aparelho. |
-| F5 | A regra da promoção (seção 4): o primeiro da fila entra quando o estudo atual **já teve o encontro dele** (ou não há estudo atual) **e** o primeiro é do próximo encontro. | Depois do encontro, a célula já lê o estudo seguinte, como faria o "Preparar o próximo". E nunca passa por cima de um estudo atual que a célula ainda não viveu. |
+| F5 | A regra da promoção (seção 4): o primeiro da fila entra quando o estudo atual **já teve o encontro dele, e o dia desse encontro já acabou** (ou não há estudo atual) **e** o primeiro é do próximo encontro. | No dia seguinte ao encontro, a célula já lê o estudo seguinte, como faria o "Preparar o próximo". Nunca passa por cima de um estudo atual que a célula ainda não viveu, nem troca o estudo no meio do encontro (mudança de 09/11, seção 10). |
 | F6 | "Já teve o encontro dele" é mais estrito que o `estudoUsado` de hoje: o dia da semana que passou só conta quando ninguém registrou, naquele dia, "Não houve encontro" ou um encontro com outro estudo. | O `estudoUsado` responde "o líder deve preparar o próximo?", e na dúvida diz que sim. A promoção é automática: na semana sem encontro, ela não pode gastar o estudo da semana. |
 | F7 | Ao entrar na célula, o estudo ganha `criado_em` = o instante da promoção, e o instante em que foi escrito fica em `preparado_em`. | Todas as regras de hoje leem `criado_em` como "o instante em que o estudo passou a valer na célula" (o dia em que nasceu, o estudo do dia, o combinado de antes, a ordem do histórico, o corte da filha). Com isso nenhuma delas muda, e um estudo escrito antes da multiplicação e promovido depois não vai para a filha, porque a célula mãe e a filha não o viveram juntas (A2 da Fase 2). |
 | F8 | O estudo agendado não leva Acolhida, Adoração e Testemunho. Ao entrar na célula, os três voltam a vazio (as sugestões da semana), como todo estudo novo (A5). | Os três moram na célula, não no estudo, e o Testemunho pode ter nomes. O líder ajusta os três quando o estudo já é o da semana. |
@@ -221,7 +221,7 @@ Toda ação responde `{ fila: [...], promovido: { id, titulo } | null }`, depois
 
 ### 3.6 O registro de encontro
 
-`registrarEncontro` roda a promoção depois de gravar e a resposta ganha `promovido: { id, tipo, titulo, refs } | null`. A folha avisa "Encontro registrado. O próximo estudo já está na aba Estudo." quando houve promoção.
+`registrarEncontro` roda a promoção depois de gravar e a resposta ganha `promovido: { id, tipo, titulo, refs } | null` e `amanha: { id, tipo, titulo, refs } | null` (o primeiro da fila, quando a promoção o põe na célula amanhã). O encontro de hoje nunca promove na hora (seção 4.1); o de um dia que já passou, sim. A folha avisa "Presença salva. Amanhã, o próximo estudo entra na aba Estudo." com `amanha`, "Presença salva. O próximo estudo já está na aba Estudo." com `promovido` e "Presença salva" sem nenhum dos dois.
 
 ---
 
@@ -231,8 +231,8 @@ Toda ação responde `{ fila: [...], promovido: { id, titulo } | null }`, depois
 
 O **primeiro da fila** (a data mais cedo) passa a ser o estudo da célula quando as duas coisas valem:
 
-1. **O estudo atual já teve o encontro dele**, ou a célula está sem estudo atual. "Já teve" (`jaTeveEncontro`, F6) é:
-   - um encontro registrado ligado a ele (a folha "Quem foi ao encontro?" com ele escolhido); ou
+1. **O estudo atual já teve o encontro dele, num dia que já acabou**, ou a célula está sem estudo atual. "Já teve" (`jaTeveEncontro` com `diaAcabou`, F6) é:
+   - um encontro registrado ligado a ele (a folha "Quem foi ao encontro?" com ele escolhido), com a data **antes de hoje** (o encontro de hoje só conta amanhã: muitos líderes fazem a chamada no começo do encontro); ou
    - um registro sem estudo ligado, de um app antigo, feito depois que ele entrou (a regra da Fase 1); ou
    - desde o dia em que ele entrou (sem contar hoje), passou o dia do encontro da célula e ninguém registrou, para aquele dia, "Não houve encontro nesta semana" nem um encontro com outro estudo (o "Outro estudo, fora do app" incluído). É o caso de quem esqueceu de registrar.
 2. **O primeiro da fila é do próximo encontro:** a data dele vai até o primeiro dia de encontro depois de hoje (`limiteDaFila`). Sem dia de encontro marcado, até hoje + 7. Uma data que já passou também serve.
@@ -241,7 +241,9 @@ Ela é conferida a cada leitura da célula (`GET /api/propositos`), a cada regis
 
 **Na prática, numa célula de quinta:** o estudo B está na fila para 30/10, e o atual A é de 23/10.
 
-- Quinta, 23/10, 21h: o líder registra o encontro com A. B entra na hora e quem abre a célula já vê B. A vai para Estudos anteriores.
+- Quinta, 23/10, 19h30: o líder registra o encontro com A, no começo do encontro. Nada muda na aba Estudo: a célula segue com A até o fim do dia, e o aviso diz "Presença salva. Amanhã, o próximo estudo entra na aba Estudo."
+- Sexta, 24/10: na primeira vez que alguém abre a célula, B entra. A vai para Estudos anteriores.
+- Se o líder quer B antes disso, ele abre B na fila e toca em "Usar agora" (sem confirmação: A já teve o encontro dele).
 - Se ninguém registrou: na sexta, 24/10, na primeira vez que alguém abre a célula, a quinta já passou sem "Não houve encontro", e B entra.
 - Se o líder registrou "Não houve encontro" em 23/10: A não teve o encontro dele, e B espera. O líder vê, na fila, "Para quinta, 30/10" e, quando a data passar, "a data já passou", com "Ajustar as datas".
 
@@ -341,7 +343,7 @@ O caminho antigo ("Preparar o próximo" abrindo a parte guardada) sai do preparo
 
 ### 5.6 A folha de registro (index)
 
-Só o aviso depois de salvar: "Encontro registrado. O próximo estudo já está na aba Estudo." quando a resposta traz `promovido`.
+Só o aviso depois de salvar (seção 3.6): "Presença salva. Amanhã, o próximo estudo entra na aba Estudo." quando a resposta traz `amanha`; "Presença salva. O próximo estudo já está na aba Estudo." quando traz `promovido` (um encontro de outro dia registrado depois).
 
 ---
 
@@ -378,7 +380,8 @@ Só o aviso depois de salvar: "Encontro registrado. O próximo estudo já está 
 | Dividir, aviso | Estudo salvo. A parte 2 está nos próximos estudos. |
 | Migração | A parte 2 de “{título}” está guardada só neste celular. / Pôr nos próximos estudos / Descartar |
 | Migração, aviso | Pronto: a parte 2 está nos próximos estudos |
-| Registro, aviso | Encontro registrado. O próximo estudo já está na aba Estudo. |
+| Registro, aviso (o encontro de hoje) | Presença salva. Amanhã, o próximo estudo entra na aba Estudo. |
+| Registro, aviso (um dia que já passou) | Presença salva. O próximo estudo já está na aba Estudo. |
 | Erros (a tela põe a maiúscula e o ponto) | as mensagens de `MENSAGENS` (seção 2.1) |
 
 ---
@@ -445,3 +448,15 @@ Os commits `b874ded` (banco v23 e as regras puras do servidor), `941c82f` (as co
 - **Capturas** (`FOTOS`) do `teste-estudo-fila.mjs`: a aba com a fila, agendar com a data, depois de reordenar, a leitura de um estudo da fila, a aba depois do encontro, a do membro e o cartão da parte do celular, a 390 px, claro e escuro; o `teste-estudo-dividir.mjs` guarda a parte 2 nos próximos estudos.
 
 Ficam para o dono: F2 (o auxiliar só vê a fila) e a linha da política de privacidade (seção 8).
+
+---
+
+## 10. Mudança de 09/11: a promoção espera o dia do encontro acabar
+
+A avaliação de usabilidade de 09/11 (B1 e B2) mostrou que registrar a presença no dia do encontro trocava o estudo de todos na hora, às vezes no meio do encontro, e que o estudo promovido aparecia com a data do encontro de hoje. O que mudou:
+
+- **A regra (4.1):** o encontro registrado conta para a promoção só depois que o dia dele acaba (`jaTeveEncontro({ ..., diaAcabou: true })`, usado por `devePromover`). O encontro registrado dias depois continua promovendo na hora. O `estudoUsado` e a primeira data livre da fila não mudaram: para eles, o encontro de hoje já registrado conta.
+- **"Usar agora"** continua sendo o jeito do líder pôr o próximo antes, de propósito. Depois do registro, ele não pede confirmação.
+- **A resposta do registro** ganha `amanha` (3.6), e o aviso diz quando o próximo entra.
+- **As datas na tela:** o retrato ganha `ultimoRegistro` (a data do último encontro registrado). Com o encontro de hoje registrado, o cartão "Próximo encontro" mostra o da semana que vem (e não "Hoje"), e o selo "Encontro hoje · veja o estudo" some. A legenda do estudo ("Para o encontro de …") continua contando o encontro de hoje, porque o estudo da aba ainda é o de hoje; no dia seguinte, o estudo que entrou mostra o encontro seguinte.
+

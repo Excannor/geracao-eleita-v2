@@ -381,6 +381,12 @@ secao('peças sob demanda');
     checar(celula.includes('mesa-anteriores') && celula.includes('paraQuemFaltou') && celula.includes('@media print') && !html.includes('mesa-anteriores') && !html.includes('mesa-impressao'),
       'os estudos anteriores, "Quem não veio" e a impressão estão na peça estudo-celula, fora do index.html');
     checar(preparo.includes('data-combinado') && !html.includes('data-combinado'), 'o campo do combinado está na peça do preparo, fora do index.html');
+    // B16 e B17: quem não entrou no desafio em grupo não aparece apagado nem pelo nome, e o convite tem botão
+    checar(!/\.dsf-membro\.fora/.test(html) && !html.includes('Ainda não entrou') && html.includes('data-escolher-desafio-grupo') && html.includes("'convidado', 'convidados'"),
+      'o desafio em grupo conta os convidados sem nome nem opacidade, e o convite leva até a lista de desafios');
+    // As folhas de quem conduz (celula-conduz.js) vão na peça do estudo, para a folga do index
+    checar(celula.includes('CC.celulaConduz =') && celula.includes('Quem foi ao encontro?') && celula.includes('data-todos-vieram') && !html.includes('data-todos-vieram') && !html.includes('data-confirmar-multiplicar'),
+      'as folhas de quem conduz (presença, dia do encontro, recado, multiplicar) estão na peça estudo-celula, fora do index.html');
     checar(!/folhaPrepararEstudo|montarEstudo|estudoEmTexto|semanaDoEstudo|PERGUNTAS_ACOLHIDA/.test(html) && html.includes('CC.apoioCelula'),
       'o estudo antigo (preparar, montar, texto do grupo) saiu do index.html; fica a casca');
   }
@@ -1437,6 +1443,8 @@ runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'estudo-regras.js'), 
   const fila = [{ id: 'b', tipo: 'blocos', titulo: 'Batalha espiritual', data: '2026-10-29' }, { id: 'c', tipo: 'semana', titulo: '', data: '2026-11-05' }];
   checar(R.linhaDoProximo(fila) === 'Próximo: Batalha espiritual · qui 29/10' && R.linhaDoProximo(fila.slice(1)) === 'Próximo: A leitura da semana · qui 05/11'
     && R.linhaDoProximo([]) === '' && R.linhaDoProximo(null) === '', 'linhaDoProximo(): o que o cartão do líder diz; com a fila vazia, nada');
+  checar(R.titulo({ tipo: 'semana', planoAte: 21 }) === 'A leitura da semana · dias 15 a 21' && R.titulo({ tipo: 'semana', planoAte: 3 }) === 'A leitura da semana · dias 1 a 7'
+    && R.titulo({ tipo: 'semana', planoAte: 0 }) === 'A leitura da semana', 'titulo(): a leitura da semana com a semana guardada leva os dias do plano (B22)');
   checar(R.quandoNaFila(fila[0], '2026-10-25') === 'Para quinta, 29/10' && R.quandoNaFila(fila[0], '2026-10-29') === 'Para quinta, 29/10'
     && R.quandoNaFila(fila[0], '2026-10-30') === 'Para quinta, 29/10 · a data já passou', 'quandoNaFila(): a data da linha, e "a data já passou" sem culpa');
   checar(JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, -1)) === '["b","a","c"]' && JSON.stringify(R.moverNaFila(['a', 'b', 'c'], 1, 1)) === '["a","c","b"]'
@@ -2655,7 +2663,11 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 5 · atualizada em 22 de outubro de 2026<\/p>/.test(pol), 'a política está na versão 5, com o ajuste de 22 de outubro');
+  checar(/<p class="atualizada">Versão 6 · atualizada em 9 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a política está na versão 6 (9 de novembro), a mais nova no histórico');
+  checar(/<tr><td>Se leu hoje<\/td><td>[^<]*visitantes da célula veem só quantas pessoas leram, sem nomes/.test(pol)
+    && /<tr><td>Etapa de Minha caminhada<\/td><td>[^<]*só se você ligar "Quem conduz a minha célula vê"/.test(pol),
+    'o quadro de quem vê: a visitante vê só o número de quem leu, e a etapa de Minha caminhada só vai para quem conduz se a pessoa ligar');
   checar(/conquistas e pontos, cartas e álbuns\)/.test(pol) && /as suas anotações e as suas cartas continuam guardadas/.test(pol)
     && historico.indexOf('<b>Ajuste da versão 5, 22 de outubro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 5,') < historico.indexOf('<b>Versão 5,'),
     'a política lista cartas e álbuns no progresso, diz que ficam ao zerar e tem o ajuste no histórico');
@@ -2731,7 +2743,11 @@ secao('próximos estudos: as regras da fila (estudos.mjs, docs/a-mesa-fila.md)')
   const B = { id: 'eB', agendadoPara: '2026-10-29' };
   const pode = (hoje, extra = {}) => devePromover({ atual: A, cabeca: B, hoje, encontro: Q, encontros: [], diaDe: diaSP, ...extra });
   checar(!pode('2026-10-21') && !pode('2026-10-22') && pode('2026-10-23'), 'devePromover(): o atual de 22/10 ainda espera o encontro dele; na sexta, com a quinta passada, B (29/10) entra');
-  checar(pode('2026-10-22', { encontros: [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T23:00:00Z' }] }), 'devePromover(): registrado o encontro com o atual, B entra na hora');
+  const hojeReg = [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-22T20:00:00Z' }];
+  checar(!pode('2026-10-22', { encontros: hojeReg }) && pode('2026-10-23', { encontros: hojeReg }),
+    'devePromover(): registrado o encontro de hoje com o atual, B espera o dia acabar (a célula ainda pode estar reunida); no dia seguinte, entra');
+  checar(pode('2026-10-24', { encontros: [{ data: '2026-10-22', estudo: 'eA', em: '2026-10-24T13:00:00Z' }] }) && jaTeveEncontro({ id: 'eA', criadoEm: A.criadoEm, nasceu: '2026-10-20', hoje: '2026-10-22', encontro: Q, encontros: hojeReg }),
+    'devePromover(): o encontro de um dia que já acabou, registrado depois, deixa B entrar na hora; jaTeveEncontro() sem diaAcabou ainda conta o de hoje');
   checar(!pode('2026-10-29', { encontros: sem }) && !pode('2026-10-23', { encontros: outro }) && pode('2026-10-30', { encontros: sem }),
     'devePromover(): a semana sem encontro e a feita com outro estudo seguram a fila; passada a quinta seguinte, a fila segue');
   checar(!pode('2026-10-23', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }) && pode('2026-10-30', { cabeca: { id: 'eB', agendadoPara: '2026-11-05' } }),
@@ -2787,6 +2803,27 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
   await ce.definirEncontro('lider', ID, 4);
   const OUTRA = (await ce.criarCelula('outro', { titulo: 'Outra' }, '2026-10-01')).id;
   const p = () => ce.proposito(ID);
+  // B12: a hora e o lugar do encontro são opcionais; sem o campo (o app antigo), ficam como estavam
+  {
+    await ce.definirEncontro('lider', ID, 4, { hora: '19:30', lugar: '  Casa   da Ana ' });
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'o encontro guarda a hora e o lugar (uma linha, sem espaço sobrando)');
+    await ce.definirEncontro('lider', ID, 4);
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'marcar o dia sem os campos não apaga a hora nem o lugar');
+    const falha = async (extra) => { try { await ce.definirEncontro('lider', ID, 4, extra); return false; } catch { return true; } };
+    checar(await falha({ hora: '25:00' }) && await falha({ hora: '7h' }) && await falha({ lugar: 'x'.repeat(81) }), 'hora que não existe e lugar com mais de 80 letras são recusados');
+    ce = await new Contas(join(pasta, 'contas.json')).carregar();
+    checar(p().encontroHora === '19:30' && p().encontroLugar === 'Casa da Ana', 'a hora e o lugar voltam do banco');
+    await ce.definirEncontro('lider', ID, 4, { hora: '', lugar: '' });
+    checar(p().encontroHora === '' && p().encontroLugar === '', 'e podem ser apagados');
+  }
+  // B21: "Entrei numa célula" já vem com a data da entrada para quem é membro; visitante não
+  {
+    checar(ce.marcosDe('ana').celula === '2026-10-01' && ce.marcosDe('lider').celula === '2026-10-01' && !ce.marcosDe('vera').celula,
+      'quem é membro da célula já tem o marco "Entrei numa célula", com a data da entrada; a visitante não');
+    await ce.definirMarco('ana', 'celula', '2025-03-09');
+    checar(ce.marcosDe('ana').celula === '2025-03-09' && !ce.achar('lider').marcos?.celula, 'a data que a pessoa marcou vale, e nada é gravado por ela');
+    await ce.definirMarco('ana', 'celula', '');
+  }
   const fila = () => ce.filaDe(ID).map((x) => x.titulo + '@' + x.agendadoPara).join(' ');
   const linha = (id) => ce.banco().prepare('SELECT * FROM celula_estudos WHERE id = ?').get(id);
 
@@ -2857,10 +2894,12 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
 
   // --- a promoção pelo registro ---
   const r29 = await ce.registrarEncontro('lider', ID, { data: '2026-10-29', presentes: ['lider', 'ana'], visitantes: 0, estudo: B }, '2026-10-29', quando('10-29', 21));
-  checar(r29.promovido && r29.promovido.id === D1 && p().estudoId === D1 && !ce.filaDe(ID).length, 'registrado o encontro com B, C entra na hora');
+  checar(!r29.promovido && r29.amanha && r29.amanha.id === D1 && p().estudoId === B && ce.promoverDaFila(p(), quando('10-29', 23)) === null && p().estudoId === B,
+    'registrado o encontro de hoje com B, C não entra no meio do encontro: a resposta diz que ele entra amanhã');
+  checar(ce.promoverDaFila(p(), quando('10-30', 8)).id === D1 && p().estudoId === D1 && !ce.filaDe(ID).length, 'no dia seguinte, na primeira leitura, C entra');
 
   // --- a semana sem encontro segura a fila ---
-  const E = (await ce.salvarEstudo('lider', ID, estudo('Estudo E', { agendar: true }), opcoes, quando('10-29', 22))).estudo.id;
+  const E = (await ce.salvarEstudo('lider', ID, estudo('Estudo E', { agendar: true }), opcoes, quando('10-30', 9))).estudo.id;
   checar(fila() === 'Estudo E@2026-11-12', 'com C esperando o encontro dele (5/11), o novo vai para 12/11');
   await ce.registrarEncontro('lider', ID, { data: '2026-11-05', semEncontro: true, presentes: [], visitantes: 0 }, '2026-11-05', quando('11-05', 21));
   checar(ce.promoverDaFila(p(), quando('11-06', 8)) === null && p().estudoId === D1, 'com "Não houve encontro" em 5/11, C não teve o encontro dele, e E espera');

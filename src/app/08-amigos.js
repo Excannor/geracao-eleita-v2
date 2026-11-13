@@ -341,14 +341,18 @@
     });
   };
 
-  CC.telaToque = function (amigo) {
+  // opcoes.motivo 'falta' (quem faltou ao encontro, em "Precisam de atenção"): o balão e o aviso
+  // perguntam como a pessoa está, em vez de "vamos ler hoje" (avaliação de 09/11, B14).
+  CC.telaToque = function (amigo, opcoes = {}) {
+    const falta = opcoes.motivo === 'falta';
     CC.telaCheia('<div class="cena cena-amigos">'
       + '<h1 class="titulo-toque">Dê um toque em ' + CC.esc(amigo.nome) + '</h1>'
-      + '<div class="balao-fala">' + FALA_TOQUE + '</div>' + duplaGrande(eu(), amigo)
-      + '<p class="dias-dupla">' + CC.icoChama() + '<b>' + (amigo.dias || 0) + '</b> ' + ((amigo.dias || 0) === 1 ? 'dia' : 'dias') + ' de propósito</p></div>', {
+      + '<div class="balao-fala">' + (falta ? 'Lembramos de você no encontro!' : FALA_TOQUE) + '</div>' + duplaGrande(eu(), amigo)
+      + (amigo.dias != null ? '<p class="dias-dupla">' + CC.icoChama() + '<b>' + amigo.dias + '</b> ' + (amigo.dias === 1 ? 'dia' : 'dias') + ' de propósito</p>' : '')
+      + '<p class="frase-cena">' + CC.esc(String(amigo.nome || '').split(' ')[0]) + ' recebe um aviso no celular' + (falta ? ' perguntando se está tudo bem.' : ' chamando para ler hoje.') + '</p></div>', {
       classe: 'tela-toque',
       rotulo: 'Dar um toque',
-      pe: '<button class="botao" data-enviar-toque>' + CC.ico('sino') + 'Notificar</button>'
+      pe: '<button class="botao" data-enviar-toque>' + CC.ico('sino') + 'Dar um toque</button>'
         + '<button class="botao plano" data-fechar-tela>Continuar</button>',
       ligar: (el, fechar) => {
         el.querySelector('[data-fechar-tela]').onclick = fechar;
@@ -356,8 +360,9 @@
         b.onclick = async () => {
           b.disabled = true;
           try {
-            await enviarToque(amigo.usuario);
-            b.innerHTML = CC.ico('certo') + 'Notificado';
+            if (falta) await CC.api('api/cutucar', { para: amigo.usuario, tema: 'falta' });
+            else await enviarToque(amigo.usuario);
+            b.innerHTML = CC.ico('certo') + 'Toque enviado';
             el.querySelector('.balao-fala').classList.add('enviado');
             CC.carregarAmigos().then(() => { if (location.hash.startsWith('#/novidades') || location.hash.startsWith('#/amigos')) CC.redesenhar(); });
           } catch (e) {
@@ -473,8 +478,8 @@
       + '</div></div>'
       + (!euLi && !amigo.leuHoje ? '<p class="passo-dica pequena">Leia hoje para poder dar um toque.</p>' : '')
       + '<div class="acoes">'
-      + (podeTocar ? '<button class="botao" data-toque>' + CC.ico('sino') + 'Notificar</button>' : '')
-      + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Notificado hoje</button>' : '')
+      + (podeTocar ? '<button class="botao" data-toque>' + CC.ico('sino') + 'Dar um toque</button>' : '')
+      + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Toque enviado hoje</button>' : '')
       + '<button class="botao contorno" data-novo-com>' + CC.ico('mais-sinal') + 'Novo propósito com&nbsp;' + CC.esc(amigo.nome) + '</button>'
       + '<button class="botao plano" data-encerrar>Desfazer amizade</button>'
       + '<div class="pe-duplo-plano"><button class="botao plano" data-denunciar>' + CC.ico('bandeira') + 'Denunciar</button>'
@@ -602,7 +607,8 @@
       frase = 'O grupo <b>' + CC.esc(d.titulo || 'de vocês') + '</b> chegou a <b>' + CC.plural(Number(d.dias) || 0, 'dia', 'dias') + '</b> de meta batida!';
       arte = CC.icoChama();
     }
-    const reacao = '<button class="botao-reagir' + (ev.euReagi ? ' ligado' : '') + '" data-celebrar="' + CC.esc(ev.id) + '" aria-pressed="' + ev.euReagi + '">'
+    // Ninguém celebra a si mesmo: no próprio cartão fica só quem celebrou (avaliação de 09/11, B20)
+    const reacao = meu ? '' : '<button class="botao-reagir' + (ev.euReagi ? ' ligado' : '') + '" data-celebrar="' + CC.esc(ev.id) + '" aria-pressed="' + ev.euReagi + '">'
       + CC.ico('aperto') + '<b>' + (ev.total || '') + '</b><span class="so-leitor">Celebrar</span></button>';
     const nomes = (ev.quem || []);
     const celebrado = ev.total
@@ -635,7 +641,7 @@
       + '<div class="lista-pedidos">' + lista.map((p) => '<div class="linha-amigo">' + retrato(p)
         + '<div class="quem-amigo"><b>' + CC.esc(p.nome) + '</b><span class="arroba">'
         + (p.terminou ? 'terminou os 14 dias' : 'dia ' + p.dia + ' de 14') + '</span></div>'
-        + '<button class="botao-icone" data-toque-conhecer="' + CC.esc(p.usuario) + '" aria-label="Notificar '
+        + '<button class="botao-icone" data-toque-conhecer="' + CC.esc(p.usuario) + '" aria-label="Dar um toque em '
         + CC.esc(p.nome) + '">' + CC.ico('sino') + '</button>'
         + '</div>'
         + '<button class="link-nota" data-como-acompanhar="' + CC.esc(p.usuario) + '">Como acompanhar '
@@ -693,7 +699,9 @@
         // O recado e o estudo da célula saíram do Feed: a célula tem aba própria agora, e
         // é lá (Hoje/Estudo) que eles aparecem.
         const eventos = m.eventos || [];
-        const linhaDoTempo = eventos.map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
+        // "Você aceitou o convite de…" não é novidade para a própria pessoa (B20)
+        const euNoFeed = (CC.quem || {}).usuario;
+        const linhaDoTempo = eventos.filter((e) => !(e.tipo === 'novoProposito' && e.autor.usuario === euNoFeed)).map((e) => ({ em: e.em, html: itemDoMural(e) })).sort((a, b) => b.em - a.em);
         const pedidoLigar = !m.ligado && !m.perguntado && amigos.length
           ? '<div class="pedido-mural">' + CC.ico('pessoas') + '<div><b>Mostrar seus marcos aos amigos?</b>'
             + '<p>Ofensiva, livros terminados, conquistas e os versículos que você compartilhar.</p>'
