@@ -14,7 +14,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8189;
+const PORTA = Number(process.env.PORTA) || 8189;
 const ESTADO = join(tmpdir(), 'cc-offline.json');
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -89,8 +89,10 @@ const guardou = await av(`(async () => {
 })()`);
 ok(guardou >= 3, 'o service worker guardou o aplicativo em cache (' + guardou + ' arquivos)');
 
-// marca uma leitura enquanto ainda há rede
+// marca uma leitura enquanto ainda há rede; a tela do dia lido (peça sob demanda) o app pede
+// sozinho logo depois de abrir, e o service worker a guarda: o teste só espera ela chegar
 await av('CC.marcarLido(1, true)');
+ok(await av('CC.pedirDiaLido().then(() => true, () => false)'), 'a tela do dia lido já está guardada para quando faltar rede');
 await dormir(900);
 
 // ---------- 2. corta a rede ----------
@@ -117,13 +119,14 @@ await dormir(500);
 await av('(document.querySelector(".no.atual").click(), document.querySelector(".pop-no [data-comecar]").click())');
 await dormir(700);
 ok(await av('!!document.querySelector(".licao")'), 'a lição do dia abre sem rede');
-await av('document.querySelectorAll("[data-trilha]").forEach((b) => b.click())');
-await dormir(400);
-ok(await av('CC.ler("lidos", []).length >= 2'), 'marcar a leitura funciona sem rede');
-
-await av('document.querySelector("[data-concluir]").click()');
-await dormir(500);
-ok(await av('!!document.querySelector(".festa .retorno-lido")'), 'a reflexão abre logo depois da leitura, sem rede');
+// "Começar" abre o leitor direto; o texto vem do cache. A leitura é cumprida pela porta de teste
+// do portão (fim do texto e tempo mínimo, CC.portaoDeLeitura).
+for (let i = 0; i < 2; i++) {
+  await av('(async () => { for (let i = 0; i < 40 && !(CC.portaoDoLeitor && CC.portaoDoLeitor()); i++) await new Promise((r) => setTimeout(r, 150)); CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); })()');
+  await dormir(700);
+}
+ok(await av('CC.ler("lidos", []).length >= 2'), 'ler o dia no leitor funciona sem rede');
+ok(await av('!!document.querySelector(".licao .dia-lido")'), 'a tela do dia lido abre logo depois da leitura, sem rede');
 ok(await av('!document.querySelector("[data-seguir]")'), 'sem telas de festa no caminho, sem rede');
 
 // escrever e guardar

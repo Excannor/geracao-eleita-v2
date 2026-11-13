@@ -136,6 +136,8 @@ caso('data de nascimento no Android', 'campo digitável com teclado numérico, s
 await preencher('nascimento', '04032001');
 caso('máscara da data de nascimento', 'DD/MM/AAAA', 'valor=' + (await av('document.getElementById("nascimento").value')),
   (await av('document.getElementById("nascimento").value')) === '04/03/2001');
+// "Você já segue Jesus?" vem sem resposta marcada (A11): a pessoa escolhe
+await av('document.querySelector(\'.opcao-caminho[data-caminho="plano"]\').click()');
 await av('document.getElementById("botao-cadastro").click()');
 await preencher('email', 'sheyla@exemplo.com');
 await av('document.getElementById("botao-cadastro").click()');

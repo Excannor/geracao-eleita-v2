@@ -9,7 +9,7 @@ import { join } from 'node:path';
 const dormir=(ms)=>new Promise(r=>setTimeout(r,ms));
 // Sobe o seu próprio servidor. Depender de um já aberto na porta fazia o teste medir
 // a versão que aquele processo tinha carregado, que pode ser de dias atrás.
-const PORTA=8170;
+const PORTA = Number(process.env.PORTA) || 8170;
 const servidor=spawn(process.execPath,[join(import.meta.dirname,'..','servidor.mjs'),String(PORTA)],
   {env:{...process.env,CAMINHO_ESTADO:join(tmpdir(),'cc-unidades','estado.json'),CAMINHO_ABERTO:'1'},stdio:'ignore'});
 await dormir(1400);

@@ -120,6 +120,9 @@ const preencheu = await av(`(() => {
   $('senha-nova').value = 'senha-boa-1';
   // o consentimento sobre o dado de fé (LGPD art. 11) é obrigatório desde o cadastro em passos
   if ($('consentimento-cadastro')) $('consentimento-cadastro').checked = true;
+  // "Você já segue Jesus?" vem sem resposta marcada
+  const sim = document.querySelector('.opcao-caminho[data-caminho="plano"]');
+  if (sim) sim.click();
   return true;
 })()`);
 ok(preencheu, 'o formulário de cadastro está na tela de entrada');
@@ -135,16 +138,18 @@ await esperarAte('!document.getElementById("abertura")', 12000);
 await dormir(1500);
 ok(await av('!document.querySelector(".cortina")'), 'depois de criar a conta, o app abre sem folha nenhuma na frente da trilha');
 ok(await av('localStorage.getItem("cc.instalar") === "1"'), 'a marca de conta nova fica guardada até o primeiro dia feito');
-// o primeiro dia: marca as duas passagens, conclui, pula a reflexão e volta à trilha
-await av('document.querySelector(".cartao-salvia[data-abrir-dia]").click(); 1', false);
-ok(await esperarAte('!!document.querySelector(".licao [data-trilha]")'), 'o cartão de hoje abre a lição do dia 1');
-await av('document.querySelectorAll(".licao [data-trilha]").forEach((b) => b.click()); 1', false);
-await esperarAte('!document.querySelector(".licao [data-concluir]").disabled');
-await av('document.querySelector(".licao [data-concluir]").click(); 1', false);
-ok(await esperarAte('!!document.querySelector(".licao.tela-festa [data-pular]")'), '"Concluir o dia" leva à reflexão, sem folha no meio');
-await av('document.querySelector(".licao.tela-festa [data-pular]").click(); 1', false);
-ok(await esperarAte('!!document.querySelector(".licao.tela-resumo [data-voltar-trilha]")'), '"Pular por hoje" leva ao resumo do dia');
-await av('document.querySelector(".licao.tela-resumo [data-voltar-trilha]").click(); 1', false);
+// o primeiro dia: "Ler hoje" abre o leitor, as duas passagens (a leitura cumprida pela porta de
+// teste do portão: fim do texto e tempo mínimo), o dia lido e a volta à trilha
+await av('document.querySelector("[data-ler-hoje]").click(); 1', false);
+ok(await esperarAte('!!document.querySelector(".leitor [data-terminei]")'), '"Ler hoje" abre o leitor do dia 1');
+for (let i = 0; i < 2; i++) {
+  await esperarAte('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())');
+  await av('CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); 1', false);
+  await dormir(500);
+}
+ok(await esperarAte('!!document.querySelector(".licao .dia-lido [data-voltar-trilha], .licao-dia [data-voltar-trilha]") && !document.querySelector(".cortina")'), 'terminar a leitura leva ao dia lido, sem folha no meio');
+await dormir(500);
+await av('document.querySelector(".licao-dia [data-voltar-trilha]").click(); 1', false);
 const abriu = await esperarAte('!!document.querySelector(".folha-instalar")', 12000);
 ok(abriu, 'depois do primeiro "Até amanhã", a conta nova vê o tutorial de instalar');
 ok(await av('localStorage.getItem("cc.instalar") === null'), 'a marca de conta nova sai quando o tutorial aparece: não volta a cada abertura');

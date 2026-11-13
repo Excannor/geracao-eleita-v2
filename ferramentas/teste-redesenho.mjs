@@ -184,6 +184,12 @@ ok(await av(q('#nascimento') + '.type') === 'text' && await av(q('#nascimento') 
 await conferirMascara('#nascimento', 'cadastro');
 await preencher('#nascimento', '');
 await teclar('#nascimento', { texto: '6/5/2004' });
+// "Você já segue Jesus?" vem sem resposta marcada: o Continuar pede a resposta
+await clicar('#botao-cadastro');
+ok(await esperar('/Escolha uma resposta/.test(' + q('#erro-cadastro') + '.textContent) && ' + q('[data-passo="2"]') + '.hidden')
+  && await av('[...document.querySelectorAll(".opcao-caminho")].every((b) => b.getAttribute("aria-pressed") === "false")'),
+  '"Você já segue Jesus?" começa sem resposta, e o Continuar pede uma');
+await clicar('.opcao-caminho[data-caminho="plano"]');
 await clicar('#botao-cadastro');
 ok(await esperar('!' + q('[data-passo="2"]') + '.hidden'), 'nome e data de nascimento levam ao e-mail');
 await preencher('#email', 'ana@teste.com');
@@ -204,8 +210,8 @@ ok(await av('CC.ler("lidos", []).length === 0 && CC.sequencia().atual === 0'),
   'a conta nova começa zerada, sem herdar progresso sem dono do aparelho');
 
 // ---------- trilha ----------
-ok(await esperar(existe('.leitura-hoje [data-abrir-dia]') + ' && ' + existe('.fala-bento.apresenta')),
-  'a conta nova vê a leitura de hoje no alto da trilha, e o Bento se apresenta');
+ok(await esperar(existe('.folha-topo [data-ler-hoje]') + ' && ' + existe('.fala-bento.apresenta')),
+  'a conta nova vê "Ler hoje" no alto da trilha, e o Bento se apresenta');
 // Cinco abas de verdade na barra (Trilha, Desafios, Bíblia, Juntos, Mais): o
 // ".so-trilho" é o fantasma que só o trilho lateral usa (Explorar, aqui), escondido no
 // celular por CSS, então não conta como aba visível.
@@ -213,8 +219,8 @@ ok(await av('document.querySelectorAll(".navegacao .aba:not(.so-trilho)").length
   + ' && getComputedStyle(' + q('.aba .rotulo-aba') + ').position !== "absolute"'),
   'cinco abas com o nome à vista, e a atual marcada para leitor de tela');
 // Desde 04/10/2026 o topo é o mesmo em todas as abas: retrato, a chama e o sino dos avisos.
-ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && ' + existe('.topo [data-sino]') + ' && ' + existe('.folha-topo .saudacao [data-sino]') + ' && ' + existe('.folha-topo .saudacao [data-ofensiva]')),
-  'o topo mostra a chama e o sino, sem dias lidos nem escudos, no Início e nas outras abas');
+ok(await av('!' + existe('.topo .contador.lidos') + ' && !' + existe('.topo .contador.escudos') + ' && ' + existe('.topo [data-sino]') + ' && ' + existe('.folha-topo .saudacao [data-sino]') + ' && ' + existe('.folha-topo .cartoes-hoje [data-ofensiva]') + ' && !' + existe('.folha-topo .saudacao [data-ofensiva]')),
+  'o topo mostra a chama e o sino, sem dias lidos nem escudos; no Início a chama fica só no cartão (sem a pílula repetida)');
 ok(await av('!' + existe('.contador.xp') + ' && ' + existe('.contador.ofensiva')), 'o topo mostra a ofensiva e não o XP');
 ok(await av('document.querySelectorAll(".no-bau").length >= 4'), 'a trilha tem um baú a cada sete dias');
 await dormir(500);
@@ -224,103 +230,68 @@ ok(await esperar(existe('.pop-no .fala-bento') + ' && /primeiro dia/i.test(' + q
   'tocar no dia de hoje abre o balão, com o Bento explicando o primeiro dia');
 await foto('3b-balao');
 
-// ---------- a lição e a celebração ----------
+// ---------- a leitura e o dia lido ----------
+// "Começar" abre o leitor direto na primeira passagem; a lição não é mais uma parada do caminho.
+// A leitura é cumprida pela porta de teste do portão (fim do texto e tempo mínimo).
 await clicar('.pop-no [data-comecar]');
-ok(await esperar(existe('.licao [data-trilha]')), 'o balão abre a lição com as passagens');
-await av('document.querySelectorAll("[data-trilha]").forEach((b) => b.click())');
-ok(await esperar('!' + q('[data-concluir]') + '.disabled'), 'marcar as passagens libera "Concluir o dia"');
-await clicar('[data-concluir]');
-ok(await esperar(existe('.licao.tela-festa .retorno-lido')) && await av('CC.leu(1)'),
-  'concluir leva direto à reflexão, e o dia já está contado');
-ok(await av('!' + existe('.licao [data-seguir]')), 'nenhuma tela de festa entre a leitura e a Palavra');
+ok(await esperar(existe('.leitor .leitor-verso')), 'o balão abre o leitor direto na primeira passagem');
+for (let i = 0; i < 2; i++) {
+  await esperar('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())');
+  await av('CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); 1');
+  await dormir(500);
+}
+ok(await esperar(existe('.licao .dia-lido')) && await av('CC.leu(1)'), 'a última passagem conclui o dia e abre "Dia 1 lido"');
+ok(await av('!' + existe('.licao [data-seguir]') + ' && !' + existe('.passos-reflexao') + ' && !' + existe('[data-avancar]')), 'nenhuma tela de festa nem passo a passo entre a leitura e a Palavra');
 await dormir(1200);
-await foto('4-reflexao');
+await foto('4-dia-lido');
 ok(await esperar(existe('.cartao-versiculo'), 6000), 'o fim mostra um versículo do trecho, na tradução escolhida');
-await foto('4c-versiculo');
-// Escrever mora no cartão do versículo (no lugar de "Nota"), com um nome só; nada de links
-// soltos entre o conteúdo e o botão principal, e o próximo dia só no fim.
-ok(await esperar(existe('.festa .cartao-versiculo [data-escrever]')) && await av(q('.festa [data-escrever]') + '.textContent.trim() === "Escrever"')
-  && await av('!' + existe('.festa [data-nota-verso]')), 'o botão "Escrever" do cartão do versículo toma o lugar de "Nota"');
-ok(await av('!' + existe('.festa .link-nota') + ' && !' + existe('.festa .acoes-reflexao') + ' && !' + existe('.licao [data-proximo]')),
-  'sem links soltos no meio da revisão, e sem "Ler o dia" antes do fim');
-ok(await av(existe('[data-etapa-bloco="guardar"] .linha-fundo[data-fundo]') + ' && /Ir mais fundo\\s*\\d+ notas?/.test(' + q('.linha-fundo') + '.textContent)'),
-  '"Ir mais fundo" é uma linha com a contagem, dentro de Guardar');
-// sem caixa: o botão não passa da altura de uma linha do parágrafo (com min-height de 44px, a
-// linha dele descia)
+ok(await esperar(existe('.dia-lido .cartao-versiculo [data-escrever]')) && await av(q('.dia-lido [data-escrever]') + '.textContent.trim() === "Escrever"')
+  && await av('!' + existe('.dia-lido [data-nota-verso]')), 'o botão "Escrever" do cartão do versículo toma o lugar de "Nota"');
+ok(await av('!' + existe('.licao [data-proximo]')), 'sem "Ler o dia" no meio');
 ok(await av('(() => { const b = ' + q('.contexto-reflexao [data-nota-reflexao]') + '; if (!b) return true;'
   + ' const linha = parseFloat(getComputedStyle(b.parentElement).lineHeight); return b.getBoundingClientRect().height <= linha + 1; })()'),
   '"Ler a nota" é um link da própria linha do contexto, sem caixa');
-ok(await av('!' + existe('[data-etapa-bloco="pensar"]:not([hidden])')), 'pensar e orar começam fechados');
-await clicar('[data-avancar]');
-// 2 ou 3: as reflexões revistas têm a quantidade de perguntas que o texto pede
-ok(await esperar(existe('[data-etapa-bloco="pensar"]:not([hidden])') + ' && [2, 3].includes(document.querySelectorAll(".pergunta-reflexao").length)'),
-  '"Pensar sobre isso" abre as perguntas do dia');
-ok(await av('[...document.querySelectorAll(".pergunta-reflexao")].every((b) => b.getAttribute("aria-pressed") === "false" && b.querySelector(".marca-escolha"))'),
-  'as perguntas são opções, com o círculo de escolha e nenhuma escolhida');
-ok(await av(existe('.etapa-pensar .titulo-etapa .ico-etapa svg')), 'o título de pensar leva o ícone da etapa');
+ok(await av('!' + q('details[data-cartao="pensar"]') + '.open && !' + q('details[data-cartao="orar"]') + '.open'), 'Pensar e Orar são cartões opcionais, fechados de início');
+await clicar('details[data-cartao="pensar"] > summary');
+ok(await esperar(q('details[data-cartao="pensar"]') + '.open && [2, 3].includes(document.querySelectorAll(".pergunta-leitura").length)'),
+  'Pensar abre ali mesmo, com as perguntas do dia');
+ok(await av('!' + existe('.marca-escolha') + ' && !' + existe('.pergunta-leitura[aria-pressed]')), 'as perguntas são cartões de leitura, sem botão de opção');
+ok(await av(existe('details[data-cartao="pensar"] .linha-fundo[data-fundo]') + ' && /Ir mais fundo\\s*\\d+ notas?/.test(' + q('.linha-fundo') + '.textContent)'),
+  '"Ir mais fundo" é uma linha com a contagem, dentro de Pensar');
+const perguntaEscolhida = await av(q('[data-pergunta="0"]') + '.textContent.trim()');
 await clicar('[data-pergunta="0"]');
-ok(await av(q('[data-pergunta="0"]') + '.getAttribute("aria-pressed") === "true"'), 'a pessoa escolhe uma pergunta');
-ok(await av('!' + q('.dica-pensar') + '.hidden'), 'escolher a pergunta mostra "Fique um minuto com essa pergunta"');
-const perguntaEscolhida = await av(q('[data-pergunta="0"] .texto-pergunta') + '.textContent.trim()');
-await clicar('[data-avancar]');
-ok(await esperar(existe('[data-etapa-bloco="orar"]:not([hidden])') + ' && document.querySelectorAll(".oracao-guia li").length === 3'),
-  '"Transformar em oração" mostra três começos de oração');
-ok(await av(existe('.etapa-pensar.encolhida') + ' && getComputedStyle(' + q('#pensar-inteiro') + ').display === "none" && '
-  + q('.lembrete-pergunta') + '.textContent.trim() === ' + JSON.stringify(perguntaEscolhida)),
-  'em orar, pensar encolhe e mostra só a pergunta escolhida');
-ok(await av(q('[data-abrir-pensar]') + '.getAttribute("aria-expanded") === "false"'), 'o botão de abrir pensar diz que está fechado');
-await clicar('[data-abrir-pensar]');
-ok(await av(q('[data-abrir-pensar]') + '.getAttribute("aria-expanded") === "true" && getComputedStyle(' + q('#pensar-inteiro') + ').display !== "none"'),
-  'abrir pensar de novo mostra a reflexão e as perguntas');
-await clicar('[data-abrir-pensar]');
-ok(await av(existe('.painel-orar .titulo-etapa .ico-etapa svg') + ' && /Ore com as suas palavras/.test(' + q('.painel-orar h2') + '.textContent)'),
-  'orar tem painel próprio, com o ícone das mãos no título');
-ok(await av('[...document.querySelectorAll(".painel-orar .frase-oracao")].length === 3 && [...document.querySelectorAll(".frase-oracao")].every((b) => /…$/.test(b.textContent.trim()))'),
-  'as frases de oração são botões, uma por linha, terminando em reticências');
-await dormir(900);
+ok(await esperar(existe('.pergunta-escolhida') + ' && ' + q('.pergunta-escolhida') + '.textContent.includes(' + JSON.stringify(perguntaEscolhida.slice(0, 30)) + ')'),
+  'tocar numa pergunta leva à escrita, com a pergunta em cima');
+ok(await av('/Observar, entender, aplicar/.test(' + q('.segmentado') + '.textContent) && ' + existe('.ajuda-oia')), '"Observar, entender, aplicar", com uma linha de ajuda, no lugar de "OIA completo"');
+await clicar('[data-pronto]');
+ok(await esperar(existe('.dia-lido details[data-cartao="pensar"][open]')), 'Pronto volta ao dia lido, com Pensar como estava (lembrado)');
+await clicar('details[data-cartao="orar"] > summary');
+ok(await esperar(q('details[data-cartao="orar"]') + '.open && document.querySelectorAll(".dia-lido .frase-oracao").length === 3'), 'Orar abre ali mesmo, com três começos de oração');
+ok(await av('[...document.querySelectorAll(".frase-oracao")].every((b) => /…$/.test(b.textContent.trim()))'), 'as frases de oração terminam em reticências');
+ok(await av(q('[data-oracao-inline]') + '.placeholder === CC.reflexaoDoDia(1).oracao.join("\\n")'), 'o campo da oração tem os começos de frase do dia');
+await dormir(600);
 await foto('4d-orar');
 await clicar('[data-orei]');
 ok(await esperar(existe('.amem:not([hidden])')) && await av('CC.xpTotal() === 10'), '"Orei" responde com amém e não vale XP');
-// tocar numa frase abre a escrita da oração já começando por ela, com o cursor no fim
 const frase0 = await av('CC.reflexaoDoDia(1).oracao[0].replace(/\\s*(…|\\.\\.\\.)$/, "")');
 await clicar('[data-frase-oracao="0"]');
-ok(await esperar(existe('#campo-oracao') + ' && ' + q('#campo-oracao') + '.value.startsWith(' + JSON.stringify(frase0) + ')'),
-  'tocar numa frase abre a escrita com a frase já escrita');
-await dormir(200);
-ok(await av('document.activeElement === ' + q('#campo-oracao') + ' && ' + q('#campo-oracao') + '.selectionStart === ' + q('#campo-oracao') + '.value.length'),
-  'o cursor fica no fim da frase');
-ok(await av('!CC.temRegistro(1)'), 'a frase sozinha não vira registro antes de a pessoa escrever');
-await clicar('[data-pronto]');
-ok(await esperar(existe('[data-etapa-bloco="orar"]:not([hidden])')), 'depois da frase, a revisão volta para a etapa de orar');
-await clicar('[data-orar-escrevendo]');
-// Comparado com a oração do próprio dia, não com um texto fixo: cada dia tem a sua desde
-// que as reflexões deixaram de ser as mesmas para todo texto do mesmo gênero.
-ok(await esperar(existe('#campo-oracao') + ' && ' + q('#campo-oracao') + '.placeholder === CC.reflexaoDoDia(1).oracao.join("\\n")'),
-  'escrever a oração abre com os começos de frase do dia');
-await clicar('[data-pronto]');
-ok(await esperar(existe('[data-etapa-bloco="orar"]:not([hidden])')), 'ao voltar, a etapa de orar continua aberta');
-await clicar('[data-orar-escrevendo]');
-ok(await esperar(existe('#campo-oracao')), 'escrever abre na oração');
-await preencher('#campo-oracao', 'oração de teste');
-ok(await av('CC.temRegistro(1) && CC.xpTotal() === 10'), 'a oração fica guardada e não vale XP');
-await clicar('[data-pronto]');
-await esperar(existe('[data-avancar]'));
-await clicar('[data-avancar]');
-ok(await esperar(existe('.licao.tela-resumo .resumo-dia')), 'terminar de orar leva a uma tela só de resumo do dia');
-ok(await av('!/XP/.test(' + q('.resumo-dia') + '.innerText)'), 'o resumo não mostra XP');
-// Compartilhar no fim do dia: a imagem de story da ofensiva leva a frase que está na tela
-// (.frase-cena), não outra sorteada de novo (01d-story.js). A folha do sistema é simulada.
+ok(await esperar(q('[data-oracao-inline]') + '.value.startsWith(' + JSON.stringify(frase0) + ')'), 'tocar numa frase a põe no campo da oração');
+await preencher('[data-oracao-inline]', 'oração de teste');
+ok(await av('CC.registro(1).oracao === "oração de teste" && CC.temRegistro(1) && CC.xpTotal() === 10'), 'a oração fica guardada no registro do dia e não vale XP');
+ok(await av('!/XP/.test(' + q('.dia-lido') + '.innerText)'), 'o dia lido não mostra XP');
+// Story da chama: a imagem leva a frase que está na tela (.frase-cena). A folha do sistema é simulada.
 await av('(() => { navigator.canShare = (d) => !!(d && d.files); navigator.share = async (d) => { window.__compartilhado = d; }; return true; })()');
-await clicar('.pe-duplo [data-compartilhar]');
-ok(await esperar('!!window.__compartilhado'), 'Compartilhar no fim do dia abre o compartilhamento com a imagem');
+await clicar('.dia-lido [data-compartilhar]');
+ok(await esperar('!!window.__compartilhado'), 'o Story da chama abre o compartilhamento com a imagem');
 ok(await av('(async () => { const d = window.__compartilhado; const vista = ' + q('.frase-cena') + '.childNodes[0].textContent.trim();'
   + ' const ref = (' + q('.frase-cena .ref-frase') + ' || { textContent: "" }).textContent;'
   + ' const f = CC.FRASES_OFENSIVA.find((x) => x.linhas.join(" ") === vista);'
   + ' const esperado = await CC.story.preparar({ tipo: "ofensiva", dias: CC.sequencia().atual, frase: { linhas: f.linhas, ref } });'
   + ' return d.files.length === 1 && d.files[0] === esperado && /^geracao-eleita-ofensiva-\\d+-dias?\\.png$/.test(d.files[0].name); })()'),
 'a imagem do fim do dia leva a mesma frase que está na tela');
+ok(await av('document.querySelectorAll(".licao-dia .licao-pe button").length === 1'), 'um botão só no pé: "Voltar à trilha"');
 await dormir(900);
-await foto('4e-resumo');
+await foto('4e-dia-lido-fim');
 await clicar('[data-voltar-trilha]');
 await esperar('!' + existe('.licao'));
 // conta nova: o tutorial de instalar vem agora, depois da primeira leitura

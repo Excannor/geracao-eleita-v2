@@ -12,7 +12,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8204;
+const PORTA = Number(process.env.PORTA) || 8204;
 const PASTA = join(tmpdir(), 'cc-troca');
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));

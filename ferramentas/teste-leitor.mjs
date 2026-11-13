@@ -13,7 +13,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8192;
+const PORTA = Number(process.env.PORTA) || 8192;
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -137,16 +137,25 @@ ok(larguraSobra <= 0, 'nada estoura a largura da tela no leitor (' + larguraSobr
 await foto('leitor-3-blivre-maior.png');
 
 // ---------- marcar pelo leitor ----------
-await av('document.querySelector("[data-terminei]").click()');
+// "Terminei" só destrava no fim do texto e com o tempo mínimo (CC.portaoDeLeitura): antes disso,
+// o toque não faz nada; o teste cumpre a leitura pela porta de teste do portão.
+await av('document.querySelector("[data-terminei]").dispatchEvent(new MouseEvent("click", { bubbles: true, detail: 1 }))');
+await dormir(300);
+ok(await av('document.querySelector(".leitor-titulo b").textContent.startsWith("Gênesis") && document.querySelector("[data-terminei]").getAttribute("aria-disabled") === "true"'),
+  'antes do fim do texto e do tempo mínimo, "Terminei" não faz nada');
+await av('CC.portaoDoLeitor().concluir(); document.querySelector("[data-terminei]").click()');
 ok(await esperar('document.querySelector(".leitor h2")?.textContent === "Mateus 1"'),
   'terminar o Antigo Testamento leva direto a Mateus 1');
 ok(await av('document.querySelectorAll(".licao .passagem.feita").length === 1'),
-  'a lição por baixo já mostra a primeira passagem marcada');
-await av('document.querySelector("[data-terminei]").click()');
+  'a lição por baixo já mostra a primeira passagem lida');
+await av('CC.portaoDoLeitor().concluir(); document.querySelector("[data-terminei]").click()');
 ok(await esperar('!document.querySelector(".leitor")'), 'terminar a última trilha fecha o leitor');
-ok(await av('CC.leu(1)'), 'o dia 1 conta como lido');
+ok(await av('CC.leu(1) && CC.origemDoDia(1) === "app"'), 'o dia 1 conta como lido, lido no app');
+ok(await esperar('!!document.querySelector(".licao .dia-lido")'), 'e a lição vai direto para a tela do dia lido');
 
 // Esc fecha o texto e deixa a lição aberta
+await av('location.hash = "#/dia/2"');
+await esperar('!!document.querySelector(\'.licao [data-ler="novo"]\')');
 await av('document.querySelector(\'[data-ler="novo"]\').click()');
 await esperar('!!document.querySelector(".leitor")');
 await av('dispatchEvent(new KeyboardEvent("keydown", { key: "Escape" }))');

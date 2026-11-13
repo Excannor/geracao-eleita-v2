@@ -280,7 +280,10 @@ try {
       ok(await t.erroCadastro() === 'O Geração Eleita é para quem tem 12 anos ou mais.', nome + ': menos de 12 anos: recusado com a regra dita');
       await t.foto('erro-menor-de-12');
       await t.data('2001-07-15');
-      ok(await t.av('document.querySelector(\'[data-caminho="plano"]\').getAttribute("aria-pressed") === "true"'), nome + ': "Sim" já vem escolhido');
+      ok(await t.av('[...document.querySelectorAll(".opcao-caminho")].every((b) => b.getAttribute("aria-pressed") === "false")'), nome + ': "Você já segue Jesus?" vem sem resposta marcada');
+      await t.tocar('#botao-cadastro');
+      ok(/^Escolha uma resposta/.test(await t.erroCadastro()), nome + ': sem resposta, o Continuar pede uma');
+      await t.tocar('[data-caminho="plano"]');
       await t.tocar('#botao-cadastro');
       ok(await t.ate('document.getElementById("passo-rotulo").textContent === "Passo 2 de 3" && document.activeElement.id === "email"'), nome + ': passo 2, cursor no e-mail');
       await t.foto('passo-2');

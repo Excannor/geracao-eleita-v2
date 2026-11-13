@@ -392,7 +392,7 @@
   const pedirDiaLido = () => CC.pedirPeca(window.DIA_LIDO, () => !!CC.telaDiaLido);
   CC.pedirDiaLido = pedirDiaLido;
   // e é pedida também logo depois da abertura do app, para o service worker já guardá-la
-  if (CC.quandoCarregar) CC.quandoCarregar(() => setTimeout(() => { if (CC.appServido && CC.appServido()) pedirDiaLido().catch(() => {}); }, 6000));
+  if (CC.quandoCarregar) CC.quandoCarregar(() => setTimeout(() => { if (CC.appServido && CC.appServido()) pedirDiaLido().catch(() => {}); }, 2500));
   const pontes = { sessao: () => sessao, ir, sair, botao, nb, primeiroNome, totalApoio, pintarVersiculo };
   function telaFesta(dia, u) {
     if (CC.telaDiaLido) return CC.telaDiaLido(pontes, dia, u);
