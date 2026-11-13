@@ -133,7 +133,8 @@
     const proporcao = (m) => m ? ' style="aspect-ratio:' + m.largura + ' / ' + m.altura + '"' : '';
     const cartao = (it) => {
       const m = pronto(it.arquivo);
-      return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '">'
+      // o nome do cartão é o título (com a linha e a referência), não o texto do desenho (C14)
+      return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '" aria-label="' + esc(it.titulo + '. ' + it.linha + '. ' + it.ref) + '">'
         + '<span class="item-atlas-mapa" aria-hidden="true"' + proporcao(m) + '>' + (m ? svg(m, { faixa: false, mini: true }) : '') + '</span>'
         + '<span class="item-atlas-textos"><b>' + esc(it.titulo) + '</b><span class="item-atlas-linha">' + esc(it.linha) + '</span>'
         + '<span class="item-atlas-pe"><mark>' + nb(esc(it.ref)) + '</mark>' + CC.ico('avancar') + '</span></span></a>';
@@ -189,10 +190,13 @@
       + '<h3 class="atlas-trecho">' + (m.pernas.length ? linhaAmostra('ida') : '') + esc((m.trechos || {}).ida || 'Ida') + '</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
       + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + esc((m.trechos || {}).volta || 'Volta') + '</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
       + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(trechoDeLeitura(m.leitura)) + '</a>' : '')
+      + '<div class="atlas-anotacoes" data-notas-contexto="atlas:' + esc(m.slug) + '" data-tipo-nota="nota"></div>'
       + '<p class="atlas-fonte">Posições e caminhos aproximados. Relevo e profundidade: SRTM, GMTED2010 e ETOPO1 (dados públicos); costa: Natural Earth.</p>';
     CC.ligarVoltarDoTopo(raiz);
     CC.inseparavel(raiz);
     ligarZoom(raiz, m);
+    // "Suas anotações", como na parábola (revisão de usabilidade, C26)
+    if (CC.notasDoContexto) CC.notasDoContexto(raiz);
   }
 
   // ---------- aproximar e arrastar ----------
