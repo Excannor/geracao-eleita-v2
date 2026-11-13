@@ -233,9 +233,16 @@
     CC.carregarBiblia(b).then((biblia) => {
       if (minha !== geracao) return;
       const caps = Object.hasOwn(biblia.livros, livro) ? biblia.livros[livro] : null;
-      if (!caps) { mostrarVazio(alvo, 'Não encontrei esse livro.'); CC.fecharLeituraBiblia(); return; }
+      if (!caps) {
+        // link escrito à mão ou compartilhado sem acento ("#/biblia/joao/3"): acha o livro
+        const r = CC.refDaBusca(livro.replace(/-/g, ' ') + ' 1');
+        if (r && Object.hasOwn(biblia.livros, r.livro)) { CC.substituirRota('#/biblia/' + encodeURIComponent(r.livro) + (capitulo ? '/' + capitulo : '')); return; }
+        mostrarVazio(alvo, 'Não encontrei esse livro.'); CC.fecharLeituraBiblia(); return;
+      }
       const total = caps.length;
       const capValido = capitulo >= 1 && capitulo <= total ? capitulo : 0;
+      // capítulo que o livro não tem: avisa, em vez de cair calado na grade
+      if (capitulo && !capValido && !CC.voltandoNoHistorico()) CC.avisar('Não achei o capítulo ' + capitulo + ': ' + livro + ' tem ' + CC.plural(total, 'capítulo', 'capítulos') + '.');
       alvo.innerHTML = '<div class="folha-biblia">' + CC.botaoVoltar('Bíblia')
         + '<h1>' + nb(CC.esc(livro)) + '</h1>'
         + '<p class="subtitulo-tela">' + CC.esc(CC.plural(total, 'capítulo', 'capítulos')) + '</p></div>'

@@ -300,6 +300,18 @@ await dormir(400);
 await ir('#/atlas', '!!document.querySelector(".item-atlas")', 15000);
 ok(await av('[...document.querySelectorAll(".item-atlas")].every((a) => /^[^.]+\\. /.test(a.getAttribute("aria-label") || "") && a.querySelector(".item-atlas-mapa").getAttribute("aria-hidden") === "true")'), 'cada cartão do atlas tem o título como nome, e o desenho fica escondido do leitor de tela');
 
+// ---------- links diretos e "não encontrei" (C21) ----------
+await ir('#/biblia/joao/3', '!!document.querySelector(".leitor-biblia:not(.saindo)")', 15000);
+ok(await av('location.hash') === '#/biblia/Jo%C3%A3o/3', '#/biblia/joao/3 (sem acento) abre João 3');
+await ir('#/biblia/Salmos/999', '!!document.querySelector(".grade-capitulos")', 15000);
+ok(await esperar('/Salmos tem 150 capítulos/.test((document.getElementById("aviso-flutuante") || {}).textContent || "")'), '#/biblia/Salmos/999 avisa que Salmos tem 150 capítulos');
+await ir('#/mapa/foo', '!!document.querySelector(".saidas-vazio")');
+ok(await av('!!document.querySelector(".saidas-vazio a[href=\\"#/biblia\\"]") && !!document.querySelector(".saidas-vazio a[href=\\"#/explorar\\"]")'), 'o "não encontrei" oferece "Ir para a Bíblia" e "Buscar no Explorar"');
+await ir('#/xyz', '!!document.querySelector(".saidas-vazio")');
+ok(true, 'a página não encontrada também');
+await ir('#/livro/genesis', 'location.hash.startsWith("#/nota/") && !!document.querySelector(".nota-corpo")');
+ok(await av('decodeURIComponent(location.hash)') === '#/nota/03 - Livros da Bíblia/Gênesis', '#/livro/genesis abre a ficha de Gênesis');
+
 // ---------- depuração ----------
 if (process.env.DEPURAR_BUSCA) {
   await ir('#/explorar', '!!document.querySelector(".cartao-mapas")');

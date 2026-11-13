@@ -528,6 +528,12 @@
     if (CC.fecharPopNo) CC.fecharPopNo();
 
     if (rota === 'propositos') { CC.substituirRota('#/novidades/propositos'); return; }
+    // endereço limpo para a ficha de um livro: #/livro/genesis (revisão de usabilidade, C21)
+    if (rota === 'livro') {
+      const nome = (CC.LIVROS.find(([l]) => CC.slugDoLivro(l) === CC.slugDoLivro(arg)) || [])[0];
+      CC.substituirRota(nome ? '#/nota/' + encodeURIComponent('03 - Livros da Bíblia/' + nome) : '#/explorar');
+      return;
+    }
     if (rota === '' || rota === 'dia') CC.vistaTrilha(conteudo);
     else if (rota === 'passos' || rota === 'licoes') CC.vistaPassos(conteudo);
     else if (rota === 'praticar') CC.vistaPraticar(conteudo);

@@ -600,7 +600,10 @@
     return { porDia };
   };
 
+  // A tela de "não encontrei" oferece uma saída além do voltar (revisão de usabilidade, C21).
   CC.vazio = function (raiz, mensagem) {
-    raiz.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({ icone: 'info', texto: mensagem });
+    raiz.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({ icone: 'info', texto: mensagem })
+      + '<div class="acoes saidas-vazio"><a class="botao contorno" href="#/biblia">Ir para a Bíblia</a>'
+      + '<a class="botao plano" href="#/explorar">Buscar no Explorar</a></div>';
   };
 })(window.CC);
