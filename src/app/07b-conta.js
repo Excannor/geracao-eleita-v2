@@ -75,7 +75,7 @@
         + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
           '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
         + '</div></div>')
-      + grupo('Leitura', linha('Tradução e créditos', traducao ? traducao.abreviatura : '', 'data-ir="#/config/textos"'))
+      + grupo('Leitura', linha('Tradução e créditos', CC.nomeCurtoDaTraducao ? CC.nomeCurtoDaTraducao(traducao) : (traducao || {}).abreviatura || '', 'data-ir="#/config/textos"'))
       // o item diz o que faz (a seção já se chama "Seu caminho"; revisão de usabilidade, C20)
       + grupo('Seu caminho', linha('Plano de leitura',
         quem.caminho === 'conhecer' ? 'Conhecer Jesus' : 'Plano da Bíblia em um ano', 'data-caminho'))

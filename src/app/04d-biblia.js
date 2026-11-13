@@ -72,6 +72,10 @@
     return '<a class="ref-biblia" href="' + CC.hrefDaRef(r) + '" aria-label="' + CC.esc('Ler ' + r.livro + ' ' + r.cap + ' na Bíblia') + '"><mark>' + texto + '</mark></a>';
   };
 
+  // O nome curto da tradução, para a tela: "BLIVRE" não diz nada a ninguém (revisão, C17).
+  const NOME_CURTO = { blivre: 'Bíblia Livre' };
+  CC.nomeCurtoDaTraducao = (b) => (b ? NOME_CURTO[b.sigla] || b.abreviatura || String(b.sigla || '').toUpperCase() : '');
+
   // .folha-biblia: só apresentação, a folha do alto das telas da Bíblia (22-leitura.css)
   function esqueleto(alvo, titulo, voltar, seletor) {
     alvo.innerHTML = '<div class="folha-biblia' + (seletor ? ' com-seletor' : '') + '">' + (seletor ? CC.seletorBiblia('ler') : '') + (voltar ? CC.botaoVoltar(voltar) : '') + '<h1' + (voltar ? '' : ' class="titulo-biblia"') + '>' + nb(CC.esc(titulo)) + '</h1></div>'
@@ -161,7 +165,7 @@
         + '<a class="botao-redondo atalho-anotacoes" href="#/perfil/anotacoes" aria-label="Minhas anotações">' + CC.ico('caderno') + '</a>'
         + '<h1 class="titulo-biblia"><button class="botao-versao" data-versao aria-haspopup="dialog" aria-label="Bíblia, tradução '
         + CC.esc(b.nome.replace(/Biblica® Open |™/g, '')) + '. Trocar a tradução">Bíblia<span class="sigla-versao">'
-        + CC.esc(b.abreviatura || b.sigla.toUpperCase()) + CC.ico('baixo') + '</span></button></h1>'
+        + CC.esc(CC.nomeCurtoDaTraducao(b)) + CC.ico('baixo') + '</span></button></h1>'
         + '<p class="subtitulo-tela">Escolha um livro e leia à vontade, no seu ritmo.</p>'
         + cartaoContinuar(biblia) + '</div>'
         + '<div class="busca-caixa">' + CC.ico('lupa') + '<input id="busca-livro" type="search" placeholder="Buscar livro (ex.: João 3)" aria-label="Buscar livro da Bíblia" autocomplete="off" spellcheck="false" enterkeyhint="go"></div>'
@@ -341,7 +345,7 @@
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
       + '<button class="fechar" data-fechar-biblia aria-label="' + (!leitorSobreGrade && veioDeFora() ? 'Voltar' : 'Voltar aos capítulos') + '">' + CC.ico('fechar') + '</button>'
-      + '<div class="leitor-titulo"><span class="rot">' + CC.esc(b.abreviatura) + '</span>'
+      + '<div class="leitor-titulo"><span class="rot">' + CC.esc(CC.nomeCurtoDaTraducao(b)) + '</span>'
       + '<b>' + nb(CC.esc(livro) + ' ' + n) + '</b></div>'
       + '<button class="botao-icone letra" data-aa-biblia aria-label="Tradução, letra e tema">Aa</button>'
       + '</div>'
