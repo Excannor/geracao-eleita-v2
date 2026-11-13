@@ -344,7 +344,7 @@
 
     el.innerHTML = '<div class="leitor-cabeca">'
       + '<div class="licao-topo">'
-      + '<button class="fechar" data-fechar-biblia aria-label="' + (!leitorSobreGrade && veioDeFora() ? 'Voltar' : 'Voltar aos capítulos') + '">' + CC.ico('fechar') + '</button>'
+      + '<button class="fechar" data-fechar-biblia aria-label="' + (!leitorSobreGrade && veioDeFora() ? 'Voltar' : 'Voltar aos capítulos') + '">' + CC.ico('voltar') + '</button>'
       + '<div class="leitor-titulo"><span class="rot">' + CC.esc(CC.nomeCurtoDaTraducao(b)) + '</span>'
       + '<b>' + nb(CC.esc(livro) + ' ' + n) + '</b></div>'
       + '<button class="botao-icone letra" data-aa-biblia aria-label="Tradução, letra e tema">Aa</button>'
