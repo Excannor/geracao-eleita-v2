@@ -4,7 +4,7 @@
 // "Dividir em 2 encontros", no lugar do aviso das 80 partes; a prévia mostra os dois encontros; o
 // "Desfazer a divisão" volta o texto inteiro; dividido, a parte 1 é salva como o estudo da célula e,
 // no mesmo pedido, a parte 2 entra nos próximos estudos, na fila do servidor, com a data do encontro
-// seguinte (docs/a-mesa-fila.md). Registrado o encontro com a parte 1, a parte 2 entra sozinha na
+// seguinte (docs/a-mesa-fila.md). Depois do encontro com a parte 1 (aqui, pelo "Usar agora"), a parte 2 entra na
 // aba, e a parte 1 vai para Estudos anteriores. Por fim, "Imprimir" no app instalado do iPhone
 // (html.app-ios): o PDF tem todas as folhas, com a marca d'água em cada uma, e o tema escuro não vaza
 // para o papel.
@@ -305,8 +305,13 @@ await foto('06b-parte-2-nos-proximos-390-escuro');
 await tema(false);
 
 // ---------- 4. depois do encontro, a parte 2 entra sozinha ----------
+// O encontro registrado hoje só põe a parte 2 amanhã (a célula ainda pode estar reunida); o dia
+// seguinte não se simula aqui, então o líder a põe de propósito, pelo "Usar agora".
 const reg = await pedir('api/celula', { acao: 'registrarEncontro', id: ID, data: HOJE, presentes: ['lider', 'ana'], visitantes: 0, estudo: S1 }, lider);
-ok(reg.status === 200 && reg.dado.promovido && reg.dado.promovido.titulo === TITULO + ' (parte 2)', '4. registrado o encontro com a parte 1, a parte 2 entra na célula');
+ok(reg.status === 200 && reg.dado.promovido === null && reg.dado.amanha && reg.dado.amanha.titulo === TITULO + ' (parte 2)' && (await celulaDe(ana, ID)).estudo.id === S1,
+  '4. registrado o encontro de hoje com a parte 1, a parte 2 fica para amanhã e a célula segue na parte 1');
+const usarP2 = await pedir('api/celula', { acao: 'filaUsar', id: ID, estudo: (await celulaDe(lider, ID)).fila[0].id }, lider);
+ok(usarP2.status === 200 && usarP2.dado.promovido && usarP2.dado.promovido.titulo === TITULO + ' (parte 2)', '4. "Usar agora" põe a parte 2 na célula');
 await como(lider, rota('estudo'), false);
 ok(await esperar('/\\(parte 2\\)/.test(document.querySelector(".mesa-estudo .mesa-t1")?.textContent || "")', 20000), '4. a aba mostra a parte 2');
 cel = await celulaDe(lider, ID);
