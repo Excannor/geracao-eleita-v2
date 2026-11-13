@@ -347,7 +347,8 @@ try {
       await sairPelaConfig(t, nome);
       await t.foto('saiu');
       await entrar(t, nome, 'pedro.silva', 'leitura-diaria-7', { errada: 'leitura-diaria-8' });
-      ok(await t.ate('!!document.querySelector("[data-ler-hoje]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': entrou de novo na trilha do plano');
+      // com o dia 1 lido hoje, o alto da trilha mostra "Dia 1 lido" no lugar de "Ler hoje"
+      ok(await t.ate('!!document.querySelector("[data-ler-hoje], [data-rever-dia]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': entrou de novo na trilha do plano');
       await t.foto('entrou-de-novo');
     } finally {
       ok(t.excecoes.length === 0, nome + ': nenhuma exceção' + (t.excecoes[0] ? ': ' + t.excecoes[0] : ''));
