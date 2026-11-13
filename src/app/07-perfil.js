@@ -180,7 +180,7 @@
       + '<div class="titulo-secao"><h2>Meus conteúdos</h2></div>'
       + '<div class="lista-atalhos">'
       + atalho('#/perfil/anotacoes', 'caderno', 'Minhas anotações')
-      + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
+      + atalho('#/perfil/livros', 'livro', 'Meu progresso nos livros')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
       // Só para quem ainda não está em nenhuma célula: quem já está numa (ou mais) usa a
@@ -190,8 +190,8 @@
       // O app: instalar e as configurações com nome, não só o ícone do canto.
       + '<div class="titulo-secao"><h2>Ajustes</h2></div>'
       + '<div class="lista-atalhos">'
-      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
-      + atalho('#/config', 'engrenagem', 'Configurações e conta')
+      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar o app</span>' + CC.ico('avancar') + '</button>'
+      + atalho('#/config', 'engrenagem', 'Configurações')
       + '</div>'
       // O painel do administrador saiu daqui: mora no Mais, só para o admin (10-roteador.js).
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
@@ -279,24 +279,23 @@
   // Meus versículos e Minhas anotações viraram uma tela só: 07g-anotacoes.js.
 
   // ---------- livros ----------
+  // Na ordem da Bíblia, com a unidade escrita ("7 de 20 leituras": são os dias do plano que
+  // passam pelo livro, não capítulos), e o toque abre o livro na Bíblia (revisão, C13).
   CC.vistaLivros = function (raiz) {
-    const vistos = [];
-    for (const d of D.plano) for (const l of d.livros) if (!vistos.includes(l)) vistos.push(l);
+    const doPlano = new Set();
+    for (const d of D.plano) for (const l of d.livros) doPlano.add(l);
     const pilula = (l) => {
       const p = CC.progressoDoLivro(l);
       const completo = p.lidos === p.total;
-      const id = '03 - Livros da Bíblia/' + l;
       const dentro = (completo ? CC.ico('certo') : '') + CC.esc(l)
-        + ' <span class="conta-livro">' + p.lidos + '/' + p.total + '</span>';
+        + ' <span class="conta-livro">' + p.lidos + ' de ' + CC.plural(p.total, 'leitura', 'leituras') + '</span>';
       const classe = 'pilula' + (completo ? ' livro-feito' : (p.lidos ? ' livro-andando' : ''));
-      return D.notas[id]
-        ? '<a class="' + classe + '" href="#/nota/' + encodeURIComponent(id) + '">' + dentro + '</a>'
-        : '<span class="' + classe + '">' + dentro + '</span>';
+      return '<a class="' + classe + '" href="#/biblia/' + encodeURIComponent(l) + '">' + dentro + '</a>';
     };
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
-      + '<h1>Livros da Bíblia</h1>'
-      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos.</p></div>'
-      + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';
+      + '<h1>Meu progresso nos livros</h1>'
+      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. Cada livro conta as leituras do plano que passam por ele.</p></div>'
+      + '<div class="pilulas">' + CC.LIVROS.map(([l]) => l).filter((l) => doPlano.has(l)).map(pilula).join('') + '</div>';
   };
 
   // ---------- Minha história com Deus ----------
