@@ -147,8 +147,10 @@
   CC.linkDoMapa = function (nomeDoLivro) {
     const m = CC.mapaDoLivro(nomeDoLivro);
     if (!m) return '';
-    return '<a class="link-mapa" href="#/mapa/' + m.slug + '"><span class="link-mapa-icone" aria-hidden="true">' + CC.ico('ramos') + '</span>'
-      + '<span><b>Ver o mapa do livro</b><small>' + CC.esc(m.nome) + ' inteiro numa página</small></span>' + CC.ico('avancar') + '</a>';
+    // vindo do mapa, o link volta para ele em vez de empilhar outro (revisão, C19)
+    const doMapa = CC.anteriorNaPilha && CC.anteriorNaPilha() === '#/mapa/' + m.slug;
+    return '<a class="link-mapa" href="#/mapa/' + m.slug + '"' + (doMapa ? ' data-voltar' : '') + '><span class="link-mapa-icone" aria-hidden="true">' + CC.ico('ramos') + '</span>'
+      + '<span><b>' + (doMapa ? 'Voltar ao mapa do livro' : 'Ver o mapa do livro') + '</b><small>' + CC.esc(m.nome) + ' inteiro numa página</small></span>' + CC.ico('avancar') + '</a>';
   };
   // ---------- a casca da tela do mapa ----------
   // A barra e a cabeça (o nome no pincel e os capítulos) saem daqui, na hora: é o que aparece

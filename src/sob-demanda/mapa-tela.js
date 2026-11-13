@@ -208,7 +208,9 @@
       + curta(64, meio) + '<section class="mapa-bloco mapa-procure">' + procure + '</section>'
       + ler
       // a ficha do livro (Explorar > Livros) e o mapa ficam ligados nos dois sentidos
-      + (D.notas[FICHA(nome)] ? '<a class="botao contorno mapa-ficha" href="#/nota/' + encodeURIComponent(FICHA(nome)) + '">Ver a ficha do livro</a>' : '')
+      // vindo da ficha, o botão volta para ela em vez de empilhar outra (revisão, C19)
+      + (D.notas[FICHA(nome)] ? '<a class="botao contorno mapa-ficha" href="#/nota/' + encodeURIComponent(FICHA(nome)) + '"'
+        + (CC.anteriorNaPilha && CC.anteriorNaPilha() === '#/nota/' + encodeURIComponent(FICHA(nome)) ? ' data-voltar>Voltar à ficha do livro' : '>Ver a ficha do livro') + '</a>' : '')
       + '</div>';
   }
 
@@ -254,8 +256,11 @@
     W = Math.max(280, raiz.clientWidth - 32);
     const cache = carregados.get(m.slug);
     const pintar = (mapa) => {
-      raiz.innerHTML = folha(m) + corpoDoMapa({ ...mapa, sigla: siglaDe(mapa.nome) });
+      // no fim, "Suas anotações", como na parábola (revisão de usabilidade, C26)
+      raiz.innerHTML = folha(m) + corpoDoMapa({ ...mapa, sigla: siglaDe(mapa.nome) })
+        + '<div class="mapa-anotacoes" data-notas-contexto="mapa:' + CC.esc(m.slug) + '" data-tipo-nota="nota"></div>';
       ligar(raiz, m);
+      if (CC.notasDoContexto) CC.notasDoContexto(raiz);
     };
     // Já carregado: desenha na hora, para o redesenho não perder a rolagem.
     if (cache && cache.pronto) { pintar(cache.pronto); return; }

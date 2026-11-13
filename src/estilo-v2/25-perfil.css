@@ -348,3 +348,5 @@ a.painel-celula-linha { color: inherit; text-decoration: none; }
 .cartao-abrir-ref { display: flex; align-items: center; margin: 0 0 18px; }
 .cartao-abrir-ref .textos { flex: 1 1 auto; display: grid; }
 .item-visual .sub { color: var(--salvia-texto); }
+/* A tabela da ficha do livro vem do material com um cabeçalho vazio: some (revisão, C19). */
+.nota-corpo thead:not(:has(th:not(:empty))) { display: none; }
