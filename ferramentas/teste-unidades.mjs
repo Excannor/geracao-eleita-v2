@@ -23,7 +23,7 @@ const cmd=(m,p={})=>new Promise(res=>{const id=++seq;pend.set(id,res);ws.send(JS
 const av=async e=>(await cmd('Runtime.evaluate',{expression:e,returnByValue:true,awaitPromise:true})).result?.value;
 await cmd('Runtime.enable');await cmd('Log.enable');
 await cmd('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:2,mobile:true});
-await cmd('Page.navigate',{url:'http://127.0.0.1:8170/#/praticar'});
+await cmd('Page.navigate',{url:'http://127.0.0.1:' + PORTA + '/#/praticar'});
 await dormir(2200);
 let f=0;const ok=(c,m)=>{console.log((c?'  ok   ':'  FALHA')+'  '+m);if(!c)f++;};
 ok(await av('document.querySelectorAll(".cartao-pratica").length===12'),'as 12 unidades aparecem ('+await av('document.querySelectorAll(".cartao-pratica").length')+')');

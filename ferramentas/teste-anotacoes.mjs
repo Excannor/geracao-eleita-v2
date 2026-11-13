@@ -201,7 +201,9 @@ await av('location.hash = "#/conhecer/1"');
 await esperar(existe('[data-ler]'), 10000);
 await clicar('[data-ler]');
 await esperar('[...document.querySelectorAll("button")].some((b) => /Terminei a leitura/.test(b.textContent))', 10000);
-await av('[...document.querySelectorAll("button")].find((b) => /Terminei a leitura/.test(b.textContent)).click(); true');
+// "Terminei a leitura" destrava no fim do texto e com o tempo mínimo: a porta de teste do portão cumpre
+await esperar('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())', 10000);
+await av('CC.portaoDoLeitor().concluir(); [...document.querySelectorAll("button")].find((b) => /Terminei a leitura/.test(b.textContent)).click(); true');
 ok(await esperar(existe('[data-notas-contexto="conhecer:1"] [data-escrever-contexto]') + ' && !' + existe('[data-anotacao]'), 10000), 'o Conhecer Jesus usa o mesmo bloco de notas');
 await clicar('.tela-conhecer [data-fechar]');
 await av('location.hash = "#/perfil/anotacoes"');
