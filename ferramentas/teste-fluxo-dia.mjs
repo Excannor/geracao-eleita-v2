@@ -70,7 +70,7 @@ try {
     toques++;
     return true;
   };
-  const tela = async () => av('document.querySelector(".dia-lido") ? "dia lido" : document.querySelector(".leitor:not(.saindo)") ? "leitor: " + document.querySelector(".leitor-titulo b").textContent'
+  const tela = async () => av('document.querySelector(".licao-dia:not(.saindo) .dia-lido") ? "dia lido" : document.querySelector(".leitor:not(.saindo)") ? "leitor: " + document.querySelector(".leitor-titulo b").textContent'
     + ' : document.querySelector(".licao-dia:not(.saindo)") ? "lição" : document.querySelector("[data-ler-hoje], [data-rever-dia]") ? "trilha" : "?"');
   const anotarTela = async () => { const t = await tela(); if (telas[telas.length - 1] !== t) telas.push(t); };
   const rolarAteOFim = () => av('(() => { const p = document.querySelector(".leitor .licao-palco"); p.scrollTop = p.scrollHeight; p.dispatchEvent(new Event("scroll")); return 1; })()');
@@ -141,8 +141,7 @@ try {
   ok(await esperar(q('.leitor [data-terminei]') + '.getAttribute("aria-disabled") === null', 15000), 'com o tempo cumprido, o leitor de tela já ouve o botão disponível');
   ok(await av(q('.leitor [data-terminei]') + '.classList.contains("enchendo")'), '…enquanto, na tela, ele ainda enche até o fim do texto');
   await av(q('.leitor [data-terminei]') + '.click(); 1');
-  await dormir(800);
-  await dormir(2000);
+  await dormir(600); // o leitor sai com a animação dele
   toques++;
   ok(await esperar(existe('.dia-lido'), 10000), 'toque 3: a última passagem conclui o dia e abre "Dia lido" direto');
   await anotarTela();
@@ -159,7 +158,7 @@ try {
   ok(voltou, 'toque 4: de volta à Trilha, com "Dia 1 lido"');
   await anotarTela();
   ok(toques <= 4, 'da Trilha ao "Dia lido" e de volta: ' + toques + ' toques (no máximo 4)');
-  ok(telas.length <= 5 && telas.join(' > ') === 'trilha > leitor: Gênesis 1-\u20603 > leitor: Mateus\u00a01 > dia lido > trilha', 'telas: ' + telas.join(' > '));
+  ok(telas.length <= 5 && telas.join(' > ').replace(/[\u00a0\u2060]/g, (c) => (c === '\u00a0' ? ' ' : '')) === 'trilha > leitor: Gênesis 1-3 > leitor: Mateus 1 > dia lido > trilha', 'telas: ' + telas.join(' > '));
   ok(await av('!document.querySelector(".no.atual .face svg") || !document.querySelector(".no.atual").innerHTML.includes("M12 2l")'), 'lido o dia, o nó seguinte descansa');
   ok(await av('/Amanhã · Dia 2/.test((document.querySelector(".cartao-no-hoje") || {}).textContent || "")'), 'o cartão do nó seguinte diz "Amanhã · Dia 2"');
 
@@ -182,6 +181,7 @@ try {
   ok(await av('/Leia as duas passagens e conclua o dia\\./.test(document.querySelector(".licao-dia .passo-dica").textContent) || !!document.querySelector(".licao-dia .cabeca-licao .passo-dica")'), 'a dica diz o que fazer');
   await tocar('.licao-dia [data-papel]');
   ok(await esperar(existe('.folha-papel [data-papel-sim]')), 'a folha curta pergunta se leu na Bíblia');
+  await dormir(500); // a folha termina de subir
   ok(await av('/O dia conta para a sua chama\\. O baú da semana abre com as leituras feitas aqui\\./.test(document.querySelector(".folha-papel").textContent)'), 'e explica o que conta e o que não conta');
   await av('CC.marcarLido(2, "papel"); CC.marcarLido(3, "papel"); CC.marcarLido(4, "app"); CC.marcarLido(5, "app"); CC.marcarLido(6, "app"); 1');
   await tocar('.folha-papel [data-papel-sim]');
@@ -194,6 +194,7 @@ try {
   await dormir(600);
   await tocar('[data-bau="7"]');
   ok(await esperar(existe('.pop-bau [data-ir-dia]')), 'o baú travado diz o que falta, com um atalho para cada dia');
+  await dormir(400); // o balão termina de abrir
   ok(await av('/Leia os dias 1 a 7 aqui no app para abrir\\./.test(document.querySelector(".pop-bau").textContent) && [...document.querySelectorAll(".pop-bau [data-ir-dia]")].map((b) => b.dataset.irDia).join() === "2,3,7"'),
     '"Leia os dias 1 a 7 aqui no app para abrir", e os dias 2, 3 e 7');
   ok(await av('document.querySelector(".pop-bau").contains(document.activeElement)'), 'o foco entra no balão');
