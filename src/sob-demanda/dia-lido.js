@@ -135,7 +135,7 @@
       + '<summary><span class="ico-etapa">' + CC.ico('oracao') + '</span><span class="rot-opcional"><b>Orar</b><small>Com as suas palavras</small></span>' + CC.ico('baixo') + '</summary>'
       + '<div class="corpo-opcional">'
       + '<ul class="oracao-guia">' + r.oracao.map((frase, i) => '<li><button class="frase-oracao" data-frase-oracao="' + i + '">'
-        + '<span>' + CC.esc(comReticencias(frase)) + '</span>' + CC.ico('mais') + '</button></li>').join('') + '</ul>'
+        + '<span>' + CC.esc(comReticencias(frase)) + '</span>' + CC.ico('caneta') + '</button></li>').join('') + '</ul>'
       + '<div class="campo"><label for="oracao-do-dia">Sua oração</label>'
       + '<textarea id="oracao-do-dia" data-oracao-inline placeholder="' + CC.esc(r.oracao.join('\n')) + '">' + CC.esc(registro.oracao || '') + '</textarea></div>'
       + '<span class="salvo" id="salvo-oracao" role="status"></span>'

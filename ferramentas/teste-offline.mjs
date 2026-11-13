@@ -119,14 +119,18 @@ await dormir(500);
 await av('(document.querySelector(".no.atual").click(), document.querySelector(".pop-no [data-comecar]").click())');
 await dormir(700);
 ok(await av('!!document.querySelector(".licao")'), 'a lição do dia abre sem rede');
-// "Começar" abre o leitor direto; o texto vem do cache. A leitura é cumprida pela porta de teste
-// do portão (fim do texto e tempo mínimo, CC.portaoDeLeitura).
-for (let i = 0; i < 2; i++) {
-  await av('(async () => { for (let i = 0; i < 40 && !(CC.portaoDoLeitor && CC.portaoDoLeitor()); i++) await new Promise((r) => setTimeout(r, 150)); CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); })()');
-  await dormir(700);
-}
-ok(await av('CC.ler("lidos", []).length >= 2'), 'ler o dia no leitor funciona sem rede');
-ok(await av('!!document.querySelector(".licao .dia-lido")'), 'a tela do dia lido abre logo depois da leitura, sem rede');
+// Sem rede, "Li na minha Bíblia" vem em destaque na lição (a pessoa pode ler na Bíblia dela):
+// "Começar" abriu o leitor por cima; ele fecha, e a lição mostra o botão.
+await av('(() => { const f = document.querySelector(".leitor [data-fechar-leitor]"); if (f) CC.fecharLeitor(); return 1; })()');
+await av('location.hash = "#/dia/" + CC.diaAtual()');
+await dormir(700);
+ok(await av('!!document.querySelector(".licao-dia .papel-destaque[data-papel]")'), 'sem rede, "Li na minha Bíblia" aparece em destaque na lição');
+await av('document.querySelector(".licao-dia [data-papel]").click()');
+await dormir(700);
+await av('document.querySelector(".folha-papel [data-papel-sim]").click()');
+await dormir(900);
+ok(await av('CC.ler("lidos", []).length >= 2 && CC.origemDoDia(CC.ler("lidos").slice(-1)[0]) === "papel"'), '"Sim, li" conta o dia sem rede, com a origem papel');
+ok(await av('!!document.querySelector(".licao .dia-lido")'), 'a tela do dia lido abre logo depois, sem rede');
 ok(await av('!document.querySelector("[data-seguir]")'), 'sem telas de festa no caminho, sem rede');
 
 // escrever e guardar

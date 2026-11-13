@@ -154,7 +154,7 @@ ok(await av('CC.leu(1) && CC.origemDoDia(1) === "app"'), 'o dia 1 conta como lid
 ok(await esperar('!!document.querySelector(".licao .dia-lido")'), 'e a lição vai direto para a tela do dia lido');
 
 // Esc fecha o texto e deixa a lição aberta
-await av('location.hash = "#/dia/2"');
+await av('location.hash = "#/dia/3"');
 await esperar('!!document.querySelector(\'.licao [data-ler="novo"]\')');
 await av('document.querySelector(\'[data-ler="novo"]\').click()');
 await esperar('!!document.querySelector(".leitor")');
@@ -178,7 +178,7 @@ evs.length = 0;
 await av('location.hash = "#/"');
 await cmd('Page.reload', {});
 ok(await esperar('!!document.querySelector(".no")'), 'o aplicativo abre sem rede');
-await av('location.hash = "#/dia/2"');
+await av('location.hash = "#/dia/3"');
 await esperar('!!document.querySelector("[data-ler]")');
 await av('document.querySelector(\'[data-ler="antigo"]\').click()');
 ok(await esperar('document.querySelectorAll(".leitor .leitor-verso").length > 10'),
