@@ -166,17 +166,19 @@ async function celular({ base, ua, largura, altura, cenario }) {
 
 // O primeiro dia, do jeito de cada caminho, até a trilha (ou a lista do Conhecer Jesus).
 async function primeiroDiaPlano(t) {
-  await t.tocar('.cartao-salvia[data-abrir-dia]');
-  ok(await t.ate('!!document.querySelector(".licao [data-trilha]")'), 'plano: o cartão de hoje abre a lição do dia 1');
-  await t.foto('licao-dia-1');
-  await t.av('document.querySelectorAll(".licao [data-trilha]").forEach((b) => b.click()); 1');
-  await t.ate('!document.querySelector(".licao [data-concluir]").disabled');
-  await t.tocar('.licao [data-concluir]');
-  await t.ate('!!document.querySelector(".licao.tela-festa [data-pular]")');
+  // "Ler hoje" abre o leitor direto; a leitura é cumprida pela porta de teste do portão (fim do
+  // texto e tempo mínimo); a última passagem leva ao dia lido, com um "Voltar à trilha" só
+  await t.tocar('[data-ler-hoje]');
+  ok(await t.ate('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())'), 'plano: "Ler hoje" abre o leitor do dia 1');
+  await t.foto('leitor-dia-1');
+  for (let i = 0; i < 2; i++) {
+    await t.ate('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())');
+    await t.av('CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); 1');
+    await dormir(600);
+  }
+  ok(await t.ate('!!document.querySelector(".licao-dia .dia-lido")'), 'plano: a leitura termina no dia lido');
   await t.foto('fim-da-licao');
-  await t.tocar('.licao.tela-festa [data-pular]');
-  await t.ate('!!document.querySelector(".licao.tela-resumo [data-voltar-trilha]")');
-  await t.tocar('.licao.tela-resumo [data-voltar-trilha]');
+  await t.tocar('.licao-dia [data-voltar-trilha]');
 }
 async function primeiroDiaConhecer(t) {
   await t.tocar('.tela-conhecer-lista .cartao-destaque');
@@ -186,13 +188,12 @@ async function primeiroDiaConhecer(t) {
   ok(await t.ate('!!(CC.leitorAberto && CC.leitorAberto())'), 'conhecer: "Ler" abre o texto bíblico');
   await dormir(800);
   await t.foto('conhecer-leitura');
-  await t.av('CC.fecharLeitor(); 1');
-  ok(await t.ate('!!document.querySelector(".tela-conhecer [data-terminar]")'), 'conhecer: depois de ler, "Terminei o dia"');
-  await t.foto('conhecer-depois-de-ler');
-  await t.tocar('.tela-conhecer [data-terminar]');
-  // o fim do dia mostra o resumo primeiro; o tutorial de instalar vem depois de "Até amanhã"
-  ok(await t.ate('!!document.querySelector(".tela-conhecer [data-ate-amanha]")'), 'conhecer: "Terminei o dia" mostra o resumo com "Até amanhã"');
-  ok(!(await t.av('!!document.querySelector(".folha-instalar")')), 'conhecer: nenhuma folha por cima do resumo do dia');
+  // terminar a leitura (fim do texto e tempo mínimo) conclui o dia na mesma tela
+  await t.ate('!!(CC.portaoDoLeitor && CC.portaoDoLeitor())');
+  await t.av('CC.portaoDoLeitor().concluir(); document.querySelector(".leitor [data-terminei]").click(); 1');
+  ok(await t.ate('!!document.querySelector(".tela-conhecer .concluido-cj") && !!document.querySelector(".tela-conhecer [data-ate-amanha]")'), 'conhecer: terminar a leitura conclui o dia, com a chama e "Até amanhã"');
+  ok(!(await t.av('!!document.querySelector(".folha-instalar")')), 'conhecer: nenhuma folha por cima do dia concluído');
+  await dormir(500);
   await t.foto('conhecer-resumo');
   await t.tocar('.tela-conhecer [data-ate-amanha]');
 }
@@ -330,13 +331,13 @@ try {
       await t.tocar('#botao-cadastro');
       ok(await t.appPronto(), nome + ': "Criar minha conta" entra no app');
       await dormir(1500);
-      const primeira = await t.av(`({ trilha: !!document.querySelector('.cartao-salvia[data-abrir-dia]'), conhecer: !!document.querySelector('.tela-conhecer-lista'),
+      const primeira = await t.av(`({ trilha: !!document.querySelector('[data-ler-hoje]'), conhecer: !!document.querySelector('.tela-conhecer-lista'),
         folhas: document.querySelectorAll('.cortina').length, y: CC.rolagemY(), hoje: (document.querySelector('.no.atual') || {}).getBoundingClientRect ? Math.round(document.querySelector('.no.atual').getBoundingClientRect().bottom) : -1 })`);
       ok(primeira.trilha && !primeira.conhecer && primeira.folhas === 0, nome + ': primeira tela: a trilha do plano, sem nada do Conhecer Jesus e sem folha na frente');
       ok(primeira.y === 0 && primeira.hoje > 0 && primeira.hoje < 800 - 108, nome + ': abre no alto, com a saudação, e o dia 1 à vista acima da barra (antes rolava e cortava os cartões)');
       await t.foto('primeira-tela');
       await t.cmd('Page.reload');
-      ok(await t.appPronto() && await t.ate('!!document.querySelector(".cartao-salvia[data-abrir-dia]")'), nome + ': recarregar mantém a conta e a trilha');
+      ok(await t.appPronto() && await t.ate('!!document.querySelector("[data-ler-hoje]")'), nome + ': recarregar mantém a conta e a trilha');
       await dormir(800);
       await primeiroDiaPlano(t);
       await depoisDoPrimeiroDia(t, nome);
@@ -346,7 +347,7 @@ try {
       await sairPelaConfig(t, nome);
       await t.foto('saiu');
       await entrar(t, nome, 'pedro.silva', 'leitura-diaria-7', { errada: 'leitura-diaria-8' });
-      ok(await t.ate('!!document.querySelector(".cartao-salvia[data-abrir-dia]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': entrou de novo na trilha do plano');
+      ok(await t.ate('!!document.querySelector("[data-ler-hoje]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': entrou de novo na trilha do plano');
       await t.foto('entrou-de-novo');
     } finally {
       ok(t.excecoes.length === 0, nome + ': nenhuma exceção' + (t.excecoes[0] ? ': ' + t.excecoes[0] : ''));
@@ -391,7 +392,7 @@ try {
       await t.tocar('#botao-cadastro');
       ok(await t.appPronto(), nome + ': conta criada, entra no app');
       await dormir(1500);
-      const primeira = await t.av(`({ conhecer: !!document.querySelector('.tela-conhecer-lista'), trilha: !!document.querySelector('.cartao-salvia[data-abrir-dia]'),
+      const primeira = await t.av(`({ conhecer: !!document.querySelector('.tela-conhecer-lista'), trilha: !!document.querySelector('[data-ler-hoje]'),
         passos: /Primeiros passos/.test(document.getElementById('conteudo').innerText), folhas: document.querySelectorAll('.cortina').length, caminho: CC.quem.caminho })`);
       ok(primeira.conhecer && !primeira.trilha && !primeira.passos && primeira.folhas === 0 && primeira.caminho === 'conhecer',
         nome + ': primeira tela: Conhecer Jesus (os 14 dias), sem a trilha do plano nem os Primeiros passos');
@@ -412,7 +413,7 @@ try {
       await t.foto('trocar-caminho');
       await t.tocar('.cortina [data-caminho-opcao="plano"]');
       await t.av('location.hash = "#/"; 1');
-      ok(await t.ate('!!document.querySelector(".cartao-salvia[data-abrir-dia]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': trocou para o plano: a trilha aparece e o Conhecer Jesus sai');
+      ok(await t.ate('!!document.querySelector("[data-ler-hoje]") && !document.querySelector(".tela-conhecer-lista")'), nome + ': trocou para o plano: a trilha aparece e o Conhecer Jesus sai');
       await t.foto('trocou-para-o-plano');
       await t.av('location.hash = "#/config"; 1');
       await t.ate('!!document.querySelector("[data-caminho]")');
@@ -423,7 +424,7 @@ try {
       ok(await t.ate('!!document.querySelector(".tela-conhecer-lista") && /1 de 14/.test(document.body.innerText)'), nome + ': voltou ao Conhecer Jesus, com o dia 1 ainda feito');
       await sairPelaConfig(t, nome);
       await entrar(t, nome, 'joana@exemplo.com', 'conhecendo-123', { errada: 'conhecendo-124' });
-      ok(await t.ate('!!document.querySelector(".tela-conhecer-lista") && !document.querySelector(".cartao-salvia[data-abrir-dia]")'), nome + ': entrou de novo (pelo e-mail) no Conhecer Jesus');
+      ok(await t.ate('!!document.querySelector(".tela-conhecer-lista") && !document.querySelector("[data-ler-hoje]")'), nome + ': entrou de novo (pelo e-mail) no Conhecer Jesus');
       await t.foto('entrou-de-novo');
     } finally {
       ok(t.excecoes.length === 0, nome + ': nenhuma exceção' + (t.excecoes[0] ? ': ' + t.excecoes[0] : ''));
@@ -446,6 +447,7 @@ try {
       ok(await t.erroCadastro() === 'Diga como quer que a gente te chame.', nome + ': campo vazio avisa');
       await t.digitar('#nome', 'Rute');
       await t.data('1999-11-30');
+      await t.tocar('[data-caminho="plano"]');
       await t.tocar('#botao-cadastro');
       await t.digitar('#email', 'rute@exemplo.com');
       await t.tocar('#botao-cadastro');
@@ -453,7 +455,7 @@ try {
       await t.digitar('#senha-nova', 'rute-le-a-biblia');
       await t.tocar('#consentimento-cadastro');
       await t.tocar('#botao-cadastro');
-      ok(await t.appPronto() && await t.ate('!!document.querySelector(".cartao-salvia[data-abrir-dia]")'), nome + ': conta criada, a trilha do plano');
+      ok(await t.appPronto() && await t.ate('!!document.querySelector("[data-ler-hoje]")'), nome + ': conta criada, a trilha do plano');
       await dormir(1200);
       await t.foto('primeira-tela');
       await primeiroDiaPlano(t);
