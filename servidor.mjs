@@ -755,10 +755,15 @@ async function retratoDoProposito(p, eu, { verTudo = false } = {}) {
     };
   });
   const minha = p.membros.find((m) => m.usuario === eu) || {};
+  // A visitante da célula vê só quantos leram hoje, nunca quem (avaliação de 09/11, B4): o "leu
+  // hoje" de cada um sai do retrato dela, e vai a conta pronta.
+  const soNumero = !!p.celula && !verTudo && minha.papel === 'visitante';
+  const contagemHoje = soNumero ? { leramHoje: membros.filter((m) => m.papel !== 'visitante' && m.fezHoje).length, pessoasHoje: membros.filter((m) => m.papel !== 'visitante' && m.estado === 'ativo').length } : {};
+  const membrosVistos = soNumero ? membros.map((m) => (m.usuario === eu ? m : { ...m, fezHoje: null, extraHoje: false })) : membros;
   return {
     id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
     criadoPor: p.criadoPor, criadoEm: p.criadoEm,
-    dias, hoje, membros, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
+    dias, hoje, membros: membrosVistos, ...contagemHoje, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
     ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia, verTudo) : {}),
   };
 }
@@ -845,7 +850,13 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const doEstudo = convidado ? { combinadoAnterior: null, temAnteriores: false, daMae: null }
     : CONTAS.dadosDoEstudo(p, { membro: membroLe, eu, conduz: conduzo, hoje: hojeDe(eu) });
   const extra = {
-    encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
+    encontro: Number.isInteger(p.encontro) ? p.encontro : -1,
+    // o dia do último encontro registrado (só a data): o cartão "Próximo encontro" pula o de hoje
+    // quando ele já foi registrado
+    ultimoRegistro: (p.encontros || []).reduce((m, x) => (x && x.data > m ? x.data : m), ''),
+    // a hora e o lugar do encontro, para todos da célula (B12)
+    encontroHora: p.encontroHora || '', encontroLugar: p.encontroLugar || '',
+    recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.
@@ -929,11 +940,14 @@ function painelDaCelula(p, info, ativos, referencia) {
   return {
     chama: { ...termometro(pessoasChama.map((x) => x.acesa)), pessoas: pessoasChama },
     frequencia: { ...freq, presencas },
-    funil: funil(ativos.map((m) => {
+    // a etapa de Minha caminhada, com o nome, só de quem ligou "Quem conduz a minha célula vê"
+    // (avaliação de 09/11, B3); quem não ligou não entra em etapa nenhuma, só na conta de quem não mostra
+    caminhadaOculta: ativos.filter((m) => !info.get(m.usuario).conta.caminhadaCelula).length,
+    funil: funil(ativos.filter((m) => info.get(m.usuario).conta.caminhadaCelula).map((m) => {
       const x = info.get(m.usuario);
       return {
         usuario: m.usuario, nome: nomeDe(m.usuario),
-        marcos: x.conta.marcos || {}, acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
+        marcos: CONTAS.marcosDe(m.usuario), acompanha: CONTAS.discipulosAtivosDe(m.usuario).length,
         caminho: x.conta.caminho || 'plano', passos: new Set((x.estado && x.estado.licoes) || []).size,
       };
     })),
@@ -1980,7 +1994,7 @@ const servidor = createServer(async (req, res) => {
         }
         if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id, hoje); return {}; }
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
-        if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia); return {}; }
+        if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia, { hora: corpo.hora, lugar: corpo.lugar }); return {}; }
         if (qual === 'recado') { await CONTAS.definirRecado(eu, id, texto, new Date(), { quando, hoje }); return {}; }
         if (qual === 'estudo') {
           // Só o líder prepara (contas.mjs, salvarEstudo, dá 403 aos outros). A leitura da semana
@@ -2024,7 +2038,7 @@ const servidor = createServer(async (req, res) => {
           const faltaram = [];
           for (const u of r.faltaram) faltaram.push({ usuario: u, nome: await nomeDeExibicao(u) });
           faltaram.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR') || a.usuario.localeCompare(b.usuario));
-          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram, promovido: resumoDoEstudo(r.promovido) };
+          return { encontro: { data: r.registro.data, estudo: r.registro.estudo }, estudo: resumoDoEstudo(ligado), faltaram, promovido: resumoDoEstudo(r.promovido), amanha: resumoDoEstudo(r.amanha) };
         }
         if (qual === 'remover') { await CONTAS.removerDaCelula(eu, id, usuario, hoje); return {}; }
         if (qual === 'multiplicar') {
@@ -2071,7 +2085,7 @@ const servidor = createServer(async (req, res) => {
         meusDiscipulos.push({
           id: x.id, usuario: outro.usuario, nome: outro.nome, desde: x.aceitoEm, ultimoEncontro: ultimoEncontroDiscipulado(x),
           // O último check-in, se for desta semana: um estado de dias atrás já não diz nada.
-          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: outro.marcos, acompanha,
+          ...resumoParaDiscipulador({ mostrar: x.mostrar, passos, semana, marcos: CONTAS.marcosDe(outro.usuario), acompanha,
             checkin: ((c) => (c && c.data >= somaDias(referencia, -6) ? c : null))(CONTAS.ultimoCheckin(x.discipulo)) }),
         });
       }
@@ -2092,12 +2106,12 @@ const servidor = createServer(async (req, res) => {
       // aparece em nenhuma das listas acima).
       const algumVinculo = CONTAS.discipuladosDe(eu).some((x) => x.estado === 'ativo' || x.estado === 'convidado');
       const meuCheckin = CONTAS.ultimoCheckin(eu);
-      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: conta.marcos || {}, algumVinculo, meuCheckin });
+      json(res, 200, { meuDiscipulador, meusDiscipulos, pedidos, marcos: CONTAS.marcosDe(eu), caminhadaCelula: !!conta.caminhadaCelula, algumVinculo, meuCheckin });
       return;
     }
 
     if (rota === '/api/discipulado') {
-      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave, corpo, mente, espirito }) => {
+      await acao(async ({ acao: qual, id, usuario, papel, mostrar, data, chave, corpo, mente, espirito, sim }) => {
         const hoje = hojeDe(eu);
         if (qual === 'checkin') return { checkin: await CONTAS.registrarCheckin(eu, hoje, { corpo, mente, espirito }) };
         if (qual === 'convidar') {
@@ -2116,6 +2130,7 @@ const servidor = createServer(async (req, res) => {
         if (qual === 'encontro') { await CONTAS.registrarEncontroDiscipulado(eu, id, data, hoje); return {}; }
         if (qual === 'encerrar') { await CONTAS.encerrarDiscipulado(eu, id, hoje); return {}; }
         if (qual === 'marco') { const marcos = await CONTAS.definirMarco(eu, chave, data); return { marcos }; }
+        if (qual === 'caminhadaCelula') return { caminhadaCelula: await CONTAS.definirCaminhadaCelula(eu, sim === true) };
         throw Object.assign(new Error('ação desconhecida'), { publico: true });
       });
       return;
@@ -2436,7 +2451,8 @@ const servidor = createServer(async (req, res) => {
     // para a mesma pessoa (a conta fica em memória: reiniciar o servidor só libera de novo).
     if (rota === '/api/cutucar') {
       await acao(async ({ para, tema }) => {
-        const TEMAS = { cafe: 'cutucadaCafe', oracao: 'cutucadaOracao', treino: 'cutucadaTreino' };
+        // falta: o toque de quem conduz para quem faltou ao encontro (pergunta como a pessoa está)
+        const TEMAS = { cafe: 'cutucadaCafe', oracao: 'cutucadaOracao', treino: 'cutucadaTreino', falta: 'cutucadaFalta' };
         if (!TEMAS[tema]) throw Object.assign(new Error('escolha café, oração ou treino'), { publico: true });
         const outro = CONTAS.achar(String(para || ''));
         if (!outro || CONTAS.relacao(eu, outro.usuario) !== 'amigos') throw Object.assign(new Error('só dá para chamar um amigo'), { publico: true, codigo: 403 });

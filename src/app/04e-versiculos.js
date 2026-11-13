@@ -145,6 +145,7 @@
   const lerRascunho = () => { try { return JSON.parse(localStorage.getItem(CHAVE_RASCUNHO)) || null; } catch (e) { return null; } };
   const gravarRascunho = (r) => { try { if (r) localStorage.setItem(CHAVE_RASCUNHO, JSON.stringify(r)); else localStorage.removeItem(CHAVE_RASCUNHO); } catch (e) { /* segue */ } };
   const TIPOS = [['nota', 'Nota'], ['oracao', 'Oração'], ['estudo', 'Estudo']];
+  const EXEMPLO = { nota: 'O que Deus falou com você hoje?', oracao: 'Senhor, hoje eu quero te dizer...', estudo: 'O que você descobriu neste trecho?' };
   const AJUDA = {
     nota: 'Para começar: O que diz? · O que significa? · Como vivo isso?',
     oracao: 'Fale com Deus do seu jeito. De outras pessoas, use só o primeiro nome.',
@@ -159,13 +160,15 @@
   }
   const todasAsTags = () => [...new Set(CC.notas().flatMap((n) => n.tags))].sort();
 
-  // { id } edita; { ref } abre nota nova no trecho; sem os dois, nota livre (Estudo).
+  // { id } edita; { ref } abre nota nova no trecho; sem os dois, nota livre, do tipo Nota (o botão
+  // se chama "Escrever uma nota livre"; abria em Estudo, revisão de usabilidade, C16). Ligada a
+  // uma página do Explorar (contexto, sem versículo), continua Estudo.
   // titulo: o título que a nota nova já traz (o do estudo da célula, por exemplo).
   function abrirEditor({ id, ref, texto, tipo, contexto, titulo, depois } = {}) {
     const existente = id ? CC.nota(id) : null;
     const chave = id || 'novo:' + (ref || contexto || '');
     const r0 = ref && CC.lerRef(ref);
-    const inicio = existente || { titulo: String(titulo || '').slice(0, CC.MAX_TITULO_NOTA), texto: '', tipo: tipo || (ref ? 'nota' : 'estudo'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
+    const inicio = existente || { titulo: String(titulo || '').slice(0, CC.MAX_TITULO_NOTA), texto: '', tipo: tipo || (contexto && !ref ? 'estudo' : 'nota'), tags: [], versos: ref ? [ref] : [], cor: r0 ? corDoTrecho(r0) : 0, contexto: contexto || '' };
     const campos = (x) => JSON.stringify([x.titulo || '', x.texto, x.tipo, x.tags, x.versos, x.cor]);
     const rasc = lerRascunho();
     const recuperou = rasc && rasc.chave === chave && campos(rasc) !== campos(inicio);
@@ -193,14 +196,17 @@
       + '<div class="segmentado tipo-nota" role="group" aria-label="Tipo">'
       + TIPOS.map(([t, nome]) => '<button data-tipo="' + t + '" aria-pressed="' + (st.tipo === t) + '">' + nome + '</button>').join('') + '</div>'
       // o título é opcional: separa as notas de um mesmo versículo (cada uma, um estudo)
-      + '<label class="so-leitor" for="campo-titulo-nota">Título</label>'
-      + '<input id="campo-titulo-nota" class="campo-titulo-nota" type="text" maxlength="' + CC.MAX_TITULO_NOTA + '" placeholder="Título"'
+      // rótulos à vista, e um exemplo na caixa do texto (C16)
+      + '<label class="rotulo-editor" for="campo-titulo-nota">Título (opcional)</label>'
+      + '<input id="campo-titulo-nota" class="campo-titulo-nota" type="text" maxlength="' + CC.MAX_TITULO_NOTA + '" placeholder="Ex.: Deus cuida de mim"'
       + ' autocomplete="off" autocapitalize="sentences" enterkeyhint="next" value="' + CC.esc(st.titulo) + '">'
-      + '<label class="so-leitor" for="campo-nota">Sua nota</label>'
-      + '<textarea id="campo-nota" class="campo-nota" rows="6" maxlength="5000" autocapitalize="sentences">' + CC.esc(st.texto) + '</textarea>'
+      + '<label class="rotulo-editor" for="campo-nota">Sua nota</label>'
+      + '<textarea id="campo-nota" class="campo-nota" rows="6" maxlength="5000" autocapitalize="sentences" placeholder="' + EXEMPLO[st.tipo] + '">' + CC.esc(st.texto) + '</textarea>'
       + '<p class="ajuda-nota" data-ajuda>' + AJUDA[st.tipo] + '</p>'
+      // aberta de um lugar de todos (o estudo da célula): a nota continua só de quem escreve (B18)
+      + (st.contexto ? '<p class="ajuda-nota" data-so-voce>Só você vê esta anotação.</p>' : '')
       + '<p class="rotulo-editor">Cor</p><div class="cores-marca" role="group" aria-label="Cor da nota" data-cores>' + corHtml() + '</div>'
-      + '<p class="rotulo-editor">Tags</p>' + lista('tags', 'tag', 'Nova tag', 'Ex.: graça', ' list="tags-usadas"')
+      + '<p class="rotulo-editor">Marcadores</p>' + lista('tags', 'marcador', 'Novo marcador', 'Ex.: graça', ' list="tags-usadas"')
       + '<datalist id="tags-usadas">' + todasAsTags().map((t) => '<option value="' + CC.esc(t) + '">').join('') + '</datalist>'
       + (existente ? '<button class="botao plano perigo" data-apagar>' + CC.ico('lixeira') + 'Apagar nota</button>' : '')
       + '<p class="so-leitor" role="status" data-vivo></p>',
@@ -243,6 +249,7 @@
       $('[data-cores]').innerHTML = corHtml();
       folha.querySelectorAll('[data-tipo]').forEach((x) => x.setAttribute('aria-pressed', x.dataset.tipo === st.tipo));
       $('[data-ajuda]').textContent = AJUDA[st.tipo];
+      campo.placeholder = EXEMPLO[st.tipo];
       pintarTrecho();
       guardarRascunho();
     };

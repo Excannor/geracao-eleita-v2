@@ -94,7 +94,7 @@
       + '<span class="mapas-seta" aria-hidden="true">' + CC.ico('baixo') + '</span></button>'
       + (deHoje ? '<a class="mapas-hoje" href="#/mapa/' + deHoje.slug + '"><span>Mapa de hoje: <b>' + CC.esc(deHoje.nome) + '</b></span>' + CC.ico('avancar') + '</a>' : '')
       + '<div class="mapas-corpo" id="corpo-mapas"' + (mapasAberto ? '' : ' hidden') + '>'
-      + '<p class="passo-dica mapas-dica">Cada livro da Bíblia desmontado num mapa: a raiz, os ramos, as conexões e onde Jesus aparece.</p>'
+      + '<p class="passo-dica mapas-dica">Cada livro da Bíblia desmontado num mapa de ideias: a raiz, os ramos, as conexões e onde Jesus aparece. Os mapas de lugares estão no Atlas bíblico.</p>'
       + '<div class="segmentos-mapas" role="group" aria-label="Testamento">' + botaoT('at', 'Antigo Testamento') + botaoT('nt', 'Novo Testamento') + '</div>'
       + '<div class="grades-mapas" data-grade-mapas>' + gradeDoTestamento(testamento) + '</div>'
       + '<button type="button" class="botao contorno mapas-fechar" data-fechar-mapas>Fechar</button>'
@@ -147,8 +147,10 @@
   CC.linkDoMapa = function (nomeDoLivro) {
     const m = CC.mapaDoLivro(nomeDoLivro);
     if (!m) return '';
-    return '<a class="link-mapa" href="#/mapa/' + m.slug + '"><span class="link-mapa-icone" aria-hidden="true">' + CC.ico('alfinete') + '</span>'
-      + '<span><b>Ver o mapa</b><small>' + CC.esc(m.nome) + ' inteiro numa página</small></span>' + CC.ico('avancar') + '</a>';
+    // vindo do mapa, o link volta para ele em vez de empilhar outro (revisão, C19)
+    const doMapa = CC.anteriorNaPilha && CC.anteriorNaPilha() === '#/mapa/' + m.slug;
+    return '<a class="link-mapa" href="#/mapa/' + m.slug + '"' + (doMapa ? ' data-voltar' : '') + '><span class="link-mapa-icone" aria-hidden="true">' + CC.ico('ramos') + '</span>'
+      + '<span><b>' + (doMapa ? 'Voltar ao mapa do livro' : 'Ver o mapa do livro') + '</b><small>' + CC.esc(m.nome) + ' inteiro numa página</small></span>' + CC.ico('avancar') + '</a>';
   };
   // ---------- a casca da tela do mapa ----------
   // A barra e a cabeça (o nome no pincel e os capítulos) saem daqui, na hora: é o que aparece

@@ -208,6 +208,11 @@ try {
   const retratoComVisitante = (await propositos(lider2.cookie)).find((p) => p.id === id2);
   ok(retratoComVisitante.hoje.meta === 20, 'os visitantes ficam fora da meta do dia (não somam ao total de 30)');
   ok(retratoComVisitante.membros.find((m) => m.usuario === 'visita2n1').papel === 'visitante', 'quem conduz vê o papel de visitante de cada um');
+  // B4 (avaliação de 09/11): a visitante vê só quantos leram hoje, nunca quem
+  const daVisita = (await propositos(visitantes2[0].cookie)).find((p) => p.id === id2);
+  ok(daVisita.membros.filter((m) => m.usuario !== 'visita2n1').every((m) => m.fezHoje === null && m.extraHoje === false)
+    && Number.isInteger(daVisita.leramHoje) && daVisita.pessoasHoje === 20, 'a visitante não recebe o "leu hoje" de cada um, só a conta pronta (' + daVisita.leramHoje + ' de ' + daVisita.pessoasHoje + ')');
+  ok(retratoComVisitante.membros.every((m) => typeof m.fezHoje === 'boolean') && !('leramHoje' in retratoComVisitante), 'quem conduz (e o membro) recebe o "leu hoje" de cada um, como antes');
   const visita11 = await criar('visita2n11', { nascimento: '2004-04-05' });
   ok((await pedir('/api/celula', { acao: 'entrar', token: token2, visitante: true }, visita11.cookie)).status === 409,
     'o 11º visitante não entra: o teto de visitantes é próprio e menor (10)');

@@ -386,11 +386,9 @@
 /* a raridade aparece depois que a carta vira (A9 da avaliação de UX): antes, "Prata" vinha com a
    carta ainda de costas, e a expectativa virava "será que vem Ouro" */
 .rv:is([data-fase="brilha"], [data-fase="fim"], [data-fase="menos"]) .rv-raridade { opacity: 1; }
-/* "Pular animação" só durante a animação; antes do toque, o convite para abrir */
+/* "Pular animação" só durante a animação (o convite para abrir fica no título, album.js) */
 .rv[data-fase="fechado"] .rv-pular { visibility: hidden; }
-.rv-dica-toque { position: absolute; left: 0; right: 0; bottom: 6px; z-index: 6; margin: 0; color: var(--tinta-fraca, #6b6f66); font-size: .9375rem; font-weight: 700; text-align: center; pointer-events: none; }
-.rv:not([data-fase="fechado"]) .rv-dica-toque { display: none; }
-.rv-fim:focus { outline: none; }
+.rv:not([data-fase="fechado"]) .rv-fim:focus { outline: none; }
 .rv-fim { display: grid; justify-items: center; gap: 6px; padding: 0 16px; opacity: 0; transform: translateY(8px); transition: opacity .4s ease, transform .4s ease; pointer-events: none; }
 .rv[data-fase="fim"] .rv-fim { opacity: 1; transform: none; pointer-events: auto; }
 .rv-nova { margin: 0; color: var(--tinta, #2c2d2b); font-size: .9375rem; font-weight: 500; line-height: 1.4; }

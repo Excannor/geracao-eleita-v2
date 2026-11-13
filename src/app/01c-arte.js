@@ -475,16 +475,24 @@
     document.body.appendChild(el);
     // fecharAoNavegar: a tela some na primeira troca de endereço (um link dentro dela, como
     // "Abrir Efésios 6 na Bíblia", ou o voltar do celular); sem isso, só o Esc a fechava.
+    // Com fecharAoNavegar ela também entra no histórico, como as folhas: o voltar do celular a
+    // fecha sem tirar a pessoa da tela de baixo (CC.empilharSobreposicao, 01-nucleo.js).
     let fechada = false;
-    const fechar = () => {
+    let soltarHistorico = () => {};
+    const fecharDeVez = (semVoltar) => {
       if (fechada) return;
       fechada = true;
+      if (!semVoltar) soltarHistorico();
       removeEventListener('hashchange', fechar);
       el.classList.add('saindo');
       setTimeout(() => el.remove(), CC.semMovimento() ? 0 : 180);
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
     };
-    if (opcoes.fecharAoNavegar) addEventListener('hashchange', fechar);
+    const fechar = () => fecharDeVez(false);
+    if (opcoes.fecharAoNavegar) {
+      addEventListener('hashchange', fechar);
+      if (CC.empilharSobreposicao) soltarHistorico = CC.empilharSobreposicao(el, () => fecharDeVez(true));
+    }
     if (opcoes.ligar) opcoes.ligar(el, fechar);
     const primeiro = el.querySelector('.tela-cheia-pe button, button');
     if (primeiro) primeiro.focus({ preventScroll: true });

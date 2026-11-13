@@ -329,6 +329,12 @@ const ESQUEMA = [
   ALTER TABLE celula_estudos ADD COLUMN agendado_para TEXT NOT NULL DEFAULT '';
   ALTER TABLE celula_estudos ADD COLUMN preparado_em TEXT NOT NULL DEFAULT '';
   `,
+  // v24: o encontro da célula ganha a hora ('HH:MM', hora local) e o lugar (texto livre do líder,
+  // até 80 letras), ao lado do dia da semana: "Hoje, às 19h30 · Casa da Ana" (avaliação de 09/11, B12).
+  `
+  ALTER TABLE propositos ADD COLUMN encontro_hora TEXT NOT NULL DEFAULT '';
+  ALTER TABLE propositos ADD COLUMN encontro_lugar TEXT NOT NULL DEFAULT '';
+  `,
 ];
 
 function migrarEsquema(db) {

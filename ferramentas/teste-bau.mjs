@@ -116,7 +116,8 @@ async function capturar(nome, tema) {
   writeFileSync(join(SAIDA, nome + '-' + largura + '-' + tema + '.png'), Buffer.from(foto.data, 'base64'));
 }
 const nosDoisTemas = async (nome) => { for (const t of ['claro', 'escuro']) await capturar(nome, t); await av('CC.guardarTema(false)'); };
-const fecharTudo = () => av('document.querySelectorAll(".tela-cheia, .cortina").forEach((e) => e.remove()); true');
+// fecha como o Esc (tirando a entrada de cada folha do histórico) e só então tira o que sobrar
+const fecharTudo = () => av('(() => { for (let i = 0; i < 9 && CC.fecharSobreposicaoDoTopo && CC.fecharSobreposicaoDoTopo(); i++); document.querySelectorAll(".tela-cheia, .cortina").forEach((e) => e.remove()); return true; })()');
 
 // A folha de compartilhar do sistema, simulada (como em teste-compartilhar.mjs).
 const SIMULAR = `window.__compartilhado = null;
@@ -258,11 +259,12 @@ try {
   ok(await esperar('!!' + q('.album-grade .album-carta'), 15000), 'o álbum abre');
   const grade = await av(`(() => { const s = document.querySelector('[data-album="${ALBUM1.id}"]');
     return { cartas: s.querySelectorAll('.album-carta').length, vagas: s.querySelectorAll('.album-vaga').length, texto: [...s.querySelectorAll('.album-grade')].map((g) => g.innerText.replace(/×\\d+/g, '').trim()).join(''),
-      titulo: s.querySelector('.titulo-secao').textContent, versoes: s.querySelector('.album-versoes').textContent }; })()`);
+      titulo: s.querySelector('.titulo-secao').textContent, versoes: !!s.querySelector('.album-versoes') }; })()`);
   ok(grade.cartas === doAlbum1.length && grade.vagas === 13 - doAlbum1.length && !grade.texto,
     ALBUM1.nome + ': as recebidas (' + doAlbum1.join(', ') + ') e as silhuetas, sem texto nas miniaturas (' + JSON.stringify(grade) + ')');
-  ok(new RegExp(doAlbum1.length + ' de 13 cartas').test(grade.titulo) && new RegExp('Coleção: ' + versoesNo1 + ' de 65 versões').test(grade.versoes),
-    'o álbum diz "' + doAlbum1.length + ' de 13 cartas" e "Coleção: ' + versoesNo1 + ' de 65 versões"');
+  ok(new RegExp(doAlbum1.length + ' de 13 cartas').test(grade.titulo) && !grade.versoes && versoesNo1 > 0,
+    'o álbum diz "' + doAlbum1.length + ' de 13 cartas", sem uma segunda contagem de versões');
+  ok(await av('!document.querySelector("[data-album-vazio]")'), 'com cartas, o álbum não mostra o recado do álbum vazio');
   const mini = await av(`(() => { const b = document.querySelector('[data-carta="${PRIMEIRA.id}"]'); return { rotulo: b.getAttribute('aria-label'), pips: [...b.querySelectorAll('.album-pips i.tem')].map((i) => i.className),
     copias: (b.querySelector('.album-copias') || {}).textContent || '', canvas: !!b.querySelector('canvas') }; })()`);
   ok(/Versões: Bronze, Prata/.test(mini.rotulo) && /Repetidas: 2 de Prata/.test(mini.rotulo) && mini.pips.length === 2 && mini.copias === '×2' && mini.canvas,
@@ -301,10 +303,13 @@ try {
   const hojeSaem = LANCADAS.length < TOTAL ? 'Hoje podem sair ' + LANCADAS.length + ' das ' + TOTAL + ' cartas' : '';
   ok(/Linho\s*49%/.test(comum) && /Bronze\s*30%/.test(comum) && /Prata\s*15%/.test(comum) && /Ouro\s*5%/.test(comum) && /Glória\s*1%/.test(comum), 'mostra as chances do sorteio comum (' + comum.replace(/\s+/g, ' ') + ')');
   ok(/Prata\s*40%/.test(marco) && /Ouro\s*35%/.test(marco) && /Glória\s*25%/.test(marco) && !/Linho|Bronze/.test(marco), 'e as do sorteio de marco, sem Linho nem Bronze (' + marco.replace(/\s+/g, ' ') + ')');
-  ok(/No máximo 5 seguidas sem Prata ou melhor/.test(pode) && /20º é Ouro/.test(pode) && /sobe 15 pontos/.test(pode)
-    && (hojeSaem ? pode.includes(hojeSaem) : !/Hoje podem sair/.test(pode)) && pode.includes('Desde o último Ouro: ' + semOuro + (semOuro === 1 ? ' sorteio' : ' sorteios')),
+  ok(/mais de 5 cartas seguidas sem uma Prata ou melhor/.test(pode) && /20ª é Ouro/.test(pode) && /\+15 em 100/.test(pode)
+    && (hojeSaem ? pode.includes(hojeSaem.replace('sair', 'chegar')) : !/Hoje podem chegar/.test(pode)) && pode.includes('Cartas desde o último Ouro: ' + semOuro + '.'),
     'mostra as proteções, quantas cartas podem sair hoje e os números da pessoa (' + (hojeSaem || 'todas lançadas') + '; ' + semOuro + ' desde o último Ouro)');
   ok(!/nunca repete|não repete/i.test(pode), 'não promete que as cartas não se repetem');
+  const principal = await av('(() => { const f = document.querySelector(".folha-pode-vir").cloneNode(true); f.querySelector("details").remove(); return f.textContent; })()');
+  ok(!/sorteio|chance|proteç/i.test(principal) && /7 dias de leitura/.test(principal) && await av('!document.querySelector(".folha-pode-vir details").open'),
+    'o texto principal explica como as cartas chegam, sem "sorteio", "chance" nem "proteções"; os números ficam fechados em "Ver os números"');
   await nosDoisTemas('05-o-que-pode-vir');
   await fecharTudo();
 
@@ -375,6 +380,8 @@ try {
   await av('CC.telaBau(56)');
   await esperar('!!document.querySelector(".tela-bau .rv-bau")');
   ok(/Um baú na estrada!/.test(await texto('.tela-bau .album-titulo-bau')), 'fechado, o título "Um baú na estrada!" aparece por cima do baú');
+  ok(await texto('.tela-bau .album-dica-bau') === 'Toque no baú para abrir', 'e logo abaixo, "Toque no baú para abrir"');
+  await capturar('09-bau-fechado', 'claro');
   await terminar('.tela-bau');
   ok(await esperar('!!' + q('.tela-bau .album-fim .carta-viva')) && await av('!!CC.estado().bausAbertos["dia:56"] && !!CC.estado().cartas.eventos["bau:dia:56"]'),
     '"Pular" antes do toque vai ao fim e guarda o baú e a carta');

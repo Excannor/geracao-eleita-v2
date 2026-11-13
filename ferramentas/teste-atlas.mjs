@@ -99,7 +99,7 @@ async function foto(nome, sel, bloco = 'start') {
   const r = await cmd('Page.captureScreenshot', { format: 'png' });
   writeFileSync(join(CAPTURAS, nome + '.png'), Buffer.from(r.data, 'base64'));
 }
-const abaAcesa = () => av('(document.querySelector("nav [aria-current=\\"page\\"], .barra-abas [aria-current=\\"page\\"]") || {}).textContent || ""');
+const abaAcesa = () => av('(document.querySelector(".navegacao [aria-current=\\"page\\"], .barra-abas [aria-current=\\"page\\"]") || {}).textContent || ""');
 
 // ---------- o servidor ----------
 const html = await (await fetch(base)).text();
@@ -121,7 +121,7 @@ await cmd('Page.navigate', { url: base + '#/explorar' });
 ok(await esperar('!!document.querySelector(".cartao-atlas")', 12000), 'o Explorar mostra o cartão dos mapas bíblicos');
 await tirarAviso();
 ok(await av('document.querySelector(".cartao-parabolas").nextElementSibling === document.querySelector(".cartao-atlas")'), 'o cartão vem logo abaixo das parábolas');
-ok(await texto('.cartao-atlas-titulo') === 'Mapas bíblicos' && await texto('.cartao-atlas-dica') === 'Onde a história aconteceu', 'o cartão diz "Mapas bíblicos" e "Onde a história aconteceu"');
+ok(await texto('.cartao-atlas-titulo') === 'Atlas bíblico' && await texto('.cartao-atlas-dica') === 'Mapas de onde a história aconteceu', 'o cartão diz "Atlas bíblico" e "Mapas de onde a história aconteceu"');
 ok(await av('document.querySelector(".cartao-atlas").getBoundingClientRect().height >= 44 && document.querySelector(".cartao-atlas").getAttribute("href") === "#/atlas"'), 'o cartão é um link de bom tamanho para a lista');
 const abaExplorar = await abaAcesa();
 ok(await semEstouro(), 'nada estoura a largura do Explorar');
@@ -130,7 +130,7 @@ await foto('explorar-390-claro', '.cartao-atlas', 'center');
 // ---------- a lista ----------
 await av('document.querySelector(".cartao-atlas").click()');
 ok(await esperar('location.hash === "#/atlas" && document.querySelectorAll(".item-atlas").length === ' + A.itens.length, 10000), 'o cartão leva à lista dos mapas');
-ok(await texto('.atlas-nome') === 'Mapas bíblicos' && await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".atlas-nome")).fontFamily)'), 'a lista se chama "Mapas bíblicos", no pincel');
+ok(await texto('.atlas-nome') === 'Atlas bíblico' && await av('/Permanent Marker/.test(getComputedStyle(document.querySelector(".atlas-nome")).fontFamily)'), 'a lista se chama "Mapas bíblicos", no pincel');
 ok(await av('JSON.stringify([...document.querySelectorAll(".grupo-atlas h2")].map((h) => h.textContent))') === JSON.stringify(A.grupos.map((g) => g.nome)), 'a lista agrupa os mapas (' + A.grupos.map((g) => g.nome).join(', ') + ')');
 ok(await esperar('[...document.querySelectorAll(".item-atlas-mapa")].every((d) => d.querySelector("svg image"))'), 'cada mapa da lista mostra o próprio desenho');
 ok(await av('[...document.querySelectorAll(".item-atlas-mapa")].every((d) => Math.abs(d.querySelector("svg").getBoundingClientRect().height - d.getBoundingClientRect().height) < 2)'), 'cada miniatura cabe inteira na caixa, sem corte e sem sobra');

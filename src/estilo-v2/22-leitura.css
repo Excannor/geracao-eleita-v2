@@ -397,3 +397,11 @@
 .ajuda-oia { margin: -14px 0 18px; }
 /* teclado aberto (tela baixa): o campo da oração encolhe e o cursor fica acima do "Pronto" */
 @media (max-height: 560px) { .campo textarea.alto { min-height: 110px; } .licao-dia .licao-palco { scroll-padding-bottom: 96px; } }
+
+/* "Ler | Explorar", no alto da lista dos livros e do Explorar (04d-biblia.js, CC.seletorBiblia):
+   o controle segmentado de sempre, com links no lugar dos botões. */
+.seletor-biblia { display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 18px; background: var(--folha-campo, var(--campo)); }
+.seletor-biblia a { display: grid; place-items: center; min-height: 44px; border-radius: 999px; color: var(--folha-tinta, var(--tinta)); font-family: var(--fonte); font-size: 0.9375rem; font-weight: 700; text-decoration: none; }
+.seletor-biblia a[aria-current="page"] { background: var(--inverso); color: var(--inverso-tinta); }
+/* com o seletor no alto, o atalho de Minhas anotações desce para a linha do título */
+.folha-biblia.com-seletor .atalho-anotacoes { top: 102px; }

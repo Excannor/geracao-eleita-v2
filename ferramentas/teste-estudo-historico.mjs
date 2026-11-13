@@ -515,6 +515,7 @@ try {
   const notasAntes = await av('(CC.conquistasComNivel(CC.estado(), CC.hojeIso()).find((c) => c.id === "notas") || {}).valor');
   await clicar('.mesa-anotacao [data-escrever-contexto]');
   ok(await esperar(existe('.folha-editor #campo-nota')), '13. "Escrever minha anotação" abre o editor');
+  ok(await na(() => (document.querySelector('.folha-editor [data-so-voce]') || {}).textContent === 'Só você vê esta anotação.'), 'B18. o editor aberto do estudo diz "Só você vê esta anotação."');
   ok((await av(q('#campo-titulo-nota') + '.value')) === 'Batalha espiritual, vigilância e Armadura de Deus' && /Estudo da célula/.test(await texto('.folha-editor .chips-nota')),
     '13. a nota nova já traz o título do estudo e o lugar "Estudo da célula"');
   await na((t) => { const c = document.querySelector('#campo-nota'); c.value = t; c.dispatchEvent(new Event('input', { bubbles: true })); return true; }, NOTA_ANA);

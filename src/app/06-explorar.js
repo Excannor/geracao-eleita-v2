@@ -54,6 +54,8 @@
     if (tipo === 'conhecer') return 'Conhecer Jesus · dia ' + alvo;
     if (tipo === 'parabola') return 'Parábola · ' + (CC.tituloDaParabola ? CC.tituloDaParabola(alvo) : alvo);
     if (tipo === 'estudo') return 'Estudo da célula';
+    if (tipo === 'mapa') { const m = CC.mapaDoLivro && (window.MAPAS || []).find((x) => x.slug === alvo); return 'Mapa do livro · ' + (m ? m.nome : alvo); }
+    if (tipo === 'atlas') { const m = ((window.ATLAS || {}).itens || []).find((x) => x.slug === alvo); return 'Atlas bíblico · ' + (m ? m.titulo : alvo); }
     return tipo === 'nota' ? (D.notas[alvo] ? CC.semPrefixo(D.notas[alvo].nome) : alvo) : ((secaoDe(alvo) || {}).rotulo || alvo);
   };
   CC.hrefDoContexto = (chave) => '#/' + chave.slice(0, chave.indexOf(':')) + '/' + encodeURIComponent(chave.slice(chave.indexOf(':') + 1));
@@ -294,7 +296,7 @@
     const perguntas = cartaoPerguntasHonestas();
 
     // .folha-perfil: só apresentação, a folha do alto (25-perfil.css): o título, a frase e a busca.
-    raiz.innerHTML = '<div class="folha-perfil"><h1>Explorar</h1>'
+    raiz.innerHTML = '<div class="folha-perfil folha-explorar">' + (CC.seletorBiblia ? CC.seletorBiblia('explorar') : '') + '<h1>Explorar</h1>'
       + '<p class="passo-dica">Quer entender melhor o que leu? Aqui tem quem é quem, onde tudo aconteceu e o que cada livro conta.</p>'
       + CC.campoBusca('') + '</div>'
       // Quem ainda não fez o caminho vê ele primeiro; depois ele desce para o fim da tela.
@@ -330,7 +332,16 @@
     const s = secaoDe(pasta);
     if (!s) return CC.vazio(raiz, 'Não encontrei essa seção.');
     const [icone, cor] = estilo(pasta);
-    const ids = filtro ? s.ids.filter((id) => D.notas[id].filtro === filtro) : s.ids;
+    let ids = filtro ? s.ids.filter((id) => D.notas[id].filtro === filtro) : s.ids;
+    // Lista em ordem alfabética (Pessoas, Lugares...): sem contar o artigo, "A mulher samaritana"
+    // fica no M, não antes de Abel. Listas em outra ordem (os acontecimentos) ficam como estão (C23).
+    const nomeDe = (id) => CC.semPrefixo(D.notas[id].nome);
+    const semArtigo = (id) => CC.semAcento(nomeDe(id)).replace(/^(o|a|os|as|um|uma) /, '');
+    if (ids.every((id, i) => !i || nomeDe(ids[i - 1]).localeCompare(nomeDe(id), 'pt-BR') <= 0)) {
+      ids = ids.slice().sort((a, b) => semArtigo(a).localeCompare(semArtigo(b), 'pt-BR'));
+    }
+    // lista longa ganha a busca dentro dela
+    const comBusca = ids.length >= 20;
 
     const filtros = s.filtros.length
       ? '<div class="filtros">'
@@ -346,6 +357,8 @@
       + '<div><h1>' + CC.esc(s.rotulo) + '</h1><p>' + CC.esc(s.descricao) + '</p></div></div></div>'
       + CC.tituloSecao(filtro ? FILTRO_LEGIVEL[filtro] || filtro : 'Tudo', CC.plural(ids.length, 'texto', 'textos'))
       + filtros
+      + (comBusca ? '<div class="busca-caixa busca-na-lista">' + CC.ico('lupa') + '<input type="search" data-buscar-lista placeholder="Buscar nesta lista" aria-label="Buscar nesta lista" autocomplete="off" spellcheck="false"></div>'
+        + '<p class="passo-dica" data-lista-vazia hidden>Nada com esse nome nesta lista.</p>' : '')
       + (ids.length ? '<div class="grade">' + ids.map(CC.itemNota).join('') + '</div>'
         : '<div class="vazio">Nada por aqui com esse filtro.</div>')
       + '<div data-notas-contexto="secao:' + CC.esc(pasta) + '"></div>';
@@ -356,6 +369,18 @@
         location.hash = '#/secao/' + encodeURIComponent(pasta) + (f ? '?' + encodeURIComponent(f) : '');
       };
     });
+    const campo = raiz.querySelector('[data-buscar-lista]');
+    if (campo) {
+      campo.oninput = () => {
+        const q = CC.semAcento(campo.value.trim());
+        let vistos = 0;
+        raiz.querySelectorAll('.grade .item').forEach((a) => {
+          a.hidden = !!q && !CC.semAcento(a.textContent).includes(q);
+          if (!a.hidden) vistos++;
+        });
+        raiz.querySelector('[data-lista-vazia]').hidden = vistos > 0;
+      };
+    }
     CC.notasDoContexto(raiz);
     CC.inseparavel(raiz);
   };
@@ -447,7 +472,7 @@
   // ---------- busca ----------
   CC.campoBusca = function (valor) {
     return '<div class="busca-caixa">' + CC.ico('lupa')
-      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, temas…" aria-label="Buscar" '
+      + '<input id="campo-busca" type="search" placeholder="Buscar pessoas, lugares, parábolas, João 3…" aria-label="Buscar no Explorar e na Bíblia" '
       + 'autocomplete="off" spellcheck="false" enterkeyhint="search" value="' + CC.esc(valor) + '"></div>';
   };
 
@@ -465,8 +490,52 @@
     });
   };
 
+  // ---------- o que a busca acha além dos textos ----------
+  // As parábolas, os mapas dos livros e os mapas do atlas (revisão de usabilidade, C4): cada
+  // palavra digitada precisa começar uma palavra do título, da linha ou da referência ("viagem"
+  // acha "viagens", "prodigo" acha "pródigo"); as palavrinhas (de, o, a...) não contam.
+  const MIUDAS = new Set(['a', 'o', 'as', 'os', 'de', 'da', 'do', 'das', 'dos', 'e', 'em', 'no', 'na', 'um', 'uma']);
+  const palavras = (t) => CC.semAcento(t).split(/[^a-z0-9]+/).filter((p) => p && !MIUDAS.has(p));
+  const casa = (pergunta, alvo) => {
+    const ps = palavras(pergunta);
+    if (!ps.length) return false;
+    const ws = palavras(alvo);
+    return ps.every((p) => ws.some((w) => w.startsWith(p) || (p.length >= 5 && w.startsWith(p.slice(0, -1)))));
+  };
+  function achadosVisuais(consulta) {
+    const saida = [];
+    const P = window.PARABOLAS || { itens: [] };
+    for (const p of P.itens) {
+      if (casa(consulta, [p.titulo, p.linha, p.ref, 'parábola'].join(' '))) {
+        saida.push({ selo: 'Parábola', titulo: p.titulo, linha: p.linha, ref: p.ref, href: '#/parabola/' + p.slug });
+      }
+    }
+    for (const m of window.MAPAS || []) {
+      if (casa(consulta, m.nome + ' mapa livro') && palavras(consulta).some((p) => CC.semAcento(m.nome).replace(/\s+/g, '').startsWith(p) || /^\d$/.test(p))) {
+        saida.push({ selo: 'Mapa do livro', titulo: 'Mapa de ' + m.nome, linha: m.grupo + ' · ' + CC.plural(m.capitulos, 'capítulo', 'capítulos'), href: '#/mapa/' + m.slug });
+      }
+    }
+    const A = window.ATLAS || { itens: [], grupos: [] };
+    for (const m of A.itens) {
+      const grupo = (A.grupos.find((g) => g.id === m.grupo) || {}).nome || '';
+      if (casa(consulta, [m.titulo, m.linha, m.ref, grupo, 'mapa atlas'].join(' '))) {
+        saida.push({ selo: 'Atlas bíblico', titulo: m.titulo, linha: m.linha, ref: m.ref, href: '#/atlas/' + m.slug });
+      }
+    }
+    return saida;
+  }
+  const itemVisual = (x) => '<a class="item item-visual" href="' + x.href + '"><span class="sub">' + CC.esc(x.selo) + '</span>'
+    + '<b>' + CC.esc(x.titulo) + '</b>' + (x.linha ? '<span class="resumo">' + CC.esc(x.linha) + (x.ref ? ' · ' + CC.esc(x.ref) : '') + '</span>' : '') + '</a>';
+  // "Abrir João 3 na Bíblia": o cartão grande do alto, na busca do Explorar e na da Bíblia.
+  CC.cartaoAbrirRef = (r) => '<a class="cartao-continuar cartao-abrir-ref" href="' + CC.hrefDaRef(r) + '">'
+    + '<span class="icone-continuar">' + CC.ico('livro') + '</span>'
+    + '<span class="textos"><small>Abrir na Bíblia</small><b>' + CC.esc(r.livro + ' ' + r.cap + (r.de ? '.' + r.de : '')) + '</b></span>'
+    + CC.ico('avancar') + '</a>';
+
   CC.vistaBusca = function (raiz, consulta) {
     const q = CC.semAcento(consulta);
+    const ref = CC.refDaBusca ? CC.refDaBusca(consulta) : null;
+    const visuais = q.length < 2 ? [] : achadosVisuais(consulta);
     const achados = q.length < 2 ? [] : Object.keys(D.notas)
       .filter((id) => D.notas[id].t.includes(q) && !CC.notaInterna(id))
       .sort((a, b) => {
@@ -478,7 +547,12 @@
 
     const meus = q.length < 2 ? [] : CC.meusTextos().filter((x) => CC.semAcento(x.texto).includes(q));
 
-    const resultados = (meus.length
+    const resultados = (ref ? CC.cartaoAbrirRef(ref) : '')
+      + (visuais.length
+        ? CC.tituloSecao('Mapas e parábolas', CC.plural(visuais.length, 'achado', 'achados'))
+          + '<div class="grade">' + visuais.slice(0, 12).map(itemVisual).join('') + '</div>'
+        : '')
+      + (meus.length
         ? CC.tituloSecao('No que você escreveu', CC.plural(meus.length, 'trecho', 'trechos'))
           + '<div class="grade">' + meus.slice(0, 12).map((x) =>
             '<a class="item" href="' + x.href + '"><span class="sub">' + CC.esc(x.onde) + '</span>'
@@ -489,7 +563,7 @@
         ? CC.tituloSecao('Nos textos', CC.plural(achados.length, 'texto', 'textos'))
           + '<div class="grade">' + achados.map(CC.itemNota).join('') + '</div>'
         : (q.length < 2 ? '<div class="vazio">Digite pelo menos duas letras.</div>'
-          : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>'));
+          : (ref || visuais.length || meus.length ? '' : '<div class="vazio">Não achei nada com “' + CC.esc(consulta) + '”. Tente outra palavra.</div>')));
 
     // No celular, trocar o innerHTML da tela destruía o input que estava focado. O Android
     // fechava o teclado já na primeira letra. Na passagem Explorar → Busca e nas letras
@@ -556,7 +630,10 @@
     return { porDia };
   };
 
+  // A tela de "não encontrei" oferece uma saída além do voltar (revisão de usabilidade, C21).
   CC.vazio = function (raiz, mensagem) {
-    raiz.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({ icone: 'info', texto: mensagem });
+    raiz.innerHTML = CC.botaoVoltar('Voltar') + CC.estado({ icone: 'info', texto: mensagem })
+      + '<div class="acoes saidas-vazio"><a class="botao contorno" href="#/biblia">Ir para a Bíblia</a>'
+      + '<a class="botao plano" href="#/explorar">Buscar no Explorar</a></div>';
   };
 })(window.CC);

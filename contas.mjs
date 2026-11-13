@@ -247,6 +247,7 @@ function paraLinhas(d) {
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
       encontro: Number.isInteger(p.encontro) ? p.encontro : -1, recado: p.recado || '', recado_em: p.recadoEm || '', recado_quando: p.recadoQuando || '',
+      encontro_hora: p.encontroHora || '', encontro_lugar: p.encontroLugar || '',
       // O estudo mora em celula_estudos desde a v19; a célula guarda só o ponteiro. estudo_id tem
       // de estar aqui: sincronizar regrava a linha inteira (INSERT OR REPLACE) só com estas
       // colunas, e sem ele a primeira gravação zeraria o estudo de todas as células. As quatro
@@ -343,6 +344,7 @@ function deLinhas(t, versao) {
       id: l.id, tipo: l.tipo, alvo: l.alvo || '', titulo: l.titulo || '', criadoPor: l.criado_por, criadoEm: l.criado_em,
       encerradoEm: l.encerrado_em || '', grupo: !!l.grupo, celula: !!l.celula,
       encontro: l.encontro === undefined || l.encontro === null ? -1 : Number(l.encontro), recado: l.recado || '', recadoEm: l.recado_em || '', recadoQuando: l.recado_quando || '',
+      encontroHora: l.encontro_hora || '', encontroLugar: l.encontro_lugar || '',
       estudoId: l.estudo_id || '',
       estudoAcolhida: l.estudo_acolhida || '', estudoAdoracao: l.estudo_adoracao || '', estudoTestemunho: l.estudo_testemunho || '',
       mae: l.mae || '', multiplicadaEm: l.multiplicada_em || '', multiplicadaInstante: l.multiplicada_instante || '',
@@ -1385,10 +1387,22 @@ export class Contas {
     return p;
   }
 
-  async definirEncontro(eu, id, dia) {
+  // hora ('HH:MM' ou '') e lugar (até 80 letras, uma linha) são opcionais: sem o campo no pedido
+  // (o app antigo), ficam como estavam.
+  async definirEncontro(eu, id, dia, { hora, lugar } = {}) {
     const p = this.celulaDeQuemConduz(eu, id);
     const n = Number(dia);
     if (!Number.isInteger(n) || n < -1 || n > 6) throw erro('escolha um dia da semana');
+    if (hora !== undefined && hora !== null) {
+      const h = String(hora);
+      if (h && !/^([01]\d|2[0-3]):[0-5]\d$/.test(h)) throw erro('escolha uma hora válida');
+      p.encontroHora = h;
+    }
+    if (lugar !== undefined && lugar !== null) {
+      const l = String(lugar).replace(/\s+/g, ' ').trim();
+      if (l.length > 80) throw erro('o lugar tem no máximo 80 letras');
+      p.encontroLugar = l;
+    }
     p.encontro = n;
     await this.salvar();
     return p;
@@ -1903,6 +1917,17 @@ export class Contas {
     return this.promoverEstudo(p, cabeca, agora);
   }
 
+  // O primeiro da fila, se a promoção o puser na célula amanhã (sem nada mudar até lá), ou null.
+  entraAmanha(p, agora = new Date()) {
+    if (!p || !p.celula || p.encerradoEm) return null;
+    const cabeca = this.filaDe(p.id)[0];
+    if (!cabeca) return null;
+    const diaDe = this.diaNaCelula(p);
+    const atual = p.estudoId ? this.estudo(p.estudoId) : null;
+    const amanha = somaDias(diaDe(agora.toISOString()), 1);
+    return devePromover({ atual, cabeca, hoje: amanha, encontro: p.encontro, encontros: p.encontros, diaDe }) ? cabeca : null;
+  }
+
   // Um estudo da fila desta célula, ou 404 "esse estudo já não está nos próximos estudos".
   estudoDaFila(p, estudoId) {
     const e = String(estudoId || '').length <= 64 ? this.estudo(estudoId) : null;
@@ -2050,9 +2075,11 @@ export class Contas {
     if (existente) Object.assign(existente, registro); else encontros.push(registro);
     await this.salvar();
     const quemConduz = this.ativosDe(p).map((m) => m.usuario).filter((u) => podeConduzir(p, u));
-    // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, seção 4)
+    // depois do encontro, o próximo da fila entra na célula (docs/a-mesa-fila.md, seção 4): o
+    // encontro de um dia que já acabou o promove agora; o de hoje, só amanhã (amanha: quem entra)
     const promovido = this.promoverDaFila(p, agora);
-    return { p, registro, promovido, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
+    const amanha = promovido ? null : this.entraAmanha(p, agora);
+    return { p, registro, promovido, amanha, faltaram: quemFaltou({ membros: p.membros, presentes: lista, registradoPor, quemConduz, data: d, semEncontro: sem }) };
   }
 
   // Os pedidos de oração e de ajuda que a pessoa deixou naquela célula somem com ela: quem
@@ -2353,6 +2380,21 @@ export class Contas {
   // ---------- minha caminhada (marcos pessoais) ----------
   // Vivem soltos no extra da conta (campo "marcos"), sem coluna própria: é só uma data opcional
   // por marco, e o discipulador só os vê se a pessoa ligar "mostrar marcos".
+  // Os marcos como saem para a tela e para quem a pessoa escolheu mostrar. "Entrei numa célula"
+  // não depende de a pessoa lembrar de marcar: quem é membro ativo de uma célula (visitante não)
+  // já tem a data, a da entrada mais antiga (avaliação de 09/11, B21). A data que a pessoa marcou vale.
+  marcosDe(usuario) {
+    const a = this.achar(usuario);
+    const marcos = { ...((a && a.marcos) || {}) };
+    if (a && !marcos.celula) {
+      const desde = this.propositosDe(a.usuario).filter((p) => p.celula && !p.encerradoEm)
+        .map((p) => p.membros.find((m) => m.usuario === a.usuario && m.estado === 'ativo' && m.papel !== 'visitante'))
+        .filter(Boolean).map((m) => String(m.tornouMembroEm || m.entrouEm || '').slice(0, 10)).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).sort()[0];
+      if (desde) marcos.celula = desde;
+    }
+    return marcos;
+  }
+
   async definirMarco(eu, chave, data) {
     const a = this.exigirCompleto(eu);
     if (!MARCOS.includes(chave)) throw erro('marco desconhecido');
@@ -2362,7 +2404,16 @@ export class Contas {
     if (d) marcos[chave] = d; else delete marcos[chave];
     a.marcos = marcos;
     await this.salvar();
-    return marcos;
+    return this.marcosDe(a.usuario);
+  }
+
+  // Quem conduz a minha célula vê a minha etapa de Minha caminhada no painel? Vem desligado, como o
+  // "Minha caminhada" do discipulado: decisão de fé e batismo só saem com o nome se a pessoa ligar.
+  async definirCaminhadaCelula(eu, sim) {
+    const a = this.exigirCompleto(eu);
+    if (sim === true) a.caminhadaCelula = true; else delete a.caminhadaCelula;
+    await this.salvar();
+    return !!a.caminhadaCelula;
   }
 
   // ---------- cuidado mútuo (Atos 2.42, 2.44-45) ----------

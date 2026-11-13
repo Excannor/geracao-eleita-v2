@@ -180,7 +180,7 @@
       + '<div class="titulo-secao"><h2>Meus conteúdos</h2></div>'
       + '<div class="lista-atalhos">'
       + atalho('#/perfil/anotacoes', 'caderno', 'Minhas anotações')
-      + atalho('#/perfil/livros', 'livro', 'Livros da Bíblia')
+      + atalho('#/perfil/livros', 'livro', 'Meu progresso nos livros')
       + atalho('#/passos', 'bandeira', 'Primeiros passos')
       + atalho('#/perfil/discipulado', 'cruz', 'Discipulado')
       // Só para quem ainda não está em nenhuma célula: quem já está numa (ou mais) usa a
@@ -190,8 +190,8 @@
       // O app: instalar e as configurações com nome, não só o ícone do canto.
       + '<div class="titulo-secao"><h2>Ajustes</h2></div>'
       + '<div class="lista-atalhos">'
-      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar no celular</span>' + CC.ico('avancar') + '</button>'
-      + atalho('#/config', 'engrenagem', 'Configurações e conta')
+      + '<button class="atalho" data-instalar>' + CC.ico('baixar') + '<span>Instalar o app</span>' + CC.ico('avancar') + '</button>'
+      + atalho('#/config', 'engrenagem', 'Configurações')
       + '</div>'
       // O painel do administrador saiu daqui: mora no Mais, só para o admin (10-roteador.js).
       + '<div class="linha-ajuda">' + CC.ico('aperto') + '<p>Precisa conversar com alguém? Fale com alguém de '
@@ -279,80 +279,27 @@
   // Meus versículos e Minhas anotações viraram uma tela só: 07g-anotacoes.js.
 
   // ---------- livros ----------
+  // Na ordem da Bíblia, com a unidade escrita ("7 de 20 leituras": são os dias do plano que
+  // passam pelo livro, não capítulos), e o toque abre o livro na Bíblia (revisão, C13).
   CC.vistaLivros = function (raiz) {
-    const vistos = [];
-    for (const d of D.plano) for (const l of d.livros) if (!vistos.includes(l)) vistos.push(l);
+    const doPlano = new Set();
+    for (const d of D.plano) for (const l of d.livros) doPlano.add(l);
     const pilula = (l) => {
       const p = CC.progressoDoLivro(l);
       const completo = p.lidos === p.total;
-      const id = '03 - Livros da Bíblia/' + l;
       const dentro = (completo ? CC.ico('certo') : '') + CC.esc(l)
-        + ' <span class="conta-livro">' + p.lidos + '/' + p.total + '</span>';
+        + ' <span class="conta-livro">' + p.lidos + ' de ' + CC.plural(p.total, 'leitura', 'leituras') + '</span>';
       const classe = 'pilula' + (completo ? ' livro-feito' : (p.lidos ? ' livro-andando' : ''));
-      return D.notas[id]
-        ? '<a class="' + classe + '" href="#/nota/' + encodeURIComponent(id) + '">' + dentro + '</a>'
-        : '<span class="' + classe + '">' + dentro + '</span>';
+      return '<a class="' + classe + '" href="#/biblia/' + encodeURIComponent(l) + '">' + dentro + '</a>';
     };
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil')
-      + '<h1>Livros da Bíblia</h1>'
-      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos.</p></div>'
-      + '<div class="pilulas">' + vistos.map(pilula).join('') + '</div>';
+      + '<h1>Meu progresso nos livros</h1>'
+      + '<p class="passo-dica">' + CC.livrosCompletos() + ' de ' + CC.totalLivros + ' concluídos. Cada livro conta as leituras do plano que passam por ele.</p></div>'
+      + '<div class="pilulas">' + CC.LIVROS.map(([l]) => l).filter((l) => doPlano.has(l)).map(pilula).join('') + '</div>';
   };
 
   // ---------- Minha história com Deus ----------
-  // Guia privado: nunca sai daqui, para amigo, célula, discipulado nem painel (só volta pela
-  // própria conta da pessoa, em api/estado). Três campos livres, com autosalvamento, como o
-  // "Escrever sobre hoje" da lição (04-licao.js). Entra pelo cartão fixo no topo de Minhas
-  // anotações (07g-anotacoes.js), e o voltar leva de volta para lá.
-  // 1 Pedro 3.15 na NBV, palavra por palavra (conteudo/biblias/nbv.json; teste-anotacoes confere).
-  const VERSO_HISTORIA = 'Entreguem-se aos cuidados de Cristo, seu Senhor, e se alguém perguntar acerca da esperança que vocês têm, '
-    + 'estejam preparados para contar-lhe, e façam-no de uma maneira amável e respeitosa.';
-  const CAMPOS_HISTORIA = [
-    ['antes', 'Antes: como era a sua vida? O que você buscava?'],
-    ['encontro', 'O encontro: como você conheceu Jesus? Quem estava por perto?'],
-    ['hoje', 'Hoje: o que mudou? Conte uma coisa concreta.'],
-  ];
-  const MAX_HISTORIA = 600;
-
-  function campoHistoria(chave, pergunta, valor) {
-    return '<div class="campo"><label for="campo-historia-' + chave + '">' + CC.esc(pergunta) + '</label>'
-      + '<textarea id="campo-historia-' + chave + '" data-campo="' + chave + '" maxlength="' + MAX_HISTORIA
-      + '" rows="4" autocomplete="off" autocapitalize="sentences">' + CC.esc(valor || '') + '</textarea>'
-      + '<p class="passo-dica pequena" data-conta="' + chave + '"></p></div>';
-  }
-
-  CC.vistaHistoria = function (raiz) {
-    const h = CC.minhaHistoria() || {};
-    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar('Minhas anotações')
-      + '<h1>Minha história com Deus</h1>'
-      + '<p class="passo-dica">Contar o que Deus fez na sua vida é um jeito simples de falar de Jesus. Se você cresceu na igreja, conte quando a fé passou a ser sua.</p></div>'
-      + '<blockquote class="verso-historia"><p>“' + VERSO_HISTORIA + '”</p><cite>1 Pedro 3.15</cite></blockquote>'
-      + '<span class="selo-status" id="salvo-historia" role="status"></span>'
-      + CAMPOS_HISTORIA.map(([chave, pergunta]) => campoHistoria(chave, pergunta, h[chave])).join('')
-      + '<p class="passo-dica pequena">Use palavras suas, sem termos de igreja.</p>'
-      + '<div class="acoes"><button class="botao contorno pequeno" data-copiar>' + CC.ico('compartilhar') + 'Copiar minha história</button></div>';
-
-    const conta = (chave) => {
-      const campo = raiz.querySelector('[data-campo="' + chave + '"]');
-      const nota = raiz.querySelector('[data-conta="' + chave + '"]');
-      if (campo && nota) nota.textContent = CC.pertoDoLimite(campo.value.length, MAX_HISTORIA) ? campo.value.length + ' de ' + MAX_HISTORIA + ' caracteres' : '';
-    };
-    const salvo = raiz.querySelector('#salvo-historia');
-    const salvar = () => {
-      const v = (chave) => (raiz.querySelector('[data-campo="' + chave + '"]') || {}).value || '';
-      CC.gravarHistoria(v('antes'), v('encontro'), v('hoje'));
-      if (salvo) { salvo.classList.add('leu'); salvo.innerHTML = CC.ico('certo') + 'Salvo'; }
-    };
-    CAMPOS_HISTORIA.forEach(([chave]) => {
-      conta(chave);
-      const campo = raiz.querySelector('[data-campo="' + chave + '"]');
-      campo.addEventListener('input', () => { conta(chave); salvar(); });
-    });
-    raiz.querySelector('[data-copiar]').onclick = async () => {
-      const atual = CC.minhaHistoria() || {};
-      const texto = ['antes', 'encontro', 'hoje'].map((c) => atual[c] || '').filter(Boolean).join('\n\n');
-      if (!texto) { CC.avisar('Escreva sua história antes de copiar.'); return; }
-      CC.avisar((await CC.copiar(texto)) ? 'História copiada' : 'Não consegui copiar');
-    };
-  };
+  // O editor mora na peça sob demanda "historia" (src/sob-demanda/historia.js): aqui fica a casca.
+  CC.vistaHistoria = (raiz) => CC.cascaDaPeca(raiz, { peca: window.HISTORIA_TELA, pronta: () => CC.historiaTela,
+    titulo: 'Minha história com Deus', voltar: 'Minhas anotações', rota: '#/perfil/historia' });
 })(window.CC);

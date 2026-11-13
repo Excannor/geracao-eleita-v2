@@ -387,8 +387,8 @@ console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'dia-lido'];
-const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'apoiar', 'historia', 'dia-lido'];
+const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js', 'celula-conduz.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
   let codigo = (PARTES_PECA[nome] || [nome + '.js']).map((f) => enxugarJs(readFileSync(src('sob-demanda', f), 'utf8'), f)).join('\n');
@@ -503,6 +503,8 @@ const html = molde
     + 'window.QR_GERADOR=' + JSON.stringify(pecas.qrcode) + ';'
     + 'window.MAPA_TELA=' + JSON.stringify(pecas['mapa-tela']) + ';'
     + 'window.PAINEL_TELA=' + JSON.stringify(pecas['painel-tela']) + ';'
+    + 'window.APOIAR_TELA=' + JSON.stringify(pecas.apoiar) + ';'
+    + 'window.HISTORIA_TELA=' + JSON.stringify(pecas.historia) + ';'
     + 'window.ATLAS_TELA=' + JSON.stringify(pecas.atlas) + ';'
     + 'window.ESTUDO_CELULA=' + JSON.stringify(pecas['estudo-celula']) + ';'
     + 'window.ESTUDO_PREPARO=' + JSON.stringify(pecas['estudo-preparo']) + ';'

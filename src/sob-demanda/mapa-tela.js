@@ -21,7 +21,8 @@
   const siglaDe = (nome) => (LIVROS.find(([l]) => l === nome) || [])[2] || nome;
   // citação que abre com palavra curta (“O nome...”, “o Filho...”) não deixa o “O sozinho no fim da linha
   const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1\u00a0');
-  const marca = (ref) => '<mark>' + nb(CC.esc(ref)) + '</mark>';
+  // a etiqueta abre o capítulo no leitor (CC.marcaRef, 04d-biblia.js)
+  const marca = (ref) => (CC.marcaRef ? CC.marcaRef(ref) : '<mark>' + nb(CC.esc(ref)) + '</mark>');
   const marcas = (refs) => (refs || []).map(marca).join(' ');
   // "Mt 1.23" por extenso: "Mateus 1.23"
   const porExtenso = (ref) => String(ref || '').replace(/^(\S+) /, (m, sigla) => (NOME_DA_SIGLA.get(sigla) || sigla) + ' ');
@@ -207,7 +208,9 @@
       + curta(64, meio) + '<section class="mapa-bloco mapa-procure">' + procure + '</section>'
       + ler
       // a ficha do livro (Explorar > Livros) e o mapa ficam ligados nos dois sentidos
-      + (D.notas[FICHA(nome)] ? '<a class="botao contorno mapa-ficha" href="#/nota/' + encodeURIComponent(FICHA(nome)) + '">Ver a ficha do livro</a>' : '')
+      // vindo da ficha, o botão volta para ela em vez de empilhar outra (revisão, C19)
+      + (D.notas[FICHA(nome)] ? '<a class="botao contorno mapa-ficha" href="#/nota/' + encodeURIComponent(FICHA(nome)) + '"'
+        + (CC.anteriorNaPilha && CC.anteriorNaPilha() === '#/nota/' + encodeURIComponent(FICHA(nome)) ? ' data-voltar>Voltar à ficha do livro' : '>Ver a ficha do livro') + '</a>' : '')
       + '</div>';
   }
 
@@ -253,8 +256,11 @@
     W = Math.max(280, raiz.clientWidth - 32);
     const cache = carregados.get(m.slug);
     const pintar = (mapa) => {
-      raiz.innerHTML = folha(m) + corpoDoMapa({ ...mapa, sigla: siglaDe(mapa.nome) });
+      // no fim, "Suas anotações", como na parábola (revisão de usabilidade, C26)
+      raiz.innerHTML = folha(m) + corpoDoMapa({ ...mapa, sigla: siglaDe(mapa.nome) })
+        + '<div class="mapa-anotacoes" data-notas-contexto="mapa:' + CC.esc(m.slug) + '" data-tipo-nota="nota"></div>';
       ligar(raiz, m);
+      if (CC.notasDoContexto) CC.notasDoContexto(raiz);
     };
     // Já carregado: desenha na hora, para o redesenho não perder a rolagem.
     if (cache && cache.pronto) { pintar(cache.pronto); return; }

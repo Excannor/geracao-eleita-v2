@@ -47,6 +47,11 @@
 .mesa-citacao figcaption { color: var(--tinta-fraca); font-size: .875rem; font-weight: 700; }
 
 /* ---------- aba Estudo: o líder e No plano ---------- */
+/* os atalhos de quem conduz, no alto da aba (B6): dois lado a lado e a fila embaixo */
+.mesa-atalhos { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+.mesa-atalhos .botao { min-width: 0; min-height: 48px; padding-inline: 10px; }
+.mesa-atalhos [data-ir-proximos], .mesa-atalhos [data-agendar-topo] { grid-column: 1 / -1; min-height: 44px; }
+.mesa-ancora { display: block; height: 0; scroll-margin-top: 96px; }
 .mesa-lider { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 10px 14px; padding: 16px 16px 16px 20px; border-radius: var(--raio-cartao); background: var(--cartao); }
 .mesa-lider > svg { box-sizing: border-box; width: 44px; height: 44px; padding: 11px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); }
 .mesa-lider b { display: block; color: var(--tinta-forte); font-size: 1rem; font-weight: 800; line-height: 1.3; }

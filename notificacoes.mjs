@@ -422,6 +422,14 @@ const T = {
     ['Orar com {amigo}?', '"onde dois ou três se reunirem em meu nome, eu estarei ali no meio deles" (Mt 18.20).'],
     ['Oração em dupla 🙏', '{amigo} te convidou pra orar. Pode ser rapidinho, até por mensagem de voz.'],
   ],
+  // O toque de quem conduz para quem faltou ao encontro (Célula > Precisam de atenção). Sem
+  // "sentimos sua falta": aviso não cobra presença (teste.mjs, tom); pergunta como a pessoa está.
+  cutucadaFalta: [
+    ['{amigo} pensou em você', 'A célula se reuniu e lembrou de você. Está tudo bem? Se quiser conversar, é só chamar.'],
+    ['Um recado de {amigo}', 'Lembramos de você no encontro da célula. Como você está? Posso orar por alguma coisa?'],
+    ['{amigo} quer saber de você', 'Está tudo bem com você? A célula te espera no próximo encontro, do jeito que você estiver.'],
+    ['Oi, é {amigo}', 'Passando para saber como você está. O seu lugar na célula continua guardado.'],
+  ],
   cutucadaTreino: [
     ['{amigo} te chamou pra treinar 💪', 'Corpo também é cuidado. Bora combinar o treino?'],
     ['Treino com {amigo}? 💪', 'Um convite pra se mexer junto. Responde quando puder.'],

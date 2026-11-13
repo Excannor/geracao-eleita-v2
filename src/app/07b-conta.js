@@ -75,8 +75,9 @@
         + [['Sistema', null], ['Claro', false], ['Escuro', true]].map(([rot, v]) =>
           '<button data-tema="' + JSON.stringify(v) + '" aria-pressed="' + (tema === v) + '">' + rot + '</button>').join('')
         + '</div></div>')
-      + grupo('Leitura', linha('Tradução e créditos', traducao ? traducao.abreviatura : '', 'data-ir="#/config/textos"'))
-      + grupo('Seu caminho', linha('Seu caminho',
+      + grupo('Leitura', linha('Tradução e créditos', CC.nomeCurtoDaTraducao ? CC.nomeCurtoDaTraducao(traducao) : (traducao || {}).abreviatura || '', 'data-ir="#/config/textos"'))
+      // o item diz o que faz (a seção já se chama "Seu caminho"; revisão de usabilidade, C20)
+      + grupo('Seu caminho', linha('Plano de leitura',
         quem.caminho === 'conhecer' ? 'Conhecer Jesus' : 'Plano da Bíblia em um ano', 'data-caminho'))
       + grupo('Notificações', linha('Lembretes e avisos', CC.resumoNotificacoes(), 'data-ir="#/config/notificacoes"'))
       + grupo('Privacidade', (quem.comSenha
@@ -84,7 +85,8 @@
           + '<span>Mostrar meus marcos no Juntos</span><span class="interruptor" aria-hidden="true"><i></i></span></button>'
         : '')
         + linha('Pessoas bloqueadas', '', 'data-ir="#/amigos/bloqueados"')
-        + linha('Privacidade', '', 'data-privacidade')
+        // com conta, a folha tem a data do consentimento e como retirá-lo; sem conta, abre direto a política
+        + linha(quem.comSenha ? 'Privacidade e consentimento' : 'Política de privacidade', '', 'data-privacidade')
         + linha('Termos de Uso', '', 'data-termos'))
       + grupo('Seus dados', linha('Baixar o que escrevi', '', 'data-exportar')
         + linha('Zerar progresso', '', 'data-zerar', 'perigo'))
@@ -128,7 +130,7 @@
       await CC.carregarNovidades();
       CC.redesenhar();
     });
-    ligar('[data-privacidade]', () => CC.abrirPrivacidade(quem));
+    ligar('[data-privacidade]', () => (quem.comSenha ? CC.abrirPrivacidade(quem) : window.open('privacidade.html', '_blank', 'noopener')));
     ligar('[data-termos]', () => window.open('termos.html', '_blank', 'noopener'));
     ligar('[data-caminho]', () => folhaSeuCaminho(quem));
     ligar('[data-completar]', () => CC.completarCadastro(quem));
@@ -379,7 +381,6 @@
     const dataConsentimento = quem && quem.comSenha && quem.consentimentoEm ? dataBr(String(quem.consentimentoEm).slice(0, 10)) : '';
     CC.folha('<h3>Privacidade</h3>' + (dataConsentimento ? '<p class="passo-dica">Você concordou em ' + CC.esc(dataConsentimento) + '.</p>' : '')
       + '<p>' + LINK_PRIVACIDADE + '</p>'
-      + '<p><a href="termos.html" target="_blank" rel="noopener">Ler os Termos de Uso</a></p>'
       + '<p class="passo-dica">Dúvidas ou problemas: <a href="mailto:suporte@geracaoeleita.app">suporte@geracaoeleita.app</a></p>'
       + (quem && quem.comSenha
         ? '<h3>Retirar o consentimento</h3>'

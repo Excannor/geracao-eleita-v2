@@ -19646,7 +19646,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
   // cartela de ouro, de cantos recortados, e a pílula de madrepérola); a máscara do brilho
   // (mascaraDoBrilho e mascaraDoRotulo) recorta exatamente a mesma forma, para a beirada da
   // plaqueta sair nítida com a carta inclinada.
-  const textoDoRotulo = (carta) => String(carta.album || '').toUpperCase() + '  ·  ' + carta.numero + '/' + (carta.total || 13);
+  const textoDoRotulo = (carta) => String(carta.album || '').toUpperCase() + '  ·  ' + 'Nº ' + carta.numero; // "Nº 3", e não "3/13", que brigava com o "Você tem 1 de 13" (revisão, C9)
   function plaqueta(k, carta, M) {
     const wr = medir(k, textoDoRotulo(carta), oswald(32, 600), 4.5);
     if (M.cheia) return { wr, forma: redondo(CW / 2 - wr / 2 - 62, 44, wr + 124, 54, 27), x: CW / 2 - wr / 2 - 62, y: 44, w: wr + 124, h: 54 };
@@ -20747,7 +20747,7 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
     }
     el.style.setProperty('--largura', largura + 'px');
     el.setAttribute('role', 'img');
-    el.setAttribute('aria-label', 'Carta ' + carta.album + ', ' + carta.numero + ' de ' + carta.total + ', ' + RARIDADES[rar].nome + ': '
+    el.setAttribute('aria-label', 'Carta ' + carta.album + ', número ' + carta.numero + ', ' + RARIDADES[rar].nome + ': '
       + carta.titulo + '. Você sabia? ' + carta.sabia + ' ' + carta.ref);
     el.innerHTML = '<div class="cv-giro"><div class="cv-face cv-frente">' + CAMADAS + '</div><div class="cv-face cv-verso">' + CAMADAS + '</div></div>';
     el.querySelector('.cv-frente').prepend(frente);
@@ -21094,7 +21094,6 @@ const caida = pol([[bx + 112, borda1(0.79) + 2], [bx + 150, borda1(0.9) + 4], [b
       + ';--t:' + ESCALA_TEMPO + ';--lc:' + larg + 'px;--lb:' + largBau + 'px;--yb:' + yb + 'px;--s0:' + S0 + ';--boca:' + boca + '">'
       // "Pular animação" só aparece com a animação andando: antes do toque ele parecia "pular o prêmio"
       + '<button type="button" class="botao contorno pequeno rv-pular">Pular animação</button>'
-      + '<p class="rv-dica-toque">Toque no baú para abrir</p>'
       + '<div class="rv-palco">'
       + '<i class="rv-raios" aria-hidden="true"></i><i class="rv-aura" aria-hidden="true"></i>'
       + '<div class="rv-bau-pecas" aria-hidden="true"><span class="rv-peca rv-boca"></span><i class="rv-luz"></i>'

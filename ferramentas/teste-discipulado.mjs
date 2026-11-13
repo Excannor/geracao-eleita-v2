@@ -25,11 +25,11 @@ console.log('\n  Discipulado: regras puras\n');
 {
   const D = await import(pathToFileURL(join(AQUI, 'discipulado.mjs')).href);
   ok(D.papelValido('discipulador') && D.papelValido('discipulo') && !D.papelValido('outro'), 'só os dois papéis são válidos');
-  ok(JSON.stringify(D.mostrarValido({ passos: 1, marcos: 'sim' })) === JSON.stringify({ passos: true, semana: false, marcos: true, checkin: true }),
-    '"mostrar" vira sempre quatro booleanos, nunca outra chave; o check-in vem ligado se não foi desligado');
-  ok(D.mostrarValido({ checkin: false }).checkin === false, 'o discípulo pode desligar o check-in');
+  ok(JSON.stringify(D.mostrarValido({ passos: 1, marcos: 'sim' })) === JSON.stringify({ passos: true, semana: false, marcos: true, checkin: false }),
+    '"mostrar" vira sempre quatro booleanos, nunca outra chave; o check-in vem desligado se não foi ligado (B5)');
+  ok(D.mostrarValido({ checkin: true }).checkin === true && D.mostrarValido({ checkin: 'sim' }).checkin === false, 'o discípulo liga o check-in só com true');
   const c = { data: '2026-10-01', corpo: 3, mente: 1, espirito: 2 };
-  ok(D.resumoParaDiscipulador({ mostrar: {}, checkin: c }).checkin === c && !('checkin' in D.resumoParaDiscipulador({ mostrar: { checkin: false }, checkin: c })),
+  ok(D.resumoParaDiscipulador({ mostrar: { checkin: true }, checkin: c }).checkin === c && !('checkin' in D.resumoParaDiscipulador({ mostrar: {}, checkin: c })),
     'o discipulador vê o último check-in só se o discípulo mostrar');
 
   const datas = (...d) => new Set(d);
@@ -126,6 +126,7 @@ try {
   ok(deBia.meuDiscipulador && deBia.meuDiscipulador.usuario === 'ana', 'Bia vê a Ana como quem a acompanha');
   ok(deBia.meuDiscipulador.id === convite1.id, 'a tela do discípulo também vem com o id, para poder mostrar, marcar encontro e encerrar');
   ok(deBia.meuDiscipulador.mostrar.passos === true && deBia.meuDiscipulador.mostrar.marcos === false, 'Bia vê de volta o que ela mesma escolheu mostrar');
+  ok(deBia.meuDiscipulador.mostrar.checkin === false, 'o aceite sem escolher o check-in deixa o check-in desligado (B5)');
 
   // ---------- o outro papel do convite ----------
   console.log('\n  O outro papel: "quero que você me acompanhe"\n');

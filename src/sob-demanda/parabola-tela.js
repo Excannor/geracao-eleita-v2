@@ -78,7 +78,9 @@
   // ---------- a parábola ----------
   // citação que abre com palavra curta não deixa a aspa e a palavra sozinhas no fim da linha
   const tx = (t) => CC.esc(t).replace(/([“‘]\S{1,2}) /g, '$1 ');
-  const ref = (r) => (r ? ' ' + marca(r) : '');
+  // no corpo da parábola, a etiqueta abre o capítulo no leitor (CC.marcaRef, 04d-biblia.js)
+  const marcaLink = (r) => (r ? (CC.marcaRef ? CC.marcaRef(r) : marca(r)) : '');
+  const ref = (r) => (r ? ' ' + marcaLink(r) : '');
   // "dizer-lhe", "vê-lo": dentro das falas, a palavra com hífen não quebra no hífen
   const falaTx = (t) => tx(t).replace(/[^\s“]+-[^\s”]+/g, '<span class="sem-quebra">$&</span>');
   // "Lc 14.15-24" → { livro: "Lucas", cap: 14, de: 15, ate: 24 }
@@ -135,7 +137,7 @@
     return '<div class="parabola">'
       + p.secoes.map((s, i) => seta(i) + '<section class="secao-parabola">' + rotulo(s.icone, s.titulo) + s.blocos.map((b) => bloco(p, b)).join('') + '</section>').join('')
       + seta(p.secoes.length) + '<section class="dizendo-parabola">' + rotulo('ancora', 'O que Jesus está dizendo')
-      + '<p class="dizendo-texto">' + tx(d.texto) + '</p><p class="dizendo-apoio">' + (d.apoio ? tx(d.apoio) + ref(d.ref) : marca(d.ref)) + '</p></section>'
+      + '<p class="dizendo-texto">' + tx(d.texto) + '</p><p class="dizendo-apoio">' + (d.apoio ? tx(d.apoio) + ref(d.ref) : marcaLink(d.ref)) + '</p></section>'
       + '<h2 class="pensar-parabola">Para pensar</h2><ol class="perguntas-parabola">' + p.perguntas.map((q) => '<li>' + tx(q) + '</li>').join('') + '</ol>'
       + parecidas
       + (t ? '<a class="botao parabola-ler" data-ler-parabola href="#/biblia/' + encodeURIComponent(t.livro) + '/' + t.cap + '">Ler ' + CC.esc(t.livro + ' ' + t.cap) + ' na Bíblia</a>' : '')
@@ -161,7 +163,7 @@
       '<button class="botao-redondo" data-compartilhar-parabola aria-label="Compartilhar esta parábola">' + CC.ico('compartilhar') + '</button>')
       + '<div class="parabola-cabeca"><span class="mapa-grupo">' + CC.esc(grupoDe(item.grupo).nome) + '</span>' + desenho(p, p.desenho, 'parabola-heroi')
       + '<h1 class="parabolas-nome parabola-nome">' + CC.esc(item.titulo) + '</h1>'
-      + '<span class="parabola-sub">' + marca(item.ref) + '<span> · ' + minutos(p) + ' min de leitura</span></span></div></div>' + corpo(p, item.slug);
+      + '<span class="parabola-sub">' + marcaLink(item.ref) + '<span> · ' + minutos(p) + ' min de leitura</span></span></div></div>' + corpo(p, item.slug);
     raiz.querySelector('[data-compartilhar-parabola]').onclick = async () => {
       const r = await CC.compartilhar('A parábola “' + item.titulo + '” no Geração Eleita', location.origin + location.pathname + '#/parabola/' + item.slug);
       if (r === 'copiado') CC.avisar('Link copiado');

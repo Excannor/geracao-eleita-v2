@@ -205,6 +205,8 @@ window.CC = window.CC || {};
     camadas: '<path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>',
     calendario: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>',
     mapa: '<path d="M3 6l6-2 6 2 6-2v14l-6 2-6-2-6 2z"/><path d="M9 4v14M15 6v14"/>',
+    // o mapa do livro (raiz e ramos): não é o alfinete de lugar nem o mapa dobrado do atlas
+    ramos: '<circle cx="12" cy="5" r="2.5"/><circle cx="5" cy="19" r="2.5"/><circle cx="19" cy="19" r="2.5"/><path d="M12 7.5v4.5M12 12l-5.3 5M12 12l5.3 5"/>',
     alfinete: '<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
     // xícara e telefone do Feather Icons (MIT), para as missões presenciais
     xicara: '<path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><path d="M6 1v3"/><path d="M10 1v3"/><path d="M14 1v3"/>',
@@ -462,6 +464,11 @@ window.CC = window.CC || {};
       el.setAttribute('role', 'status');
       document.body.appendChild(el);
     }
+    // Com uma tela cheia aberta (a carta, o baú), o aviso sobe para cima dos botões dela, em vez
+    // de cobrir o próprio botão que a pessoa acabou de tocar (revisão de usabilidade, C22).
+    const pe = document.querySelector('.tela-cheia:not(.saindo) .tela-cheia-pe:not([hidden])');
+    const topoDoPe = pe ? pe.getBoundingClientRect().top : 0;
+    el.style.bottom = topoDoPe > 0 && topoDoPe < innerHeight ? Math.round(innerHeight - topoDoPe + 10) + 'px' : '';
     el.innerHTML = (tipo ? '<i class="aviso-ico aviso-' + tipo + '">' + CC.ico(tipo === 'erro' ? 'info' : 'certo') + '</i>' : '') + '<span>' + CC.esc(texto) + '</span>';
     // um aviso trocou o outro: bate de leve, para a troca não passar despercebida
     if (!novo) { el.classList.remove('bate'); void el.offsetWidth; el.classList.add('bate'); }
@@ -511,6 +518,21 @@ window.CC = window.CC || {};
     }
     return pecas.get(arquivo);
   };
+  // A casca de uma tela que mora numa peça (Apoiar, Minha história com Deus): o título e o
+  // esqueleto até ela chegar, a tela quando chega e, na falha, o recado com "Tentar de novo".
+  // { peca: window.<NOME>, pronta: () => CC.<tela>, titulo, voltar, rota }
+  CC.cascaDaPeca = (raiz, o) => {
+    if (o.pronta()) return o.pronta()(raiz);
+    raiz.innerHTML = '<div class="folha-perfil titulo-frase">' + CC.botaoVoltar(o.voltar) + '<h1>' + CC.esc(o.titulo) + '</h1></div>' + CC.esqueleto('cartoes');
+    CC.ligarVoltarDoTopo(raiz);
+    const ainda = () => location.hash.startsWith(o.rota) && raiz.querySelector('.folha-perfil + .esqueleto');
+    CC.pedirPeca(o.peca, () => !!o.pronta()).then(() => { if (ainda()) o.pronta()(raiz); }, () => {
+      if (!ainda()) return;
+      raiz.querySelector('.esqueleto').outerHTML = CC.estadoSemPeca('Não consegui abrir esta tela');
+      const b = raiz.querySelector('[data-acao-estado]');
+      if (b) b.onclick = () => CC.cascaDaPeca(raiz, o);
+    });
+  };
   // A falha de uma peça, no azulejo das parábolas: o que houve e o "Tentar de novo".
   CC.estadoSemPeca = (titulo) => {
     const semRede = navigator.onLine === false;
@@ -541,6 +563,112 @@ window.CC = window.CC || {};
     }, true);
   }
 
+  // ---------- o voltar do celular fecha o que está por cima ----------
+  // Toda folha (e a tela cheia que fecha ao navegar) entra no histórico ao abrir, como o painel
+  // do Mais: o voltar do celular a fecha e a tela de baixo fica onde estava. Ela também se fecha
+  // sozinha quando a tela muda (o endereço passa a ser outro). Fechar pelo botão, por fora ou
+  // arrastando tira a entrada do histórico (history.back), mas só no tique seguinte e só se ela
+  // ainda for a atual: quem fecha e logo abre outra folha reaproveita a mesma entrada, e quem
+  // fecha e muda de tela por código ("fechar(); location.hash = ...") deixa uma entrada
+  // fantasma, que o voltar pula sozinho. Um link "#/..." de dentro da folha troca a entrada da
+  // folha pelo destino (location.replace), sem fantasma. As folhas presas (consentimento)
+  // ficam de fora: nem o voltar nem a troca de tela as fecha.
+  const SESSAO_SOBRE = Math.random().toString(36).slice(2, 8);
+  let contaSobre = 0;
+  const sobrepostas = []; // { n, href, fechar }, na ordem em que abriram
+  let voltaPendente = null;
+  // o 01-nucleo.js também roda no servidor (regras-app.mjs), sem histórico nem janela
+  const comHistorico = typeof history !== 'undefined' && typeof addEventListener === 'function';
+  const estadoAtual = () => (comHistorico && history.state && typeof history.state === 'object' ? history.state : {});
+  const nDoEstado = (st) => (st.sobre && st.sobreSessao === SESSAO_SOBRE ? st.sobre : 0);
+  // Cada entrada do histórico ganha um carimbo crescente (t), na ordem em que foi criada, que é
+  // a ordem dela no histórico: ao cair numa entrada fantasma, o carimbo da entrada de onde se
+  // veio diz o sentido (voltando, pula para trás; avançando, para frente).
+  let ultimoT = 0;
+  let tAtual = 0;
+  const novoT = () => (ultimoT = Math.max(Date.now(), ultimoT + 1));
+  const carimbar = () => {
+    const st = estadoAtual();
+    if (comHistorico && !st.t) { try { history.replaceState({ ...st, t: novoT() }, ''); } catch (e) { /* segue */ } }
+    tAtual = estadoAtual().t || 0;
+  };
+  CC.empilharSobreposicao = (el, fecharSemVoltar) => {
+    const n = ++contaSobre;
+    const st = estadoAtual();
+    const novo = { ...st, sobre: n, sobreSessao: SESSAO_SOBRE, t: novoT() };
+    delete novo.painelMais;
+    // a entrada de uma folha que acabou de fechar, ou a do painel do Mais que abriu esta, é reaproveitada
+    const reaproveitar = (voltaPendente && nDoEstado(st) === voltaPendente.n) || st.painelMais;
+    if (voltaPendente && nDoEstado(st) === voltaPendente.n) { clearTimeout(voltaPendente.timer); voltaPendente = null; }
+    if (reaproveitar && st.t) novo.t = st.t;
+    try { if (reaproveitar) history.replaceState(novo, ''); else history.pushState(novo, ''); } catch (e) { /* segue sem histórico */ }
+    tAtual = novo.t;
+    const item = { n, href: location.href, fechar: fecharSemVoltar };
+    sobrepostas.push(item);
+    // link interno de dentro dela: troca a entrada da folha pelo destino
+    el.addEventListener('click', (ev) => {
+      const a = ev.target.closest && ev.target.closest('a[href^="#/"]');
+      if (!a || ev.defaultPrevented || a.target || ev.ctrlKey || ev.metaKey || ev.shiftKey) return;
+      if (!nDoEstado(estadoAtual())) return;
+      ev.preventDefault();
+      soltar(n);
+      fecharSemVoltar();
+      if (location.hash === a.getAttribute('href')) return;
+      location.replace(a.getAttribute('href'));
+    });
+    return () => soltar(n, true);
+  };
+  // Tira da pilha; com voltar, desfaz a entrada no histórico (no tique seguinte, se ainda for ela).
+  function soltar(n, voltar) {
+    const i = sobrepostas.findIndex((x) => x.n === n);
+    if (i < 0) return;
+    sobrepostas.splice(i, 1);
+    if (!voltar || nDoEstado(estadoAtual()) !== n) return;
+    if (voltaPendente) clearTimeout(voltaPendente.timer);
+    const pend = { n };
+    pend.timer = setTimeout(() => {
+      if (voltaPendente === pend) voltaPendente = null;
+      if (nDoEstado(estadoAtual()) === n) history.back();
+    }, 0);
+    voltaPendente = pend;
+  }
+  // Fecha a de cima (o Esc do roteador): true se havia uma.
+  CC.fecharSobreposicaoDoTopo = () => {
+    const topo = sobrepostas[sobrepostas.length - 1];
+    if (!topo) return false;
+    soltar(topo.n, true);
+    topo.fechar();
+    return true;
+  };
+  CC.temSobreposicao = () => sobrepostas.length > 0;
+  if (comHistorico) addEventListener('popstate', () => {
+    const st = estadoAtual();
+    const n = nDoEstado(st);
+    // uma entrada de folha que não está mais aberta (fantasma, ou de antes de recarregar): pula
+    const fantasma = !!st.sobre && !sobrepostas.some((x) => x.n === n);
+    const deDepois = tAtual > (st.t || 0);
+    tAtual = st.t || 0;
+    for (let i = sobrepostas.length - 1; i >= 0; i--) {
+      const x = sobrepostas[i];
+      if (!fantasma && x.n <= n) continue;
+      sobrepostas.splice(i, 1);
+      x.fechar();
+    }
+    if (fantasma) { if (deDepois) history.back(); else history.forward(); }
+  });
+  if (comHistorico) addEventListener('hashchange', () => {
+    carimbar();
+    for (let i = sobrepostas.length - 1; i >= 0; i--) {
+      const x = sobrepostas[i];
+      if (x.href === location.href) continue;
+      sobrepostas.splice(i, 1);
+      x.fechar();
+    }
+  });
+  // Recarregada com uma folha aberta, a página abre na entrada dela: volta para a de baixo,
+  // que tem o mesmo endereço (senão o primeiro voltar parecia não fazer nada).
+  if (estadoAtual().sobre) { try { history.back(); } catch (e) { /* segue */ } } else carimbar();
+
   // Substitui o confirm() do navegador, que num aplicativo instalado parece um erro.
   // cancelar: o nome do segundo botão. Com nome próprio ("Sair"), ele vira contorno: as duas
   // escolhas pesam igual; o "Cancelar" de sempre continua plano. Tocar fora resolve null (não é
@@ -555,11 +683,21 @@ window.CC = window.CC || {};
       + '<button class="botao' + (perigo ? ' vermelho' : '') + '" data-sim>' + CC.esc(acao || 'Confirmar') + '</button>'
       + '<button class="botao ' + (cancelar ? 'contorno' : 'plano') + '" data-nao>' + CC.esc(cancelar || 'Cancelar') + '</button>'
       + '</div></div>';
-    const fechar = (v) => { CC.sair(cortina); resolver(v); };
+    let fechada = false;
+    let soltarHistorico = () => {};
+    const fechar = (v, semVoltar) => {
+      if (fechada) return;
+      fechada = true;
+      if (!semVoltar) soltarHistorico();
+      CC.sair(cortina);
+      resolver(v);
+    };
     cortina.querySelector('[data-sim]').onclick = () => fechar(true);
     cortina.querySelector('[data-nao]').onclick = () => fechar(false);
     cortina.onclick = (ev) => { if (ev.target === cortina) fechar(null); };
     document.body.appendChild(cortina);
+    // o voltar do celular é o mesmo que tocar fora: nenhuma das duas escolhas
+    soltarHistorico = CC.empilharSobreposicao(cortina, () => fechar(null, true));
     cortina.querySelector('[data-sim]').focus();
   });
 
@@ -639,16 +777,24 @@ window.CC = window.CC || {};
       cortina.style.bottom = 'auto';
     };
     if (vv) { vv.addEventListener('resize', acompanharTeclado); vv.addEventListener('scroll', acompanharTeclado); }
-    const fechar = () => {
+    let fechada = false;
+    let soltarHistorico = () => {};
+    const fecharDeVez = (semVoltar) => {
+      if (fechada) return;
+      fechada = true;
+      if (!semVoltar) soltarHistorico();
       if (vv) { vv.removeEventListener('resize', acompanharTeclado); vv.removeEventListener('scroll', acompanharTeclado); }
       CC.sair(cortina);
       if (origem && origem.focus && document.body.contains(origem)) origem.focus();
       setTimeout(CC.endireitarRaiz, 120);
     };
+    const fechar = () => fecharDeVez(false);
     if (!opcoes.presa) cortina.onclick = (ev) => { if (ev.target === cortina) fechar(); };
     if (opcoes.presa) cortina.dataset.presa = '1';
     if (!opcoes.presa) arrastarParaFechar(folha, fechar);
     document.body.appendChild(cortina);
+    // o voltar do celular e a troca de tela fecham a folha (ver CC.empilharSobreposicao)
+    if (!opcoes.presa) soltarHistorico = CC.empilharSobreposicao(cortina, () => fecharDeVez(true));
     if (opcoes.ligar) opcoes.ligar(folha, fechar);
     // No celular, abrir a folha não abre o teclado: ele cobria o texto antes de a pessoa ler.
     // O teclado aparece quando ela toca no campo, e o campo rola para o meio da folha.

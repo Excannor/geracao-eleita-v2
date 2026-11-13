@@ -124,7 +124,7 @@
   };
   const linhaAmostra = (tipo) => '<svg class="atlas-amostra ' + tipo + '" viewBox="0 0 28 8" aria-hidden="true"><path d="M2 4h24"/></svg>';
   const barra = (voltar) => '<div class="mapa-barra"><button class="botao-redondo" data-voltar data-rotulo-voltar="' + voltar + '" aria-label="Voltar">'
-    + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Mapas bíblicos</span><span class="atlas-vaga"></span></div>';
+    + CC.ico('voltar') + '</button><span class="mapa-barra-titulo">Atlas bíblico</span><span class="atlas-vaga"></span></div>';
 
   // ---------- a lista (#/atlas) ----------
   function lista(raiz) {
@@ -133,13 +133,14 @@
     const proporcao = (m) => m ? ' style="aspect-ratio:' + m.largura + ' / ' + m.altura + '"' : '';
     const cartao = (it) => {
       const m = pronto(it.arquivo);
-      return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '">'
+      // o nome do cartão é o título (com a linha e a referência), não o texto do desenho (C14)
+      return '<a class="item-atlas" href="#/atlas/' + it.slug + '" data-item-atlas="' + it.slug + '" aria-label="' + esc(it.titulo + '. ' + it.linha + '. ' + it.ref) + '">'
         + '<span class="item-atlas-mapa" aria-hidden="true"' + proporcao(m) + '>' + (m ? svg(m, { faixa: false, mini: true }) : '') + '</span>'
         + '<span class="item-atlas-textos"><b>' + esc(it.titulo) + '</b><span class="item-atlas-linha">' + esc(it.linha) + '</span>'
         + '<span class="item-atlas-pe"><mark>' + nb(esc(it.ref)) + '</mark>' + CC.ico('avancar') + '</span></span></a>';
     };
     raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Explorar')
-      + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Mapas bíblicos</h1>'
+      + '<div class="atlas-cabeca"><span class="mapa-grupo">Explorar</span><h1 class="atlas-nome">Atlas bíblico</h1>'
       + '<p>As cidades, os caminhos e o relevo de onde a história aconteceu.</p></div></div>'
       + '<div class="lista-atlas">' + A.grupos.map((g) => '<section class="grupo-atlas"><h2>' + esc(g.nome) + '</h2>'
         + A.itens.filter((it) => it.grupo === g.id).map(cartao).join('') + '</section>').join('')
@@ -175,9 +176,9 @@
     // a linha se desenha quando a tela abre; um redesenho com o mesmo mapa na tela não repete
     const animar = !raiz.querySelector('[data-atlas-mapa="' + m.slug + '"]');
     const grupo = (CC.atlasDados.A.grupos.find((g) => g.id === item.grupo) || {}).nome || '';
-    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Mapas bíblicos')
+    raiz.innerHTML = '<div class="folha-mapa folha-atlas">' + barra('Atlas bíblico')
       + '<div class="atlas-cabeca"><span class="mapa-grupo">' + esc(grupo) + '</span><h1 class="atlas-nome">' + esc(m.titulo) + '</h1>'
-      + '<p class="atlas-sub">' + esc(m.sub) + ' · <mark>' + nb(esc(m.ref)) + '</mark></p>'
+      + '<p class="atlas-sub">' + esc(m.sub) + ' · ' + (CC.marcaRef ? CC.marcaRef(m.ref) : '<mark>' + nb(esc(m.ref)) + '</mark>') + '</p>'
       + (m.quando ? '<p class="atlas-quando">' + esc(m.quando.charAt(0).toUpperCase() + m.quando.slice(1)) + '</p>' : '') + '</div></div>'
       + (m.texto ? '<p class="atlas-texto">' + esc(m.texto) + '</p>' : '')
       + '<figure class="atlas-quadro" data-atlas-mapa="' + esc(m.slug) + '"><div class="atlas-palco" data-atlas-palco><div class="atlas-zoom">' + svg(m, { animar }) + '</div></div>'
@@ -189,10 +190,13 @@
       + '<h3 class="atlas-trecho">' + (m.pernas.length ? linhaAmostra('ida') : '') + esc((m.trechos || {}).ida || 'Ida') + '</h3><ol class="atlas-paradas">' + ida.map(parada).join('') + '</ol>'
       + (volta.length ? '<h3 class="atlas-trecho">' + linhaAmostra('volta') + esc((m.trechos || {}).volta || 'Volta') + '</h3><ol class="atlas-paradas">' + volta.map(parada).join('') + '</ol>' : '')
       + (ler ? '<a class="botao atlas-ler" href="#/biblia/' + encodeURIComponent(ler.livro) + '/' + ler.cap + '">' + CC.ico('livro') + 'Ler a passagem · ' + esc(trechoDeLeitura(m.leitura)) + '</a>' : '')
+      + '<div class="atlas-anotacoes" data-notas-contexto="atlas:' + esc(m.slug) + '" data-tipo-nota="nota"></div>'
       + '<p class="atlas-fonte">Posições e caminhos aproximados. Relevo e profundidade: SRTM, GMTED2010 e ETOPO1 (dados públicos); costa: Natural Earth.</p>';
     CC.ligarVoltarDoTopo(raiz);
     CC.inseparavel(raiz);
     ligarZoom(raiz, m);
+    // "Suas anotações", como na parábola (revisão de usabilidade, C26)
+    if (CC.notasDoContexto) CC.notasDoContexto(raiz);
   }
 
   // ---------- aproximar e arrastar ----------
