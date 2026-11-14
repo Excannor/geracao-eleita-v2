@@ -809,7 +809,8 @@
     // segue para convite, célula ou completar cadastro antes de decidir isso.
     if (quem && quem.comSenha && !quem.consentimento) await CC.pedirConsentimento();
 
-    // Não há folha de "endereço novo" aqui: ge.off-sec.net já é o endereço do app (saiu em 02/10).
+    // Não há folha de "endereço novo" aqui: o app já abre no endereço oficial, geracaoeleita.app
+    // (a folha herdada do app original saiu em 02/10).
 
     // Aberto no navegador de dentro do Instagram/Facebook/WebView: "Abra no Chrome/Safari"
     // (07c-instalar.js), uma vez por aba. Num navegador de verdade, nada.

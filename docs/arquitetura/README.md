@@ -20,7 +20,7 @@ flowchart LR
     LS[("localStorage<br/>progresso do aparelho")]
   end
   subgraph CF["Cloudflare"]
-    T["Túnel nomeado<br/>ge.off-sec.net"]
+    T["Túnel nomeado<br/>geracaoeleita.app"]
   end
   subgraph Casa["Raspberry Pi (Docker)"]
     S["servidor.mjs<br/>Node 24, sem dependências"]
@@ -180,7 +180,7 @@ No iOS 26 o WebKit descola da borda o que é `position: fixed` durante a rolagem
 
 ## Onde roda
 
-O app no ar mora num Raspberry Pi, com Docker, atrás do túnel nomeado da Cloudflare em `ge.off-sec.net`. No host, o container escuta só em `127.0.0.1:8083`; dentro dele, o servidor usa a 8080.
+O app no ar mora num Raspberry Pi, com Docker, atrás do túnel nomeado da Cloudflare em `geracaoeleita.app`, o domínio oficial. No host, o container escuta só em `127.0.0.1:8083`; dentro dele, o servidor usa a 8080.
 
 Para publicar: `.\publicar.ps1`, que leva o último commit para o Pi, refaz o container `caminho` e recria o `tunel-fixo`. O túnel fixo usa a rede do container do app e fica órfão quando ele é recriado, por isso ele é recriado junto. Noutra máquina, o mesmo par de comandos: `docker compose up -d --build caminho && docker compose up -d --force-recreate tunel-fixo`.
 

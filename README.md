@@ -24,7 +24,7 @@ projeto.
 ## Onde o app roda
 
 O app no ar mora num Raspberry Pi, com Docker, e sai para a internet pelo túnel nomeado da
-Cloudflare em `https://ge.off-sec.net`. Para publicar o último commit, rode `.\publicar.ps1`
+Cloudflare em `https://geracaoeleita.app`, o domínio oficial. Para publicar o último commit, rode `.\publicar.ps1`
 (PowerShell, nesta pasta): ele leva só o que está commitado, refaz o container e o túnel e
 confere se o site respondeu. Veja **Rodar com Docker** para subir o mesmo conjunto noutra
 máquina.

@@ -160,7 +160,8 @@ Respostas curtas bastam. Cada uma destrava um ponto marcado como *depende do don
 
 - Perguntas 1 a 4 (controlador, igreja, acordo): **"não tem ainda"** / **"ainda não tem"**.
   A política não inventa nenhum dos dois.
-- Pergunta 5: `suporte@geracaoeleita.app` **existe e é lido**.
+- Pergunta 5: `suporte@geracaoeleita.app` **existe e é lido**. O endereço oficial do app é
+  **geracaoeleita.app** (resposta de novembro de 2026; `CAMINHO_ENDERECO` no `docker-compose.yml`).
 - Pergunta 8 e 11: **menor de 18 pode liderar célula, mas só com aprovação** (feito). Sobre
   adultos e discipuladores menores não houve resposta.
 - Pergunta 13: o relatório exportado **não é enviado a ninguém hoje** (app em desenvolvimento).

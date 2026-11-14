@@ -1,4 +1,4 @@
-# Publica o último commit no servidor de produção (Raspberry Pi, https://ge.off-sec.net).
+# Publica o último commit no servidor de produção (Raspberry Pi, https://geracaoeleita.app).
 #
 # Uso, de dentro desta pasta:   .\publicar.ps1
 #
@@ -38,10 +38,10 @@ if ($LASTEXITCODE) { throw 'O build ou a subida no Pi falhou' }
 
 Start-Sleep 8
 try {
-  $r = Invoke-WebRequest 'https://ge.off-sec.net/' -UseBasicParsing -TimeoutSec 20
+  $r = Invoke-WebRequest 'https://geracaoeleita.app/' -UseBasicParsing -TimeoutSec 20
   Write-Host "No ar: HTTP $($r.StatusCode) com $commit" -ForegroundColor Green
 } catch {
   Write-Host "O site não respondeu ainda: $($_.Exception.Message)" -ForegroundColor Red
-  Write-Host 'Espere uns segundos e abra https://ge.off-sec.net; se continuar fora, veja: ssh -i ~/.ssh/id_ed25519_pi pi@192.168.1.34 "cd geracao-eleita && sudo docker compose logs --tail 30"'
+  Write-Host 'Espere uns segundos e abra https://geracaoeleita.app; se continuar fora, veja: ssh -i ~/.ssh/id_ed25519_pi pi@192.168.1.34 "cd geracao-eleita && sudo docker compose logs --tail 30"'
   exit 1
 }

@@ -383,7 +383,7 @@ importarEstadosLegados();
 // quando quem convida usa o app pelo endereço antigo. Sem ele (testes, HML), o da própria visita.
 const enderecoPublico = (req) => process.env.CAMINHO_ENDERECO
   || (req.headers['x-forwarded-proto'] || 'http') + '://' + (req.headers.host || 'localhost');
-const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://ge.off-sec.net';
+const CONTATO_PUSH = process.env.CAMINHO_ENDERECO || 'https://geracaoeleita.app';
 // Só as ferramentas de teste: aceitam um serviço de push em 127.0.0.1 e fixam o relógio.
 const PUSH_TESTE = process.env.CAMINHO_PUSH_TESTE === '1';
 const agoraDoServidor = () => (PUSH_TESTE && process.env.CAMINHO_RELOGIO ? new Date(process.env.CAMINHO_RELOGIO) : new Date());
