@@ -424,8 +424,7 @@ button { font-family: inherit; }
   border-top: 1px solid var(--borda);
   border-radius: var(--raio-g) var(--raio-g) 0 0;
   /* 0 a 320px, 1 a 390px (e além): a régua que encolhe ícone, rótulo e o botão da Bíblia
-     juntos, para a barra a 320px parecer a de 390px encolhida, e não apertada. Vale para
-     as quatro combinações de Célula/Discipulado, não só para quando a barra está cheia. */
+     juntos, para a barra a 320px parecer a de 390px encolhida, e não apertada. */
   --cresce: calc((100vw - 320px) / 70px);
 }
 
@@ -437,10 +436,6 @@ button { font-family: inherit; }
   height: 64px;
   padding: 0 2px;
 }
-/* Célula e Discipulado (e, na barra cheia, também Juntos do outro lado) deixam a ilha com
-   três abas em vez de duas: mesma classe do mock aprovado. */
-.navegacao.cheia .ilha { padding: 0; }
-.navegacao.cheia .ilha .aba { max-width: none; }
 
 .aba {
   flex: 0 0 auto;
@@ -465,9 +460,6 @@ button { font-family: inherit; }
 .aba .ico-aba { width: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); height: clamp(24px, calc(24px + 4px * var(--cresce)), 28px); display: block; transition: transform .2s var(--mola); }
 /* o nome da aba à vista: ícone sozinho não diz a quem chegou agora o que há ali */
 .aba .rotulo-aba { font-family: var(--fonte-destaque); font-size: clamp(0.67rem, calc(0.67rem + 0.05rem * var(--cresce)), 0.72rem); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.1; white-space: nowrap; color: inherit; }
-/* Com 6 botões (Célula e Discipulado juntos) o rótulo precisa de mais um passo de encolhida:
-   0.56rem a 320px, 0.6rem a 390px, na mesma régua --cresce. */
-.navegacao.cheia .aba:not(.aba-central) .rotulo-aba { font-size: clamp(0.56rem, calc(0.56rem + 0.04rem * var(--cresce)), 0.6rem); }
 .aba .ponto-aba { top: -2px; right: -4px; }
 /* Fantasmas: abas que só existem para o trilho lateral (Desafios quando o celular o trocou
    por Célula/Discipulado, e o Explorar, que no celular mora dentro do Mais). No celular
@@ -2644,8 +2636,8 @@ a.linha-config:hover, button.linha-config:hover { text-decoration: none; backgro
   .navegacao .marca-lateral .simbolo svg.ico-logo { width: 30px; height: auto; }
   /* As ilhas eram só um agrupamento visual do celular: no trilho lateral elas somem do
      layout (display: contents) e as abas voltam a ser itens soltos da lista vertical.
-     A ordem no celular muda de caso para caso (ver abasDoCelular em 10-roteador.js), mas
-     o trilho lateral sempre mostra a lista inteira, na mesma ordem: Trilha, Desafios,
+     O celular mostra só cinco (ver abasDoCelular em 10-roteador.js), mas o trilho
+     lateral sempre mostra a lista inteira, na mesma ordem: Trilha, Desafios,
      Célula, Discipulado, Bíblia, Juntos, Explorar. Como .navegacao é o flex container aqui
      (a ilha virou "contents"), `order` decide essa posição sem depender do HTML. */
   .ilha { display: contents; }
@@ -3172,10 +3164,6 @@ a.visao-item:hover, button.visao-item:hover { background: var(--fundo-2); text-d
 /* ---------- 1.8 · barra de baixo ---------- */
 .aba .ponto-aba { border-color: var(--cartao); }
 .mais-ico { box-shadow: inset 0 0 0 2px var(--borda); }
-.navegacao.cheia .aba:not(.aba-central) .rotulo-aba {
-  font-size: clamp(0.62rem, calc(0.62rem + 0.04rem * var(--cresce)), 0.66rem);
-  letter-spacing: 0;
-}
 
 /* =====================================================================================
    POLIMENTO DE DESIGN · lote 2: ajustes pontuais por tela (ux-polimento.md, seção 2)

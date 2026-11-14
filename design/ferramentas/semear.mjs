@@ -5,7 +5,7 @@
 // Contas (senha "senha123" em todas):
 //   marcos  dia 42, amigos, célula (líder, com o estudo do dono), discipulado (conduz o davi),
 //           propósito com a ana
-//           -> barra cheia (Trilha · Juntos · Célula | Bíblia | Discipulado · Mais); admin do
+//           -> barra com Célula, e o Discipulado no Mais (Trilha · Célula | Bíblia | Juntos · Mais); admin do
 //              painel se o servidor subir com CAMINHO_ADMIN=marcos
 //   ana     dia 43, membro da célula do marcos -> barra com Célula
 //   davi    dia 41, discípulo do marcos -> barra com Discipulado

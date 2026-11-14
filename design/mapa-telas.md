@@ -57,7 +57,7 @@ redesenhem as telas em paralelo sem conflito, e **como rodar, semear e fotografa
    cada camada). Prefira reaproveitar as peças da base a reescrever.
 6. Especificidade: as camadas entram na ordem `estilo.css` → `00` → `01` → `21`...`26`. A mesma
    especificidade ganha quem vem depois; regras do `estilo.css` com mais classes (por exemplo
-   `.navegacao.cheia .aba:not(.aba-central) .rotulo-aba`) só perdem para um seletor tão forte.
+   `.navegacao .aba.selecionada:not(.aba-central) .rotulo-aba`) só perdem para um seletor tão forte.
    Telas largas: o `estilo.css` tem um `@media (min-width: 860px)` no meio do arquivo; se a sua
    regra de celular estragar o computador, ponha-a em `@media (max-width: 859px)`.
 7. Commits com `git -c user.name="Excannor" -c user.email="marcos.estevaobs@gmail.com" commit -F <arquivo>`,
@@ -176,7 +176,7 @@ BASE=http://localhost:8101/ SAIDA=$S/estado-trilha node design/ferramentas/semea
 
 O `semear.mjs` cria cinco contas (senha `senha123`) e grava `cookie-<conta>.txt` na pasta:
 **marcos** (dia 42, amigos, líder da célula "Célula Esperança", conduz o davi no discipulado,
-propósito com a ana, admin do painel: barra cheia), **ana** (membro da célula: barra com Célula),
+propósito com a ana, admin do painel: barra com Célula e o Discipulado no Mais), **ana** (membro da célula: barra com Célula),
 **davi** (discipulado: barra com Discipulado), **rute** (só amiga: barra padrão com Desafios) e
 **lia** (caminho Conhecer Jesus). As datas saem do dia em que roda: noutro dia, apague a pasta e
 semeie de novo para a ofensiva não zerar.

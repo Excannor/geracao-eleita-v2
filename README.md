@@ -58,23 +58,28 @@ Para usar outra porta: `node servidor.mjs 3000`.
 
 ## Navegação
 
-A barra de baixo tem a **Bíblia** (`#/biblia`) no meio, num quadrado arredondado, e muda
-conforme a pessoa participa de uma célula ou de um discipulado:
+A barra de baixo tem sempre cinco botões, com o nome à vista, na mesma ordem para todo mundo:
+Trilha, o segundo lugar, a **Bíblia** (`#/biblia`) no meio, num quadrado arredondado, Juntos e
+Mais. O segundo lugar muda conforme a pessoa participa de uma célula ou de um discipulado:
 
 | Quem | Esquerda | Direita |
 |---|---|---|
 | sem célula nem discipulado | Trilha · Desafios | Juntos · Mais |
 | com célula | Trilha · Célula | Juntos · Mais |
 | com discipulado | Trilha · Discipulado | Juntos · Mais |
-| com os dois | Trilha · Juntos · Célula | Discipulado · Mais |
+| com os dois | Trilha · Célula | Juntos · Mais (o Discipulado mora no Mais) |
 
-O **Mais** abre um painel com Desafios (quando não está na barra), Explorar, Meus versículos,
-Minha história com Deus, Apoiar o app, Configurações e, só para o administrador, o Painel. O
-Perfil fica na foto redonda no canto do topo, ao lado do fogo da ofensiva. No computador, em
-telas a partir de 860px, a barra vira um trilho lateral, com a marca "Geração Eleita" no alto.
-Tudo isto mora em `src/app/10-roteador.js` (`abasDoCelular`, `abrirPainelMais`,
-`pintarNavegacao`, `pintarTopo`). A rota de Desafios é `#/missoes`, e o arquivo,
-`09b-missoes.js`: os nomes ficaram assim para não quebrar links guardados.
+Com seis botões os nomes não cabiam a 360px, e a barra mostrava só os ícones.
+`ferramentas/teste-barra-abas.mjs` confere a ordem e os nomes a 390, 360 e 320px.
+
+O **Mais** abre um painel com o Discipulado (de quem também tem célula), Desafios (quando não
+está na barra), Explorar, Meus versículos, Minha história com Deus, Apoiar o app, Configurações
+e, só para o administrador, o Painel. O Perfil fica na foto redonda no canto do topo, ao lado
+do fogo da ofensiva. No computador, em telas a partir de 860px, a barra vira um trilho lateral,
+com a marca "Geração Eleita" no alto. Tudo isto mora em `src/app/10-roteador.js`
+(`abasDoCelular`, `abrirPainelMais`, `pintarNavegacao`, `pintarTopo`). A rota de Desafios é
+`#/missoes`, e o arquivo, `09b-missoes.js`: os nomes ficaram assim para não quebrar links
+guardados.
 
 ## As telas
 

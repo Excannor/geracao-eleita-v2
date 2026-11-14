@@ -1,4 +1,4 @@
-// Conta marcos, parte A (barra cheia, admin): início, Passos, Mais, Desafios e Praticar com o
+// Conta marcos, parte A (barra com Célula e o Discipulado no Mais, admin): início, Passos, Mais, Desafios e Praticar com o
 // quiz em cada estado, Feed e suas folhas, propósitos, bloqueados, célula (precisa de
 // CELULA=<id>), modo encontro, discipulado.
 import { clic, quiz, CELULA, expandir } from './comum.mjs';

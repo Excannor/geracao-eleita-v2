@@ -2,7 +2,7 @@
 // dois papéis, os limites (1 discipulador, 12 discípulos), "mostrar" controlando exatamente o
 // que o discipulador vê, nenhum texto do discípulo aparecendo, encontro só com a data, encerrar,
 // o marco "discipula" automático, a cadeia (só o número) e a limpeza ao apagar a conta.
-// Uso: node ferramentas/teste-discipulado.mjs
+// Uso: node ferramentas/teste-discipulado.mjs   (PORTA=<porta> para trocar a 8210)
 import { spawn } from 'node:child_process';
 import { rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -10,7 +10,7 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const AQUI = join(dirname(fileURLToPath(import.meta.url)), '..');
-const PORTA = 8210;
+const PORTA = Number(process.env.PORTA) || 8210;
 const PASTA = join(tmpdir(), 'cc-discipulado');
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 

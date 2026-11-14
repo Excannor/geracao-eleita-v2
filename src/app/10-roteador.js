@@ -6,16 +6,14 @@
   const topo = document.getElementById('topo');
   const navegacao = document.getElementById('navegacao');
 
-  // A barra muda de cara com quem está falando: Desafios sai do lugar quando entra Célula ou
-  // Discipulado (aí mora dentro do Mais), e some de vez o Explorar, que virou item do Mais.
-  // Praticar mora dentro de Desafios e no fim de cada unidade da trilha. O Perfil saiu daqui:
-  // virou o retrato no canto do topo (pintarTopo).
-  //   nada:        Trilha · Desafios          | Bíblia | Juntos · Mais
-  //   só célula:   Trilha · Célula            | Bíblia | Juntos · Mais
-  //   só disc.:    Trilha · Discipulado       | Bíblia | Juntos · Mais
-  //   os dois:     Trilha · Juntos · Célula   | Bíblia | Discipulado · Mais
-  // No caso dos dois o Juntos passa para a esquerda: "DISCIPULADO" não cabe ao lado de
-  // "JUNTOS" a 320px, e são 6 botões em vez de 5.
+  // A barra tem sempre cinco botões, na mesma ordem para todo mundo (revisão de UX, B9):
+  //   Trilha · [2º lugar] | Bíblia | Juntos · Mais
+  // O 2º lugar é de quem a pessoa tem, nesta prioridade: Célula, Discipulado, Desafios. O que
+  // não cabe ali mora dentro do Mais (Desafios para quem tem Célula ou Discipulado; o
+  // Discipulado para quem tem os dois). Com seis botões os nomes não cabiam: "Discipulado"
+  // mede 61px a 11px e cada aba tem uns 57px a 360px (49px a 320px), e a barra cheia
+  // mostrava só os ícones. Explorar e Perfil não estão aqui: o Explorar é item do Mais e
+  // mora na aba Bíblia; o Perfil é o retrato no canto do topo (pintarTopo).
   const TRILHA = ['#/', 'Trilha', 'trilha', 'trilha'];
   const DESAFIOS = ['#/missoes', 'Desafios', 'bau', 'desafios'];
   const JUNTOS = ['#/novidades', 'Juntos', 'novidades', 'juntos'];
@@ -33,10 +31,8 @@
   // As abas do celular, já na ordem visual: uma ilha de cada lado da Bíblia. O Mais mora
   // sempre por último, na ilha da direita.
   function abasDoCelular({ temCelula, temDiscipulado }) {
-    if (temCelula && temDiscipulado) return { esq: [TRILHA, JUNTOS, CELULA], dir: [DISCIPULADO, null] };
-    if (temCelula) return { esq: [TRILHA, CELULA], dir: [JUNTOS, null] };
-    if (temDiscipulado) return { esq: [TRILHA, DISCIPULADO], dir: [JUNTOS, null] };
-    return { esq: [TRILHA, DESAFIOS], dir: [JUNTOS, null] };
+    const segunda = temCelula ? CELULA : temDiscipulado ? DISCIPULADO : DESAFIOS;
+    return { esq: [TRILHA, segunda], dir: [JUNTOS, null] };
   }
   // null é o marcador do botão Mais: ele não é um item de dados como os outros (não tem
   // rota própria, abre um painel), então entra por fora do array de abas comuns.
@@ -271,10 +267,11 @@
       + '<span>' + CC.esc(rotulo) + (sub ? '<small>' + CC.esc(sub) + '</small>' : '') + '</span></a>';
   }
 
-  function abrirPainelMais(desafiosNoPainel) {
+  function abrirPainelMais(desafiosNoPainel, discipuladoNoPainel) {
     if (painelMaisAberto) { fecharPainelMais(); return; }
     painelMaisAberto = true;
     const itens = [];
+    if (discipuladoNoPainel) itens.push(itemPainelMais(CC.icoAba('dupla'), false, 'Discipulado', 'Quem você acompanha e quem te acompanha', '#/discipulado'));
     if (desafiosNoPainel) {
       const lista = CC.missoesDoDia ? CC.missoesDoDia(CC.hojeIso(), CC.estado()) : [];
       const feitas = lista.filter((m) => m.feita).length;
@@ -315,6 +312,7 @@
     const { temCelula, temDiscipulado } = estadoDaBarra();
     const { esq, dir } = abasDoCelular({ temCelula, temDiscipulado });
     const desafiosNaBarra = !temCelula && !temDiscipulado;
+    const discipuladoNaBarra = temDiscipulado && !temCelula;
     const dono = (CC.quem && CC.quem.usuario) || '';
     const chaveNova = (papel) => 'cc.novaaba.' + papel + ':' + dono;
 
@@ -323,7 +321,8 @@
     const noExplorar = ROTAS_DO_EXPLORAR.has(rota);
     const pendencias = CC.pendenciasDeAmigos ? CC.pendenciasDeAmigos() : 0;
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
-    const maisSelecionado = ativa === MAIS || (!desafiosNaBarra && ativa === '#/missoes');
+    // O que mora no Mais acende o Mais (Desafios e, para quem tem célula, o Discipulado).
+    const maisSelecionado = ativa === MAIS || (!desafiosNaBarra && ativa === '#/missoes') || (temDiscipulado && !discipuladoNaBarra && ativa === '#/discipulado');
     const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
     const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
     // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
@@ -354,10 +353,11 @@
       + (noExplorar ? ' data-via-explorar' : '')
       + (naBiblia ? ' aria-current="page"' : '') + '><span class="icone-aba">' + CC.icoAba('livro') + '</span>'
       + '<span class="rotulo-aba">Bíblia</span></button>';
-    // Fantasmas: só existem para o trilho lateral (>= 860px), que sempre mostra Desafios e
-    // Explorar mesmo quando o celular os escondeu dentro do Mais ou trocou por Célula/
-    // Discipulado. .so-trilho fica invisível no celular (ver estilo.css).
+    // Fantasmas: só existem para o trilho lateral (>= 860px), que sempre mostra Desafios,
+    // Explorar e o Discipulado (de quem tem) mesmo quando o celular os guardou dentro do
+    // Mais. .so-trilho fica invisível no celular (ver estilo.css).
     const fantasmaDesafios = desafiosNaBarra ? '' : aba(DESAFIOS, true);
+    const fantasmaDiscipulado = temDiscipulado && !discipuladoNaBarra ? aba(DISCIPULADO, true) : '';
     const fantasmaExplorar = aba(EXPLORAR, true);
     // No computador o trilho lista tudo, então não há Mais: o que no celular mora dentro dele
     // (anotações, apoiar, instalar, painel do administrador e configurações) vira item do
@@ -375,15 +375,14 @@
     // Duas ilhas em pílula, uma de cada lado do botão da Bíblia: no trilho lateral (>= 860px)
     // .ilha vira `display: contents` e some do layout, e a ordem visual passa a ser dada por
     // `order` (ver @media (min-width: 860px) perto do fim do estilo.css), não mais pela
-    // ordem no HTML — que no celular muda de caso para caso (ver abasDoCelular).
+    // ordem no HTML (o celular mostra só cinco, ver abasDoCelular).
     navegacao.innerHTML = '<a class="marca-lateral" href="#/">'
       + '<span class="simbolo">' + CC.icoLogo() + '</span>'
       + '<span>Geração <em>Eleita</em></span></a>'
       + '<div class="ilha">' + lado(esq) + '</div>'
       + biblia
       + '<div class="ilha">' + lado(dir) + '</div>'
-      + fantasmaDesafios + fantasmaExplorar + extrasDoTrilho;
-    navegacao.classList.toggle('cheia', esq.length + dir.length + 1 === 6);
+      + fantasmaDesafios + fantasmaDiscipulado + fantasmaExplorar + extrasDoTrilho;
     navegacao.querySelectorAll('[data-ir]').forEach((el) => {
       el.onclick = () => {
         CC.vibrar('leve');
@@ -394,12 +393,12 @@
     const instalarTrilho = navegacao.querySelector('[data-instalar-trilho]');
     if (instalarTrilho) instalarTrilho.onclick = () => { CC.vibrar('leve'); CC.tutorialInstalar(); };
     const botao = navegacao.querySelector('[data-abrir-mais]');
-    if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra); };
+    if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra, temDiscipulado && !discipuladoNaBarra); };
   }
   CC.pintarNavegacao = pintarNavegacao;
 
   // A ordem visual do celular, achatada, para o cálculo de "de que lado a tela entra"
-  // (entradaDaTela) — muda de caso para caso, então não dá para usar um array fixo.
+  // (entradaDaTela) — o segundo lugar muda de pessoa para pessoa (ver abasDoCelular).
   function ordemDasAbas() {
     const { esq, dir } = abasDoCelular(estadoDaBarra());
     return esq.concat(dir).filter(Boolean).map((t) => t[0]);
