@@ -168,14 +168,29 @@ for (const [quem, conta, segunda] of pessoas) {
 await tema('claro');
 await tela(360);
 await entrarComo(marcos);
+// UX4.6: a novidade do Discipulado que mora no Mais aparece no Mais e no item dentro dele
+ok(await av('!!document.querySelector(".navegacao [data-abrir-mais] .ponto-aba") && document.querySelector(".navegacao [data-abrir-mais]").getAttribute("aria-label") === "Mais, novidade no Discipulado"'),
+  'UX4.6: o Discipulado ainda não aberto põe o ponto no Mais, e o Mais diz isso ao leitor de tela');
 await av('document.querySelector(".navegacao [data-abrir-mais]").click()');
 ok(await esperar('!!document.querySelector(".painel-mais a[href=\\"#/discipulado\\"]")'), 'Marcos: o Mais tem o Discipulado');
+ok(await av('!!document.querySelector(".painel-mais a[href=\\"#/discipulado\\"] [data-ponto-mais]") && document.querySelectorAll(".painel-mais .ponto-aba").length === 1 && /Discipulado, novo/.test(document.querySelector(".painel-mais a[href=\\"#/discipulado\\"]").textContent)'),
+  'UX4.6: e o item Discipulado, só ele, leva o mesmo ponto (com "novo" para o leitor de tela)');
 ok(await av('document.querySelector(".painel-mais a").getAttribute("href")') === '#/discipulado', 'e ele vem primeiro no Mais');
 await av('document.querySelector(".painel-mais a[href=\\"#/discipulado\\"]").click()');
 ok(await esperar('location.hash === "#/discipulado" && !document.querySelector(".painel-mais:not(.saindo)")'), 'tocar nele abre o Discipulado e fecha o Mais');
 await dormir(400);
 const acesas = () => av('[...document.querySelectorAll(".navegacao .aba.selecionada:not(.so-trilho)")].map((b) => b.dataset.papel).join(",")');
 ok(await acesas() === 'mais', 'no Discipulado, só o Mais fica aceso na barra (' + await acesas() + ')');
+ok(await av('!document.querySelector(".navegacao [data-abrir-mais] .ponto-aba") && document.querySelector(".navegacao [data-abrir-mais]").getAttribute("aria-label") === "Mais"'), 'UX4.6: aberto o Discipulado, o ponto sai do Mais');
+await av('location.hash = "#/"');
+await dormir(300);
+await av('document.querySelector(".navegacao [data-abrir-mais]").click()');
+ok(await esperar('!!document.querySelector(".painel-mais a[href=\\"#/discipulado\\"]")') && await av('!document.querySelector(".painel-mais .ponto-aba")'), 'UX4.6: e do item dentro dele, de vez');
+await av('document.querySelector(".veu-mais").click()');
+await dormir(300);
+await entrarComo(davi);
+ok(await av('!!document.querySelector(".navegacao .aba[data-papel=\\"discipulado\\"]:not(.so-trilho) .ponto-aba") && !document.querySelector(".navegacao [data-abrir-mais] .ponto-aba")'),
+  'UX4.6: para o Davi, com o Discipulado na barra, o ponto fica na própria aba, não no Mais');
 await entrarComo(davi, '#/discipulado');
 ok(await acesas() === 'discipulado', 'para o Davi, que só tem discipulado, a aba Discipulado é que acende');
 await av('document.querySelector(".navegacao [data-abrir-mais]").click()');

@@ -200,3 +200,31 @@ guardada.
 
 **O que ficou de fora.** O estado "instalar" (iPhone sem o app instalado) e "sem suporte" não
 mostram as preferências (como antes): não há o que escolher ali.
+
+## UX4.6 · O ponto do Discipulado dentro de "Mais"
+
+**Como era.** Desde a barra de cinco abas (dd0b005), quem tem célula e discipulado acha o
+Discipulado como primeiro item do Mais. A novidade dele (o ponto da aba nova, que fica até a
+pessoa abrir o Discipulado pela primeira vez, `cc.novaaba.discipulado:<usuário>`) só era
+desenhada na aba Discipulado da barra, que essa pessoa não tem: o ponto sumia de vista. O Mais não
+leva ponto nenhum, de propósito (os desafios do dia deixavam o ponto aceso para sempre).
+
+**Agora** (`10-roteador.js`):
+- quando o Discipulado mora no Mais e ainda não foi aberto, o botão Mais ganha o mesmo ponto da
+  barra, e o rótulo para o leitor de tela vira "Mais, novidade no Discipulado";
+- dentro do Mais, o item Discipulado leva o mesmo ponto, no canto do ícone, e "novo" para o leitor
+  de tela; só ele, nenhum outro item;
+- aberto o Discipulado, o ponto sai dos dois na mesma hora. Para isso, a visita é anotada antes
+  de o ponto ser calculado (antes, a aba visitada ainda saía com o ponto na pintura da própria
+  visita e só perdia na seguinte; vale também para a Célula);
+- quem tem o Discipulado na barra (sem célula) continua com o ponto na própria aba, e o Mais dele
+  não ganha ponto. Os desafios continuam sem ponto no Mais.
+
+Custo no index.html: 0,5 KB (folga de 66,0 KB).
+
+**Testes.** `teste-barra-abas`: o Mais com o ponto e o rótulo; o item Discipulado, só ele, com o
+ponto e "novo"; aberto o Discipulado, o ponto sai do Mais e do item; para quem tem o Discipulado na
+barra, o ponto fica na aba, não no Mais.
+
+**O que ficou de fora.** A "novidade" continua sendo a da aba nova. Convites de discipulado
+pendentes não acendem ponto em lugar nenhum (nem na barra), como antes.

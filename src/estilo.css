@@ -552,6 +552,9 @@ button { font-family: inherit; }
    cinza). O mesmo fundo claro e o mesmo verde dos quadros do Explorar. */
 .painel-mais .q { display: grid; place-items: center; flex: 0 0 auto; width: 40px; height: 40px; border-radius: 12px; background: var(--verde-fraco); color: var(--verde); }
 .painel-mais .q svg { width: 24px; height: 24px; }
+/* a novidade da aba que mora no Mais (UX4.6): o mesmo ponto da barra, no canto do ícone */
+.painel-mais .q { position: relative; }
+.painel-mais .q .ponto-aba { top: -3px; right: -3px; border: 2px solid var(--cartao); background: var(--alerta, var(--vermelho)); }
 .painel-mais small { display: block; margin-top: 2px; font-weight: 600; font-size: 0.8rem; color: var(--tinta-fraca); }
 
 /* ---------- botões ----------

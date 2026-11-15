@@ -280,16 +280,17 @@
     else location.hash = destino;
   }
 
-  function itemPainelMais(icone, leve, rotulo, sub, href) {
-    return '<a href="' + href + '" data-ir-mais="' + href + '"><span class="q' + (leve ? ' leve' : '') + '">' + icone + '</span>'
-      + '<span>' + CC.esc(rotulo) + (sub ? '<small>' + CC.esc(sub) + '</small>' : '') + '</span></a>';
+  // novo: o ponto de novidade da aba que mora no Mais (UX4.6), o mesmo da barra
+  function itemPainelMais(icone, leve, rotulo, sub, href, novo) {
+    return '<a href="' + href + '" data-ir-mais="' + href + '"><span class="q' + (leve ? ' leve' : '') + '">' + icone + (novo ? '<i class="ponto-aba" data-ponto-mais></i>' : '') + '</span>'
+      + '<span>' + CC.esc(rotulo) + (novo ? '<span class="so-leitor">, novo</span>' : '') + (sub ? '<small>' + CC.esc(sub) + '</small>' : '') + '</span></a>';
   }
 
-  function abrirPainelMais(desafiosNoPainel, discipuladoNoPainel) {
+  function abrirPainelMais(desafiosNoPainel, discipuladoNoPainel, discipuladoNovo) {
     if (painelMaisAberto) { fecharPainelMais(); return; }
     painelMaisAberto = true;
     const itens = [];
-    if (discipuladoNoPainel) itens.push(itemPainelMais(CC.icoAba('dupla'), false, 'Discipulado', 'Quem você acompanha e quem te acompanha', '#/discipulado'));
+    if (discipuladoNoPainel) itens.push(itemPainelMais(CC.icoAba('dupla'), false, 'Discipulado', 'Quem você acompanha e quem te acompanha', '#/discipulado', discipuladoNovo));
     if (desafiosNoPainel) {
       const lista = CC.missoesDoDia ? CC.missoesDoDia(CC.hojeIso(), CC.estado()) : [];
       const feitas = lista.filter((m) => m.feita).length;
@@ -341,11 +342,12 @@
     const noPainel = rota === 'config' && String(arg || '').startsWith('painel');
     // O que mora no Mais acende o Mais (Desafios e, para quem tem célula, o Discipulado).
     const maisSelecionado = ativa === MAIS || (!desafiosNaBarra && ativa === '#/missoes') || (temDiscipulado && !discipuladoNaBarra && ativa === '#/discipulado');
-    const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
-    const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
-    // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais.
+    // Uma vez que a pessoa chegou na aba, o pontinho de novidade não aparece nunca mais (já nesta
+    // pintura: no Discipulado que mora no Mais, o ponto do Mais sai assim que ele abre, UX4.6).
     if (ativa === '#/celula') gravarLocal(chaveNova('celula'), '1');
     if (ativa === '#/discipulado') gravarLocal(chaveNova('discipulado'), '1');
+    const pontoCelula = temCelula && !lerLocal(chaveNova('celula'));
+    const pontoDiscipulado = temDiscipulado && !lerLocal(chaveNova('discipulado'));
 
     const aba = ([href, rotulo, icone, papel], soTrilho) => {
       // no trilho do computador o Explorar tem item próprio, e é ele que se acende
@@ -357,12 +359,14 @@
         + '<span class="rotulo-aba">' + rotulo + '</span></button>';
     };
 
-    // O Mais não leva ponto: os desafios do dia ficavam sempre "pendentes" e o ponto vermelho
-    // nunca sumia, sem dizer do que era. Ponto só para novidade de verdade (amigos, aba nova).
+    // O Mais não leva ponto pelos desafios: eles ficavam sempre "pendentes" e o ponto vermelho
+    // nunca sumia, sem dizer do que era. Ponto só para novidade de verdade: a do Discipulado, quando
+    // ele mora no Mais (UX4.6), aparece no Mais e no item dentro dele, até a pessoa abri-lo.
+    const discipuladoNovoNoMais = temDiscipulado && !discipuladoNaBarra && pontoDiscipulado;
     const botaoMais = () => {
-      const ponto = '';
+      const ponto = discipuladoNovoNoMais ? '<i class="ponto-aba"></i>' : '';
       return '<button type="button" class="aba' + (maisSelecionado ? ' selecionada' : '') + '" data-papel="mais" data-abrir-mais'
-        + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="Mais"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
+        + (maisSelecionado ? ' aria-current="page"' : '') + ' aria-label="' + (discipuladoNovoNoMais ? 'Mais, novidade no Discipulado' : 'Mais') + '"><span class="icone-aba">' + CC.icoAba('mais') + ponto + '</span>'
         + '<span class="rotulo-aba">Mais</span></button>';
     };
 
@@ -411,7 +415,7 @@
     const instalarTrilho = navegacao.querySelector('[data-instalar-trilho]');
     if (instalarTrilho) instalarTrilho.onclick = () => { CC.vibrar('leve'); CC.tutorialInstalar(); };
     const botao = navegacao.querySelector('[data-abrir-mais]');
-    if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra, temDiscipulado && !discipuladoNaBarra); };
+    if (botao) botao.onclick = () => { CC.vibrar('leve'); abrirPainelMais(!desafiosNaBarra, temDiscipulado && !discipuladoNaBarra, discipuladoNovoNoMais); };
   }
   CC.pintarNavegacao = pintarNavegacao;
 
