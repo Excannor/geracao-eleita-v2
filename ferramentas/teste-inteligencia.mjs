@@ -53,7 +53,11 @@ console.log('\n  Inteligência: a célula (regras puras)\n');
   const sim = (datas) => REGRAS.simularOfensiva(datas, HOJE);
   ok(I.chamaAcesa(sim([HOJE])) && I.chamaAcesa(sim([somaDias(HOJE, -1)])), 'leu hoje ou ontem: chama acesa');
   ok(I.chamaAcesa(sim([somaDias(HOJE, -2)])), 'leu só anteontem: o escudo que todo mundo tem cobre o dia de ontem e a chama segue acesa, como no Início');
-  ok(!I.chamaAcesa(sim([somaDias(HOJE, -3)])) && !I.chamaAcesa(sim([])), 'leu só há 3 dias (dois dias em branco, um escudo) ou nunca: chama apagada');
+  // Fora da primeira semana (o primeiro dia lido foi em 1/9), sem 7 dias seguidos e no mesmo mês:
+  // um escudo só. Na primeira semana, o escudo do iniciante (Fase 3, 02-estado.js) cobre um buraco
+  // de até 2 dias, e a chama de quem leu só há 3 dias continua acesa, como no Início.
+  ok(!I.chamaAcesa(sim(['2026-09-01', somaDias(HOJE, -3)])) && !I.chamaAcesa(sim([])), 'leu só há 3 dias (dois dias em branco, um escudo) ou nunca: chama apagada');
+  ok(I.chamaAcesa(sim([somaDias(HOJE, -3)])), 'na primeira semana, o escudo do iniciante cobre os dois dias em branco: chama acesa, como no Início');
   const comEscudo = sim(dias(somaDias(HOJE, -19), 18)); // 18 dias seguidos até anteontem: ontem fica coberto por um escudo
   ok(I.chamaAcesa(comEscudo) && comEscudo.protegidos.length === 1 && comEscudo.atual === 18, 'o escudo do app cobre o dia em branco: a chama continua acesa, com os 18 dias');
 
