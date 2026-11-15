@@ -59,7 +59,7 @@
         // a barra é da dupla: conta os dias em que os dois leram, nunca quanto cada um leu
         + '<div class="linha-barra"><div class="barra-missao"><i style="width:' + pct(dias, ALVO_SEMANA) + '"></i></div><span class="conta-missao">' + dias + '/' + ALVO_SEMANA + '</span></div>'
         + '<span class="estado-dupla">' + (a.leuHoje ? CC.ico('certo') + CC.esc(a.nome.split(' ')[0]) + ' já leu hoje'
-          : (a.toqueEnviado ? 'Toque enviado para ' + CC.esc(a.nome.split(' ')[0])
+          : (a.toqueEnviado ? 'Você já tocou hoje em ' + CC.esc(a.nome.split(' ')[0])
             : '<button class="link-nota" data-encorajar="' + CC.esc(a.usuario) + '">' + CC.ico('aperto') + 'Dar um toque em ' + CC.esc(a.nome.split(' ')[0]) + '</button>')) + '</span></div>'
         + '<span class="premio-missao">' + CC.arte.bau(feita ? 'aberto' : 'travado', feita ? 'madeira' : '') + '</span></div>';
     }).join('');
@@ -96,12 +96,10 @@
       const b = raiz.querySelector('#missao-amigos [data-convidar]');
       if (b) b.onclick = () => CC.convidar();
       raiz.querySelectorAll('#missao-amigos [data-encorajar]').forEach((e) => {
-        e.onclick = async () => {
-          e.disabled = true;
-          try {
-            await CC.api('api/toques', { para: e.dataset.encorajar });
-            e.outerHTML = '<span>' + CC.ico('certo') + 'Toque enviado</span>';
-          } catch (erro) { e.disabled = false; CC.avisar(erro.message); }
+        // R1.5: a folha do toque com versículo (toque.js)
+        e.onclick = () => {
+          const amigo = (((CC.amigosEmCache() || {}).amigos) || []).find((x) => x.usuario === e.dataset.encorajar) || { usuario: e.dataset.encorajar, nome: '' };
+          CC.darToque(amigo, (r) => { if (e.isConnected) e.outerHTML = '<span>' + CC.ico('certo') + (r === 'ja' ? 'Você já tocou hoje' : 'Toque enviado') + '</span>'; });
         };
       });
     };

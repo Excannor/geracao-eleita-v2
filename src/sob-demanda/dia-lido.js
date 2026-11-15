@@ -320,18 +320,12 @@
       + '</div>';
     const b = alvo.querySelector('[data-encorajar]');
     if (b) {
-      b.onclick = async () => {
+      // R1.5: a folha do toque com versículo (toque.js)
+      b.onclick = () => CC.darToque(semLer, (r) => {
+        semLer.toqueEnviado = true;
         b.disabled = true;
-        try {
-          await CC.salvarNoServidor();
-          await CC.api('api/toques', { para: semLer.usuario });
-          semLer.toqueEnviado = true;
-          b.innerHTML = CC.ico('certo') + 'Toque enviado para ' + primeiro(semLer);
-        } catch (e) {
-          b.disabled = false;
-          CC.avisar(e.message);
-        }
-      };
+        b.innerHTML = CC.ico('certo') + (r === 'ja' ? 'Você já tocou hoje em ' : 'Toque enviado para ') + primeiro(semLer);
+      });
     }
   }
 

@@ -16,7 +16,7 @@
     if (!faltam.length) return;
     const meu = String((CC.quem && CC.quem.nome) || 'Você').split(' ')[0];
     CC.folha('<h2>Dar um toque</h2>'
-      + '<p class="passo-dica">Cada pessoa recebe um aviso no celular, no máximo um por dia. O texto muda a cada vez. Por exemplo:</p>'
+      + '<p class="passo-dica">Cada pessoa recebe um aviso no celular com um versículo, no máximo um por dia. O texto muda a cada vez. Por exemplo:</p>'
       + '<div class="recado-lider previa-toque"><p><b>' + CC.esc(meu) + ' lembrou de você</b></p><p class="passo-dica">Um toque de amizade pra ler a Bíblia hoje. Responde lendo, se der.</p></div>'
       + '<div class="lista-pedidos">' + faltam.map((m) => '<div class="linha-amigo">' + retrato(m) + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + '</b></div></div>').join('') + '</div>'
       + '<div class="acoes"><button class="botao" data-enviar-toques>' + CC.ico('sino') + (faltam.length === 1 ? 'Dar um toque em ' + CC.esc(nomeCurto(faltam[0])) : 'Enviar para ' + faltam.length + ' pessoas') + '</button>'
@@ -28,8 +28,10 @@
         const enviar = folha.querySelector('[data-enviar-toques]');
         enviar.onclick = async () => {
           enviar.disabled = true;
-          const r = await Promise.allSettled(faltam.map((m) => CC.api('api/toques', { para: m.usuario })));
-          const foram = r.filter((x) => x.status === 'fulfilled').length;
+          // R1.5: o versículo de encorajamento do dia vai junto (o servidor confere e guarda)
+          const verso = CC.VERSOS_DO_TOQUE[Number(CC.hojeIso().replace(/\D/g, '')) % CC.VERSOS_DO_TOQUE.length];
+          const r = await Promise.allSettled(faltam.map((m) => CC.api('api/toques', { para: m.usuario, versiculo: verso })));
+          const foram = r.filter((x) => x.status === 'fulfilled' && x.value.resultado === 'enviado').length;
           fechar();
           CC.avisar(foram ? (foram === 1 ? 'Toque enviado' : 'Toques enviados para ' + foram + ' pessoas') : 'Hoje você já deu um toque em quem falta', { tipo: foram ? 'certo' : undefined });
           recarregar();

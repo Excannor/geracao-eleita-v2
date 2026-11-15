@@ -314,6 +314,10 @@
         + Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
 
+  // R1.5: os versículos de encorajamento do toque (o app oferece também o da leitura de hoje); o
+  // servidor usa a mesma lista quando o toque chega sem versículo válido.
+  CC.VERSOS_DO_TOQUE = ['Hebreus 10.24', '1 Tessalonicenses 5.11', 'Eclesiastes 4.9', 'Salmos 119.105', 'Lamentações 3.22-23', 'Romanos 15.13'];
+
   // Semana de segunda a domingo, pela data da segunda-feira (a mesma das semanas completas).
   const segundaDe = (iso) => CC.segundaDaSemana(iso);
   function semanasNaPalavra(e) {

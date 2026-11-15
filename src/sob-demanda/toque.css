@@ -1,0 +1,8 @@
+/* O toque com versículo (toque.js): o cartão do versículo na folha, na tela do toque e em quem recebe. */
+.verso-toque { display: grid; gap: 6px; margin: 4px 0 12px; padding: 14px 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); text-align: left; }
+.verso-toque .etiqueta { margin: 0; }
+.verso-toque-citacao { display: grid; gap: 4px; margin: 0; padding: 0; border: 0; background: none; }
+.verso-toque-citacao b { color: var(--tinta-forte); font-size: .875rem; }
+.verso-toque-citacao span { font-family: var(--fonte-biblia); font-size: 1rem; line-height: 1.45; text-wrap: pretty; }
+.verso-toque .link-inline { justify-self: start; min-height: 44px; }
+.cena .verso-toque { width: 100%; max-width: 420px; margin: 12px auto 0; }

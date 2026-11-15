@@ -177,3 +177,37 @@ normalização, fusão, aviso de escudo, Zerar; no servidor: mês antigo forjado
 não muda) e `ferramentas/teste-chama.mjs` (o convite na folha de volta, reacender lendo no papel,
 a festa no Dia lido, o mês no servidor, sem segunda vez, os dias reacesos na semana, e reacender
 na hora pela folha da chama).
+
+## R1.5 · Um toque por dia por amigo, sempre com um versículo
+
+**Como era.** O servidor já guardava um toque por dia por amigo (`Contas.tocar`, chave `de>para`)
+e um teto de 5 por dia para quem toca, mas o segundo toque do mesmo amigo no dia (resultado
+"ja") também virava notificação no celular, pela decisão de 01/10. O toque não levava versículo.
+
+**O que mudou.**
+- Um por dia por amigo de verdade: o segundo do dia devolve "ja", não muda a data nem o
+  versículo e **não manda notificação**. No app, quem já tocou vê "Você já tocou hoje" (na folha
+  do amigo, na tela do toque, nos Desafios, no Dia lido e na folha rápida), e nunca um erro.
+- O toque sempre leva um versículo. Quem toca escolhe: o primeiro é o versículo da leitura de
+  hoje (o "Para levar com você" do dia lido hoje); "Outro versículo" passa pelos de encorajamento
+  (`CC.VERSOS_DO_TOQUE`, em `02b-jogo.js`: Hebreus 10.24, 1 Tessalonicenses 5.11, Eclesiastes 4.9,
+  Salmos 119.105, Lamentações 3.22-23, Romanos 15.13). Só a referência viaja e é guardada; o texto
+  aparece da Bíblia do app (NBV), palavra por palavra, para quem manda e para quem recebe.
+- O servidor confere a referência contra a NBV (livro, capítulo, versículos que existem, no
+  máximo 3); o que não passa, ou o toque que chega sem versículo (app antigo, o toque da célula
+  para quem falta), recebe um dos de encorajamento, pelo dia. O aviso no celular abre com ele:
+  "Com Hebreus 10.24. ..." (ou "Com ..., para ler hoje." quando não cabe).
+- Quem recebe vê, na tela do toque, "Ana mandou junto" com o versículo.
+- Banco: migração v25, `toques.versiculo` (a referência). `api/amigos` devolve o versículo de cada
+  toque recebido; `api/toques` recebe `versiculo` e devolve o que ficou guardado.
+- O código do cliente mora na peça `src/sob-demanda/toque.js` (a escolha, a folha rápida e o que
+  chega); no index ficam só a casca e `CC.darToque`.
+
+**Privacidade.** O ajuste da versão 6 (15 de novembro) diz que a referência do versículo fica
+guardada com o toque e que o amigo que recebe a vê.
+
+**Testes.** `teste.mjs` (os versículos existem na NBV e se leem sozinhos, o aviso abre com a
+referência e cabe no limite, o versículo do primeiro toque do dia fica, a peça), `teste-notificacoes`
+(o segundo toque do dia não chega no celular) e `ferramentas/teste-chama.mjs` (a tela do toque com
+o versículo da NBV e a troca, o toque recebido com o versículo, "ja" no servidor e "Você já tocou
+hoje" no app, o versículo forjado trocado, a folha rápida dos Desafios), nos dois temas.

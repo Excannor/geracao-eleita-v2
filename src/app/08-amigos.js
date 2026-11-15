@@ -115,10 +115,10 @@
     CC.redesenhar();
   }
 
-  const enviarToque = async (usuario) => {
-    await CC.salvarNoServidor();
-    await CC.api('api/toques', { para: usuario });
-  };
+  // R1.5: o toque com versículo mora na peça toque.js. CC.darToque abre a folha rápida (Desafios,
+  // Dia lido); a tela do toque e a de quem recebe pedem a peça para o versículo.
+  const pedirToque = () => CC.pedirPeca(window.TOQUE, () => !!CC.toque);
+  CC.darToque = (amigo, depois) => pedirToque().then(() => CC.toque.folha(amigo, depois), () => CC.avisar('Sem conexão agora. Tente de novo daqui a pouco.'));
 
 
   // ---------- publicar no mural ----------
@@ -349,7 +349,8 @@
       + '<h1 class="titulo-toque">Dê um toque em ' + CC.esc(amigo.nome) + '</h1>'
       + '<div class="balao-fala">' + (falta ? 'Lembramos de você no encontro!' : FALA_TOQUE) + '</div>' + duplaGrande(eu(), amigo)
       + (amigo.dias != null ? '<p class="dias-dupla">' + CC.icoChama() + '<b>' + amigo.dias + '</b> ' + (amigo.dias === 1 ? 'dia' : 'dias') + ' de propósito</p>' : '')
-      + '<p class="frase-cena">' + CC.esc(String(amigo.nome || '').split(' ')[0]) + ' recebe um aviso no celular' + (falta ? ' perguntando se está tudo bem.' : ' chamando para ler hoje.') + '</p></div>', {
+      + '<p class="frase-cena">' + CC.esc(String(amigo.nome || '').split(' ')[0]) + ' recebe um aviso no celular' + (falta ? ' perguntando se está tudo bem.' : ' chamando para ler hoje.') + '</p>'
+      + (falta ? '' : '<div data-verso-toque></div>') + '</div>', {
       classe: 'tela-toque',
       rotulo: 'Dar um toque',
       pe: '<button class="botao" data-enviar-toque>' + CC.ico('sino') + 'Dar um toque</button>'
@@ -357,12 +358,15 @@
       ligar: (el, fechar) => {
         el.querySelector('[data-fechar-tela]').onclick = fechar;
         const b = el.querySelector('[data-enviar-toque]');
+        let verso = null;
+        if (!falta) pedirToque().then(() => { if (el.isConnected) verso = CC.toque.cartao(el.querySelector('[data-verso-toque]')); }, () => {});
         b.onclick = async () => {
           b.disabled = true;
           try {
+            let r = 'enviado';
             if (falta) await CC.api('api/cutucar', { para: amigo.usuario, tema: 'falta' });
-            else await enviarToque(amigo.usuario);
-            b.innerHTML = CC.ico('certo') + 'Toque enviado';
+            else { await pedirToque(); r = await CC.toque.enviar(amigo.usuario, verso && verso.ref()); }
+            b.innerHTML = CC.ico('certo') + (r === 'ja' ? 'Você já tocou hoje' : 'Toque enviado');
             el.querySelector('.balao-fala').classList.add('enviado');
             CC.carregarAmigos().then(() => { if (location.hash.startsWith('#/novidades') || location.hash.startsWith('#/amigos')) CC.redesenhar(); });
           } catch (e) {
@@ -378,13 +382,14 @@
     CC.telaCheia('<div class="cena cena-amigos">'
       + '<h1 class="titulo-toque">' + CC.esc(toque.nome) + ' deu um toque!</h1>'
       + '<div class="balao-fala lado-esquerdo">' + FALA_TOQUE + '</div>' + duplaGrande(toque, eu())
-      + '<p class="frase-cena">A lição de hoje espera vocês dois.</p></div>', {
+      + '<div data-verso-recebido></div><p class="frase-cena">A lição de hoje espera vocês dois.</p></div>', {
       classe: 'tela-toque',
       rotulo: 'Toque de ' + toque.nome,
       pe: '<button class="botao" data-ler>Fazer a lição</button>'
         + '<div class="pe-duplo-plano"><button class="botao plano" data-fechar>Depois</button>'
         + '<button class="botao plano" data-silenciar>Silenciar ' + CC.esc(toque.nome) + '</button></div>',
       ligar: (el, fechar) => {
+        if (toque.versiculo) pedirToque().then(() => CC.toque.recebido(el.querySelector('[data-verso-recebido]'), toque), () => {});
         el.querySelector('[data-fechar]').onclick = fechar;
         el.querySelector('[data-ler]').onclick = () => { fechar(); CC.abrirLicao(CC.diaAtual()); };
         el.querySelector('[data-silenciar]').onclick = async () => {
@@ -479,7 +484,7 @@
       + (!euLi && !amigo.leuHoje ? '<p class="passo-dica pequena">Leia hoje para poder dar um toque.</p>' : '')
       + '<div class="acoes">'
       + (podeTocar ? '<button class="botao" data-toque>' + CC.ico('sino') + 'Dar um toque</button>' : '')
-      + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Toque enviado hoje</button>' : '')
+      + (amigo.toqueEnviado ? '<button class="botao" disabled>' + CC.ico('certo') + 'Você já tocou hoje</button>' : '')
       + '<button class="botao contorno" data-novo-com>' + CC.ico('mais-sinal') + 'Novo propósito com&nbsp;' + CC.esc(amigo.nome) + '</button>'
       + '<button class="botao plano" data-encerrar>Desfazer amizade</button>'
       + '<div class="pe-duplo-plano"><button class="botao plano" data-denunciar>' + CC.ico('bandeira') + 'Denunciar</button>'

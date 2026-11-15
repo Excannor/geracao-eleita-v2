@@ -719,6 +719,11 @@ export function montarMensagem(tipo, dados = {}, { usuario = '', data = '', nome
   if (!lista) throw new Error('tipo de notificação desconhecido: ' + tipo);
   const [titulo, corpo] = escolherFrase(chave, lista, d, usuario, data);
   let pronto = preencher(corpo, d);
+  // R1.5: o toque leva um versículo junto; a referência abre o corpo do aviso
+  if (tipo === 'toque' && dados.versiculo) {
+    const comVerso = 'Com ' + dados.versiculo + '. ' + pronto;
+    pronto = [...comVerso].length <= CORPO_MAX ? comVerso : 'Com ' + dados.versiculo + ', para ler hoje.';
+  }
   if (tipo === 'desafioGrupo' && dados.grupo && [...pronto].length > CORPO_MAX) pronto = preencher(corpo, { ...d, quem: 'a sua célula' });
   return { titulo: preencherTitulo(titulo, d), corpo: pronto, tag, url };
 }

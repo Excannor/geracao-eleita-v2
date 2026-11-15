@@ -239,6 +239,8 @@ function paraLinhas(d) {
     { tabela: 'silenciados', chaves: ['quem', 'alvo'], linhas: listas(d.silenciados) },
     { tabela: 'convites_usados', chaves: ['nonce'], linhas: Object.entries(d.convitesUsados).map(([nonce, vence]) => ({ nonce, vence: Number(vence) })) },
     { tabela: 'toques', chaves: ['de', 'para'], linhas: Object.entries(d.toques).map(([k, dia]) => { const [de, para] = k.split('>'); return { de, para, dia }; }) },
+    // R1.5: o versículo de cada toque (só os toques que existem; apagar o toque leva o versículo)
+    { tabela: 'toque_versos', chaves: ['de', 'para'], linhas: Object.keys(d.toques).filter((k) => (d.toquesVerso || {})[k]).map((k) => { const [de, para] = k.split('>'); return { de, para, versiculo: d.toquesVerso[k] }; }) },
     { tabela: 'denuncias', chaves: ['ordem'], linhas: d.denuncias.map((x, ordem) => ({ ordem, de: x.de, contra: x.contra, motivo: x.motivo, em: x.em })) },
     { tabela: 'convites_aceites', chaves: ['de', 'para'], linhas: (d.convitesAceites || []).map((x) => ({
       convite: x.convite, de: x.de, para: x.para, em: x.em, conta_nova: x.contaNova ? 1 : 0, ativado_em: x.ativadoEm || '',
@@ -301,6 +303,7 @@ function lerTabelas(db) {
     silenciados: lerTabela(db, 'silenciados', ['quem', 'alvo'], 'quem, ordem'),
     convites: lerTabela(db, 'convites_usados', ['nonce']),
     toques: lerTabela(db, 'toques', ['de', 'para']),
+    toqueVersos: lerTabela(db, 'toque_versos', ['de', 'para']),
     denuncias: lerTabela(db, 'denuncias', ['ordem'], 'ordem'),
     aceites: lerTabela(db, 'convites_aceites', ['de', 'para'], 'em'),
     propositos: lerTabela(db, 'propositos', ['id'], 'criado_em'),
@@ -335,6 +338,8 @@ function deLinhas(t, versao) {
   for (const l of t.silenciados) (d.silenciados[l.quem] || (d.silenciados[l.quem] = [])).push(l.alvo);
   for (const l of t.convites) d.convitesUsados[l.nonce] = Number(l.vence);
   for (const l of t.toques) d.toques[l.de + '>' + l.para] = l.dia;
+  d.toquesVerso = {};
+  for (const l of t.toqueVersos || []) d.toquesVerso[l.de + '>' + l.para] = l.versiculo;
   d.denuncias = t.denuncias.map((l) => ({ de: l.de, contra: l.contra, motivo: l.motivo, em: l.em }));
   d.convitesAceites = (t.aceites || []).map((l) => ({
     convite: l.convite, de: l.de, para: l.para, em: l.em, contaNova: !!l.conta_nova, ativadoEm: l.ativado_em || '',
@@ -2245,7 +2250,9 @@ export class Contas {
   }
 
   // ---------- toques ----------
-  async tocar(eu, para, { hoje, euLeu, eleLeu }) {
+  // R1.5: um toque por dia por amigo, sempre com um versículo (a referência, já conferida pelo
+  // servidor). O segundo do dia devolve 'ja' e não muda nada: nem a data, nem o versículo.
+  async tocar(eu, para, { hoje, euLeu, eleLeu, versiculo = '' }) {
     const a = this.exigirCompleto(eu);
     const b = this.achar(para);
     if (!b || this.relacao(a.usuario, b.usuario) !== 'amigos') throw erro('só dá para dar um toque em amigo', 403);
@@ -2257,11 +2264,13 @@ export class Contas {
       .filter(([k, d]) => k.startsWith(a.usuario + '>') && d === hoje).length;
     if (hojeDados >= LIMITE_TOQUES_DIA) throw erro('você já deu ' + LIMITE_TOQUES_DIA + ' toques hoje', 429);
     this.dados.toques[chave] = hoje;
+    (this.dados.toquesVerso ||= {})[chave] = String(versiculo || '');
     await this.salvar();
     return 'enviado';
   }
 
   toqueEnviado(eu, para, hoje) { return this.dados.toques[eu + '>' + para] === hoje; }
+  versoDoToque(de, para) { return ((this.dados.toquesVerso || {})[de + '>' + para]) || ''; }
 
   // Toques do dia de hoje para esta pessoa. A data é a de quem tocou, que pode estar
   // um dia à frente num fuso diferente.

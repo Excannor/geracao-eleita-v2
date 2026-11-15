@@ -335,6 +335,13 @@ const ESQUEMA = [
   ALTER TABLE propositos ADD COLUMN encontro_hora TEXT NOT NULL DEFAULT '';
   ALTER TABLE propositos ADD COLUMN encontro_lugar TEXT NOT NULL DEFAULT '';
   `,
+  // v25: o toque leva um versículo junto (R1.5, docs/fases/r1-chama-que-perdoa.md): a referência
+  // ("Hebreus 10.24"), nunca o texto; quem recebe lê o texto na própria Bíblia do app. Mesma chave
+  // de toques (de, para), um por dia por amigo. Tabela própria, e não coluna em toques: a migração
+  // vale também num banco antigo de ensaio que não tem toques.
+  `
+  CREATE TABLE IF NOT EXISTS toque_versos (de TEXT NOT NULL, para TEXT NOT NULL, versiculo TEXT NOT NULL, PRIMARY KEY (de, para));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -496,6 +503,7 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['bloqueios', 'DELETE FROM bloqueios WHERE quem = ? OR alvo = ?', [u, u]],
     ['silenciados', 'DELETE FROM silenciados WHERE quem = ? OR alvo = ?', [u, u]],
     ['toques', 'DELETE FROM toques WHERE de = ? OR para = ?', [u, u]],
+    ['toque_versos', 'DELETE FROM toque_versos WHERE de = ? OR para = ?', [u, u]],
     ['convites_aceites', 'DELETE FROM convites_aceites WHERE de = ? OR para = ?', [u, u]],
     // a dupla (grupo = 0) é relação de duas pontas só: sai inteira, com os dias batidos; o grupo
     // e a célula ficam, só a pessoa sai deles (a mesma regra de Contas.apagar)

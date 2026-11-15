@@ -11,11 +11,14 @@
 // R1.4, reacender a chama: quem tinha 10 dias e perdeu (3 dias em branco, 2 escudos) vê o convite
 // na folha de volta, reacende lendo hoje (no papel) e os 10 dias voltam; o servidor guarda o mês, e
 // não há segunda vez no mesmo mês. Quem já leu hoje reacende pela folha da chama, na hora.
+// R1.5, um toque por dia por amigo, com versículo: a tela do toque mostra o versículo (o texto da
+// NBV, palavra por palavra) e deixa trocar; quem recebe o vê; o segundo toque do dia vira "Você já
+// tocou hoje" no app e "ja" no servidor, sem outro aviso; a folha rápida dos Desafios faz o mesmo.
 // Uso: node ferramentas/teste-chama.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, nos temas claro e escuro, uma subpasta por parte: R1.1, R1.2...)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -63,9 +66,12 @@ async function alvo() {
 // Uma conta com 4 dias seguidos (6 dias do plano, dois deles no papel) que acabaram há 4 dias: três
 // dias em branco passam do escudo, a chama apagou e a falta está dentro da janela da folha de
 // volta. O servidor só aceita leitura com até 7 dias de atraso (servidor.mjs, conferirProgresso).
+const NOMES = {};
 async function contaComFalta(usuario, semEstado, marcadoEm) {
   const r = await fetch(base + '/api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ usuario, nome: 'Joana', senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2008-04-05', consentimento: true }) });
+    body: JSON.stringify({ usuario, nome: NOMES[usuario] || 'Joana', senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2008-04-05', consentimento: true,
+      // o "hoje" do servidor é o do fuso da conta: o mesmo do navegador do teste
+      fuso: Intl.DateTimeFormat().resolvedOptions().timeZone }) });
   const cookie = (r.headers.get('set-cookie') || '').split(';')[0];
   if (!r.ok) throw new Error('não criou a conta: ' + r.status + ' ' + await r.text());
   if (semEstado) return cookie;
@@ -371,6 +377,80 @@ try {
   ok(await esperar('CC.sequencia().atual === 11', 8000), 'já lido hoje: reacende na hora, 11 dias');
   ok(await esperar('/A chama voltou: 11 dias seguidos!/.test(document.body.textContent)', 4000), 'com o recado "A chama voltou: 11 dias seguidos!"');
   ok(await av('JSON.stringify(CC.ler("reacesoEm", {})) === ' + JSON.stringify(JSON.stringify({ [mes]: iso(new Date()) }))), 'um registro só, do mês');
+
+  // ---------- R1.5: um toque por dia por amigo, com versículo ----------
+  const nbv = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8')).livros;
+  const textoNbv = (ref) => { const m = /^(.+) (\d+)\.(\d+)(?:-(\d+))?$/.exec(ref); const cap = (nbv[m[1]] || [])[Number(m[2]) - 1] || []; return cap.slice(Number(m[3]) - 1, Number(m[4] || m[3])).join(' '); };
+  const api = async (rota, corpo, cookie) => { const r = await fetch(base + rota, { method: corpo ? 'POST' : 'GET', headers: { 'content-type': 'application/json', cookie }, body: corpo ? JSON.stringify(corpo) : undefined }); return r.json().catch(() => ({})); };
+  const amigar = async (a, b) => { const cv = await api('/api/convites', {}, a); await api('/api/convites/aceitar', { token: new URL(cv.link).searchParams.get('convite') }, b); };
+  for (const tema of ['claro', 'escuro']) {
+    await temaDe(tema);
+    const [ana, bia, cai] = ['ana', 'bia', 'cai'].map((x) => x + tema);
+    Object.assign(NOMES, { [ana]: 'Ana', [bia]: 'Bia Souza', [cai]: 'Caio' });
+    const anaC = await contaComFalta(ana, false, { 1: atras(0) });
+    const biaC = await contaComFalta(bia, true);
+    const caiC = await contaComFalta(cai, true);
+    await amigar(anaC, biaC);
+    await amigar(anaC, caiC);
+    await entrar(anaC);
+    await esperar(q('.folha-topo'), 20000);
+    await esperar('!document.getElementById("abertura")', 15000);
+    await dormir(800);
+    await fecharFolhas();
+    await av('location.hash = "#/amigos"; 1');
+    ok(await esperar(q('[data-amigo="' + bia + '"]'), 15000), 'a Ana leu hoje e vê a Bia no Juntos');
+    await av(q('[data-amigo="' + bia + '"]') + '.click(); 1');
+    ok(await esperar(q('.cortina [data-toque]')), 'a folha da Bia oferece "Dar um toque"');
+    await av(q('.cortina [data-toque]') + '.click(); 1');
+    ok(await esperar(q('.tela-toque .verso-toque [data-texto-verso]'), 10000), 'a tela do toque mostra o versículo que vai junto');
+    const primeiroRef = await av(q('.tela-toque [data-texto-verso]') + '.dataset.ref');
+    ok(await esperar('(' + q('.tela-toque [data-texto-verso]') + '.textContent || "") === ' + JSON.stringify(textoNbv(primeiroRef)), 8000),
+      'o primeiro é o versículo da leitura de hoje (' + primeiroRef + '), com o texto da NBV palavra por palavra');
+    await av(q('.tela-toque [data-outro-verso]') + '.click(); 1');
+    const escolhido = await av(q('.tela-toque [data-texto-verso]') + '.dataset.ref');
+    ok(escolhido !== primeiroRef && await esperar('(' + q('.tela-toque [data-texto-verso]') + '.textContent || "") === ' + JSON.stringify(textoNbv(escolhido)), 8000),
+      '"Outro versículo" troca para um de encorajamento (' + escolhido + '), também da NBV');
+    await capturar('r1.5-tela-toque-' + tema);
+    await av(q('.tela-toque [data-enviar-toque]') + '.click(); 1');
+    ok(await esperar('/Toque enviado/.test(' + q('.tela-toque [data-enviar-toque]') + '.textContent)', 8000), 'o toque sai: "Toque enviado"');
+    const daBia = await api('/api/amigos', null, biaC);
+    ok(((daBia.toques || []).find((t) => t.usuario === ana) || {}).versiculo === escolhido, 'a Bia recebe o toque com o versículo escolhido');
+    const denovo = await api('/api/toques', { para: bia, versiculo: 'Salmos 119.105' }, anaC);
+    ok(denovo.resultado === 'ja' && denovo.versiculo === escolhido, 'o servidor aceita um toque por dia por amigo: o segundo é "ja" e não troca o versículo');
+    const forjado = await api('/api/toques', { para: cai, versiculo: 'Livro Nenhum 99.1' }, anaC);
+    ok(forjado.resultado === 'enviado' && /^\S.* \d+\.\d+/.test(forjado.versiculo) && forjado.versiculo !== 'Livro Nenhum 99.1',
+      'um versículo que não existe vira um dos de encorajamento: o toque sempre leva um (' + forjado.versiculo + ')');
+    await av('document.querySelectorAll(".tela-cheia").forEach((t) => t.remove()); CC.carregarAmigos().then(() => 1)');
+    await av('location.hash = "#/novidades"; 1');
+    await dormir(300);
+    await av('location.hash = "#/amigos"; 1');
+    await esperar(q('[data-amigo="' + bia + '"]'), 10000);
+    await av(q('[data-amigo="' + bia + '"]') + '.click(); 1');
+    ok(await esperar(q('.cortina .folha')) && !(await av('!!' + q('.cortina [data-toque]'))) && /Você já tocou hoje/.test(await texto('.cortina .folha')),
+      'no app, o segundo toque não aparece: "Você já tocou hoje"');
+    await fecharFolhas();
+
+    // a folha rápida dos Desafios: o Caio já recebeu (o forjado acima) e mostra o estado
+    await av('location.hash = "#/missoes"; 1');
+    ok(await esperar('/Você já tocou hoje em Caio/.test((document.querySelector("#missao-amigos") || {}).textContent || "")', 10000), 'nos Desafios: "Você já tocou hoje em Caio"');
+    await av('CC.darToque({ usuario: "x", nome: "Teste", toqueEnviado: true }); 1');
+    ok(await esperar('/Você já tocou hoje em Teste/.test(document.body.textContent)', 4000), 'a folha rápida também não manda o segundo: avisa "Você já tocou hoje"');
+    await dormir(3500); // o recado de cima sai antes da captura
+    await av('CC.darToque(CC.amigosEmCache().amigos.find((a) => a.usuario === ' + JSON.stringify(cai) + ') ? { usuario: "' + cai + '", nome: "Caio" } : null); 1');
+    ok(await esperar(q('.cortina .verso-toque [data-texto-verso]'), 8000), 'a folha rápida mostra para quem vai e o versículo');
+    await capturar('r1.5-folha-rapida-' + tema);
+    await av(q('.cortina [data-enviar-toque]') + '.click(); 1');
+    ok(await esperar('/Você já tocou hoje em Caio/.test(document.body.textContent)', 8000), 'mandado de novo no mesmo dia, o servidor diz "ja" e o app avisa "Você já tocou hoje", sem erro');
+    await fecharFolhas();
+
+    // quem recebe: a Bia abre o app e vê o toque com o versículo
+    await entrar(biaC);
+    ok(await esperar(q('.tela-toque [data-verso-recebido] [data-texto-verso]'), 20000), 'a Bia abre o app: o toque da Ana chega com o versículo');
+    ok(await esperar('(' + q('.tela-toque [data-verso-recebido] [data-texto-verso]') + '.textContent || "") === ' + JSON.stringify(textoNbv(escolhido)), 8000)
+      && /Ana mandou junto/.test(await texto('.tela-toque [data-verso-recebido]')), '"Ana mandou junto", com o texto da NBV');
+    await capturar('r1.5-recebido-' + tema);
+    await av('document.querySelectorAll(".tela-cheia, .cortina").forEach((t) => t.remove()); 1');
+  }
 } catch (e) {
   falhas++;
   console.log('  FALHA ' + (e && e.stack || e));

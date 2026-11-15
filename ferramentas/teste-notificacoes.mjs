@@ -135,12 +135,14 @@ ok(toque.resultado === 'enviado', 'a Ana leu e notifica o Bento, que ainda não 
 const aposToque = await esperarPush(celBento, antesDoToque + 1);
 const msgToque = aposToque[aposToque.length - 1];
 ok(msgToque && /Ana/.test(msgToque.titulo + msgToque.corpo) && !/Clara/.test(msgToque.titulo + msgToque.corpo) && msgToque.tag === 'toque', 'o Bento recebe o toque com o primeiro nome da Ana');
-// Decisão do dono (01/10): todo toque vira notificação no celular de quem recebe. O segundo
-// toque do mesmo amigo no dia não conta de novo (resultado "ja"), mas chega no celular.
+// R1.5 (docs/fases/r1-chama-que-perdoa.md): o toque leva um versículo junto, e é um por dia por
+// amigo. A decisão de 01/10 (o segundo toque do dia também chegava no celular) mudou: o segundo
+// devolve "ja", não manda nada, e o app mostra "Você já tocou hoje".
+ok(toque.versiculo && msgToque.corpo.startsWith('Com ' + toque.versiculo), 'o toque leva um versículo, que abre o corpo do aviso (' + msgToque.corpo + ')');
 const denovo = await pedirJson('/api/toques', { para: 'bento' }, ana);
-const aposDenovo = await esperarPush(celBento, antesDoToque + 2);
-ok(denovo.resultado === 'ja' && aposDenovo.length === antesDoToque + 2,
-  'notificar de novo no mesmo dia não conta outro toque, mas chega no celular');
+await dormir(1500);
+ok(denovo.resultado === 'ja' && denovo.versiculo === toque.versiculo && doAparelho(celBento).length === antesDoToque + 1,
+  'notificar de novo no mesmo dia não conta outro toque nem chega no celular');
 
 // ---------- teto de quem recebe e preferências ----------
 const outros = [];

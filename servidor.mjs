@@ -85,6 +85,21 @@ const REFLEXOES_DO_CONTEUDO = APP.reflexoes;
 const CONHECER_DO_CONTEUDO = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));
 const REGRAS = APP.regras;
 const TODOS_LIVROS = APP.livros;
+// R1.5: o versículo que vai com o toque. Só a referência, conferida contra a NBV (o livro, o
+// capítulo e os versículos existem, no máximo 3 de uma vez); o que não passa vira um dos
+// versículos de encorajamento do app (CC.VERSOS_DO_TOQUE), pelo dia: o toque sempre leva um.
+const VERSOS_NBV = APP.versiculosDa('nbv');
+function versoDoToque(ref, hoje) {
+  const m = /^(.+) (\d{1,3})\.(\d{1,3})(?:-(\d{1,3}))?$/.exec(String(ref || '').slice(0, 40));
+  if (m && TODOS_LIVROS.includes(m[1])) {
+    const total = VERSOS_NBV ? VERSOS_NBV(m[1], Number(m[2])) : 0;
+    const de = Number(m[3]);
+    const ate = Number(m[4] || m[3]);
+    if (total && de >= 1 && ate >= de && ate <= total && ate - de < 3) return m[0];
+  }
+  const lista = APP.regras.VERSOS_DO_TOQUE;
+  return lista[Number(String(hoje).replace(/\D/g, '')) % lista.length];
+}
 // A semana que o roteiro "Leitura da semana" cobre: os 7 dias do plano até onde o líder já leu (é
 // ele quem conduz o encontro).
 const { semanaDoLider } = APP;
@@ -1868,7 +1883,7 @@ const servidor = createServer(async (req, res) => {
         recebidos: listas.recebidos.map(nomeDe),
         enviados: listas.enviados.map(nomeDe),
         bloqueados: listas.bloqueados.map(nomeDe),
-        toques: CONTAS.toquesRecebidos(eu, hojeEu).map(nomeDe),
+        toques: CONTAS.toquesRecebidos(eu, hojeEu).map((u) => ({ ...nomeDe(u), versiculo: CONTAS.versoDoToque(u, eu) })),
         convitesProposito: CONTAS.propositosDe(eu).filter((p) => p.membros.some((m) => m.usuario === eu && m.estado === 'convidado')).length,
         acompanhando,
         pedidosConversa: await Promise.all(CONTAS.pedidosConversaPara(eu, hojeEu).map(async (p) => ({ ...p, nome: await nomeDeExibicao(p.usuario) }))),
@@ -2370,15 +2385,17 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/toques') {
-      await acao(async ({ para }) => {
+      await acao(async ({ para, versiculo }) => {
         const outro = CONTAS.achar(para);
         const hojeEu = hojeDe(eu);
         const euLeu = (await diaDe(eu, hojeEu)).feitas.has(hojeEu);
         const eleLeu = outro ? (await diaDe(outro.usuario, hojeNoFuso(outro.fuso))).feitas.has(hojeNoFuso(outro.fuso)) : false;
-        const resultado = await CONTAS.tocar(eu, para, { hoje: hojeEu, euLeu, eleLeu });
-        // Todo toque aceito vira notificação, inclusive o segundo do mesmo dia ("ja").
-        if (resultado === 'enviado' || resultado === 'ja') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu) }));
-        return { resultado };
+        const verso = versoDoToque(versiculo, hojeEu);
+        const resultado = await CONTAS.tocar(eu, para, { hoje: hojeEu, euLeu, eleLeu, versiculo: verso });
+        // R1.5: um toque por dia por amigo. Só o primeiro vira notificação; o segundo do mesmo dia
+        // ("ja") não manda nada, e o app mostra "Você já tocou hoje".
+        if (resultado === 'enviado') semEsperar(avisoSocial(outro.usuario, 'toque', { amigo: await nomeDeExibicao(eu), versiculo: verso }));
+        return { resultado, versiculo: CONTAS.versoDoToque(eu, outro.usuario) };
       });
       return;
     }

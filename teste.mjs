@@ -361,6 +361,8 @@ secao('peças sob demanda');
     ['dia-lido', 'DIA_LIDO', 'cc.diaLido.abertos', '', 'a tela do dia lido'],
     // a chama que perdoa (R1): as folhas raras (o aviso do escudo usado sozinho); a conta fica em 02-estado.js
     ['chama', 'CHAMA', 'Seus escudos cuidaram da chama', '', 'as folhas da chama que perdoa'],
+    // R1.5: o toque com versículo (a escolha, a folha rápida e o que chega para quem recebe)
+    ['toque', 'TOQUE', 'Junto vai este versículo', '', 'o toque com versículo'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -1063,6 +1065,19 @@ for (const f of ['02b-jogo.js', '04e-versiculos.js', '06-explorar.js']) {
   checar(CC.conferirNovidade('versiculo', { ref: 'João 3.16-18' }, null, '2026-03-01') && !CC.conferirNovidade('versiculo', { ref: 'João 3.1-36' }, null, '2026-03-01')
     && !CC.conferirNovidade('versiculo', { ref: 'Livro Nenhum 1.1' }, null, '2026-03-01'),
     'o Juntos aceita trecho de até 10 versículos de um livro que existe');
+
+// --- R1.5: o toque leva um versículo ---
+  {
+    const nbvT = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'biblias', 'nbv.json'), 'utf8')).livros;
+    const textoDe = (ref) => { const m = /^(.+) (\d+)\.(\d+)(?:-(\d+))?$/.exec(ref); const cap = m && (nbvT[m[1]] || [])[Number(m[2]) - 1]; return cap ? cap.slice(Number(m[3]) - 1, Number(m[4] || m[3])).join(' ') : ''; };
+    const ruins = CC.VERSOS_DO_TOQUE.filter((r) => { const t = textoDe(r); return !t || /^[a-zà-ú]/.test(t) || ((t.match(/[“”]/g) || []).length % 2); });
+    checar(CC.VERSOS_DO_TOQUE.length >= 5 && !ruins.length, 'os versículos do toque existem na NBV e se leem sozinhos (começam com maiúscula, aspas fechadas)' + (ruins.length ? ' (' + ruins.join(', ') + ')' : ''));
+    const N5 = await import('./notificacoes.mjs');
+    const m5 = N5.montarMensagem('toque', { amigo: 'Ana Souza', versiculo: 'Hebreus 10.24' }, { usuario: 'bento', data: '2026-03-01' });
+    checar(m5.corpo.startsWith('Com Hebreus 10.24') && [...m5.corpo].length <= N5.CORPO_MAX && /Ana/.test(m5.titulo + m5.corpo), 'o aviso do toque abre com o versículo e cabe no limite (' + m5.corpo + ')');
+    const longo = N5.montarMensagem('toque', { amigo: 'Ana', versiculo: '1 Tessalonicenses 5.11', outros: 3 }, { usuario: 'bento', data: '2026-03-04' });
+    checar(longo.corpo.includes('1 Tessalonicenses 5.11') && [...longo.corpo].length <= N5.CORPO_MAX, 'com a referência longa, o aviso continua no limite');
+  }
 
   const agora = Date.now();
   const a = { atualizadoEm: 10, marcas: { 'João 3:16': { cor: 2, em: agora - 1000 }, 'João 3:17': { cor: 1, em: agora - 5000 } } };
@@ -2143,8 +2158,12 @@ checar(contas.relacao('novo2', 'ana') === 'amigos', 'mesmo sem dupla, a amizade 
   checar(contas.lerConvite(cargaAdulterada + '.' + firma, assinar) === null, 'trocar o modo na carga do convite invalida a assinatura');
 }
 
-checar(await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'enviado'
-  && await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false }) === 'ja', 'um toque por amigo por dia');
+checar(await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false, versiculo: 'Hebreus 10.24' }) === 'enviado'
+  && await contas.tocar('bia', 'dora', { hoje: '2026-03-02', euLeu: true, eleLeu: false, versiculo: 'Salmos 119.105' }) === 'ja', 'um toque por amigo por dia');
+// R1.5: o versículo vai com o toque; o segundo do dia não troca nada
+checar(contas.versoDoToque('bia', 'dora') === 'Hebreus 10.24', 'o toque guarda o versículo do primeiro do dia (o segundo não o troca)');
+checar(await contas.tocar('bia', 'dora', { hoje: '2026-03-03', euLeu: true, eleLeu: false, versiculo: 'Salmos 119.105' }) === 'enviado' && contas.versoDoToque('bia', 'dora') === 'Salmos 119.105',
+  'no dia seguinte, um toque novo com outro versículo');
 await contas.silenciar('dora', 'bia', true);
 checar(!contas.toquesRecebidos('dora', '2026-03-02').includes('bia'), 'silenciar esconde os toques');
 await contas.apagar('bia');
