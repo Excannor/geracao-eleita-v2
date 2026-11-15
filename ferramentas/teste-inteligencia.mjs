@@ -256,6 +256,25 @@ console.log('\n  Inteligência: leitura_dias\n');
   ok(I.sincronizarLeituraDias(db, 'ana', ['2026-09-01', '2026-09-20', 'lixo']) === 0, 'sem mudança não grava nada, e data inválida é ignorada');
   ok(!JSON.stringify(db.prepare('SELECT * FROM leitura_dias').all()).includes('segredo'), 'na tabela só há datas, nunca o que a pessoa escreveu');
 
+  // UX4.7: o reacender da chama (R1.4) copiado para chama_reacesa (v26), para o painel da igreja
+  B.gravarEstadoNoBanco(db, 'caio', { lidos: [1], marcadoEm: { 1: '2026-09-02' }, reacesoEm: { '2026-08': '2026-08-20', '2026-09': '2026-09-02' } });
+  ok(I.preencherChamaReacesa(db, REGRAS.reacesosDe) === 2 && I.preencherChamaReacesa(db, REGRAS.reacesosDe) === 0, 'UX4.7: a primeira subida copia o reacender de quem já tinha (2 do Caio), e a segunda não copia de novo');
+  ok(JSON.stringify(Object.fromEntries(I.reacesasDesde(db, '2026-08-25'))) === JSON.stringify({ caio: ['2026-09-02'] }), 'UX4.7: o reacender de cada um desde uma data');
+  ok(I.sincronizarChamaReacesa(db, 'caio', ['2026-09-02', 'lixo']) === 1 && I.reacesasDesde(db, '2026-01-01').get('caio').join() === '2026-09-02'
+    && I.sincronizarChamaReacesa(db, 'caio', ['2026-09-02']) === 0, 'UX4.7: sincronizar regrava (sai o que a pessoa não tem mais), ignora data inválida e não grava sem mudança');
+  I.apagarLeituraDias(db, 'caio');
+  ok(!I.reacesasDesde(db, '2026-01-01').has('caio'), 'UX4.7: apagar o progresso leva junto o reacender');
+  {
+    // Por que o painel precisa do reacender: com ele, a chama de março continua (21 dias, o
+    // escudo ganho no 21º dia cobre o buraco de 26 e 27); sem ele, ela apaga. É o mesmo cálculo do
+    // Início (diaDe), agora também no painel da igreja.
+    const datas = [...dias('2026-03-01', 10), ...dias('2026-03-13', 10), '2026-03-25'];
+    const com = REGRAS.simularOfensiva(datas, '2026-03-28', ['2026-03-25']);
+    const sem = REGRAS.simularOfensiva(datas, '2026-03-28', []);
+    ok(com.reacendeu === '2026-03-25' && com.atual === 21 && I.chamaAcesa(com) && !I.chamaAcesa(sem),
+      'UX4.7: o mesmo histórico, com o reacender, fica com a chama acesa (21 dias); sem ele, apagada');
+  }
+
   db.prepare('INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em, sem_encontro) VALUES (?, ?, ?, ?, ?, ?)').run('p1', '2026-09-20', 2, 'ana', 'x', 0);
   db.prepare('INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em, sem_encontro) VALUES (?, ?, ?, ?, ?, ?)').run('p1', '2026-09-27', 0, 'ana', 'x', 1);
   db.prepare('INSERT INTO celula_encontros (proposito, data, visitantes, registrado_por, em, sem_encontro) VALUES (?, ?, ?, ?, ?, ?)').run('p1', '2026-09-13', 0, 'ana', 'x', 0);

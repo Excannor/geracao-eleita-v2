@@ -228,3 +228,46 @@ barra, o ponto fica na aba, não no Mais.
 
 **O que ficou de fora.** A "novidade" continua sendo a da aba nova. Convites de discipulado
 pendentes não acendem ponto em lugar nenhum (nem na barra), como antes.
+
+## UX4.7 · O painel da igreja e o "reacender a chama" (R1.4)
+
+**Como era.** O painel da igreja (administrador) simula a chama de cada membro pela cópia
+achatada das datas de leitura (`leitura_dias`), para não abrir o JSON de progresso de todo mundo.
+O reacender (R1.4, `reacesoEm` no progresso) não estava nessa cópia: o painel chamava
+`simularOfensiva` sem ele, e um mês reacendido virava, lá, uma chama que apagou e recomeçou. O
+Início, os amigos, a célula, os propósitos, as notificações e o painel de cada célula já usavam o
+estado (`diaDe`).
+
+**Na prática.** O painel da igreja só mostra se cada membro está com a chama acesa (a
+porcentagem por célula). A diferença aparece no dia em que o escudo ganho pela sequência que
+voltou é o que cobre um buraco seguinte: com o reacender, a pessoa tem 21 dias e a chama acesa;
+sem ele, a sequência de 1 dia não tem escudo e a chama apaga (o caso está no
+`teste-inteligencia`). É raro, mas era o painel da igreja contradizendo o Início e o painel do
+líder.
+
+**A correção, sem dado novo para ninguém.**
+- Esquema **v26**: `chama_reacesa (usuario, data)`, WITHOUT ROWID, ao lado de `leitura_dias`. Só a
+  data do reacender, uma por mês.
+- A cada sincronização do progresso (`PUT /api/estado`), o servidor regrava a cópia com o
+  reacender que **ele aceitou** (`conferirProgresso`): um mês forjado fora da janela não entra
+  (`sincronizarChamaReacesa`, `inteligencia.mjs`).
+- Na primeira subida com a v26, o reacender de quem já tinha é copiado uma vez
+  (`preencherChamaReacesa`, marca `chama_reacesa_preenchida`).
+- O painel lê o reacender da mesma janela de 120 dias (`reacesasDesde`) e passa a cada simulação.
+- Apagar o progresso ou a conta leva a cópia junto (`apagarLeituraDias`, `apagarPessoaDoBanco`
+  e, com ele, os backups).
+- O que sai do servidor não muda: o painel da igreja continua só com a porcentagem por célula.
+  A política de privacidade não muda: é a mesma data que já fica no progresso, numa cópia
+  interna, como `leitura_dias`.
+
+`docs/fases/r1-chama-que-perdoa.md` deixa de listar isso como limite conhecido.
+
+**Testes.** `teste-db`: a v26 num banco antigo e o apagar da pessoa. `teste-inteligencia`:
+preencher uma vez só, a janela, sincronizar (entra, sai, data inválida, sem mudança), apagar e o
+histórico em que o reacender muda a chama do painel. `teste.mjs`: o servidor guarda na cópia só o
+reacender aceito (sem o mês forjado) e o painel passa o reacender à simulação.
+
+**O que ficou de fora.** Não há teste de ponta a ponta que mostre a porcentagem do painel mudar:
+o caso depende de não haver virada de mês entre o reacender e hoje (a virada dá escudo para os
+dois cálculos), e o servidor não tem relógio de teste. O cálculo está coberto pelo teste da
+simulação e a ligação pelo teste do servidor.

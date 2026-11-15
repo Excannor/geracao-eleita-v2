@@ -3324,6 +3324,9 @@ secao('colocar um estudo na célula direto no banco (ferramentas/colocar-estudo.
   const srv = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   checar(/CONTAS\.salvarEstudo\(eu, id, corpo, APP\.opcoesDoEstudo\(await lerEstado\(arquivoDe\(eu\)\)\)\)/.test(srv) && /const APP = carregarRegrasDoApp\(AQUI\);/.test(srv),
     'o servidor grava o estudo com as opções de regras-app.mjs, as mesmas da ferramenta');
+  checar(/const reacesas = reacesasDesde\(DB, somaDias\(hoje, -JANELA_CHAMA\)\);/.test(srv)
+    && /REGRAS\.simularOfensiva\(\[\.\.\.\(datas\.get\(u\) \|\| \[\]\)\], dele < hoje \? dele : hoje, reacesas\.get\(u\) \|\| \[\]\)/.test(srv),
+    'UX4.7: o painel da igreja simula a chama de cada membro com o reacender dele (chama_reacesa), como o Início');
   {
     const A = carregarRegrasDoApp(AQUI);
     const o = A.opcoesDoEstudo({ lidos: [1, 2, 250] });
@@ -3931,6 +3934,15 @@ secao('cofre das anotações (cofre.mjs e servidor)');
       await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3100, reacesoEm: { [mesR]: hojeR, '2020-01': '2020-01-05' } }, ana, 'PUT');
       const r1 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};
       checar(r1[mesR] === hojeR && !r1['2020-01'], 'no servidor, reacender entra com a data de hoje e um mês antigo forjado fica de fora (' + JSON.stringify(r1) + ')');
+      // UX4.7: a cópia do reacender (chama_reacesa, v26) acompanha o que o servidor aceitou, para o
+      // painel da igreja simular a chama como o Início
+      {
+        const b = new DatabaseSync(arquivoDb);
+        try {
+          const linhas = b.prepare("SELECT usuario, data FROM chama_reacesa WHERE usuario LIKE 'ana%'").all().map((l) => l.data).join();
+          checar(linhas === hojeR, 'UX4.7: chama_reacesa guarda o reacender aceito (' + linhas + '), sem o mês forjado');
+        } finally { b.close(); }
+      }
       const outroDia = CC.somaDias(hojeR, hojeR.slice(8) === '01' ? 1 : -1);
       await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3200, reacesoEm: { [mesR]: outroDia.slice(0, 7) === mesR ? outroDia : hojeR } }, ana, 'PUT');
       const r2 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};

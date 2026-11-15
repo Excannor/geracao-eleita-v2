@@ -31,7 +31,7 @@ import { montarPainel } from './painel.mjs';
 import { estudoNoRetrato, itemDoHistorico, estudoDoRegistro, resumoDoEstudo, encontrosDoEstudo, dataNoHistorico, itemDaFila } from './estudos.mjs';
 import {
   chamaAcesa, termometro, frequencia, funil, ofensivaPerdida, atencaoComGatilhos, rankingDaChama, evangelismoDoMes,
-  saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, leiturasPorDia, quemLeuEntre,
+  saudeDosCheckins, adocao, sincronizarLeituraDias, preencherLeituraDias, apagarLeituraDias, sincronizarChamaReacesa, preencherChamaReacesa, reacesasDesde, leiturasPorDia, quemLeuEntre,
   datasDesde, frequenciaMediaPorCelula, checkinsEntre, checkinsDe, JANELA_CHAMA, JANELA_CHECKIN, DIAS_SERIE_ADOCAO,
   MINIMO_CHECKIN_CELULA,
 } from './inteligencia.mjs';
@@ -414,6 +414,9 @@ importarEstadosLegados();
 {
   const linhas = preencherLeituraDias(DB);
   if (linhas) console.log('  datas de leitura copiadas para leitura_dias: ' + linhas + ' linha(s)');
+  // e as datas do reacender da chama (v26, UX4.7), uma vez só também
+  const reacesas = preencherChamaReacesa(DB, REGRAS.reacesosDe);
+  if (reacesas) console.log('  datas do reacender copiadas para chama_reacesa: ' + reacesas + ' linha(s)');
 }
 // O serviço de push pede um contato de quem manda: o endereço do app, e não o e-mail de ninguém.
 // Endereço que vai nos links de convite e de célula: o oficial (CAMINHO_ENDERECO), mesmo
@@ -1031,12 +1034,15 @@ async function montarPainelDaIgreja(hoje) {
   const leramNaSemana = quemLeuEntre(DB, somaDias(hoje, -7), hoje);
   // A chama de cada membro pela mesma regra do Início, sobre as datas da janela.
   const datas = datasDesde(DB, somaDias(hoje, -JANELA_CHAMA));
+  // o reacender de cada um (R1.4, v26): sem ele, um mês reacendido aparecia aqui como chama que
+  // apagou e recomeçou, diferente do Início e do painel do líder (UX4.7)
+  const reacesas = reacesasDesde(DB, somaDias(hoje, -JANELA_CHAMA));
   // Cada pessoa no próprio dia (nunca depois do dia do admin), como no retrato da célula: quem
   // está num fuso atrás do admin ainda não fechou o dia dela, e contá-la no dia do admin apagaria
   // uma chama que o Início e o painel do líder mostram acesa.
   const simular = (u) => {
     const dele = hojeDe(u);
-    return REGRAS.simularOfensiva([...(datas.get(u) || [])], dele < hoje ? dele : hoje);
+    return REGRAS.simularOfensiva([...(datas.get(u) || [])], dele < hoje ? dele : hoje, reacesas.get(u) || []);
   };
   const frequencias = frequenciaMediaPorCelula(DB, somaDias(hoje, -28), hoje);
   const ativas = CONTAS.propositosAtivos().filter((p) => p.celula && p.membros.some(membroDeVerdade));
@@ -1825,9 +1831,12 @@ const servidor = createServer(async (req, res) => {
           if (novo.dono) junto.dono = novo.dono;
           // carta de convite, célula ou discipulado que o servidor não confirma não entra
           conferirCartasDoServidor(atual, junto, conta ? CONTAS.cartasDoServidor(eu).chaves : []);
-          await gravarEstado(limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu))), arquivo);
+          const conferido = limparPerfilDoEstado(conferirProgresso(atual, junto, hojeDe(eu)));
+          await gravarEstado(conferido, arquivo);
           // A cópia achatada das datas (inteligencia.mjs) acompanha o progresso: só as datas.
           sincronizarLeituraDias(DB, arquivo, datasFeitas(junto));
+          // e o reacender que o servidor aceitou (UX4.7: o painel da igreja simula com ele)
+          sincronizarChamaReacesa(DB, arquivo, REGRAS.reacesosDe(conferido));
           // A primeira lição de quem veio por um convite conta para quem convidou.
           if (conta && conta.convidadoPor && datasFeitas(junto).size && await CONTAS.ativarConvidado(eu)) await marcoDoSemeador(conta.convidadoPor);
           json(res, 200, { ok: true });

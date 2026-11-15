@@ -307,7 +307,53 @@ export function preencherLeituraDias(db) {
   return linhas;
 }
 
-export const apagarLeituraDias = (db, usuario) => db.prepare('DELETE FROM leitura_dias WHERE usuario = ?').run(usuario);
+export const apagarLeituraDias = (db, usuario) => {
+  db.prepare('DELETE FROM leitura_dias WHERE usuario = ?').run(usuario);
+  db.prepare('DELETE FROM chama_reacesa WHERE usuario = ?').run(usuario);
+};
+
+// As datas do reacender da chama (R1.4, v26), com a mesma regra de leitura_dias: entra o que
+// faltava, sai o que a pessoa não tem mais. Uma por mês, então são poucas linhas por pessoa.
+export function sincronizarChamaReacesa(db, usuario, datas) {
+  const novas = new Set([...(datas || [])].filter((d) => DATA_VALIDA.test(String(d))));
+  const antigas = new Set(db.prepare('SELECT data FROM chama_reacesa WHERE usuario = ?').all(usuario).map((l) => l.data));
+  const entram = [...novas].filter((d) => !antigas.has(d));
+  const saem = [...antigas].filter((d) => !novas.has(d));
+  if (!entram.length && !saem.length) return 0;
+  transacao(db, () => {
+    const inserir = db.prepare('INSERT OR IGNORE INTO chama_reacesa (usuario, data) VALUES (?, ?)');
+    for (const d of entram) inserir.run(usuario, d);
+    const apagar = db.prepare('DELETE FROM chama_reacesa WHERE usuario = ? AND data = ?');
+    for (const d of saem) apagar.run(usuario, d);
+  });
+  return entram.length + saem.length;
+}
+
+// Uma vez só, na primeira subida com o esquema v26: o reacender de quem já tinha.
+export function preencherChamaReacesa(db, reacesosDe) {
+  if (lerMeta(db, 'chama_reacesa_preenchida') !== null) return 0;
+  const usuarios = db.prepare('SELECT usuario FROM estados').all().map((l) => l.usuario);
+  let linhas = 0;
+  transacao(db, () => {
+    for (const u of usuarios) {
+      let estado = null;
+      try { estado = lerEstadoDoBanco(db, u); } catch { estado = null; }
+      linhas += sincronizarChamaReacesa(db, u, reacesosDe(estado || {}));
+    }
+    gravarMeta(db, 'chama_reacesa_preenchida', new Date().toISOString());
+  });
+  return linhas;
+}
+
+// O reacender de cada pessoa desde "desde" (inclusive): usuario -> [datas], para simularOfensiva.
+export function reacesasDesde(db, desde) {
+  const mapa = new Map();
+  for (const l of db.prepare('SELECT usuario, data FROM chama_reacesa WHERE data >= ?').all(desde)) {
+    if (!mapa.has(l.usuario)) mapa.set(l.usuario, []);
+    mapa.get(l.usuario).push(l.data);
+  }
+  return mapa;
+}
 
 // Quantas pessoas leram em cada dia da janela (de, ate]: a view leituras_por_dia.
 export function leiturasPorDia(db, de, ate) {

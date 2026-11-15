@@ -239,12 +239,17 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
     'a migração v23 acrescenta celula_estudos.agendado_para e preparado_em, vazios no estudo que já estava');
     dbV7.prepare("INSERT INTO celula_estudos (id, proposito, tipo, criado_por, criado_em, agendado_para) VALUES ('efila', 'p2', 'blocos', 'lider', '2026-01-09T12:00:00.000Z', '2026-01-15')").run();
     dbV7.prepare("INSERT INTO celula_estudos (id, proposito, tipo, criado_por, criado_em, agendado_para) VALUES ('eoutro', 'p2', 'blocos', 'outro', '2026-01-09T12:00:00.000Z', '2026-01-22')").run();
+    // v26 (UX4.7): as datas do reacender da chama, ao lado de leitura_dias, para o painel da igreja
+    ok(B.versaoDoEsquema() >= 26 && colunas('chama_reacesa').join() === 'usuario,data',
+      'a migração v26 cria chama_reacesa (usuario, data) num banco antigo');
+    dbV7.prepare("INSERT INTO chama_reacesa (usuario, data) VALUES ('lider', '2026-01-10'), ('outro', '2026-01-11')").run();
   }
   B.apagarPessoaDoBanco(dbV7, 'lider');
   ok(dbV7.prepare("SELECT count(*) n FROM celula_estudos WHERE id = 'lp2'").get().n === 1,
     'apagar a pessoa do banco (e dos backups) não apaga os estudos da célula: eles ficam com o @ de quem preparou');
   ok(dbV7.prepare("SELECT group_concat(id) x FROM celula_estudos WHERE id IN ('efila', 'eoutro')").get().x === 'eoutro',
     'os estudos que a pessoa deixou na fila (v23) saem com ela; os da fila de outra pessoa ficam');
+  ok(dbV7.prepare("SELECT group_concat(usuario) x FROM chama_reacesa").get().x === 'outro', 'apagar a pessoa leva junto o reacender dela (v26); o de outra pessoa fica');
   ok(dbV7.prepare("SELECT estudo FROM celula_encontros WHERE proposito = 'p1' AND data = '2026-01-08'").get().estudo === 'lp2'
     && dbV7.prepare("SELECT count(*) n FROM celula_presencas WHERE proposito = 'p1'").get().n === 0,
   'e não mexe no estudo ligado ao encontro: só a presença da pessoa sai');

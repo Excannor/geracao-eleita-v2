@@ -342,6 +342,13 @@ const ESQUEMA = [
   `
   CREATE TABLE IF NOT EXISTS toque_versos (de TEXT NOT NULL, para TEXT NOT NULL, versiculo TEXT NOT NULL, PRIMARY KEY (de, para));
   `,
+  // v26: as datas em que a pessoa reacendeu a chama (R1.4, reacesoEm do progresso: uma por mês),
+  // ao lado de leitura_dias, para o painel da igreja simular a chama como o Início simula, sem abrir
+  // o JSON de progresso de todo mundo (UX4.7). Só a data; regravada a cada sincronização do
+  // progresso, como leitura_dias. Nada novo sai do servidor: o painel continua só com "acesa".
+  `
+  CREATE TABLE IF NOT EXISTS chama_reacesa (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data)) WITHOUT ROWID;
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -543,6 +550,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     // o check-in diário e a cópia achatada das datas de leitura (v14) são só da pessoa
     ['checkins', 'DELETE FROM checkins WHERE usuario = ?', [u]],
     ['leitura_dias', 'DELETE FROM leitura_dias WHERE usuario = ?', [u]],
+    // e as datas do reacender (v26), que andam com elas
+    ['chama_reacesa', 'DELETE FROM chama_reacesa WHERE usuario = ?', [u]],
   ];
   // os estudos da célula ficam com o @ de quem preparou, mas os da fila (v23), que a célula nunca
   // recebeu, saem com a pessoa (docs/a-mesa-fila.md, F9). Um backup de antes da v23 não tem a coluna.

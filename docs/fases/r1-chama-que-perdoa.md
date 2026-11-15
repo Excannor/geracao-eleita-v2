@@ -164,9 +164,11 @@ mês já usado, menos de 7 dias, fora da janela ou leitura depois da perda).
   lido (`dia-lido.js`) cumpre o pedido e festeja "A chama voltou! Seus N dias seguidos estão de
   volta." O pedido vale só no mesmo dia e na mesma conta.
 
-**Limite conhecido.** O painel da igreja (administrador) conta a chama de cada membro pela cópia
-achatada das datas (`leitura_dias`), sem o estado: lá, um mês reacendido aparece como chama que
-apagou e recomeçou. O Início, os amigos, a célula, os propósitos e as notificações usam o estado.
+**Limite conhecido (resolvido na UX4.7).** O painel da igreja (administrador) contava a chama de
+cada membro pela cópia achatada das datas (`leitura_dias`), sem o estado: lá, um mês reacendido
+aparecia como chama que apagou e recomeçou. Desde a UX4.7 (`docs/fases/ux4.md`), as datas do
+reacender têm a sua cópia (`chama_reacesa`, esquema v26) e o painel simula com elas, como o
+Início, os amigos, a célula, os propósitos e as notificações.
 
 **Privacidade.** Só a data do reacender, junto do progresso de leitura que a política já
 descreve; nada novo para outras pessoas.
