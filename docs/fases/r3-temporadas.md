@@ -223,3 +223,55 @@ guardar dado novo).
   dias de atraso, então o teste não tem como gravar datas de outro mês), manda à célula 55 de 120,
   sem nome de ninguém; o Juntos mostra o cartão e a barra; os outros quatro momentos e as fases antes
   e depois na mesma tela; sem célula, nada.
+
+## R3.4 · Retrospectiva de dezembro
+
+**O que é.** A recomendação 20: no fim do ano, "Seu ano na Palavra" e "O ano da célula", cada um com
+uma imagem para story. Tela única, `#/perfil/retrospectiva` (peça nova `retrospectiva.js` e `.css`;
+a casca fica em `07-perfil.js`).
+
+**A época.** De 1º de dezembro a 7 de janeiro (em janeiro, o ano que acabou): `anoDaRetrospectiva`,
+a mesma regra no servidor (`desafios-grupo.mjs`) e no app. Nessa época:
+- na Trilha, logo abaixo do cartão da temporada, a entrada "Seu ano na Palavra 2026 · Os seus
+  números do ano. Só você vê." (peça das temporadas);
+- no Juntos, no alto, para cada célula, "O ano da célula em 2026 · Os números da célula no ano,
+  somados, sem nomes."
+Fora da época, as entradas somem, e a tela (aberta pelo endereço) mostra o ano de agora, "até hoje".
+
+**Seu ano na Palavra: só a própria pessoa vê.** Contado no aparelho (`meuAno`), só do estado dela;
+nada vai ao servidor. Os números (sem os que dão zero): dias com a Palavra no ano (as mesmas datas
+da chama e do R1.1), dias do plano lidos no ano, capítulos, livros terminados no ano (todos os dias
+do livro lidos, o último deles marcado no ano), temporadas concluídas no ano (a mesma regra) e
+semanas completas (R1.2). Embaixo, o mês com mais dias com a Palavra e a lista dos livros
+terminados, na ordem da Bíblia. Sem leitura no ano: "Em 2026 ainda não há leitura marcada. O plano
+continua de onde você está."
+
+**O ano da célula: só números somados.** O servidor (`anoDaCelula`, com os membros ativos de hoje,
+sem visitante) manda `{ ano, pessoas, diasLidos, capitulos, temporadas, encontros, metas, momentos }`:
+dias do plano lidos no ano somando todos, capítulos, temporadas concluídas, encontros registrados
+no ano e metas do calendário sazonal batidas (R3.3). Nenhum nome, nenhum número de uma pessoa.
+**Com menos de 3 pessoas**, a célula recebe só `{ ano, pessoas, poucos: true }` e a tela diz: "O
+ano da célula aparece quando ela tem 3 pessoas ou mais, para que ninguém seja reconhecido pelos
+números." (o mesmo cuidado do check-in somado, que pede 3 respostas). As metas do calendário só
+aparecem quando alguma foi batida: "0 de 5" seria cobrança. Nada novo é guardado (sem migração).
+`privacidade.html`: duas linhas no quadro de quem vê e o "Segundo ajuste da versão 7".
+
+**As imagens para story** (1080×1920, desenhadas no aparelho com as peças de `01d-story.js`, e
+compartilhadas por `CC.compartilharImagem`): o fundo grafite das imagens do app, "Meu ano na
+Palavra" (ou "O ano da célula" com o nome dela), o ano grande em sálvia, até 4 números e a marca.
+Só sai se a pessoa tocar em "Imagem para o story".
+
+**Limites conhecidos.** O ano da célula usa os membros de hoje: quem saiu no meio do ano não entra
+na soma, e quem entrou traz o ano inteiro dele. A peça da retrospectiva não é guardada de antemão:
+aberta uma vez, o service worker a guarda; antes disso, sem rede, a casca mostra "Tentar de novo".
+
+**Testes.**
+- `teste.mjs`: a peça (6 checagens da lista), a política (1) e 8 da regra: a época; menos de 3
+  pessoas sem números; a soma do ano (dias, capítulos, temporadas e encontros só do ano e até hoje);
+  só números (a lista exata das chaves); as metas do calendário; o ano da pessoa com um estado
+  montado (11 dias com a Palavra, 20 dias do plano, 2 semanas completas, março, Gênesis, temporadas
+  1 e 2); a mesma época no app; os textos sem exagero e sem zeros.
+- `ferramentas/teste-retrospectiva.mjs` (novo, 20 checagens por tema): o servidor, deslocado para
+  15 de dezembro de 2026, manda à célula 65 dias e 6 temporadas sem nomes; a de 2 pessoas, só o
+  aviso; a entrada no Juntos; o ano da Ana só com os números dela; o ano da célula somado; as duas
+  imagens geradas no aparelho e o botão; a entrada da Trilha em dezembro, que some fora dele.

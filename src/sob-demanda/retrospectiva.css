@@ -1,0 +1,11 @@
+/* A retrospectiva de dezembro (retrospectiva.js): os números do ano, da pessoa e da célula. */
+.bloco-ano { display: grid; gap: 12px; margin: 0 0 22px; padding: 18px; border-radius: 26px; background: var(--cartao); }
+.bloco-ano h2 { margin: 0; }
+.bloco-ano p { margin: 0; }
+.nome-celula-ano { margin-top: -8px !important; color: var(--tinta-fraca); font-weight: 700; }
+.numeros-ano { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.numero-ano { display: grid; gap: 2px; padding: 12px 14px; border-radius: 18px; background: var(--campo); }
+.numero-ano b { color: var(--tinta-forte); font-size: 1.75rem; font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
+.numero-ano span { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.3; }
+.mes-ano, .lista-ano { color: var(--tinta); font-size: .9375rem; line-height: 1.45; }
+.bloco-ano .botao { justify-self: start; }

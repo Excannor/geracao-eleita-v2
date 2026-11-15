@@ -4,7 +4,8 @@
    folha da temporada. A conta (CC.temporadaDoDia, CC.progressoTemporada, CC.temporadaCompletaEm) e
    o selo em Conquistas ficam no index (02b-jogo.js, 07-perfil.js); a chegada fica no Dia lido.
    R3.2: em Conquistas, as barras de "faltam N dias para fechar" (temporada, livros e semana).
-   R3.3: no Juntos, o calendário sazonal da célula (os números vêm somados do servidor). */
+   R3.3: no Juntos, o calendário sazonal da célula (os números vêm somados do servidor).
+   R3.4: as entradas da retrospectiva de dezembro (na Trilha e no Juntos); a tela é a peça retrospectiva.js. */
 (function (CC) {
   'use strict';
 
@@ -53,6 +54,21 @@
       + (entrando ? '<span class="abertura-temporada" data-abertura-temporada>' + CC.esc(t.abertura) + '</span>' : '')
       + '</span>' + CC.ico('avancar') + '</button>');
     folha.querySelector('[data-temporada]').onclick = () => folhaTemporada(t.numero);
+    // R3.4: de 1º de dezembro a 7 de janeiro, a entrada da retrospectiva, logo abaixo da temporada
+    const ano = anoDaRetrospectiva(CC.hojeIso());
+    if (ano && !folha.querySelector('[data-entrada-retrospectiva]')) {
+      folha.querySelector('[data-temporada]').insertAdjacentHTML('afterend', '<a class="cartao-retrospectiva" href="#/perfil/retrospectiva" data-entrada-retrospectiva="' + ano + '">'
+        + '<span class="textos-temporada"><small>Retrospectiva</small><b>Seu ano na Palavra ' + ano + '</b>'
+        + '<span class="faltam-temporada">Os seus números do ano. Só você vê.</span></span>' + CC.ico('avancar') + '</a>');
+    }
+  }
+  // A época da retrospectiva (R3.4): de 1º de dezembro a 7 de janeiro; em janeiro, o ano que acabou.
+  // A mesma regra de desafios-grupo.mjs (anoDaRetrospectiva) e de retrospectiva.js.
+  function anoDaRetrospectiva(hoje) {
+    const ano = Number(hoje.slice(0, 4));
+    if (hoje.slice(5, 7) === '12') return ano;
+    if (hoje.slice(5, 7) === '01' && Number(hoje.slice(8, 10)) <= 7) return ano - 1;
+    return 0;
   }
 
   // A folha da temporada: a abertura, o que se lê, quantos dias faltam e o selo.
@@ -182,9 +198,15 @@
   function calendario(raiz) {
     const lugar = raiz.querySelector('[data-calendario]');
     if (!lugar || lugar.childElementCount) return;
-    const cels = (CC.minhasCelulas ? CC.minhasCelulas() : []).filter((c) => c.calendario);
-    if (!cels.length) return;
-    lugar.innerHTML = CC.tituloSecao('Calendário da célula') + cels.map(cartaoCalendario).join('');
+    const todas = CC.minhasCelulas ? CC.minhasCelulas() : [];
+    const cels = todas.filter((c) => c.calendario);
+    // R3.4: em dezembro, o ano da célula (a tela da retrospectiva, só com números somados)
+    const anos = todas.filter((c) => c.anoDaCelula);
+    if (!cels.length && !anos.length) return;
+    lugar.innerHTML = (anos.length ? anos.map((c) => '<a class="cartao-calendario cartao-ano-celula" href="#/perfil/retrospectiva" data-entrada-ano-celula="' + CC.esc(c.id) + '">'
+      + '<small class="cabeca-calendario">Retrospectiva · ' + CC.esc(c.titulo) + '</small><h3>O ano da célula em ' + c.anoDaCelula.ano + '</h3>'
+      + '<p>Os números da célula no ano, somados, sem nomes.</p></a>').join('') : '')
+      + (cels.length ? CC.tituloSecao('Calendário da célula') + cels.map(cartaoCalendario).join('') : '');
   }
 
   CC.temporadas = { trilha, folha: folhaTemporada, pendentesDe, pertoDeFechar, conquistas, calendario };

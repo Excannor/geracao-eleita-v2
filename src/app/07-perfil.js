@@ -308,4 +308,7 @@
   // O editor mora na peça sob demanda "historia" (src/sob-demanda/historia.js): aqui fica a casca.
   CC.vistaHistoria = (raiz) => CC.cascaDaPeca(raiz, { peca: window.HISTORIA_TELA, pronta: () => CC.historiaTela,
     titulo: 'Minha história com Deus', voltar: 'Minhas anotações', rota: '#/perfil/historia' });
+  // R3.4: a retrospectiva de dezembro (peça "retrospectiva"); a entrada fica na Trilha e no Juntos
+  CC.vistaRetrospectiva = (raiz) => CC.cascaDaPeca(raiz, { peca: window.RETROSPECTIVA, pronta: () => CC.retrospectivaTela,
+    titulo: 'Seu ano na Palavra', voltar: 'Perfil', rota: '#/perfil/retrospectiva' });
 })(window.CC);

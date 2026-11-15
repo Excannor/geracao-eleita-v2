@@ -18,7 +18,7 @@ import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
 import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou, membroDeVerdade } from './cuidado.mjs';
-import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel, momentoDaCelula } from './desafios-grupo.mjs';
+import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel, momentoDaCelula, anoDaRetrospectiva, anoDaCelula } from './desafios-grupo.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -890,6 +890,18 @@ function calendarioDaCelula(referencia, estados) {
     ? estados.map((e) => ({ ...e, marcadoEm: Object.fromEntries(Object.entries(e.marcadoEm || {}).map(([k, d]) => [k, mover(d)])) })) : estados;
   return momentoDaCelula({ hoje: mover(referencia), estados: movidos, temporadas: APP.conteudo.temporadas || [], totalDias: PLANO_DO_CONTEUDO.length });
 }
+// R3.4: o ano da célula, de 1º de dezembro a 7 de janeiro (anoDaRetrospectiva), só somado e só com 3
+// pessoas ou mais (anoDaCelula). O mesmo deslocamento de datas do calendário vale nos testes.
+function retrospectivaDaCelula(p, referencia, estados) {
+  const mover = (d) => (DESLOCAR_CALENDARIO && DATA_VALIDA.test(d || '') ? somaDias(d, DESLOCAR_CALENDARIO) : d);
+  const hoje = mover(referencia);
+  const ano = anoDaRetrospectiva(hoje);
+  if (!ano) return null;
+  const movidos = DESLOCAR_CALENDARIO
+    ? estados.map((e) => ({ ...e, marcadoEm: Object.fromEntries(Object.entries(e.marcadoEm || {}).map(([k, d]) => [k, mover(d)])) })) : estados;
+  return anoDaCelula({ ano, ate: hoje.slice(0, 4) === String(ano) ? hoje : '', estados: movidos, plano: PLANO_DO_CONTEUDO,
+    temporadas: APP.conteudo.temporadas || [], encontros: (p.encontros || []).map((e) => mover(e && e.data)) });
+}
 
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
@@ -926,6 +938,7 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     // R3.3: o momento do calendário sazonal (janeiro, fevereiro, Semana Santa, setembro, novembro),
     // só com números somados da célula (os ativos, sem visitante): nunca quem leu ou quem faltou
     calendario: convidado ? null : calendarioDaCelula(referencia, ativos.map((m) => info.get(m.usuario).estado || {})),
+    anoDaCelula: convidado ? null : retrospectivaDaCelula(p, referencia, ativos.map((m) => info.get(m.usuario).estado || {})),
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.

@@ -51,3 +51,11 @@
 .cabeca-calendario { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
 .cartao-calendario .barra-temporada { background: var(--campo); }
 .conta-calendario, .chegou-calendario { color: var(--tinta-forte); font-weight: 700; }
+
+/* R3.4: as entradas da retrospectiva de dezembro */
+.folha-topo .cartao-retrospectiva {
+  display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 26px;
+  background: var(--folha-campo); color: var(--folha-tinta); text-decoration: none;
+}
+.folha-topo .cartao-retrospectiva > svg { flex: none; width: 20px; height: 20px; margin-left: auto; }
+.cartao-ano-celula { text-decoration: none; }

@@ -750,7 +750,7 @@
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
-      if (CC.minhasCelulas && CC.minhasCelulas().some((c) => c.calendario)) CC.pedirPeca(window.TEMPORADAS, () => !!CC.temporadas).then(() => CC.temporadas.calendario(raiz), () => {});
+      if (CC.minhasCelulas && CC.minhasCelulas().some((c) => c.calendario || c.anoDaCelula)) CC.pedirPeca(window.TEMPORADAS, () => !!CC.temporadas).then(() => CC.temporadas.calendario(raiz), () => {});
       ligar('[data-convidar]', () => CC.convidar());
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));

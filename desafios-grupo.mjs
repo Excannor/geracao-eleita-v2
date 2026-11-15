@@ -184,3 +184,57 @@ export function momentoDaCelula({ hoje, estados, temporadas, totalDias = 365 }) 
   return { id: m.id, titulo: m.titulo, tipo: m.tipo, texto: m.texto, selo: m.selo, inicio, fim, fase, diaDaJanela, diasDaJanela,
     pessoas, total, meta, chegou: meta > 0 && total >= meta };
 }
+
+// ---------- R3.4: a retrospectiva de dezembro (o ano da célula) ----------
+// A época: de 1º de dezembro a 7 de janeiro. Devolve o ano que a retrospectiva mostra (em janeiro,
+// o ano que acabou), ou 0 fora da época. O app tem a mesma regra (src/sob-demanda/retrospectiva.js).
+export const RETROSPECTIVA_ATE_JANEIRO = 7;
+export function anoDaRetrospectiva(hoje) {
+  if (!dataValida(hoje)) return 0;
+  const ano = Number(hoje.slice(0, 4));
+  if (hoje.slice(5, 7) === '12') return ano;
+  if (hoje.slice(5, 7) === '01' && Number(hoje.slice(8, 10)) <= RETROSPECTIVA_ATE_JANEIRO) return ano - 1;
+  return 0;
+}
+// Abaixo disso, os números somados quase dizem quanto cada um leu: a célula vê só o aviso.
+export const PESSOAS_MINIMAS_RETROSPECTIVA = 3;
+
+// O ano da célula, só com números somados (nunca de uma pessoa). estados: os membros que contam
+// (ativos, sem visitante), como estão hoje. plano: conteudo.plano (para os capítulos de cada dia).
+// encontros: as datas dos encontros registrados. ate: o último dia que conta (hoje, em dezembro).
+export function anoDaCelula({ ano, ate, estados, plano, temporadas, encontros = [] }) {
+  const pessoas = (estados || []).length;
+  if (!ano) return null;
+  if (pessoas < PESSOAS_MINIMAS_RETROSPECTIVA) return { ano, pessoas, poucos: true };
+  const doAno = (d) => dataValida(d) && d.slice(0, 4) === String(ano) && (!ate || d <= ate);
+  const capitulosDoDia = (n) => ((plano[n - 1] || {}).trechos || []).reduce((s, t) => s + (t.ate - t.de + 1), 0);
+  let diasLidos = 0;
+  let capitulos = 0;
+  let temporadasFechadas = 0;
+  for (const e of estados) {
+    const lidos = new Set(((e && e.lidos) || []).map(Number));
+    const marcado = (e && e.marcadoEm) || {};
+    for (const n of lidos) if (n >= 1 && n <= plano.length && doAno(marcado[n])) { diasLidos++; capitulos += capitulosDoDia(n); }
+    for (const t of temporadas || []) {
+      let ultima = '';
+      let fechada = true;
+      for (let n = t.de; n <= t.ate && fechada; n++) {
+        if (!lidos.has(n) || !dataValida(marcado[n])) fechada = false;
+        else if (marcado[n] > ultima) ultima = marcado[n];
+      }
+      if (fechada && doAno(ultima)) temporadasFechadas++;
+    }
+  }
+  // os momentos do calendário em que a célula bateu a meta neste ano
+  let metas = 0;
+  let momentos = 0;
+  for (const m of MOMENTOS) {
+    const j = janelaDoMomento(m.id, ano);
+    if (ate && j.inicio > ate) continue;
+    momentos++;
+    const r = momentoDaCelula({ hoje: ate && ate < j.fim ? ate : j.fim, estados, temporadas, totalDias: plano.length });
+    if (r && r.id === m.id && r.chegou) metas++;
+  }
+  const encontrosNoAno = new Set((encontros || []).filter(doAno)).size;
+  return { ano, pessoas, diasLidos, capitulos, temporadas: temporadasFechadas, encontros: encontrosNoAno, metas, momentos };
+}

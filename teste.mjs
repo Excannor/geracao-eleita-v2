@@ -404,6 +404,8 @@ secao('peças sob demanda');
     ['praticar', 'PRATICAR', 'para guardar versículos na memória', '', 'o Praticar'],
     // R3.1: o cartão e a folha da temporada (a conta e o selo ficam em 02b-jogo.js e 07-perfil.js)
     ['temporadas', 'TEMPORADAS', 'A temporada fecha quando todos forem lidos', '', 'as temporadas na Trilha'],
+    // R3.4: a retrospectiva de dezembro (a casca fica em 07-perfil.js)
+    ['retrospectiva', 'RETROSPECTIVA', 'Só você vê esta parte', '', 'a retrospectiva de dezembro'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -2015,6 +2017,42 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   checar(momentoDaCelula({ hoje: '2027-05-20', estados: [] }) === null, 'calendário: fora dos momentos, a célula não recebe nada');
 }
 
+// --- R3.4: a retrospectiva de dezembro ---
+{
+  const { anoDaRetrospectiva, anoDaCelula, PESSOAS_MINIMAS_RETROSPECTIVA } = await import('./desafios-grupo.mjs');
+  const ate = (n) => Array.from({ length: n }, (_, i) => i + 1);
+  const est = (dias, data) => ({ lidos: dias, marcadoEm: Object.fromEntries(dias.map((n) => [n, data])) });
+  checar(anoDaRetrospectiva('2026-12-01') === 2026 && anoDaRetrospectiva('2026-12-31') === 2026 && anoDaRetrospectiva('2027-01-07') === 2026
+    && anoDaRetrospectiva('2027-01-08') === 0 && anoDaRetrospectiva('2026-11-30') === 0, 'retrospectiva: a época vai de 1º de dezembro a 7 de janeiro (em janeiro, o ano que acabou)');
+  const base = { ano: 2026, ate: '2026-12-15', plano: D.plano, temporadas: D.temporadas };
+  const poucos = anoDaCelula({ ...base, estados: [est(ate(40), '2026-11-10'), est(ate(5), '2026-12-02')] });
+  checar(PESSOAS_MINIMAS_RETROSPECTIVA === 3 && poucos.poucos && poucos.pessoas === 2 && poucos.diasLidos === undefined,
+    'retrospectiva: com menos de 3 pessoas, a célula não recebe números (ninguém é reconhecido por eles)');
+  const ano = anoDaCelula({ ...base, encontros: ['2026-03-01', '2026-03-08', '2025-12-01', '2026-12-20'],
+    estados: [est(ate(40), '2026-11-10'), est(ate(5), '2026-12-02'), est(ate(10), '2025-12-20'), est(ate(20), '2026-12-16')] });
+  const capitulos = [...ate(40), ...ate(5)].reduce((s, n) => s + D.plano[n - 1].trechos.reduce((x, t) => x + t.ate - t.de + 1, 0), 0);
+  checar(ano.diasLidos === 45 && ano.capitulos === capitulos && ano.temporadas === 4 && ano.encontros === 2 && ano.pessoas === 4,
+    'retrospectiva: o ano da célula soma os dias do plano marcados no ano até hoje (45), os capítulos, as temporadas concluídas no ano (4) e os encontros do ano (2)');
+  checar(Object.keys(ano).sort().join() === 'ano,capitulos,diasLidos,encontros,metas,momentos,pessoas,temporadas', 'retrospectiva: o ano da célula leva só números somados');
+  checar(ano.momentos === 5 && ano.metas === 0 && anoDaCelula({ ...base, estados: [0, 1, 2].map(() => est(ate(30), '2026-11-05')) }).metas === 1,
+    'retrospectiva: as metas do calendário batidas no ano (novembro com 30 dias de cada um conta 1 de 5)');
+  // o ano da pessoa: contado no aparelho, só do estado dela (peça retrospectiva.js)
+  const doc = contexto.document;
+  contexto.document = { ...doc, querySelector: () => ({}) };
+  runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'retrospectiva.js'), 'utf8'), contexto, { filename: 'retrospectiva.js' });
+  contexto.document = doc;
+  const R = CC.retrospectiva;
+  // os dias 1 a 20 lidos na segunda a sexta de 2 semanas de março (10 datas), mais o dia 21 em 2025
+  const datas = ['2026-03-02', '2026-03-03', '2026-03-04', '2026-03-05', '2026-03-06', '2026-03-09', '2026-03-10', '2026-03-11', '2026-03-12', '2026-03-13'];
+  const meu = { ...CC.normalizarEstado({}), lidos: ate(21), marcadoEm: { ...Object.fromEntries(ate(20).map((n) => [n, datas[Math.floor((n - 1) / 2)]])), 21: '2025-12-30' }, diasComPalavra: ['2026-01-04', '2025-05-01'] };
+  const m = R.meuAno(2026, meu);
+  checar(m.diasComAPalavra === 11 && m.diasDoPlano === 20 && m.semanas === 2 && m.mes === 2 && m.diasNoMes === 10 && m.livros.join() === 'Gênesis' && m.temporadas.map((t) => t.numero).join() === '1,2',
+    'retrospectiva: o ano da pessoa (11 dias com a Palavra, 20 dias do plano, 2 semanas completas, março, Gênesis, temporadas 1 e 2)');
+  checar(R.anoDaRetrospectiva('2027-01-05') === 2026 && R.anoDaRetrospectiva('2026-11-15') === 0, 'retrospectiva: o app tem a mesma época do servidor');
+  const linhas = R.linhasMinhas(m).concat(R.linhasDaCelula(ano)).map(([v, r]) => v + ' ' + r).join(' | ');
+  checar(!/[—–!]|jornada|incrível|transforma|poderos|mergulh/i.test(linhas) && !/^0 /.test(linhas), 'retrospectiva: os textos dos números sem exagero e sem zeros (' + linhas.slice(0, 120) + '...)');
+}
+
 // --- R2.2b: o dia 0 (a primeira leitura curta, antes do dia 1 do plano) ---
 {
   const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
@@ -3075,6 +3113,11 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   checar(/<tr><td>Calendário da célula[^<]*<\/td><td>[^<]*só números somados da célula, sem nomes[^<]*Ninguém vê quanto você leu/.test(pol)
     && historico.indexOf('<b>Ajuste da versão 7, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 7,') < historico.indexOf('<b>Versão 7,'),
   'a política conta o calendário da célula (números somados, sem nomes), num ajuste da versão 7');
+  // R3.4: a retrospectiva: o ano da pessoa só para ela; o da célula somado e com 3 pessoas ou mais
+  checar(/<tr><td>Retrospectiva de dezembro: "Seu ano na Palavra"<\/td><td>Só você\./.test(pol)
+    && /<tr><td>Retrospectiva de dezembro: "O ano da célula"<\/td><td>[^<]*só números somados da célula, sem nomes[^<]*Com menos de 3 pessoas/.test(pol)
+    && historico.indexOf('<b>Segundo ajuste da versão 7, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Segundo ajuste da versão 7,') < historico.indexOf('<b>Ajuste da versão 7,'),
+  'a política conta a retrospectiva (o seu ano só para você; o da célula somado, com 3 pessoas ou mais), num segundo ajuste da versão 7');
   checar(historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
     && historico.indexOf('<b>Ajuste da versão 6, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 6,') < historico.indexOf('<b>Versão 6,')
     && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a versão 6 e o ajuste de 15 de novembro (dias com a Palavra) seguem no histórico, abaixo da 7');

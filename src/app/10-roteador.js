@@ -433,6 +433,7 @@
     // as duas telas antigas viraram Minhas anotações; os atalhos guardados continuam valendo
     escritos: () => CC.substituirRota('#/perfil/anotacoes'), versiculos: () => CC.substituirRota('#/perfil/anotacoes'),
     historia: CC.vistaHistoria,
+    retrospectiva: CC.vistaRetrospectiva,
   });
 
   // ---------- o caminho percorrido, para o botão de voltar dizer a verdade ----------
