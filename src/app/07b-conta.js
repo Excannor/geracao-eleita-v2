@@ -111,7 +111,7 @@
       const certo = await CC.confirmar({
         titulo: 'Recomeçar a trilha do zero?',
         texto: 'Apaga, em todos os aparelhos, as leituras marcadas do plano, os primeiros passos, os dias do Conhecer Jesus, a ofensiva, o XP, as conquistas, os baús, os desafios do dia e a prática. '
-          + 'Ficam sua foto e seu nome, as reflexões, anotações e notas, as marcações nos versículos, a Minha história com Deus, os desafios de vários dias, os amigos e a célula.',
+          + 'Ficam sua foto e seu nome, os dias com a Palavra, as reflexões, anotações e notas, as marcações nos versículos, a Minha história com Deus, os desafios de vários dias, os amigos e a célula.',
         acao: 'Zerar a trilha',
         perigo: true,
       });

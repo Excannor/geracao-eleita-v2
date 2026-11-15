@@ -816,6 +816,25 @@ checar(s.atual === 3 && s.protegidos.length === 2, 'o escudo do mês novo entra 
 s = CC.sequencia({ 1: '2026-03-01', 2: '2026-03-01', 3: '2026-03-02' }, '2026-03-02');
 checar(s.atual === 2, 'ler dois dias do plano de uma vez não infla a ofensiva');
 
+// --- R1.1: dias com a Palavra (o total da vida, que nunca cai) ---
+{
+  const e = { marcadoEm: { 1: '2026-03-01', 2: '2026-03-01', 3: '2026-03-02', 9: '2026-03-20' }, origens: { 3: 'papel' },
+    licoesEm: { a: '2026-02-27' }, conhecidos: { 1: '2026-03-02' } };
+  checar(CC.diasComAPalavra(e) === 4, 'dias com a Palavra: conta cada data com leitura (app, papel, primeiro passo, Conhecer), sem contar duas vezes a mesma data');
+  checar(CC.simularOfensiva(CC.datasFeitas(e), '2026-03-25').atual === 0 && CC.diasComAPalavra(e) === 4, 'dias com a Palavra: a chama apagou e o total não caiu');
+  checar(CC.diasComAPalavra({ ...e, diasComPalavra: ['2026-01-05', '2026-03-01'] }) === 5, 'dias com a Palavra: soma as datas guardadas no Zerar, sem repetir as de agora');
+  checar(CC.diasComAPalavra({}) === 0, 'dias com a Palavra: estado vazio dá zero');
+  checar(CC.textoDiasComAPalavra(1) === '1 dia com a Palavra' && CC.textoDiasComAPalavra(12) === '12 dias com a Palavra', 'dias com a Palavra: o texto no singular e no plural');
+  const n = CC.normalizarEstado({ atualizadoEm: 1, diasComPalavra: ['2026-03-02', 'x', 5, '2026-03-01', '2026-03-02', '2026-3-1'] });
+  checar(JSON.stringify(n.diasComPalavra) === '["2026-03-01","2026-03-02"]', 'dias com a Palavra: o estado guarda só datas ISO, sem repetir e em ordem');
+  checar(!CC.PROGRESSO_DA_TRILHA.includes('diasComPalavra'), 'dias com a Palavra: as datas guardadas ficam fora do andamento que o Zerar apaga');
+  const f = CC.fundir({ atualizadoEm: 1, diasComPalavra: ['2026-01-02'] }, { atualizadoEm: 2, diasComPalavra: ['2026-01-01', '2026-01-02'] });
+  checar(JSON.stringify(f.diasComPalavra) === '["2026-01-01","2026-01-02"]', 'dias com a Palavra: a fusão entre aparelhos une as datas guardadas');
+  const z = CC.fundir({ atualizadoEm: 1, diasComPalavra: ['2026-01-02'], marcadoEm: { 1: '2026-01-03' }, lidos: [1] },
+    { atualizadoEm: 9, zeradoEm: 9, diasComPalavra: ['2026-01-03'], marcadoEm: {}, lidos: [] });
+  checar(!z.lidos.length && JSON.stringify(z.diasComPalavra) === '["2026-01-02","2026-01-03"]', 'dias com a Palavra: a fusão com um aparelho zerado zera a trilha e mantém as datas guardadas');
+}
+
 // --- XP ---
 checar(CC.XP_REGISTRO === undefined, 'escrever não tem valor em XP');
 checar(typeof CC.trechosDaTrilha === 'function', 'o leitor separa as trilhas');
@@ -905,6 +924,8 @@ checar(CC.fundir(zerado, { ...celular, atualizadoEm: 300 }).lidos.length === 3, 
   checar(z.foto === antes.foto && z.apelido === 'Ana' && z.anotacoes['verso:João 3.16'] === 'minha nota' && z.oia[1].oracao === 'oração'
     && z.historia.antes === 'antes' && z.marcas['João 3:16'].cor === 2 && Object.keys(z.oradoEm).length === 1 && z.desafios.semRedes.ativo,
   'zerar mantém foto, nome, anotações, reflexões, Minha história, marca-texto, orações marcadas e desafios');
+  const vidaAntes = CC.diasComAPalavra(antes);
+  checar(vidaAntes > 0 && CC.diasComAPalavra(z) === vidaAntes, 'zerar não apaga os dias com a Palavra (' + vidaAntes + ' antes, ' + CC.diasComAPalavra(z) + ' depois)');
   // outro aparelho, que ainda não sabia do zeramento, sincroniza depois: não traz a trilha de
   // volta, mas o que ele tinha escrito continua
   const outro = { ...antes, atualizadoEm: z.zeradoEm - 10, anotacoes: { ...antes.anotacoes, 'nota:y': 'escrita no outro' }, foto: antes.foto };
@@ -2735,8 +2756,9 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 6 · atualizada em 9 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
-    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a política está na versão 6 (9 de novembro), a mais nova no histórico');
+  checar(/<p class="atualizada">Versão 6 · atualizada em 15 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Ajuste da versão 6, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 6,') < historico.indexOf('<b>Versão 6,')
+    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a política está na versão 6, com o ajuste de 15 de novembro (dias com a Palavra) no alto do histórico');
   checar(/<tr><td>Se leu hoje<\/td><td>[^<]*visitantes da célula veem só quantas pessoas leram, sem nomes/.test(pol)
     && /<tr><td>Etapa de Minha caminhada<\/td><td>[^<]*só se você ligar "Quem conduz a minha célula vê"/.test(pol),
     'o quadro de quem vê: a visitante vê só o número de quem leu, e a etapa de Minha caminhada só vai para quem conduz se a pessoa ligar');
@@ -3676,10 +3698,16 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     const agoraZ = Date.now() + 4000;
     const zeradoSrv = { ...cheio, atualizadoEm: agoraZ, zeradoEm: agoraZ };
     for (const campo of CC.PROGRESSO_DA_TRILHA) zeradoSrv[campo] = { ...CC.normalizarEstado({}), xpLegado: 0 }[campo];
+    // R1.1: o aparelho que zera guarda as datas lidas em diasComPalavra; uma data que o servidor
+    // nunca viu, fora da janela de atraso, não entra (ninguém inventa anos de leitura assim)
+    const datasCheio = [...CC.datasFeitas(cheio)];
+    zeradoSrv.diasComPalavra = [...datasCheio, '2020-01-01'];
     checar(cheio.lidos.length === 1 && cheio.acertosTotal === 40 && (await pedir('/api/estado', zeradoSrv, ana, 'PUT')).status === 200, 'o dono zera a trilha');
     const depoisZ = await (await pedir('/api/estado', null, ana)).json();
     checar(!depoisZ.lidos.length && !Object.keys(depoisZ.marcadoEm).length && depoisZ.acertosTotal === 0 && depoisZ.xpLegado === 0,
       'no servidor, zerar recomeça leituras, ofensiva e contadores');
+    checar(datasCheio.length === 1 && JSON.stringify(depoisZ.diasComPalavra) === JSON.stringify(datasCheio) && CC.diasComAPalavra(depoisZ) === 1,
+      'no servidor, zerar mantém os dias com a Palavra que ele conhecia, e recusa a data inventada (' + JSON.stringify(depoisZ.diasComPalavra) + ')');
     checar(depoisZ.foto === FOTO && depoisZ.notas['e:nota:y'].texto === 'SEGREDO-NOVA' && depoisZ.oia[1].o === 'SEGREDO-OIA-ANA' && depoisZ.historia.antes === 'SEGREDO-HISTORIA-ANA',
       'no servidor, zerar mantém a foto, as anotações, as reflexões e a Minha história');
     checar(!/SEGREDO/.test(bancoBruto()), 'e o que ficou continua cifrado no banco');

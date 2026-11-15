@@ -1,6 +1,7 @@
 /* A tela do dia lido (dia-lido.js). */
 .dia-lido .linha-chama { margin: 0; color: var(--tinta); font-weight: 700; }
 .dia-lido .linha-chama .numero-ofensiva { display: inline; font-size: 1.5rem; }
+.dia-lido .linha-vida-dia { margin: 2px 0 0; color: var(--tinta-fraca); font-size: .875rem; font-weight: 600; }
 .dia-lido .compartilhar-chama { width: auto; margin-top: 10px; }
 .dia-lido .titulo-guardar { margin: 4px 0 10px; font-size: 1.125rem; }
 .bau-do-dia { text-align: left; display: flex; align-items: center; gap: 14px; width: 100%; margin: 0 0 16px; padding: 14px 18px; border: 0; border-radius: var(--raio-cartao); background: var(--cartao); color: var(--tinta); font: inherit; text-align: left; }

@@ -174,7 +174,9 @@ function limparPerfilDoEstado(e) {
 //   - leitura nova com mais de 7 dias de atraso conta como hoje: quem ficou uma semana sem
 //     rede sincroniza normal; quem inventa um ano de leitura de uma vez não ganha um ano de ofensiva;
 //   - data já gravada não é trocada por uma mais antiga que isso;
-//   - contadores sobem no máximo um tanto por sincronização.
+//   - contadores sobem no máximo um tanto por sincronização;
+//   - as datas guardadas no "Zerar" para os dias com a Palavra (R1.1) só entram se o servidor já
+//     as conhecia (lidas ou guardadas antes) ou se estão dentro da mesma janela de atraso.
 const DIAS_DE_ATRASO = 7;
 const SUBIDA_MAXIMA = { acertosTotal: 500, missoesTotal: 30, maiorProposito: 30 };
 const DATA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
@@ -193,6 +195,8 @@ function conferirProgresso(atual, junto, hoje) {
     }
     junto[campo] = mapa;
   }
+  const conhecidas = new Set([...(atual ? datasFeitas(atual) : []), ...((atual && atual.diasComPalavra) || [])]);
+  junto.diasComPalavra = (junto.diasComPalavra || []).filter((d) => conhecidas.has(d) || (d >= limite && d <= amanha));
   // "Zerar progresso" que acabou de chegar: os contadores recomeçam do zero com a trilha.
   const zerouAgora = !!atual && (junto.zeradoEm || 0) > (atual.zeradoEm || 0);
   for (const [campo, maximo] of Object.entries(SUBIDA_MAXIMA)) {

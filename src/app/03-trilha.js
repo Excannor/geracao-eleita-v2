@@ -368,18 +368,21 @@
         + '<span class="textos-ler"><b>' + (lidas ? 'Continuar' : 'Ler hoje') + '</b>'
         + '<span>' + refHtml(passagemDe(dia)) + '</span><span>cerca de ' + minutos + ' min' + (total > 1 && lidas ? ' · ' + lidas + ' de ' + total + ' lidas' : '') + '</span></span>'
         + CC.ico('avancar') + '</button>';
-    // A chama: com a ofensiva em zero, o cartão mostra o que não se perdeu (o recorde ou os dias
-    // lidos), e não um zero grande.
-    const zerada = seq.atual === 0 && (seq.recorde > 0 || CC.ler('lidos', []).length > 0);
+    // A chama: com a ofensiva em zero, o cartão mostra o que não se perdeu, os dias com a Palavra
+    // (R1.1: o total da vida, app e papel), e não um zero grande. Com a chama acesa, o total vem
+    // numa linha menor embaixo, quando já passa da sequência de agora.
+    const vida = CC.diasComAPalavra();
+    const zerada = seq.atual === 0 && vida > 0;
     const chama = zerada
-      ? '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.esc(seq.recorde ? 'Seu recorde: ' + CC.plural(seq.recorde, 'dia seguido', 'dias seguidos') : CC.plural(CC.ler('lidos', []).length, 'dia lido', 'dias lidos')) + '. Abrir a chama">'
-        + '<span class="textos-salvia"><b>' + (seq.recorde ? CC.plural(seq.recorde, 'dia', 'dias') : CC.plural(CC.ler('lidos', []).length, 'dia', 'dias')) + '</b>'
-        + '<span>' + (seq.recorde ? 'seu recorde' : 'lidos até aqui') + '</span></span>'
+      ? '<button class="cartao-salvia" data-ofensiva data-dias-palavra="' + vida + '" aria-label="' + CC.esc(CC.textoDiasComAPalavra(vida)) + '. Abrir a chama">'
+        + '<span class="textos-salvia"><b>' + CC.plural(vida, 'dia', 'dias') + '</b>'
+        + '<span>com a Palavra</span></span>'
         + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(0) + '</span></button>'
       : '<button class="cartao-salvia" data-ofensiva aria-label="' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + ' com a chama acesa, '
-        + CC.esc(CC.estagioDaChama(seq.atual).nome) + '">'
+        + CC.esc(CC.estagioDaChama(seq.atual).nome) + (vida > seq.atual ? '. ' + CC.esc(CC.textoDiasComAPalavra(vida)) : '') + '">'
         + '<span class="textos-salvia"><b' + (subiu ? ' class="subiu"' : '') + '>' + CC.plural(seq.atual, 'dia', 'dias') + '</b>'
-        + '<span>' + (seq.atual === 0 ? 'Leia hoje para acender' : seq.atual === 1 ? 'de chama acesa' : 'seguidos de chama acesa') + '</span></span>'
+        + '<span>' + (seq.atual === 0 ? 'Leia hoje para acender' : seq.atual === 1 ? 'de chama acesa' : 'seguidos de chama acesa') + '</span>'
+        + (vida > seq.atual ? '<small class="vida-salvia" data-dias-palavra="' + vida + '">' + CC.esc(CC.textoDiasComAPalavra(vida)) + '</small>' : '') + '</span>'
         + '<span class="redondo-preto" aria-hidden="true">' + CC.icoChama(seq.atual) + '</span></button>';
     const cartoes = leitura + '<div class="cartoes-hoje leitura-hoje">' + chama + '</div>';
 

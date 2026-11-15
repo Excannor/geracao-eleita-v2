@@ -151,6 +151,8 @@
         + '<h1 class="rotulo-ofensiva">' + (ganhou ? 'Dia ' + sessao.dia + ' lido' : 'Revisão do dia ' + sessao.dia) + '</h1>'
         + '<p class="linha-chama"><b class="numero-ofensiva" data-de="' + (subiuHoje ? ofensivaAntes : seq.atual) + '">' + (subiuHoje ? ofensivaAntes : seq.atual) + '</b> '
         + '<span>' + (seq.atual === 1 ? 'dia seguido com a chama acesa' : 'dias seguidos com a chama acesa') + '</span></p>'
+        // R1.1: o total da vida, quando já passa da sequência de agora (quem voltou de uma falta)
+        + (CC.diasComAPalavra() > seq.atual ? '<p class="linha-vida-dia" data-dias-palavra="' + CC.diasComAPalavra() + '">' + CC.esc(CC.textoDiasComAPalavra(CC.diasComAPalavra())) + '</p>' : '')
         + '<p class="passo-dica">' + nb(CC.esc(CC.passagemDe(dia))) + (papel ? ' · lido na sua Bíblia' : '') + '</p>'
         + (ganhou ? faixaDaSemana() : '')
         + '<button class="botao contorno pequeno compartilhar-chama" data-compartilhar>' + CC.ico('compartilhar') + 'Story da chama</button>'

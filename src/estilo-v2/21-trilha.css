@@ -430,6 +430,16 @@
    e os dois ficam com o mesmo raio. */
 .folha .linha-escudos, .folha .linha-recorde { border-radius: 20px; }
 .folha .linha-recorde { align-items: center; min-height: 52px; padding: 0 16px; background: var(--campo); font-weight: 600; }
+/* R1.1: os dias com a Palavra (o total da vida, que nunca cai), abaixo do recorde, no cartão da
+   chama do Início e em destaque na folha de volta depois de uma falta */
+.folha .linha-vida { gap: 12px; padding: 8px 16px; }
+.folha .linha-vida small { display: block; margin-top: 2px; color: var(--tinta-fraca); font-size: .75rem; font-weight: 500; }
+.folha .linha-vida b { flex: none; }
+.chama-grande[data-dias-palavra] b { color: var(--tinta-forte); }
+.textos-salvia .vida-salvia { font-size: .75rem; font-weight: 600; line-height: 1.2; opacity: .78; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.recomeco .vida-grande { display: grid; justify-items: center; margin: 0; }
+.recomeco .vida-grande b { color: var(--tinta-forte); font-size: 2.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.recomeco .vida-grande span { font-weight: 700; }
 
 /* ---------- o painel do Mais: nas margens do conteúdo, com folga até a barra ---------- */
 @media (max-width: 859px) {

@@ -179,9 +179,15 @@
     const amigos = (CC.amigosEmCache() || {}).amigos || [];
 
     const lema = CC.fraseDaOfensiva();
+    // R1.1: com a chama em zero, o número grande é o dos dias com a Palavra, que nunca cai
+    const vida = CC.diasComAPalavra();
+    const grande = seq.atual === 0 && vida > 0
+      ? '<div class="chama-grande apagada" data-dias-palavra="' + vida + '">' + CC.icoChama(0) + '<b>' + vida + '</b>'
+        + '<span>' + (vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra') + '</span></div>'
+      : '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
+        + '<span>' + (seq.atual === 1 ? 'dia seguido' : 'dias seguidos') + (seq.atual ? '!' : '') + '</span></div>';
     CC.folha('<div class="folha-ofensiva">'
-      + '<div class="chama-grande' + (seq.atual ? '' : ' apagada') + '">' + CC.icoChama(seq.atual) + '<b>' + seq.atual + '</b>'
-      + '<span>' + (seq.atual === 1 ? 'dia seguido' : 'dias seguidos') + (seq.atual ? '!' : '') + '</span></div>'
+      + grande
       // O carimbo vem logo abaixo da contagem, na arte do onboarding: uma frase sorteada
       // (CC.FRASES_OFENSIVA), com a referência em cima quando é versículo, como no portal.
       // Só o carimbo, sem texto corrido embaixo: o dono quer a frase sozinha, motivando.
@@ -196,6 +202,7 @@
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
       + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
+      + (vida && seq.atual ? '<p class="linha-recorde linha-vida" data-dias-palavra="' + vida + '"><span>Dias com a Palavra<small>No app ou na sua Bíblia. Nunca volta a zero.</small></span><b>' + CC.plural(vida, 'dia', 'dias') + '</b></p>' : '')
       + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">Seu recorde guarda até onde você já chegou. Até aqui o Senhor nos ajudou! (1Sm 7.12)</p>' : '')
       + (amigos.length
         ? '<span class="etiqueta">Lendo junto</span><div class="lista-proposito">'
@@ -658,9 +665,12 @@
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
       gravarLocal('cc.aviso.zerou', dono + ':' + seq.zerouEm);
+      // R1.1: o número em destaque é o dos dias com a Palavra (o total da vida), nunca um zero
+      const vida = CC.diasComAPalavra();
       CC.folha('<div class="recomeco">' + CC.icoChama(0) + '<h2>Ainda tem brasa</h2>'
-        + '<p>O que você leu não se perdeu: tudo continua aqui, e o seu recorde de '
-        + CC.plural(seq.recorde, 'dia', 'dias') + ' também. Hoje é um novo dia para acender de novo.</p></div>'
+        + (vida ? '<p class="vida-grande" data-dias-palavra="' + vida + '"><b>' + vida + '</b><span>' + (vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra') + '</span></p>' : '')
+        + '<p>Perder um dia não é perder a Palavra. Tudo o que você leu continua aqui, e o seu recorde de '
+        + CC.plural(seq.recorde, 'dia', 'dias') + ' também. Hoje é um bom dia para acender de novo.</p></div>'
         + '<div class="acoes"><button class="botao" data-ler>Reavivar hoje</button>'
         + '<button class="botao plano" data-fechar>Agora não</button></div>',
       {

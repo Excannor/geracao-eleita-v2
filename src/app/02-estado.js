@@ -63,6 +63,10 @@
     // As cartas do baú e de outras fontes (docs/cartas.md): o livro-caixa de eventos (cada um, uma
     // cópia). Ficam fora do PROGRESSO_DA_TRILHA: o "Zerar" não as apaga.
     cartas: { eventos: {} },
+    // "Dias com a Palavra" (R1.1): as datas lidas que o "Zerar" guardou antes de apagar a trilha.
+    // O contador soma estas com as datas de agora (CC.diasComAPalavra) e nunca volta a zero.
+    // Fica fora do PROGRESSO_DA_TRILHA, e a fusão une os dois lados.
+    diasComPalavra: [],
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -367,6 +371,7 @@
       desafios: fundirDesafios(a.desafios, b.desafios),
       notas: fundirNotas(a.notas, b.notas),
       cartas: fundirCartas(a.cartas, b.cartas),
+      diasComPalavra: limparDatas(uniao(a.diasComPalavra, b.diasComPalavra)),
     };
   }
   function fundirPratica(a, b) {
@@ -392,6 +397,14 @@
     return saida;
   }
 
+  // Só datas ISO (AAAA-MM-DD), sem repetir, em ordem. O teto (uns 55 anos de leitura diária)
+  // só existe para um corpo forjado não inchar o arquivo da conta.
+  const DATA_ISO = /^\d{4}-\d{2}-\d{2}$/;
+  function limparDatas(x) {
+    if (!Array.isArray(x)) return [];
+    return [...new Set(x.filter((d) => typeof d === 'string' && DATA_ISO.test(d)))].sort().slice(-20000);
+  }
+
   // Estados gravados num formato antigo guardavam as lições em "trilha" e tinham meta e protetor.
   function normalizar(bruto) {
     if (!bruto || typeof bruto !== 'object' || bruto.vazio) return null;
@@ -403,6 +416,7 @@
     e.lidos = (e.lidos || []).map(Number).filter((n) => n >= 1 && n <= D.plano.length);
     e.origens = limparOrigens(e.origens, e.lidos);
     e.cartas = limparCartas(e.cartas);
+    e.diasComPalavra = limparDatas(e.diasComPalavra);
     return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
@@ -666,6 +680,19 @@
     return r;
   };
 
+  // "N dias com a Palavra" (R1.1, docs/fases/r1-chama-que-perdoa.md): o total da vida. Conta
+  // cada data do calendário em que houve leitura: dia do plano lido no app ou marcado como "Li na
+  // minha Bíblia", primeiro passo ou dia do Conhecer Jesus (as mesmas datas da chama). Ler três
+  // dias do plano na mesma data conta um dia. Não cai com falta, e nem o "Zerar" o apaga: as
+  // datas de antes ficam em diasComPalavra.
+  CC.diasComAPalavra = (estado) => {
+    const e = estado || E;
+    const s = CC.datasFeitas(e);
+    for (const d of e.diasComPalavra || []) s.add(d);
+    return s.size;
+  };
+  CC.textoDiasComAPalavra = (n) => (n === 1 ? '1 dia com a Palavra' : n + ' dias com a Palavra');
+
   // Recebe as datas por parâmetro para poder ser exercitada por teste.
   CC.sequencia = function (marcadas, referencia) {
     const datas = marcadas ? new Set(Object.values(marcadas)) : CC.datasFeitas();
@@ -844,6 +871,7 @@
     L.push('## Progresso', '');
     L.push('- Dias lidos: ' + E.lidos.length + ' de ' + D.plano.length);
     L.push('- Ofensiva atual: ' + seq.atual + ' · recorde: ' + seq.recorde);
+    L.push('- Dias com a Palavra: ' + CC.diasComAPalavra());
     L.push('- Primeiros passos: ' + E.licoes.length + ' de ' + D.licoes.length);
     L.push('- Livros concluídos: ' + CC.livrosCompletos() + ' de ' + CC.totalLivros, '');
 
@@ -905,6 +933,8 @@
     const agora = Date.now();
     const limpo = { ...VAZIO(), xpLegado: 0 };
     const mantido = { ...E };
+    // o "dias com a Palavra" não zera: as datas lidas até aqui ficam guardadas
+    mantido.diasComPalavra = limparDatas([...(E.diasComPalavra || []), ...CC.datasFeitas(E)]);
     for (const campo of PROGRESSO_DA_TRILHA) mantido[campo] = limpo[campo];
     E = { ...mantido, atualizadoEm: agora, zeradoEm: agora };
     localGravar();
