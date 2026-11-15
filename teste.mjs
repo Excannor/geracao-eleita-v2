@@ -46,6 +46,40 @@ checar(D.unidades.length === 12, 'há 12 unidades');
 checar(D.unidades[0].de === 1 && D.unidades[D.unidades.length - 1].ate === 365, 'as unidades cobrem do dia 1 ao 365');
 checar(D.unidades.every((u, i) => i === 0 || u.de === D.unidades[i - 1].ate + 1),
   'as unidades cobrem os dias sem buraco nem sobreposição');
+// As temporadas (R3.0): 36 trechos por cima do plano, sem mudar nenhum dia.
+{
+  const { montarTemporadas, conferirTemporadas, PALAVRAS_PROIBIDAS } = await import('./ferramentas/temporadas.mjs');
+  const T = D.temporadas || [];
+  checar(T.length === 36, 'há 36 temporadas (' + T.length + ')');
+  checar(T.every((t, i) => t.numero === i + 1), 'as temporadas estão numeradas de 1 a 36, em ordem');
+  checar(T.length && T[0].de === 1 && T[T.length - 1].ate === 365, 'as temporadas cobrem do dia 1 ao 365');
+  checar(T.every((t, i) => i === 0 || t.de === T[i - 1].ate + 1), 'as temporadas cobrem os dias sem buraco nem sobreposição');
+  const tamanhos = T.map((t) => t.ate - t.de + 1);
+  checar(tamanhos.every((n) => n >= 7 && n <= 21), 'toda temporada tem de 7 a 21 dias (de ' + Math.min(...tamanhos) + ' a ' + Math.max(...tamanhos) + ')');
+  const unidadeDe = (dia) => D.unidades.find((u) => u.de <= dia && dia <= u.ate);
+  checar(T.every((t) => unidadeDe(t.de) === unidadeDe(t.ate) && unidadeDe(t.de).numero === t.unidade), 'nenhuma temporada cruza unidade');
+  checar(D.unidades.every((u) => T.filter((t) => t.unidade === u.numero).length === 3), 'cada unidade tem 3 temporadas');
+  checar(D.unidades.every((u) => T.some((t) => t.ate === u.ate)), 'a última temporada de cada unidade termina no dia do troféu');
+  checar(T.every((t) => t.cor === unidadeDe(t.de).cor), 'cada temporada tem a cor da sua unidade');
+  checar(!conferirTemporadas(T, D).length, 'a conferência das temporadas não acha problema');
+  checar(JSON.stringify(montarTemporadas(D)) === JSON.stringify(T), 'temporadas[] do conteudo.json é o que ferramentas/temporadas.mjs gera');
+  checar(T.every((t) => t.titulo && t.abertura && t.chegada && t.selo && t.simbolo && t.antigo), 'toda temporada tem nome, abertura, chegada, selo, símbolo e trecho');
+  checar(new Set(T.map((t) => t.titulo)).size === 36 && new Set(T.map((t) => t.selo)).size === 36, 'nomes e selos não se repetem');
+  checar(T.every((t) => t.titulo.length <= 24 && t.selo.length <= 24), 'nomes e selos são curtos (até 24 caracteres)');
+  // O tom pedido pelo dono: uma frase só, calma, sem travessão, sem exclamação e sem exagero.
+  const frases = T.flatMap((t) => [t.abertura, t.chegada]);
+  checar(T.every((t) => t.abertura.startsWith('Nesta temporada você lê')), 'toda abertura diz o que se lê ("Nesta temporada você lê")');
+  checar(T.every((t) => t.chegada.startsWith('Você terminou')), 'toda chegada diz o que a pessoa terminou');
+  checar(T.every((t) => (t.abertura.match(/[.!?]/g) || []).length === 1 && t.abertura.endsWith('.')), 'toda abertura é uma frase só');
+  checar(T.every((t) => (t.chegada.match(/[.!?]/g) || []).length <= 2), 'toda chegada tem no máximo duas frases curtas');
+  checar(frases.every((f) => f.length <= 140), 'aberturas e chegadas com até 140 caracteres');
+  const todos = T.flatMap((t) => [t.titulo, t.abertura, t.chegada, t.selo]);
+  checar(todos.every((s) => !/[—–!]/.test(s)), 'os textos das temporadas não têm travessão nem exclamação');
+  const proibidas = todos.filter((s) => PALAVRAS_PROIBIDAS.some((p) => s.toLowerCase().includes(p)));
+  checar(!proibidas.length, 'os textos das temporadas não têm palavras de exagero' + (proibidas.length ? ' (' + proibidas[0] + ')' : ''));
+  const cartas = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'cartas', 'indice.json'), 'utf8')).cartas.map((c) => (c.nome || '').toLowerCase());
+  checar(T.every((t) => !cartas.includes(t.selo.toLowerCase())), 'nenhum selo tem o nome de uma carta do álbum');
+}
 checar(D.licoes.length === 12 && D.licoes.every((id) => D.notas[id]), 'os 12 primeiros passos apontam para notas que existem');
 checar(Object.keys(D.notas).length > 500, 'as notas do material vieram inteiras');
 checar(D.plano.every((d) => d.antigo || d.novo), 'todo dia tem ao menos uma passagem');

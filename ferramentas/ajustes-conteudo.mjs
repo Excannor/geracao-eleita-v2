@@ -11,6 +11,7 @@ import { aplicarPrimeirosPassos } from './primeiros-passos.mjs';
 import { aplicarPessoas } from './reescrita-pessoas.mjs';
 import { aplicarExplorar } from './reescrita-explorar.mjs';
 import { aplicarReflexoes } from './reflexoes.mjs';
+import { aplicarTemporadas } from './temporadas.mjs';
 import { aplicarTextoDosVersiculos } from './versiculos-explorar.mjs';
 
 export const AJUSTES = [
@@ -172,7 +173,9 @@ export function aplicarAjustes(dados) {
   const versiculos = aplicarTextoDosVersiculos(dados);
   // As reflexões do dia: escritas sobre a passagem, no lugar das perguntas por gênero.
   const reflexoes = aplicarReflexoes(dados);
-  return { aplicados, pendentes: pendentes.concat(passos.faltando, pessoas.faltando, limpeza.faltando, explorar.faltando, versiculos.semTexto), reescritas: limpeza.reescritas, versiculos: versiculos.trocadas, licoes: passos.trocadas, pessoas: pessoas.trocadas, pessoasSemReescrita: pessoas.semReescrita, explorar: explorar.trocadas, explorarDesatualizadas: explorar.desatualizadas, reflexoes };
+  // As temporadas (R3): nomes e frases por cima do plano, refeitas a cada importação.
+  const temporadas = aplicarTemporadas(dados);
+  return { aplicados, pendentes: pendentes.concat(passos.faltando, pessoas.faltando, limpeza.faltando, explorar.faltando, versiculos.semTexto), reescritas: limpeza.reescritas, versiculos: versiculos.trocadas, licoes: passos.trocadas, pessoas: pessoas.trocadas, pessoasSemReescrita: pessoas.semReescrita, explorar: explorar.trocadas, explorarDesatualizadas: explorar.desatualizadas, reflexoes, temporadas };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
