@@ -2959,9 +2959,13 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 6 · atualizada em 15 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
+  checar(/<p class="atualizada">Versão 7 · atualizada em 15 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 7, 15 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Versão 7,') < historico.indexOf('<b>Ajuste da versão 6,'), 'a política está na versão 7 (15 de novembro, o "leu hoje" que a pessoa tira da célula), a mais nova no histórico');
+  checar(/<tr><td>Se leu hoje<\/td><td>[^<]*"Mostrar na célula se eu li hoje"[^<]*quem conduz a célula continua vendo/.test(pol),
+    'o quadro de quem vê: o "leu hoje" sai da célula se a pessoa desligar, e quem conduz continua vendo');
+  checar(historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
     && historico.indexOf('<b>Ajuste da versão 6, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 6,') < historico.indexOf('<b>Versão 6,')
-    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a política está na versão 6, com o ajuste de 15 de novembro (dias com a Palavra) no alto do histórico');
+    && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a versão 6 e o ajuste de 15 de novembro (dias com a Palavra) seguem no histórico, abaixo da 7');
   checar(/<tr><td>Se leu hoje<\/td><td>[^<]*visitantes da célula veem só quantas pessoas leram, sem nomes/.test(pol)
     && /<tr><td>Etapa de Minha caminhada<\/td><td>[^<]*só se você ligar "Quem conduz a minha célula vê"/.test(pol),
     'o quadro de quem vê: a visitante vê só o número de quem leu, e a etapa de Minha caminhada só vai para quem conduz se a pessoa ligar');

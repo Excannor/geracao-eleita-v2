@@ -213,6 +213,27 @@ try {
   ok(daVisita.membros.filter((m) => m.usuario !== 'visita2n1').every((m) => m.fezHoje === null && m.extraHoje === false)
     && Number.isInteger(daVisita.leramHoje) && daVisita.pessoasHoje === 20, 'a visitante não recebe o "leu hoje" de cada um, só a conta pronta (' + daVisita.leramHoje + ' de ' + daVisita.pessoasHoje + ')');
   ok(retratoComVisitante.membros.every((m) => typeof m.fezHoje === 'boolean') && !('leramHoje' in retratoComVisitante), 'quem conduz (e o membro) recebe o "leu hoje" de cada um, como antes');
+  // UX4.1: a pessoa tira o próprio "leu hoje" da célula; quem conduz continua vendo (validado no servidor)
+  await pedir('/api/estado', { atualizadoEm: Date.now(), lidos: [1], marcadoEm: { 1: HOJE } }, mC.cookie);
+  const deQuem = async (c) => (await propositos(c.cookie)).find((p) => p.id === id2);
+  const leuC = (r) => r.membros.find((m) => m.usuario === 'membroc2').fezHoje;
+  let doA = await deQuem(mA);
+  ok(leuC(doA) === true && doA.minhaLeituraOculta === false && doA.naoMostram === 0, 'UX4.1: por padrão, o membro vê que a membroc2 leu hoje');
+  ok(doA.membros.filter((m) => m.papel === 'visitante').every((m) => m.fezHoje === null), 'UX4.1: o membro não recebe o "leu hoje" de quem é visitante');
+  const antes = doA.leramHoje;
+  ok((await celula2({ acao: 'leituraOculta', sim: 'sim' }, mC.cookie)).status === 200 && (await deQuem(mC)).minhaLeituraOculta === false, 'UX4.1: só true liga (um "sim" qualquer não liga)');
+  const ligou = await dados(await pedir('/api/celula', { acao: 'leituraOculta', sim: true }, mC.cookie));
+  ok(ligou.leituraOculta === true, 'UX4.1: a membroc2 desliga "Mostrar na célula se eu li hoje"');
+  doA = await deQuem(mA);
+  ok(leuC(doA) === null && doA.naoMostram === 1 && doA.leramHoje === antes - 1 && doA.pessoasHoje === 19,
+    'UX4.1: o membro deixa de receber o "leu hoje" dela, e ela sai da conta (' + doA.leramHoje + ' de ' + doA.pessoasHoje + ', 1 não mostra)');
+  const doC = await deQuem(mC);
+  ok(leuC(doC) === true && doC.minhaLeituraOculta === true, 'UX4.1: ela continua vendo o próprio "leu hoje"');
+  ok(leuC(await deQuem(lider2)) === true && !('leramHoje' in await deQuem(lider2)), 'UX4.1: o líder continua vendo que ela leu');
+  ok(leuC(await deQuem(mB)) === true, 'UX4.1: o auxiliar (quem conduz) também continua vendo');
+  const daVisita2 = await deQuem(visitantes2[1]);
+  ok(daVisita2.pessoasHoje === 19 && daVisita2.naoMostram === 1 && leuC(daVisita2) === null, 'UX4.1: a visitante também não a conta (19 pessoas, 1 não mostra)');
+  ok((await pedir('/api/celula', { acao: 'leituraOculta', sim: false }, mC.cookie)).status === 200 && leuC(await deQuem(mA)) === true, 'UX4.1: ligado de novo, o membro volta a ver');
   const visita11 = await criar('visita2n11', { nascimento: '2004-04-05' });
   ok((await pedir('/api/celula', { acao: 'entrar', token: token2, visitante: true }, visita11.cookie)).status === 409,
     'o 11º visitante não entra: o teto de visitantes é próprio e menor (10)');

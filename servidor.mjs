@@ -792,16 +792,26 @@ async function retratoDoProposito(p, eu, { verTudo = false } = {}) {
     };
   });
   const minha = p.membros.find((m) => m.usuario === eu) || {};
-  // A visitante da célula vê só quantos leram hoje, nunca quem (avaliação de 09/11, B4): o "leu
-  // hoje" de cada um sai do retrato dela, e vai a conta pronta.
-  const soNumero = !!p.celula && !verTudo && minha.papel === 'visitante';
-  const contagemHoje = soNumero ? { leramHoje: membros.filter((m) => m.papel !== 'visitante' && m.fezHoje).length, pessoasHoje: membros.filter((m) => m.papel !== 'visitante' && m.estado === 'ativo').length } : {};
-  const membrosVistos = soNumero ? membros.map((m) => (m.usuario === eu ? m : { ...m, fezHoje: null, extraHoje: false })) : membros;
+  // Na célula, quem não conduz não recebe o "leu hoje" de quem ele não pode ver, só a conta pronta:
+  // a visitante não vê o de ninguém (avaliação de 09/11, B4); o membro não vê o do visitante nem o de
+  // quem escolheu não mostrar (UX4.1). Quem conduz (líder, auxiliar) e o administrador veem tudo:
+  // é com isso que cuidam (chama, "precisa de atenção", o toque em quem falta).
+  const escondido = (m) => m.usuario !== eu && (minha.papel === 'visitante' || m.papel === 'visitante' || !!info.get(m.usuario).conta.leituraOculta);
+  const filtra = !!p.celula && !verTudo && p.criadoPor !== eu && !podeConduzir(p, eu);
+  let contagemHoje = {};
+  let membrosVistos = membros;
+  if (filtra) {
+    const gente = membros.filter((m) => m.papel !== 'visitante' && m.estado === 'ativo');
+    // a conta pronta é de quem mostra (e de mim); quem escolheu não mostrar vira só "não mostram"
+    const conta = gente.filter((m) => m.usuario === eu || !info.get(m.usuario).conta.leituraOculta);
+    contagemHoje = { leramHoje: conta.filter((m) => m.fezHoje).length, pessoasHoje: conta.length, naoMostram: gente.length - conta.length };
+    membrosVistos = membros.map((m) => (escondido(m) ? { ...m, fezHoje: null, extraHoje: false } : m));
+  }
   return {
     id: p.id, tipo: p.tipo, alvo: p.alvo, titulo: p.titulo, grupo: p.grupo, celula: !!p.celula, limite: limiteDo(p),
     criadoPor: p.criadoPor, criadoEm: p.criadoEm,
     dias, hoje, membros: membrosVistos, ...contagemHoje, euConvidado: minha.estado === 'convidado', convidadoPor: minha.convidadoPor || '',
-    ...(p.celula ? celulaNoRetrato(p, eu, info, ativos, referencia, verTudo) : {}),
+    ...(p.celula ? { minhaLeituraOculta: !!(info.get(eu) && info.get(eu).conta.leituraOculta), ...celulaNoRetrato(p, eu, info, ativos, referencia, verTudo) } : {}),
   };
 }
 
@@ -2037,6 +2047,7 @@ const servidor = createServer(async (req, res) => {
           if (!r.ja) await avisarEntradaNaCelula(eu, r, hoje);
           return { ja: !!r.ja, id: r.proposito.id, titulo: r.proposito.titulo, papel: r.papel || '' };
         }
+        if (qual === 'leituraOculta') return { leituraOculta: await CONTAS.definirLeituraOculta(eu, sim === true) };
         if (qual === 'tornarMembro') { await CONTAS.tornarMembro(eu, id, hoje); return {}; }
         if (qual === 'auxiliar') { await CONTAS.definirAuxiliar(eu, id, usuario, !!sim); return {}; }
         if (qual === 'encontro') { await CONTAS.definirEncontro(eu, id, dia, { hora: corpo.hora, lugar: corpo.lugar }); return {}; }

@@ -224,6 +224,21 @@ ok(/Quem é membro da célula vê quem já leu hoje, o seu também\. Visitantes 
   ok(((await pedir('api/amigos', null, ana)).dado.toques || []).length === 0, 'B15: cancelar não manda nada');
 }
 
+// ---------- UX4.1: a Ana tira o próprio "leu hoje" da célula ----------
+await como(ana, rotaCelula('pessoas'));
+ok(await esperar('!!' + q('[data-mostrar-leitura]')) && await av(q('[data-mostrar-leitura]') + '.getAttribute("aria-checked") === "true"') && await alto('[data-mostrar-leitura]'),
+  'UX4.1: o membro tem "Mostrar na célula se eu li hoje", ligado, com 44 px ou mais');
+ok(/Quem conduz a célula sempre vê/.test(await av(q('[data-mostrar-leitura]') + '.textContent')), 'UX4.1: o interruptor diz que quem conduz continua vendo');
+await clicar('[data-mostrar-leitura]');
+ok(await esperar('/só com você e com quem conduz a célula/.test((' + q('[data-quem-ve-leitura]') + ' || {}).textContent || "") && ' + q('[data-mostrar-leitura]') + '.getAttribute("aria-checked") === "false"'),
+  'UX4.1: desligado, a frase diz que o "leu hoje" dela fica só com ela e com quem conduz');
+ok((await celulaDe(bia, ID)).membros.find((m) => m.usuario === 'ana').fezHoje === null && (await celulaDe(lider, ID)).membros.find((m) => m.usuario === 'ana').fezHoje === false,
+  'UX4.1: no servidor, a Bia deixa de receber o "leu hoje" da Ana; o líder continua recebendo');
+await como(bia, rotaCelula('pessoas'));
+ok(await esperar('/1 pessoa prefere não mostrar\./.test((' + q('.painel-celula .passo-dica') + ' || {}).textContent || "")'), 'UX4.1: a Bia lê "1 pessoa prefere não mostrar."');
+ok((await pedir('api/celula', { acao: 'leituraOculta', sim: false }, ana)).dado.leituraOculta === false, 'UX4.1: a Ana volta a mostrar');
+await como(lider, rotaCelula());
+
 // ---------- C7: o recado com dia e hora ----------
 // a próxima quinta, de 3 a 9 dias para a frente (sempre no futuro, em qualquer fuso)
 const hojeUtc = new Date();

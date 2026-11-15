@@ -2425,6 +2425,15 @@ export class Contas {
     return !!a.caminhadaCelula;
   }
 
+  // O meu "leu hoje" aparece para os outros membros da célula? Vem mostrando (a regra de antes);
+  // ligado, só quem conduz a célula vê, para cuidar (UX4.1). Vale para todas as células da pessoa.
+  async definirLeituraOculta(eu, sim) {
+    const a = this.exigirCompleto(eu);
+    if (sim === true) a.leituraOculta = true; else delete a.leituraOculta;
+    await this.salvar();
+    return !!a.leituraOculta;
+  }
+
   // ---------- cuidado mútuo (Atos 2.42, 2.44-45) ----------
   // O pedido é do autor; os outros só respondem com um gesto sem texto. As regras (limites,
   // quem vê, o que esconde) moram em cuidado.mjs; aqui só o estado é guardado.

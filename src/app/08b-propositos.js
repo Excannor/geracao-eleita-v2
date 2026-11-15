@@ -404,16 +404,24 @@
     // O líder primeiro, depois quem já leu hoje, depois os outros: quem faltou não vira lista à parte.
     const ordem = gente.slice().sort((a, b) => (b.usuario === p.criadoPor) - (a.usuario === p.criadoPor)
       || (b.fezHoje - a.fezHoje) || String(a.nome).localeCompare(String(b.nome), 'pt-BR'));
-    // a visitante recebe só a conta pronta (p.leramHoje), sem o "leu hoje" de cada um (B4)
+    // quem não conduz recebe a conta pronta (p.leramHoje): a visitante, sem o "leu hoje" de cada
+    // um (B4); o membro, sem o de quem escolheu não mostrar (UX4.1)
     const souVisitante = eu.papel === 'visitante';
-    const leram = souVisitante && p.leramHoje != null ? p.leramHoje : gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
-    const ativosSemVisitante = souVisitante && p.pessoasHoje != null ? p.pessoasHoje : gente.filter((m) => m.estado === 'ativo').length;
+    const leram = p.leramHoje != null ? p.leramHoje : gente.filter((m) => m.estado === 'ativo' && m.fezHoje).length;
+    const ativosSemVisitante = p.pessoasHoje != null ? p.pessoasHoje : gente.filter((m) => m.estado === 'ativo').length;
+    const oculto = !!p.minhaLeituraOculta;
     // Líder menor de 18 à espera da aprovação da liderança: ainda não tira gente, não marca
     // auxiliar e não multiplica (pode encerrar a própria célula).
     const gere = souLider && p.aguardandoAprovacao !== 'lider';
-    return '<p class="passo-dica">' + leram + ' de ' + CC.plural(ativosSemVisitante, 'pessoa leu', 'pessoas leram') + ' hoje.</p>'
-      // quem é da célula sabe que o "leu hoje" é compartilhado, e com quem (B4)
-      + (souVisitante ? '' : '<p class="passo-dica pequena" data-quem-ve-leitura>Quem é membro da célula vê quem já leu hoje, o seu também. Visitantes veem só o número.</p>')
+    return '<p class="passo-dica">' + leram + ' de ' + CC.plural(ativosSemVisitante, 'pessoa leu', 'pessoas leram') + ' hoje.'
+      + (p.naoMostram ? ' ' + CC.plural(p.naoMostram, 'pessoa prefere', 'pessoas preferem') + ' não mostrar.' : '') + '</p>'
+      // quem é da célula sabe que o "leu hoje" é compartilhado, com quem, e pode tirar o seu (B4, UX4.1)
+      + (souVisitante ? '' : '<p class="passo-dica pequena" data-quem-ve-leitura>' + (oculto
+        ? 'O seu "leu hoje" fica só com você e com quem conduz a célula.'
+        : 'Quem é membro da célula vê quem já leu hoje, o seu também. Visitantes veem só o número.') + '</p>'
+        + '<div class="caixa-config"><button type="button" class="linha-config" role="switch" data-mostrar-leitura aria-checked="' + !oculto + '">'
+        + '<span>Mostrar na célula se eu li hoje<small class="dica-config">Quem conduz a célula sempre vê, para cuidar de você.</small></span>'
+        + '<span class="interruptor" aria-hidden="true"><i></i></span></button></div>')
       + '<div class="lista-pedidos">' + ordem.map((m) => {
         // sem "Ainda não leu hoje": quem não leu só não ganha a marca (sem comparação nem cobrança)
         const situacao = m.estado === 'convidado' ? 'Ainda não aceitou'
@@ -454,7 +462,8 @@
   // Visitante fica fora: ainda não é membro de verdade, então não entra em "quem falta".
   function faltamNotificar(p) {
     const amigos = ((CC.amigosEmCache() || {}).amigos || []).map((a) => a.usuario);
-    return ativos(p).filter((m) => m.papel !== 'visitante' && !m.fezHoje && m.usuario !== euUsuario() && amigos.includes(m.usuario));
+    // fezHoje null: quem não mostra o "leu hoje" (UX4.1) não entra em "quem falta"
+    return ativos(p).filter((m) => m.papel !== 'visitante' && m.fezHoje === false && m.usuario !== euUsuario() && amigos.includes(m.usuario));
   }
 
   function ligarPessoas(painel, p) {
@@ -474,6 +483,16 @@
         recarregar();
       };
     });
+    const mostrar = painel.querySelector('[data-mostrar-leitura]');
+    if (mostrar) mostrar.onclick = async () => {
+      const sim = mostrar.getAttribute('aria-checked') !== 'true';
+      mostrar.setAttribute('aria-checked', String(sim));
+      try {
+        await CC.api('api/celula', { acao: 'leituraOculta', sim: !sim });
+        CC.avisar(sim ? 'Pronto: a célula vê se você leu hoje' : 'Pronto: só quem conduz a célula vê se você leu hoje', { tipo: 'certo' });
+      } catch (e) { mostrar.setAttribute('aria-checked', String(!sim)); CC.avisar(e.message); return; }
+      recarregar();
+    };
     const notificar = painel.querySelector('[data-notificar]');
     if (notificar) notificar.onclick = () => conduzir('toque', faltamNotificar(p));
     const chamar = painel.querySelector('[data-chamar]');
@@ -583,7 +602,7 @@
     const gente = p.membros.filter((m) => m.estado !== 'saiu');
     const eu = gente.find((m) => m.usuario === euUsuario()) || {};
     const amigos = ((CC.amigosEmCache() || {}).amigos || []).map((a) => a.usuario);
-    const faltam = ativos(p).filter((m) => !m.fezHoje && m.usuario !== euUsuario() && amigos.includes(m.usuario));
+    const faltam = ativos(p).filter((m) => m.fezHoje === false && m.usuario !== euUsuario() && amigos.includes(m.usuario));
     const podeNotificar = p.tipo !== 'oracao' && eu.fezHoje && faltam.length;
     const oracao = p.tipo === 'oracao';
     const limite = p.limite || (cache && cache.limiteGrupo) || 5;
@@ -596,6 +615,7 @@
       if (m.estado === 'convidado') situacao = 'Ainda não aceitou';
       else if (oracao) situacao = m.usuario === euUsuario() && m.fezHoje ? 'Você orou hoje' : 'Orando junto';
       else if (m.fezHoje) situacao = (p.tipo === 'oracao' ? 'Orou hoje' : 'Leu hoje') + (m.extraHoje ? ' e fez o extra' : '');
+      else if (m.fezHoje === null) situacao = '';
       else situacao = m.extraHoje ? 'Fez o extra hoje' : 'Ainda não ' + verbo(p) + ' hoje';
       return '<div class="linha-amigo' + (m.estado === 'convidado' ? ' enviado' : '') + '">' + retrato(m)
         + '<div class="quem-amigo"><b>' + CC.esc(nomeCurto(m)) + (p.celula && m.usuario === p.criadoPor ? ' <small class="selo-lider">líder</small>' : '') + '</b>'
