@@ -156,10 +156,17 @@ ok(await av('!/Encontro às|encontro às/.test(' + q('#conteudo') + '.textConten
 // B10: "Comece por aqui" enquanto falta um dos três primeiros passos (aqui, o estudo)
 ok(await av('document.querySelectorAll(".comece-aqui li.feito").length === 2 && !!' + q('.comece-aqui [data-comeco-estudo]') + ' && !' + q('.comece-aqui [data-comeco-dia]')),
   'B10: o líder vê "Comece por aqui", com o dia e o convite feitos e o botão de preparar o estudo');
-ok(await av('/com a célula inteira lendo|^de \\d+ leram? hoje$/.test(' + q('.cabeca-celula .dias-cartao small') + '.textContent)'), 'C9: a contagem diz "com a célula inteira lendo" ou, sem dia inteiro ainda, quantos leram hoje (B11)');
+// B11 e UX4.2: os três números do alto, cada um dizendo o que mede
+ok(await av('/^de \\d+ leram? hoje$/.test(' + q('.cabeca-celula .dias-cartao small') + '.textContent) && !/célula inteira lendo/.test(' + q('#conteudo') + '.textContent)'),
+  'UX4.2: o número do alto é sempre quantos leram hoje, o mesmo de Pessoas (sem "dias com a célula inteira lendo")');
+ok(await av('/^Meta da célula(: \\d+ de \\d+ pontos hoje| de hoje batida!)$/.test(' + q('.painel-celula .barra-grupo span') + '.textContent) && /A meta é um ponto por pessoa\\./.test(' + q('[data-explica-meta]') + '.textContent)'),
+  'UX4.2: a barra se chama "Meta da célula" e a linha embaixo diz o que é um ponto');
 
 // ---------- o líder: Painel (C2, C3, C12, C4) ----------
 await abrir(rotaCelula('painel'), '!!' + q('.cartao-saude'));
+ok(await av('/^\\d+ de \\d+$/.test(' + q('.saude-chama b') + '.textContent) && /^com a chama acesa \\(\\d+%\\)$/.test(' + q('.saude-chama span') + '.textContent)'),
+  'UX4.2: a chama da célula em "N de M com a chama acesa (P%)", na forma do "leram hoje"');
+ok(await av('/^Chama acesa: a sequência de leitura da pessoa não parou \\(leu hoje ou ontem/.test(' + q('[data-explica-chama]') + '.textContent)'), 'UX4.2: o Painel diz o que é chama acesa');
 ok(await esperar(q('[data-lembrar-checkin]')) && await alto('[data-lembrar-checkin]'), 'C2: o Painel tem "Lembrar a célula" (só 1 de 3 fez o check-in)');
 ok(await av('decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href).includes("Fazer meu check-in")'), 'C2: o lembrete diz onde fazer o check-in');
 ok(await av('(() => { const t = decodeURIComponent(' + q('[data-lembrar-checkin]') + '.href); return t.includes("Fazer meu check-in\\".") && !/soma|nunca o de cada um|segundos/.test(t); })()'), 'C2: o lembrete não fala de quem vê o quê nem promete tempo (sem "só a soma", "10 segundos")');

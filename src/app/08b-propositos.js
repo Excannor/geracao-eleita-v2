@@ -49,27 +49,28 @@
   function contagem(p) {
     if (p.tipo === 'oracao') return '<span class="dias-cartao orando">' + CC.ico('aperto') + '<small>orando juntos</small></span>';
     const um = p.dias === 1;
-    // Na célula, a contagem diz o que conta: não é a ofensiva da pessoa, é a célula inteira.
-    const rotulo = p.celula ? (um ? 'dia com a célula inteira lendo' : 'dias com a célula inteira lendo')
-      : p.grupo
+    const rotulo = p.grupo
       ? (p.tipo === 'livro' ? (um ? 'dia de meta' : 'dias de meta') : (um ? 'dia seguido' : 'dias seguidos'))
       : (p.tipo === 'livro' ? (um ? 'dia lido' : 'dias lidos') : (um ? 'dia junto' : 'dias juntos'));
-    // Na célula sem dia inteiro ainda, o número do alto é o de hoje, e não um 0 (B11): o mesmo
-    // "5 de 7 leram hoje" da aba Pessoas.
-    if (p.celula && !p.dias) {
+    // Na célula, o número do alto é sempre o de hoje (B11, UX4.2): o mesmo "5 de 7 leram hoje" da
+    // aba Pessoas. Os dias seguidos com a meta batida (p.dias) vêm embaixo, com o nome da meta.
+    if (p.celula) {
       const gente = p.membros.filter((m) => m.estado === 'ativo' && m.papel !== 'visitante');
       const leram = p.leramHoje != null ? p.leramHoje : gente.filter((m) => m.fezHoje).length;
       const total = p.pessoasHoje != null ? p.pessoasHoje : gente.length;
-      return '<span class="dias-cartao">' + CC.icoChama() + leram + '<small>de ' + total + ' ' + (leram === 1 ? 'leu' : 'leram') + ' hoje</small></span>';
+      return '<span class="dias-cartao">' + CC.icoChama() + leram + '<small>de ' + total + ' ' + (leram === 1 ? 'leu' : 'leram') + ' hoje</small>'
+        + (p.dias ? '<small class="meta-seguida" data-meta-seguida>Meta da célula batida: ' + (p.tipo === 'livro' ? CC.plural(p.dias, 'dia', 'dias') : CC.plural(p.dias, 'dia seguido', 'dias seguidos')) + '</small>' : '')
+        + '</span>';
     }
     return '<span class="dias-cartao">' + CC.icoChama() + p.dias + '<small>' + rotulo + '</small></span>';
   }
 
-  function barraDoGrupo(hoje) {
+  function barraDoGrupo(hoje, celula) {
     const fracao = hoje.meta ? Math.min(1, hoje.pontos / hoje.meta) : 0;
+    const nome = celula ? 'Meta da célula' : 'Meta';
     return '<div class="barra-missao barra-grupo" style="--cor: var(--' + (hoje.batida ? 'verde' : 'azul') + ')">'
       + '<i style="width:' + (fracao * 100).toFixed(1) + '%"></i>'
-      + '<span>' + (hoje.batida ? 'Meta de hoje batida!' : hoje.pontos + ' de ' + hoje.meta + ' pontos hoje') + '</span></div>';
+      + '<span>' + (hoje.batida ? nome + ' de hoje batida!' : (celula ? nome + ': ' : '') + hoje.pontos + ' de ' + hoje.meta + ' pontos hoje') + '</span></div>';
   }
 
   function situacaoDaDupla(p) {
@@ -107,7 +108,7 @@
       + cabeca(p)
       + (p.celula && encontroHoje(p) && p.estudo ? '<span class="selo-status leu">' + CC.ico('livro') + 'Encontro hoje · veja o estudo</span>' : '')
       + (p.celula && p.recado ? '<p class="recado-cartao">' + CC.esc(p.recado) + '</p>' : '')
-      + (p.grupo && p.hoje && p.tipo !== 'oracao' ? barraDoGrupo(p.hoje) : situacaoDaDupla(p))
+      + (p.grupo && p.hoje && p.tipo !== 'oracao' ? barraDoGrupo(p.hoje, p.celula) : situacaoDaDupla(p))
       + '</button>';
   }
 
@@ -253,7 +254,7 @@
       // No dia do encontro: com estudo, o caminho até ele; sem estudo, só quem prepara vê o selo.
       + (encontroHoje(p) && p.estudo ? '<button class="selo-status leu botao-selo" data-ir-estudo>' + CC.ico('livro') + 'Encontro hoje · veja o estudo</button>' : '')
       + (encontroHoje(p) && !p.estudo && p.euPreparoEstudo ? '<button class="selo-status botao-selo" data-ir-preparar>' + CC.ico('livro') + 'Encontro hoje · preparar o estudo</button>' : '')
-      + (p.hoje ? barraDoGrupo(p.hoje) + '<p class="passo-dica pequena">Cada leitura de hoje vale 1 ponto, e o extra do dia vale mais 1. A meta é um ponto por pessoa.</p>' : '')
+      + (p.hoje ? barraDoGrupo(p.hoje, true) + '<p class="passo-dica pequena" data-explica-meta>A meta é um ponto por pessoa. Cada leitura de hoje vale 1 ponto, e o extra do dia vale mais 1: quem faz o extra ajuda a cobrir quem não leu.</p>' : '')
       // A meta ainda não foi batida e falta a minha leitura: o caminho até ela, sem rodeio.
       + (p.hoje && !p.hoje.batida && eu.estado === 'ativo' && !eu.fezHoje
         ? '<div class="acoes-missao acoes-meta"><a class="botao pequeno botao-ir-missao botao-ir-escuro" href="#/" data-ler-agora>Ler agora' + CC.ico('avancar') + '</a></div>' : '')
@@ -629,7 +630,7 @@
       + '<p class="tipo-proposito">' + CC.ico(ICONE[p.tipo] || 'trilha') + CC.esc(ROTULO_TIPO[p.tipo] || '') + (p.tipo === 'livro' ? ': ' + CC.esc(p.titulo) : '')
       + (oracao ? '' : ' · ' + CC.plural(p.dias, 'dia', 'dias')) + '</p>'
       + (p.celula ? topoDaCelula(p) : '')
-      + (p.grupo && p.hoje && !oracao ? barraDoGrupo(p.hoje)
+      + (p.grupo && p.hoje && !oracao ? barraDoGrupo(p.hoje, p.celula)
         : '<p class="passo-dica pequena">' + CC.esc(EXPLICA[p.tipo] || '') + '</p>')
       + '<div class="lista-pedidos">' + linhas + '</div>'
       + '<div class="acoes">'
@@ -881,7 +882,7 @@
   function quemEstaComo(c) {
     const pessoas = c.pessoas || [];
     if (!pessoas.length) return '';
-    const acesas = pessoas.filter((x) => x.acesa).map((x) => ({ nome: x.nome + (x.dias ? ' (' + x.dias + ')' : '') }));
+    const acesas = pessoas.filter((x) => x.acesa).map((x) => ({ nome: x.nome + (x.dias ? ' (' + CC.plural(x.dias, 'dia', 'dias') + ')' : '') }));
     const apagadas = pessoas.filter((x) => !x.acesa);
     return '<p class="saude-nomes">' + (acesas.length ? '<b>Acesa:</b> ' + nomeLista(acesas) : '')
       + (acesas.length && apagadas.length ? '<br>' : '') + (apagadas.length ? '<b>Apagada:</b> ' + nomeLista(apagadas) : '') + '</p>';
@@ -901,9 +902,8 @@
     if (!s || !s.chama) return '';
     const c = s.chama;
     const f = s.frequencia || { encontros: [] };
-    const legenda = c.total
-      ? CC.plural(c.acesos, 'pessoa', 'pessoas') + ' de ' + c.total + ' com a chama acesa hoje (a sequência de leitura não parou)'
-      : 'Nenhuma chama acesa hoje.';
+    // "3 de 5", na mesma forma do "leram hoje" do alto, e não uma porcentagem solta (UX4.2)
+    const legenda = c.total ? 'com a chama acesa (' + c.pct + '%)' : 'Nenhuma chama acesa hoje.';
     const maior = Math.max(1, ...f.encontros.map((e) => e.pessoas || 0));
     const barras = f.encontros.length
       ? '<div class="mini-barras" role="img" aria-label="' + CC.esc(f.encontros.map((e) => ddmm(e.data) + ': ' + (e.semEncontro ? 'sem encontro' : CC.plural(e.pessoas, 'pessoa', 'pessoas'))).join(', ')) + '">'
@@ -920,7 +920,8 @@
     const semEncontro = f.encontros.some((e) => e.semEncontro) ? ' Tracejado: semana sem encontro.' : '';
     return '<div class="cartao-saude">'
       + '<div class="saude-chama' + (c.acesos ? ' acesa' : '') + '">' + CC.icoChama(c.acesos ? undefined : 0)
-      + '<div><b>' + (c.pct === null ? 'sem membros' : c.pct + '%') + '</b><span>' + CC.esc(legenda) + '</span></div></div>'
+      + '<div><b>' + (c.pct === null ? 'sem membros' : c.acesos + ' de ' + c.total) + '</b><span>' + CC.esc(legenda) + '</span></div></div>'
+      + (c.total ? '<p class="passo-dica pequena" data-explica-chama>Chama acesa: a sequência de leitura da pessoa não parou (leu hoje ou ontem, ou um escudo guardou o dia). Entre parênteses, os dias seguidos.</p>' : '')
       + quemEstaComo(c)
       + '<div class="saude-encontros"><span class="etiqueta">Últimas 4 semanas</span>' + barras
       + (tendencia || semEncontro ? '<p class="passo-dica pequena">' + CC.esc((tendencia + semEncontro).trim()) + '</p>' : '')

@@ -57,3 +57,44 @@ que muda; o servidor depois do toque; a outra pessoa lendo "1 pessoa prefere nã
   mostra, sem nome: a meta é do grupo. Numa célula muito pequena, quem soma os pontos pode deduzir.
 - Os amigos continuam vendo o "leu hoje" pela amizade (Amigos, Trilha, Dia lido): a escolha é da
   célula. Para tirar dos amigos, seria outra escolha, na amizade.
+
+## UX4.2 · As três métricas do topo da célula
+
+**Como era.** O líder via três números que mediam coisas diferentes sem dizer o quê (B11 da
+avaliação). A Fase 1 tinha tirado o 0 do alto e explicado o ponto e a chama, mas só em parte:
+- no alto, "N dias com a célula inteira lendo" assim que houvesse um dia batido. O número é a
+  sequência de dias com a **meta** batida, e a meta pode ser batida sem todos lerem (o extra de
+  um cobre a falta de outro). O rótulo prometia algo que o número não mede;
+- na aba Hoje, a barra "3 de 5 pontos hoje", sem dizer de qual meta;
+- no Painel, "60%" grande, com "3 pessoas de 5 com a chama acesa hoje (a sequência de leitura não
+  parou)" e os nomes com um número solto entre parênteses ("Ana (4)").
+
+**Agora, um número para cada pergunta, com o nome dele:**
+- **Quantos leram hoje** (o número principal). O alto da célula mostra sempre "3 de 5 leram hoje",
+  o mesmo da aba Pessoas, também depois do primeiro dia batido. Quando há dias seguidos com a meta
+  batida, eles vêm embaixo, com o nome certo: "Meta da célula batida: 4 dias seguidos" ("4 dias"
+  no propósito de livro, em que os dias se somam).
+- **A meta da célula hoje.** A barra diz "Meta da célula: 3 de 5 pontos hoje" ou "Meta da célula
+  de hoje batida!". Embaixo: "A meta é um ponto por pessoa. Cada leitura de hoje vale 1 ponto, e o
+  extra do dia vale mais 1: quem faz o extra ajuda a cobrir quem não leu." Fora da célula, a barra
+  dos grupos não muda.
+- **A chama acesa** (Painel, só quem conduz e o administrador). "3 de 5 / com a chama acesa (60%)",
+  na mesma forma do "leram hoje", e a linha "Chama acesa: a sequência de leitura da pessoa não
+  parou (leu hoje ou ontem, ou um escudo guardou o dia). Entre parênteses, os dias seguidos." Os
+  nomes ficam "Ana (4 dias)".
+
+Decisão: trocar a métrica do alto (e não só o rótulo) porque "quantos leram hoje" é o que o líder
+conta ao grupo e é o mesmo número da aba Pessoas; a sequência da meta continua lá, com um nome
+que não promete "a célula inteira". A porcentagem da chama não some: vai para o lado, porque o
+painel da igreja compara células por ela.
+
+Tudo em `08b-propositos.js` (`contagem`, `barraDoGrupo`, `cartaoSaude`, `quemEstaComo`); nada muda
+no servidor. Custo no index.html: 0,4 KB (folga de 67,2 KB).
+
+**Testes.** `teste-celula-botoes`: o alto em "de N leram hoje" e sem "célula inteira lendo"; a
+barra "Meta da célula" com a linha do ponto; o Painel em "N de M" com "(P%)" e a linha do que é
+chama acesa. A linha "Meta da célula batida: 1 dia seguido" aparece na captura 4 (uma célula em
+que todos leram hoje).
+
+**O que ficou de fora.** O painel da igreja e o relatório continuam com a porcentagem da chama por
+célula (é a comparação entre células, e o texto de ajuda de lá já diz o que é).
