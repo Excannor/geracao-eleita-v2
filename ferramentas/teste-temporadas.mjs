@@ -15,6 +15,9 @@
 // - ler o último pendente que faltava fecha a temporada do mesmo jeito;
 // - quem nunca leu nada vê o dia 0 e nenhum cartão de temporada; lido o dia 0, a temporada 1 aparece
 //   com a abertura.
+// R3.2, perto de fechar: em Conquistas, no alto, a temporada ("faltam 8 dias para fechar a temporada"),
+// os livros começados ("faltam 8 dias para fechar Gênesis", do que falta menos ao que falta mais) e a
+// semana ("faltam 4 dias para completar esta semana"), cada um com a barra; um livro terminado sai.
 // Uso: node ferramentas/teste-temporadas.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R3.1...; PARTES=R3.1 escolhe as partes)
 import { spawn } from 'node:child_process';
@@ -275,6 +278,53 @@ try {
     await av('CC.gravar("diaZero", CC.hojeIso()); CC.redesenhar(); 1');
     ok(await esperar(q(cartao + '[data-temporada="1"]'), 8000) && await av('!!' + q('[data-abertura-temporada]')), 'lido o dia 0, a temporada 1 aparece com a abertura');
     await capturar('r3.1-inicio-depois-do-dia-zero-' + tema, true);
+  }
+
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R3.2')) break;
+    await temaDe(tema);
+    console.log('\n  R3.2 · Perto de fechar, em Conquistas\n');
+    const t = tema[0];
+    const perto = '[data-perto-de-fechar]';
+    // a Iara leu os dias 1 a 12 hoje: temporada 2, Gênesis e Mateus começados, 1 dia nesta semana
+    const iaraC = await conta('iara' + t, 'Iara', { lidos: ate(12), data: atras(0) });
+    await entrar(iaraC);
+    ok(await noInicio(), 'a Iara (dias 1 a 12, lidos hoje) abre o app');
+    await av('location.hash = "#/perfil/conquistas"; 1');
+    ok(await esperar(q(perto + ' .linha-perto'), 10000), 'Conquistas abre com a seção "Perto de fechar"');
+    ok(await av('document.querySelector("' + perto + ' h2").textContent === "Perto de fechar" && document.querySelector("' + perto + '").nextElementSibling.textContent.startsWith("Por nível")'),
+      'a seção vem no alto, antes de "Por nível"');
+    const tp = await texto(perto + ' [data-perto-temporada="2"]');
+    ok(/Temporada 2: Jacó e José/.test(tp) && /2\/10/.test(tp) && /faltam 8 dias para fechar a temporada/.test(tp) && semExagero(tp), 'a temporada, com a barra e "faltam 8 dias para fechar a temporada" (' + tp + ')');
+    const livros = await av('[...document.querySelectorAll("' + perto + ' [data-perto-livro]")].map((l) => { const p = CC.progressoDoLivro(l.dataset.pertoLivro); return { l: l.dataset.pertoLivro, faltam: p.total - p.lidos, txt: l.textContent, largura: parseFloat(l.querySelector(".barra-missao i").style.width), esperado: p.lidos / p.total * 100 }; })');
+    ok(livros.length >= 1 && livros.length <= 3 && livros.every((x) => x.faltam > 0 && x.txt.includes((x.faltam === 1 ? 'falta 1 dia' : 'faltam ' + x.faltam + ' dias') + ' para fechar ' + x.l) && Math.abs(x.largura - x.esperado) < 0.2)
+      && livros.every((x, i) => i === 0 || livros[i - 1].faltam <= x.faltam),
+    'os livros começados, do que falta menos ao que falta mais, com "faltam N dias para fechar <livro>" e a barra certa (' + livros.map((x) => x.l + ': ' + x.faltam).join(', ') + ')');
+    ok(livros.some((x) => x.l === 'Gênesis' && x.faltam === 8), 'Gênesis: faltam 8 dias para fechar (12 de 20)');
+    const sem = await texto(perto + ' [data-perto-semana]');
+    // de segunda a quarta ainda dá para completar; de quinta em diante, com 1 dia só, não
+    const restam = await av('7 - Math.round((Date.parse(CC.hojeIso()) - Date.parse(CC.segundaDaSemana(CC.hojeIso()))) / 864e5) - 1');
+    ok(/Semana completa/.test(sem) && /1\/5/.test(sem) && semExagero(sem) && (1 + restam >= 5 ? /faltam 4 dias para completar esta semana/.test(sem)
+      : /1 dia com a Palavra nesta semana\. Na segunda começa uma semana nova\./.test(sem)),
+    'a semana: 1 de 5 dias, com "faltam 4 dias para completar esta semana" ou, sem tempo para completar, "Na segunda começa uma semana nova." (' + sem + ')');
+    ok(await av('document.documentElement.scrollWidth <= 390'), 'nada passa da largura da tela');
+    await capturar('r3.2-perto-de-fechar-' + tema, true);
+    // a semana completa (5 dias com a Palavra nesta semana) muda o texto, sem barra a mais
+    await av('CC.__dias = CC.diasNaSemana; CC.diasNaSemana = () => 5; CC.redesenhar(); 1');
+    ok(await esperar('/Esta semana já está completa\./.test((' + q(perto + ' [data-perto-semana="5"]') + ' || {}).textContent || "")', 8000), 'com 5 dias, "Esta semana já está completa."');
+    await av('CC.diasNaSemana = CC.__dias; 1');
+    // um livro terminado sai da lista; a temporada fechada também
+    await av('CC.gravar("lidos", [...new Set([...CC.ler("lidos"), ...Array.from({ length: 8 }, (_, i) => 13 + i)])]); CC.redesenhar(); 1');
+    ok(await esperar('!!' + q(perto + ' [data-perto-temporada="3"]') + ' && !' + q(perto + ' [data-perto-livro="Gênesis"]'), 8000),
+      'lidos os dias 13 a 20, Gênesis sai da lista e a temporada é a 3');
+    // quem nunca leu nada não vê a seção
+    const joaoC = await conta('joao' + t, 'João');
+    await entrar(joaoC);
+    ok(await noInicio(), 'o João (nunca leu) abre o app');
+    await av('location.hash = "#/perfil/conquistas"; 1');
+    ok(await esperar('document.querySelector("h1")?.textContent === "Conquistas"', 8000), 'Conquistas abre');
+    await dormir(1500);
+    ok(await av('!document.querySelector("' + perto + ' .linha-perto") && !document.querySelector("' + perto + ' h2")'), 'sem leitura nenhuma, a seção não aparece');
   }
 } catch (e) {
   falhas++;

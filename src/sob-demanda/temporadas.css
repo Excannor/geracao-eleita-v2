@@ -36,3 +36,10 @@
 .leitura-temporada dd { margin: 0; color: var(--tinta-forte); }
 .conta-temporada { color: var(--tinta-forte); font-weight: 700; }
 .linha-selo-temporada b { color: var(--tinta-forte); }
+
+/* R3.2: perto de fechar, em Conquistas (as linhas são as das conquistas, com a barra) */
+.linha-perto .arte-perto { display: grid; place-items: center; flex: none; width: 60px; height: 60px; }
+.linha-perto .arte-perto .escudo { display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); }
+.linha-perto .arte-perto svg { width: 24px; height: 24px; }
+.linha-perto .selo-perto { width: 60px; }
+.linha-perto .selo-perto .arte-trofeu { --folha-tinta: var(--tinta-forte); --folha-tinta-fraca: var(--tinta-fraca); --folha-campo: var(--cartao); }

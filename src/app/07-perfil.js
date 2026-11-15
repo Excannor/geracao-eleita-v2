@@ -249,6 +249,8 @@
       + '<div class="estante">' + lista.map(trofeuHtml).join('') + '</div>';
     const todos = [...t.testamentos, ...t.unidades, ...t.temporadas, ...t.colecoes, ...t.desafios, ...t.albuns];
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1></div>'
+      // R3.2: "faltam N dias para fechar" (temporada, livros, semana), pintado pela peça das temporadas
+      + '<div data-perto-de-fechar></div>'
       + CC.tituloSecao('Por nível', conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length)
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
@@ -259,6 +261,7 @@
       + '<div id="trofeus" data-trofeus>' + CC.tituloSecao('Troféus', conta(todos)) + '</div>'
       + estante('A Bíblia toda', t.testamentos) + estante('Unidades do plano', t.unidades) + estante('Temporadas', t.temporadas) + estante('Partes da Bíblia', t.colecoes)
       + estante('Desafios', t.desafios) + (t.albuns.length ? estante('Álbuns de cartas', t.albuns) : '');
+    CC.pedirPeca(window.TEMPORADAS, () => !!CC.temporadas).then(() => CC.temporadas.conquistas(raiz), () => {});
     if (irAosTrofeus) requestAnimationFrame(() => { const x = raiz.querySelector('[data-trofeus]'); if (x) x.scrollIntoView(); });
   };
   CC.vistaTrofeus = (raiz) => CC.vistaConquistas(raiz, true);

@@ -2,7 +2,8 @@
    teto de 1 MB. R3.1: na folha do alto da Trilha, o cartão da temporada em que a pessoa está (o
    nome, a barra e "faltam N dias"), com a frase de abertura enquanto nenhum dia dela foi lido, e a
    folha da temporada. A conta (CC.temporadaDoDia, CC.progressoTemporada, CC.temporadaCompletaEm) e
-   o selo em Conquistas ficam no index (02b-jogo.js, 07-perfil.js); a chegada fica no Dia lido. */
+   o selo em Conquistas ficam no index (02b-jogo.js, 07-perfil.js); a chegada fica no Dia lido.
+   R3.2: em Conquistas, as barras de "faltam N dias para fechar" (temporada, livros e semana). */
 (function (CC) {
   'use strict';
 
@@ -84,5 +85,66 @@
     });
   }
 
-  CC.temporadas = { trilha, folha: folhaTemporada, pendentesDe };
+  // ---------- R3.2: perto de fechar (Conquistas) ----------
+  // As barras de "faltam N dias para fechar": a temporada em que a pessoa está, os livros já
+  // começados (os mais perto do fim) e a semana de agora (5 dias com a Palavra fazem a semana
+  // completa, R1.2). Só o que está em andamento: nada de lista do que falta no ano.
+  const LIVROS_EM_ANDAMENTO = 3;
+  const faltamPara = (n, oQue) => (n === 1 ? 'falta 1 dia' : 'faltam ' + n + ' dias') + ' para ' + oQue;
+  const linha = (arte, titulo, conta, fracao, descricao, dado) => '<div class="linha-conquista linha-perto"' + (dado ? ' ' + dado : '') + '>' + arte
+    + '<div class="corpo-conquista"><div class="titulo-conquista"><b>' + CC.esc(titulo) + '</b><span>' + conta + '</span></div>'
+    + '<div class="barra-missao"><i style="width:' + (Math.max(0, Math.min(1, fracao)) * 100).toFixed(1) + '%"></i></div>'
+    + '<span class="descricao-conquista">' + CC.esc(descricao) + '</span></div></div>';
+  const arteIcone = (icone, cor) => '<span class="arte-medalha arte-perto c-' + cor + '" aria-hidden="true"><span class="escudo">' + CC.ico(icone) + '</span></span>';
+
+  function pertoDeFechar() {
+    const linhas = [];
+    // quem nunca leu nada não tem nada perto de fechar (na Trilha, vê o dia 0)
+    if (!CC.diasComAPalavra() && !CC.ler('lidos', []).length) return linhas;
+    const t = CC.temporadaDoDia(CC.diaAtual());
+    if (t) {
+      const p = CC.progressoTemporada(t);
+      const faltam = p.total - p.feitos;
+      const pend = pendentesDe(t);
+      if (faltam) {
+        linhas.push(linha('<span class="selo-temporada selo-perto" aria-hidden="true">' + selo(t, p) + '</span>', 'Temporada ' + t.numero + ': ' + t.titulo,
+          p.feitos + '/' + p.total, p.feitos / p.total, faltamPara(faltam, 'fechar a temporada') + (pend ? ', ' + (pend === 1 ? '1 deles pendente' : pend + ' deles pendentes') : ''),
+          'data-perto-temporada="' + t.numero + '"'));
+      }
+    }
+    // os livros começados e ainda não terminados, na ordem do que falta menos
+    const vistos = [];
+    for (const d of D.plano) for (const l of d.livros) if (!vistos.includes(l)) vistos.push(l);
+    vistos.map((l, ordem) => ({ l, ordem, ...CC.progressoDoLivro(l) }))
+      .filter((x) => x.lidos > 0 && x.lidos < x.total)
+      .sort((a, b) => (a.total - a.lidos) - (b.total - b.lidos) || a.ordem - b.ordem)
+      .slice(0, LIVROS_EM_ANDAMENTO)
+      .forEach((x) => linhas.push(linha(arteIcone('livro', 'turquesa'), x.l, x.lidos + '/' + x.total, x.lidos / x.total,
+        faltamPara(x.total - x.lidos, 'fechar ' + x.l), 'data-perto-livro="' + CC.esc(x.l) + '"')));
+    // a semana de agora
+    {
+      const alvo = CC.DIAS_DA_SEMANA_COMPLETA;
+      const dias = Math.min(CC.diasNaSemana(), alvo);
+      const total = CC.semanasCompletas();
+      // os dias que ainda cabem nesta semana (até domingo, sem contar hoje se já leu): quando não dá
+      // mais para completar, o texto não cobra o impossível, só lembra que a segunda recomeça
+      const hoje = CC.hojeIso();
+      const restam = 7 - Math.round((Date.parse(hoje) - Date.parse(CC.segundaDaSemana(hoje))) / 864e5) - (CC.sequencia().feitoHoje ? 1 : 0);
+      linhas.push(linha(arteIcone('semana', 'verde'), 'Semana completa', dias + '/' + alvo, dias / alvo,
+        dias >= alvo ? 'Esta semana já está completa. ' + (total === 1 ? 'É a sua primeira.' : 'São ' + total + ' semanas completas.')
+          : dias + restam < alvo ? CC.plural(dias, 'dia', 'dias') + ' com a Palavra nesta semana. Na segunda começa uma semana nova.'
+            : faltamPara(alvo - dias, 'completar esta semana') + ' (' + alvo + ' dias com a Palavra, de segunda a domingo)',
+        'data-perto-semana="' + dias + '"'));
+    }
+    return linhas;
+  }
+  // Pinta a seção no lugar guardado pela tela de Conquistas (07-perfil.js).
+  function conquistas(raiz) {
+    const lugar = raiz.querySelector('[data-perto-de-fechar]');
+    if (!lugar || lugar.childElementCount) return;
+    const linhas = pertoDeFechar();
+    if (linhas.length) lugar.innerHTML = CC.tituloSecao('Perto de fechar') + '<div class="caixa-lista">' + linhas.join('') + '</div>';
+  }
+
+  CC.temporadas = { trilha, folha: folhaTemporada, pendentesDe, pertoDeFechar, conquistas };
 })(window.CC);

@@ -135,4 +135,34 @@ variável `window.TEMPORADAS`). O resto (6,7 KB) está na peça.
   da temporada, a abertura ao entrar, a folha, "falta 1 dia", a chegada no Dia lido, a temporada
   seguinte já com a abertura, a estante em Conquistas, os pendentes (o cartão, a folha, a temporada
   que não fecha), o último pendente que fecha, o dia 0 sem cartão e depois com a temporada 1.
-- `teste-redesenho`: a conta dos troféus da tela única inclui os selos.
+- `teste-redesenho`: a conta dos troféus da tela única inclui os selos (e, na R3.2, a conta das
+  conquistas não pega as linhas de "Perto de fechar").
+
+## R3.2 · Selos com barra de progresso
+
+**O que é.** A recomendação 16 do estudo: mostrar o quanto falta, em dias, para fechar alguma coisa
+("faltam 3 dias para fechar Gênesis"). Em Conquistas (a tela única da UX4.4), no alto, antes de "Por
+nível", a seção **"Perto de fechar"**, com as mesmas linhas das conquistas (arte, nome, conta e
+barra):
+- **a temporada** em que a pessoa está, com o selo dela: "Temporada 2: Jacó e José", "2/10",
+  "faltam 8 dias para fechar a temporada" (com pendentes dentro dela: ", 3 deles pendentes");
+- **os livros começados** e ainda não terminados, no máximo 3, do que falta menos ao que falta mais:
+  "Gênesis", "12/20", "faltam 8 dias para fechar Gênesis". A conta é a de "Meu progresso nos livros"
+  (`CC.progressoDoLivro`: os dias do plano que passam pelo livro). Terminado, o livro sai da lista;
+- **a semana completa** (R1.2: 5 dias com a Palavra, de segunda a domingo): "1/5", "faltam 4 dias
+  para completar esta semana". Quando os dias que ainda restam na semana não bastam, o texto não
+  cobra o impossível: "1 dia com a Palavra nesta semana. Na segunda começa uma semana nova." Completa,
+  "Esta semana já está completa. São 3 semanas completas." ("É a sua primeira." na primeira).
+
+Só o que está em andamento: nenhuma lista do que falta no ano. Quem nunca leu nada não vê a seção.
+"Falta 1 dia" no singular, como na Trilha.
+
+**Onde mora.** A seção sai da peça das temporadas (`pertoDeFechar` e `conquistas` em
+`temporadas.js`, que já é guardada na instalação); a tela de Conquistas (`07-perfil.js`) só guarda
+o lugar (`data-perto-de-fechar`) e pede a peça. Folga do index.html: 63,8 KB.
+
+**Testes.** `teste-temporadas`, parte R3.2 (13 checagens por tema): a seção no alto, antes de "Por
+nível"; a temporada com "faltam 8 dias para fechar a temporada"; os livros em ordem, com o texto e a
+largura da barra conferidos contra `CC.progressoDoLivro`; Gênesis 12 de 20; a semana nos dois textos
+(conforme o dia da semana em que o teste roda) e completa; Gênesis sai quando termina, e a temporada
+passa para a 3; sem leitura, sem seção.

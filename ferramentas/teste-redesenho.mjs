@@ -433,7 +433,7 @@ await foto('7-perfil');
 ok(await av('!document.querySelector("a[href=\\"#/perfil/trofeus\\"]") && /^Conquistas\\d+ de \\d+$/.test(document.querySelector(".colecao-atalhos a[href=\\"#/perfil/conquistas\\"]").textContent)'),
   'UX4.4: o Perfil tem um atalho só, "Conquistas", que conta conquistas e troféus');
 await irPara('#/perfil/conquistas');
-ok(await esperar('document.querySelectorAll(".linha-conquista").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
+ok(await esperar('document.querySelectorAll(".linha-conquista:not(.linha-perto)").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
 ok(await av('(() => { const t = CC.trofeus(); const n = t.testamentos.length + t.unidades.length + (t.temporadas || []).length + t.colecoes.length + t.desafios.length + t.albuns.length; return document.querySelectorAll(".estante .trofeu").length === n && !!document.querySelector("[data-trofeus]"); })()'),
   'UX4.4: a mesma tela tem todos os troféus, em estantes');
 await irPara('#/perfil/trofeus');
