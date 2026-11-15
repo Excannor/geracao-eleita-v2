@@ -10,6 +10,8 @@
 //   segue para a temporada 5 e o selo 4 não vem;
 // - ler o último dia de uma temporada (no papel) mostra no Dia lido "Temporada concluída", a frase
 //   de chegada e o selo, que aparece ganho em Conquistas, na estante "Temporadas" (36 selos);
+// - quando a temporada fecha um livro, ele vai no mesmo item, sem repetir o nome: o que a chegada já
+//   diz some, e o resto vem em "Livro terminado: Judas";
 // - ler o último pendente que faltava fecha a temporada do mesmo jeito;
 // - quem nunca leu nada vê o dia 0 e nenhum cartão de temporada; lido o dia 0, a temporada 1 aparece
 //   com a abertura.
@@ -210,6 +212,8 @@ try {
     const ch = await texto('.dia-lido .destaque-dia.temporada');
     ok(/Temporada concluída: Jacó e José/.test(ch) && /Você terminou Gênesis\. A próxima temporada segue com Moisés e a saída do Egito\./.test(ch) && /Selo em Conquistas: Copo de prata/.test(ch) && semExagero(ch),
       'com a frase de chegada e o selo (' + ch + ')');
+    ok(!(await av('!!' + q('.dia-lido .destaque-dia.livro'))) && !/Livro terminado/.test(ch),
+      'o livro que a temporada fecha não vem num item à parte: a chegada já diz "Você terminou Gênesis."');
     await av('document.querySelector(".dia-lido .destaque-dia.temporada").scrollIntoView({ block: "center" }); 1');
     await capturar('r3.1-dia-lido-chegada-' + tema);
     await voltarAoInicio();
@@ -224,6 +228,19 @@ try {
       'Conquistas tem todos os troféus de CC.trofeus(), os selos das temporadas também');
     await av('[...document.querySelectorAll(".etiqueta-estante")].find((x) => /^Temporadas/.test(x.textContent)).scrollIntoView({ block: "start" }); scrollBy(0, -140); 1');
     await capturar('r3.1-conquistas-selos-' + tema);
+
+    // a temporada 33 fecha Ezequiel (a chegada diz) e Judas (a chegada não diz): um item só
+    const gabiC = await conta('gabi' + t, 'Gabi', { lidos: ate(333) });
+    await entrar(gabiC);
+    ok(await noInicio(), 'a Gabi (dias 1 a 333) abre o Início');
+    ok(await lerNoPapel(334), 'a Gabi lê o dia 334 no papel');
+    ok(await esperar(q('.dia-lido .destaque-dia.temporada'), 6000), 'o Dia lido mostra a temporada 33 concluída');
+    const ch33 = await texto('.dia-lido .destaque-dia.temporada');
+    ok(/Você terminou Ezequiel e a unidade 11\./.test(ch33) && /Livro terminado: Judas/.test(ch33) && !/terminado: .*Ezequiel/.test(ch33) && !(await av('!!' + q('.dia-lido .destaque-dia.livro'))),
+      'Ezequiel e Judas ficam no item da temporada, sem repetir o nome (' + ch33 + ')');
+    await av('document.querySelector(".dia-lido .destaque-dia.temporada").scrollIntoView({ block: "center" }); 1');
+    await capturar('r3.1-dia-lido-livro-junto-' + tema);
+    await voltarAoInicio();
 
     // ---------- ficar em dia: pular não fecha temporada ----------
     const daniC = await conta('dani' + t, 'Dani', { lidos: ate(30), extra: { dia: 35, pulouPara: 35 } });

@@ -106,6 +106,13 @@ lido mostra o item "Temporada concluída: Jacó e José", com a frase de chegada
 Copo de prata". Na última temporada de uma unidade, vem antes do troféu da unidade, e a frase já
 diz "e a unidade N".
 
+**Sem repetir o livro** (ajuste depois da R3.1). Quando a leitura fecha a temporada e também
+termina um livro, os dois não vêm em itens separados ("Você terminou Gênesis!" e, logo abaixo,
+"Você terminou Gênesis." na chegada). Fica um item só, o da temporada: o livro que a frase de
+chegada já cita não aparece de novo, e o que ela não cita vem numa linha, "Livro terminado: Judas"
+(na temporada 33, que fecha Ezequiel e Judas). Sem temporada fechada, o item do livro continua como
+era. `teste-temporadas` confere os dois casos (Gênesis no dia 20; Ezequiel e Judas no dia 334).
+
 **O selo em Conquistas** (tela única da UX4.4). `CC.trofeus()` ganha `temporadas`: um selo por
 temporada (`tipo: 'temporada'`, título = nome do selo, `sub` = nome da temporada). A tela tem a
 estante "Temporadas", logo depois de "Unidades do plano", com os 36 selos: cada um com o nome do
