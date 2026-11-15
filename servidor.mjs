@@ -210,6 +210,14 @@ function conferirProgresso(atual, junto, hoje) {
     }
     junto[campo] = mapa;
   }
+  // R2.2b: o dia 0 segue a mesma regra das outras datas: a data que o servidor já tem não muda, e uma
+  // nova fora da janela de atraso (ou no futuro) vira a de antes ou hoje
+  {
+    const antes = (atual && atual.diaZero) || '';
+    const d = junto.diaZero || '';
+    if (d && d !== antes) junto.diaZero = antes || (!DATA_VALIDA.test(d) || d > amanha || d < limite ? hoje : d);
+    else if (!d && antes && !((junto.zeradoEm || 0) > ((atual && atual.zeradoEm) || 0))) junto.diaZero = antes;
+  }
   const conhecidas = new Set([...(atual ? datasFeitas(atual) : []), ...((atual && atual.diasComPalavra) || [])]);
   junto.diasComPalavra = (junto.diasComPalavra || []).filter((d) => conhecidas.has(d) || (d >= limite && d <= amanha));
   // R1.4: o reacender de um mês que o servidor já tinha não muda; um novo só entra com a data dentro

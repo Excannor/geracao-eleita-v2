@@ -77,6 +77,11 @@
     // Só muda o dia em que a pessoa está (CC.diaDoPlano), nunca lidos, datas ou recompensas. Fica
     // no PROGRESSO_DA_TRILHA (o "Zerar" recomeça do dia 1), e a fusão fica com o maior.
     pulouPara: 0,
+    // O dia 0 (R2.2b): a data em que a pessoa leu "No começo" (Gênesis 1.1 a 2.3, o mesmo trecho e
+    // os mesmos textos do dia 1 do Conhecer Jesus) antes do dia 1 do plano. Acende a chama e conta
+    // como dia com a Palavra (CC.datasFeitas), mas não é dia do plano: nada em lidos, baú ou cartas.
+    // Na fusão vale a data mais antiga; o "Zerar" o apaga, e a data fica nos dias com a Palavra.
+    diaZero: '',
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -293,7 +298,7 @@
   // escreveu, marcou ou é dela (reflexões, anotações, notas, marca-texto, Minha história, foto,
   // nome, orações marcadas, desafios de vários dias, último capítulo) fica.
   const PROGRESSO_DA_TRILHA = ['dia', 'lidos', 'licoes', 'marcadoEm', 'origens', 'licoesEm', 'conhecidos', 'pratica', 'xpLegado',
-    'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos', 'pulouPara'];
+    'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos', 'pulouPara', 'diaZero'];
   CC.PROGRESSO_DA_TRILHA = PROGRESSO_DA_TRILHA;
 
   // A data de cada dia lido: vale a mais antiga dos dois lados. Uma leitura não se desmarca, e a
@@ -385,6 +390,8 @@
       reacesoEm: fundirReacesos(a.reacesoEm, b.reacesoEm),
       // R2.1: pular para a célula não se desfaz entre aparelhos (o maior dos dois)
       pulouPara: Math.max(a.pulouPara || 0, b.pulouPara || 0),
+      // R2.2b: o dia 0 lido em dois aparelhos fica com a data mais antiga
+      diaZero: [a.diaZero, b.diaZero].filter(Boolean).sort()[0] || '',
     };
   }
   function fundirPratica(a, b) {
@@ -447,6 +454,7 @@
     e.diasComPalavra = limparDatas(e.diasComPalavra);
     e.reacesoEm = limparReacesos(e.reacesoEm);
     e.pulouPara = Number.isInteger(e.pulouPara) && e.pulouPara > 1 && e.pulouPara <= D.plano.length ? e.pulouPara : 0;
+    e.diaZero = DATA_ISO.test(e.diaZero) ? e.diaZero : '';
     return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
@@ -660,6 +668,7 @@
     for (const d of Object.values((estado || E).marcadoEm || {})) if (d) s.add(d);
     for (const d of Object.values((estado || E).licoesEm || {})) if (d) s.add(d);
     for (const d of Object.values((estado || E).conhecidos || {})) if (d) s.add(d);
+    if ((estado || E).diaZero) s.add((estado || E).diaZero);
     return s;
   };
 

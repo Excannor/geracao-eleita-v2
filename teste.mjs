@@ -12,6 +12,7 @@ import {
   Contas, diasDeProposito, resumoDeAmigo, somaDias, nascimentoValido,
   somaAnos, idadeMinimaOk, hojeNoFuso, FUSO_PADRAO, IDADE_MINIMA,
   menorDeIdade, podeConduzir, aguardandoAprovacao, LIMIARES_SEMEADORES, conferirCartasDoServidor,
+  datasFeitas as datasFeitasDoServidor,
 } from './contas.mjs';
 import { AJUSTES, notaOculta } from './ferramentas/ajustes-conteudo.mjs';
 import {
@@ -1904,6 +1905,29 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
     && CC.normalizarEstado({ pulouPara: 40 }).pulouPara === 40, 'ficar em dia: o estado guarda só um dia do plano inteiro como pulo');
   checar(CC.PROGRESSO_DA_TRILHA.includes('pulouPara'), 'ficar em dia: o "Zerar" recomeça do dia 1, sem pulo');
   checar(CC.fundir({ ...base({ pulouPara: 40, atualizadoEm: 1 }) }, { ...base({ pulouPara: 0 }), atualizadoEm: 5, zeradoEm: 5 }).pulouPara === 0, 'ficar em dia: o Zerar que chega de outro aparelho tira o pulo');
+}
+
+// --- R2.2b: o dia 0 (a primeira leitura curta, antes do dia 1 do plano) ---
+{
+  const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
+  const zero = base({ diaZero: '2026-03-10' });
+  checar(CC.datasFeitas(zero).has('2026-03-10') && CC.diasComAPalavra(zero) === 1 && datasFeitasDoServidor(zero).has('2026-03-10'),
+    'dia 0: conta como dia com a Palavra, no aparelho e no servidor (as mesmas datas da chama)');
+  checar(CC.simularOfensiva(CC.datasFeitas(zero), '2026-03-10', []).atual === 1 && CC.simularOfensiva(CC.datasFeitas({ ...zero, marcadoEm: { 1: '2026-03-11' }, lidos: [1] }), '2026-03-11', []).atual === 2,
+    'dia 0: acende a chama, e o dia 1 no dia seguinte a continua');
+  checar(!zero.lidos.length && CC.diaDoPlano(zero) === 1 && !CC.bauLiberado(7, zero) && !RC.FONTES.dias.detectar(zero).length,
+    'dia 0: não é dia do plano (nada em lidos, o plano começa no dia 1, nem baú nem carta)');
+  checar(CC.fundir(base({ atualizadoEm: 2, diaZero: '2026-03-12' }), base({ atualizadoEm: 1, diaZero: '2026-03-10' })).diaZero === '2026-03-10'
+    && CC.fundir(base({ atualizadoEm: 2 }), base({ atualizadoEm: 1, diaZero: '2026-03-10' })).diaZero === '2026-03-10',
+  'dia 0: entre aparelhos vale a data mais antiga, e um aparelho sem ele não o apaga');
+  checar(CC.normalizarEstado({ diaZero: 'ontem' }).diaZero === '' && CC.normalizarEstado({ diaZero: '2026-03-10' }).diaZero === '2026-03-10', 'dia 0: o estado guarda só uma data ISO');
+  checar(CC.PROGRESSO_DA_TRILHA.includes('diaZero'), 'dia 0: fica no andamento da trilha (o Zerar o recomeça; a data vai para os dias com a Palavra)');
+  checar(CC.fundir(base({ diaZero: '2026-03-10', atualizadoEm: 1 }), { ...base({}), atualizadoEm: 5, zeradoEm: 5, diasComPalavra: ['2026-03-10'] }).diaZero === ''
+    && CC.diasComAPalavra(CC.fundir(base({ diaZero: '2026-03-10', atualizadoEm: 1 }), { ...base({}), atualizadoEm: 5, zeradoEm: 5, diasComPalavra: ['2026-03-10'] })) === 1,
+  'dia 0: o Zerar o tira, e a data continua nos dias com a Palavra');
+  // a peça: só para quem nunca leu nada
+  const D0 = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8')).dias[0];
+  checar(!!D0 && D0.trechos.map((t) => t.livro + ' ' + t.cap).join() === 'Gênesis 1,Gênesis 2', 'dia 0: o trecho é o do dia 1 do Conhecer Jesus (Gênesis 1.1 a 2.3), reaproveitado');
 }
 
 // --- em dia: baús antigos, fontes, Zerar, Semeadores, álbum novo ---
@@ -3888,6 +3912,17 @@ secao('cofre das anotações (cofre.mjs e servidor)');
       await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3200, reacesoEm: { [mesR]: outroDia.slice(0, 7) === mesR ? outroDia : hojeR } }, ana, 'PUT');
       const r2 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};
       checar(r2[mesR] === hojeR && Object.keys(r2).length === 1, 'no servidor, o reacender do mês não muda nem duplica');
+    }
+    // R2.2b: o dia 0 no servidor: uma data forjada fora da janela vira hoje, e a que já está gravada
+    // não muda
+    {
+      const hojeZ = CC.hojeIso();
+      await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3300, diaZero: '2020-01-05' }, ana, 'PUT');
+      const z1 = (await (await pedir('/api/estado', null, ana)).json()).diaZero;
+      checar(z1 === hojeZ, 'no servidor, um dia 0 fora da janela de atraso entra como hoje (' + z1 + ')');
+      await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3400, diaZero: CC.somaDias(hojeZ, -2) }, ana, 'PUT');
+      const z2 = (await (await pedir('/api/estado', null, ana)).json()).diaZero;
+      checar(z2 === hojeZ, 'no servidor, o dia 0 gravado não muda (' + z2 + ')');
     }
     // R1.1: o aparelho que zera guarda as datas lidas em diasComPalavra; uma data que o servidor
     // nunca viu, fora da janela de atraso, não entra (ninguém inventa anos de leitura assim)

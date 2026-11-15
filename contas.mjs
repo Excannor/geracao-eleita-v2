@@ -2592,6 +2592,8 @@ export function datasFeitas(estado) {
   for (const d of Object.values((estado && estado.marcadoEm) || {})) if (d) s.add(d);
   for (const d of Object.values((estado && estado.licoesEm) || {})) if (d) s.add(d);
   for (const d of Object.values((estado && estado.conhecidos) || {})) if (d) s.add(d);
+  // o dia 0 (R2.2b, docs/fases/r2-volta-sem-culpa.md): a primeira leitura, antes do dia 1 do plano
+  if (estado && estado.diaZero) s.add(estado.diaZero);
   return s;
 }
 

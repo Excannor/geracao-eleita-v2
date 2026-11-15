@@ -14,6 +14,10 @@
 // R2.3, pular a festa: a veterana (7 dias com a Palavra) vê "Mostrar a comemoração completa" no pé do
 // Dia lido; desligada, o dia seguinte abre sem faíscas, confete, frase sorteada nem animação, com tudo
 // o que informa; ligada de novo, a festa volta. Quem ainda não é veterano não vê a preferência.
+// R2.2b, o dia 0: a conta nova vê "Comece aqui: No começo" antes do "Ler hoje"; a tela do dia 0 traz o
+// dia 1 do Conhecer Jesus; a regra de leitura vale; lido, festeja o primeiro dia (chama em 1, nada
+// por cima, o pedido só depois), sem dia do plano lido (no aparelho e no servidor); o dia 1 depois não
+// repete a festa; quem já leu o dia 1 não vê o dia 0.
 // Uso: node ferramentas/teste-volta.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R2.1, R2.2...; PARTES=R2.1,R2.2 escolhe as partes)
 import { spawn } from 'node:child_process';
@@ -379,6 +383,75 @@ try {
     ok(!(await av(q('.dia-lido [data-festa-completa]'))) && !(await av(q('.dia-lido[data-festa-curta]'))) && await av('!!document.querySelector(".dia-lido .faiscas")'),
       'quem ainda não é veterano não vê a preferência, e a festa é completa (mesmo com a marca no aparelho)');
     await av('localStorage.removeItem("cc.diaLido.festa"); location.hash = "#/"; 1');
+  }
+
+  // ---------- R2.2b: o dia 0 ----------
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R2.2b')) break;
+    await temaDe(tema);
+    console.log('\n  R2.2b · O dia 0\n');
+    const t = tema[0];
+    const zeroC = await conta('zero' + t, 'Lia');
+    await cmd('Page.navigate', { url: base + '/entrar.html' });
+    await dormir(300);
+    await av('localStorage.clear(); sessionStorage.clear(); localStorage.setItem("cc.instalar", "1"); 1');
+    await entrar(zeroC, { limpar: false });
+    await esperar(q('.folha-topo'), 20000);
+    ok(await esperar(q('.folha-topo [data-dia-zero]'), 10000), 'conta nova: o Início mostra o dia 0');
+    const cartao = await texto('.folha-topo [data-dia-zero]');
+    ok(/Comece aqui: No começo/.test(cartao) && /Gênesis\s1\.1-31\se\sGênesis\s2\.1-3, uns 4 minutos, antes do dia 1/.test(cartao), 'o convite diz o trecho e o tempo (' + cartao + ')');
+    ok(await av('document.querySelector(".folha-topo [data-dia-zero]").nextElementSibling === document.querySelector(".folha-topo .ler-hoje") && document.querySelector(".folha-topo [data-ler-hoje]").dataset.lerHoje === "1"'),
+      'vem antes do "Ler hoje", que continua no dia 1 do plano');
+    await dormir(2500);
+    await fecharFolhas();
+    await capturar('r2.2b-inicio-' + tema, true);
+    await av(q('[data-dia-zero]') + '.click(); 1');
+    ok(await esperar(q('.tela-dia-zero [data-ler-zero]')), 'tocar abre o dia 0');
+    ok(/Antes do dia 1 · uns 4 minutos/.test(await texto('.tela-dia-zero .dia-zero')) && /No começo/.test(await texto('.tela-dia-zero h1')) && await av('!!document.querySelector(".tela-dia-zero .onde-estamos, .tela-dia-zero [class*=onde]")'),
+      'com o título, a abertura e o "Onde estamos" do dia 1 do Conhecer Jesus');
+    await av('document.querySelector(".tela-dia-zero .tela-cheia-palco").scrollTop = 0; 1');
+    await capturar('r2.2b-antes-' + tema);
+    await av(q('.tela-dia-zero [data-ler-zero]') + '.click(); 1');
+    ok(await esperar(q('.leitor .leitor-verso'), 10000), 'o leitor abre com o texto');
+    await av(q('.leitor [data-terminei]') + '.click(); 1');
+    await dormir(300);
+    ok(await av('!CC.ler("diaZero") && !!document.querySelector(".leitor:not(.saindo)")'), 'a regra de leitura vale: "Terminei a leitura" logo de cara não conta');
+    // o fim do texto e um terço do tempo (o gancho de teste do leitor, o mesmo do teste-fluxo-dia)
+    await av('CC.portaoDoLeitor().concluir(); 1');
+    await av(q('.leitor [data-terminei]') + '.click(); 1');
+    ok(await esperar(q('.tela-dia-zero [data-dia-zero-feito]'), 8000), 'lido até o fim e com o tempo, "Terminei a leitura" conta o dia 0');
+    const festa = await texto('.tela-dia-zero [data-dia-zero-feito]');
+    ok(/Seu primeiro dia com a Palavra!/.test(festa) && /A chama acendeu: 1 dia\./.test(festa) && /um dia de cada vez, Lia\./.test(festa), 'a festa do primeiro dia (' + festa + ')');
+    ok(/Amanhã: Dia 1 do plano/.test(await texto('.tela-dia-zero [data-amanha-zero]')), 'e o que vem amanhã: o dia 1 do plano');
+    ok(await av('CC.ler("diaZero") === CC.hojeIso() && !CC.ler("lidos").length && CC.sequencia().atual === 1 && CC.diasComAPalavra() === 1 && CC.diaAtual() === 1'),
+      'no aparelho: o dia 0 com a data de hoje, nenhum dia do plano lido, a chama em 1, 1 dia com a Palavra, e o plano no dia 1');
+    await vigiar();
+    await dormir(2500);
+    // a própria tela do dia 0 é uma tela cheia: conta tudo o que não é ela
+    ok(await av('window.__cobriu.filter((n) => !/^Dia 0/.test(n)).length === 0'), 'nada abre por cima da festa (' + await av('JSON.stringify(window.__cobriu)') + ')');
+    await capturar('r2.2b-festa-' + tema);
+    await av(q('.tela-dia-zero [data-voltar-zero]') + '.click(); 1');
+    ok(await esperar('window.__cobriu.includes("Instalar no celular")', 5000), 'só depois do "Voltar à trilha" vem o primeiro pedido');
+    await fecharFolhas();
+    ok(await esperar('!' + q('.folha-topo [data-dia-zero]'), 5000) && await esperar(q('.folha-topo [data-ler-hoje="1"]')), 'no Início, o dia 0 sai e a leitura de hoje é o dia 1');
+    await av('CC.salvarNoServidor()');
+    await dormir(400);
+    const noServidor = await estadoDe(zeroC);
+    ok(noServidor.diaZero === await av('CC.hojeIso()') && !(noServidor.lidos || []).length, 'no servidor: o dia 0 com a data de hoje, nenhum dia do plano');
+    // o dia 1, lido no mesmo dia, não repete a festa do primeiro dia
+    await av('CC.lerHoje(1); 1');
+    await esperar(q('.leitor [data-papel-discreto]'), 10000);
+    await av(q('.leitor [data-papel-discreto]') + '.click(); 1');
+    await esperar(q('[data-papel-sim]'));
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    ok(await esperar(q('.dia-lido'), 10000) && !(await av(q('.dia-lido [data-primeiro-dia]'))), 'o dia 1 depois do dia 0 não repete a festa do primeiro dia');
+    await av('location.hash = "#/"; 1');
+    // quem já leu o dia 1 (ou tem qualquer data com a Palavra) não vê o dia 0
+    const jaC = await conta('ja' + t, 'Rui', { lidos: [1] });
+    await entrar(jaC);
+    ok(await noInicio(), 'quem já leu o dia 1 abre o Início');
+    await dormir(800);
+    ok(!(await av(q('.folha-topo [data-dia-zero]'))), 'e não vê o dia 0');
   }
 } catch (e) {
   falhas++;

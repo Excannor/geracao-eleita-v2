@@ -444,9 +444,11 @@
       + '<button class="ir-atual" data-ir-atual hidden aria-label="Voltar ao dia de hoje">' + CC.ico('baixo') + '</button>';
     ligarLetreiro(raiz);
     // R2.1: quem está 2 dias ou mais atrás da célula, ou tem dias pendentes, ganha o "Ficar em dia"
-    // e os pendentes (peça volta.js, que pinta por cima da trilha já desenhada)
+    // e os pendentes (peça volta.js, que pinta por cima da trilha já desenhada). R2.2b: quem nunca
+    // leu nada (depois de saber quem é, para um aparelho novo não ver o convite antes do progresso
+    // chegar) ganha o dia 0, na mesma peça.
     const cel = CC.diaDaCelula();
-    if (cel > atual + 1 || CC.ler('pulouPara')) CC.pedirPeca(window.VOLTA, () => !!CC.volta).then(() => CC.volta.trilha(raiz, atual, cel), () => {});
+    if (cel > atual + 1 || CC.ler('pulouPara') || (CC.quem && !CC.diasComAPalavra() && !CC.leu(1))) CC.pedirPeca(window.VOLTA, () => !!CC.volta).then(() => CC.volta.trilha(raiz, atual, cel), () => {});
 
     raiz.querySelectorAll('[data-dia]').forEach((el) => {
       el.onclick = (ev) => { ev.stopPropagation(); abrirPop(Number(el.dataset.dia), el); };

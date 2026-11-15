@@ -174,3 +174,65 @@ amanhã, desafios), o baú e os amigos. Ligada de novo, a festa volta.
 preferência ligada no pé, desligar e o aviso, o dia seguinte sem faíscas, confete, frase e
 animação e com o número certo e tudo o que informa, ligar de novo e a festa de volta, e quem
 ainda não é veterano sem a preferência e com a festa.
+
+## R2.2b · O dia 0
+
+Decisão do dono sobre a passagem curta da R2.2: um "dia 0" antes do plano. O plano de 365 dias e os
+arquivos da Bíblia não mudam.
+
+**O que é.** "No começo": o dia 1 do Conhecer Jesus reaproveitado inteiro (o trecho, Gênesis 1.1 a
+2.3, uns 4 minutos pela mesma conta de palavras do plano; a abertura; o "Onde estamos na história"
+com o "Enquanto lê, procure"; o "Repare"; a pergunta e a frase para falar com Deus). Não há texto
+novo nem trecho novo: o Conhecer Jesus já tinha exatamente esta primeira leitura curta. O trecho
+passa de Gênesis 1 por três versículos (o sétimo dia, que o "procure" pede).
+
+**Quem vê.** Só quem nunca leu nada: nenhuma data com a Palavra (nem dia do plano, nem primeiro
+passo, nem Conhecer Jesus, nem datas guardadas pelo "Zerar") e o dia 1 do plano não lido. A Trilha
+só pede a peça depois de saber quem é a pessoa (`CC.quem`): num aparelho novo, o convite não aparece
+antes de o progresso chegar do servidor. Quem está no caminho Conhecer Jesus não vê a Trilha do
+plano, e por isso também não vê o dia 0.
+
+**Onde.** No Início, acima do "Ler hoje" (que continua no dia 1 do plano, para quem preferir): o
+cartão "Comece aqui: No começo · Gênesis 1.1-31 e Gênesis 2.1-3, uns 4 minutos, antes do dia 1". Ele
+abre a tela do dia 0 ("Antes do dia 1 · uns 4 minutos"), com "Ler" e "Agora não". Mora na peça
+`volta.js`; no index só cresceu a condição de pedir a peça e uma linha em `CC.datasFeitas`.
+
+**A regra de leitura.** A do plano, pelo mesmo leitor: "Terminei a leitura" só destrava no fim do
+texto e com um terço do tempo estimado. Como no Conhecer Jesus, "Li na minha Bíblia" só aparece
+quando o texto não abre (sem rede).
+
+**Lido.** O estado ganha `diaZero`, a data em que a pessoa leu. Ela entra em `CC.datasFeitas` (e
+em `datasFeitas` do servidor, em `contas.mjs`): acende a chama, conta como dia com a Palavra e como
+"leu hoje" para os amigos, como qualquer leitura. Não é dia do plano: nada vai para `lidos`, o plano
+continua no dia 1, e não há baú nem carta.
+
+**A festa.** A tela do dia 0 vira a festa do primeiro dia, no alto: a chama, "Seu primeiro dia com a
+Palavra!", "A chama acendeu: 1 dia. Agora é um dia de cada vez, Lia.", confete, o "Repare", a
+pergunta, a frase para falar com Deus e "Amanhã: Dia 1 do plano · Gênesis 1-3 · Mateus 1, uns 12
+min". Nada abre por cima dela. O "Voltar à trilha" chama `CC.depoisDoPrimeiroDia`: só então vêm o
+tutorial de instalar e o convite das notificações. O primeiro Dia lido do plano (R2.2) não repete a
+festa depois do dia 0, porque ela é só para quem tem um dia com a Palavra e nenhum outro.
+
+**Entre aparelhos e no servidor.** Na fusão vale a data mais antiga, e um aparelho sem o dia 0 não o
+apaga. `normalizarEstado` guarda só uma data ISO. O servidor (`conferirProgresso`) aplica a mesma
+regra das outras datas: a data que ele já tem não muda, e uma nova fora da janela de 7 dias de
+atraso (ou no futuro) entra como hoje. `diaZero` fica no `PROGRESSO_DA_TRILHA`: o "Zerar" o tira, e
+a data vai para os dias com a Palavra, como as outras.
+
+**Por que não `conhecidos[1]`.** Gravar o dia 0 como o dia 1 do Conhecer Jesus contaria a pessoa
+no painel como quem "começou o Conhecer Jesus" e faria aparecer o convite "Novo na fé?" na Trilha.
+Por isso o conteúdo e a tela foram reaproveitados, mas o registro é próprio.
+
+**Testes.** `teste.mjs`:
+- o dia 0 conta nas datas do aparelho e do servidor e acende a chama;
+- não é dia do plano;
+- na fusão vale a data mais antiga;
+- a normalização, o Zerar e o trecho reaproveitado do Conhecer;
+- no servidor, uma data forjada entra como hoje e a data gravada não muda.
+
+`ferramentas/teste-volta.mjs` (PARTES=R2.2b; claro e escuro):
+- o convite antes do "Ler hoje", e a tela com o "Onde estamos";
+- a regra de leitura: tocar em "Terminei a leitura" logo de cara não conta;
+- lido, a festa, o "amanhã", a chama em 1 e nenhum dia do plano lido, no aparelho e no servidor;
+- nada por cima da festa, e o pedido só depois de "Voltar à trilha";
+- o dia 1 depois do dia 0 sem a festa do primeiro dia, e quem já leu o dia 1 sem o convite.

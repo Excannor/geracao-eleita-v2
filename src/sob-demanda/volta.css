@@ -47,3 +47,25 @@
 
 /* o nó pendente na Trilha: tracejado, sem cadeado nem alerta (sem cobrança) */
 .no.travado.pendente, .no.travado.pendente:active, .no.travado.pendente.aberto { background: var(--salvia-palido); color: var(--salvia-texto); box-shadow: none; outline: 2px dashed var(--salvia-texto); outline-offset: -2px; }
+
+/* R2.2b: o convite do dia 0 (acima do "Ler hoje") e a tela dele */
+.folha-topo .cartao-dia-zero {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 10px; padding: 12px 16px 12px 12px;
+  border: 0; border-radius: 26px; background: var(--salvia); color: var(--salvia-tinta); font: inherit; text-align: left; cursor: pointer;
+}
+.folha-topo .cartao-dia-zero .redondo-volta { background: var(--salvia-tinta); color: var(--salvia); }
+.folha-topo .cartao-dia-zero .textos-volta span { color: inherit; opacity: .8; }
+.folha-topo .cartao-dia-zero > svg { flex: none; width: 20px; height: 20px; margin-left: auto; }
+.tela-dia-zero .tela-cheia-palco { justify-content: flex-start; align-items: stretch; padding: calc(24px + env(safe-area-inset-top)) 20px 24px; }
+.dia-zero { display: grid; gap: 12px; max-width: 560px; margin: 0 auto; }
+.dia-zero h1 { margin: 0; }
+.dia-zero .leitura-hoje { display: grid; gap: 2px; padding: 14px 16px; border-radius: 20px; background: var(--cartao); }
+.dia-zero .passagem-hoje { color: var(--tinta-forte); font-weight: 800; }
+.dia-zero .tempo { color: var(--tinta-fraca); font-size: .875rem; }
+.festa-zero { display: grid; justify-items: center; gap: 6px; text-align: center; }
+.festa-zero .ico-chama { width: 120px; height: 120px; }
+.festa-zero .linha-zero { margin: 0; font-weight: 700; }
+.amanha-zero { display: grid; gap: 2px; margin: 0; padding: 14px 16px; border-radius: 20px; background: var(--salvia-palido); }
+.amanha-zero b { color: var(--tinta-forte); }
+.amanha-zero span { font-size: .875rem; }
+.tela-dia-zero .tela-cheia-pe { display: grid; gap: 8px; }
