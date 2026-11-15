@@ -167,3 +167,36 @@ todas as conquistas e todos os troféus de `CC.trofeus()`; o endereço antigo ab
 
 **O que ficou de fora.** O resto do C12 (Configurações, anotações e instalar com vários acessos)
 já tinha sido tratado na Fase 3; as Cartas não entram na tela de Conquistas.
+
+## UX4.5 · Lembretes que mostram a verdade (C11)
+
+**Como era.** Em Configurações › Lembretes e avisos, sem a permissão do navegador (ou com as
+notificações desativadas neste aparelho), o cartão do alto mostrava "Ativar notificações", mas os
+três interruptores ("Lembrete da leitura", "Ofensiva em risco", "Amigos") apareciam ligados: eram
+a escolha guardada no servidor, não o que chega. Na lista de Configurações, a linha "Lembretes e
+avisos" não dizia nada.
+
+**Agora** (só estado e exibição, `07d-notificacoes.js`; o fluxo de ativação, o pedido de permissão
+e as folhas que oferecem notificação não mudaram):
+- fora do estado "ativo" (desligadas ou bloqueadas neste aparelho), os três interruptores aparecem
+  desligados e indisponíveis (`aria-checked="false"`, `aria-disabled="true"`, apagados), o horário
+  fica desligado e, logo abaixo de "O que chega", o motivo: "Nada chega enquanto as notificações
+  estiverem desligadas. Ative acima para receber." ou "Nada chega enquanto as notificações
+  estiverem bloqueadas neste aparelho.";
+- tocar num interruptor indisponível só repete o motivo; a escolha guardada no servidor não muda e
+  volta a aparecer, igual, quando a pessoa ativa;
+- ativadas, tudo como antes;
+- a linha "Lembretes e avisos" em Configurações diz "desligadas" quando a permissão ainda não foi
+  pedida ou quando o servidor não tem aparelho ativo (antes, nada). Antes de o estado do servidor
+  chegar, continua sem dizer nada, para não afirmar o que não sabe.
+
+Custo no index.html: 0,7 KB (folga de 66,5 KB).
+
+**Testes.** `teste-redesenho` (a permissão do navegador é simulada; o estado "ativo" também, porque
+o Chrome sem cabeça não se inscreve num serviço de push): "desligadas" na linha de Configurações;
+desligadas, os três desligados e indisponíveis, com o motivo e "Ativar notificações"; tocar não
+muda a escolha guardada; bloqueadas, o mesmo com o outro motivo; ativadas, os três com a escolha
+guardada.
+
+**O que ficou de fora.** O estado "instalar" (iPhone sem o app instalado) e "sem suporte" não
+mostram as preferências (como antes): não há o que escolher ali.

@@ -446,6 +446,35 @@ ok(await esperar('document.querySelectorAll(".grupo-config").length >= 5 && ' + 
 ok(await av('/ana@teste.com/.test(document.body.innerText) && /06\\/05\\/2004/.test(document.body.innerText)'),
   'a conta mostra o e-mail e a data de nascimento só para a própria pessoa');
 await foto('8-config');
+// C11 (UX4.5): sem notificação neste aparelho, os lembretes não aparecem ligados. A permissão do
+// navegador é simulada; o fluxo de ativação não é tocado.
+{
+  const permissao = (v) => av('Object.defineProperty(Notification, "permission", { configurable: true, get: () => ' + JSON.stringify(v) + ' }); true');
+  const prefs = '[...document.querySelectorAll(".caixa-config [role=switch]")]';
+  await permissao('default');
+  await irPara('#/perfil'); await irPara('#/config');
+  ok(await esperar('/Lembretes e avisos\\s*desligadas/.test(document.querySelector("[data-ir=\\"#/config/notificacoes\\"]")?.textContent || "")'), 'UX4.5: sem permissão, Configurações diz "Lembretes e avisos: desligadas"');
+  await irPara('#/config/notificacoes');
+  ok(await esperar('!!document.querySelector("[data-motivo-prefs]") && !!document.querySelector("[data-ativar]")', 15000)
+    && await av(prefs + '.length === 3 && ' + prefs + '.every((b) => b.getAttribute("aria-checked") === "false" && b.getAttribute("aria-disabled") === "true" && b.classList.contains("apagada"))')
+    && await av('document.querySelector("#hora-lembrete").disabled && /desligadas\\. Ative acima para receber\\./.test(document.querySelector("[data-motivo-prefs]").textContent)'),
+    'UX4.5: desligadas, os três lembretes aparecem desligados e indisponíveis, com o motivo, e "Ativar notificações" continua lá');
+  await av('document.querySelector("[data-pref-off=\\"lembrete\\"]").click(); true');
+  await dormir(300);
+  const guardadas = await av('CC.api("api/notificacoes").then((d) => JSON.stringify(d.preferencias))');
+  ok(await av('document.querySelector("[data-pref-off=\\"lembrete\\"]").getAttribute("aria-checked") === "false"') && /"lembrete":true/.test(guardadas),
+    'UX4.5: tocar no lembrete indisponível não muda nada, e a escolha guardada continua (' + guardadas + ')');
+  await permissao('denied');
+  await irPara('#/config'); await irPara('#/config/notificacoes');
+  ok(await esperar('/bloqueadas neste aparelho/.test(document.querySelector("[data-motivo-prefs]")?.textContent || "")', 15000)
+    && await av(prefs + '.every((b) => b.getAttribute("aria-checked") === "false")'), 'UX4.5: bloqueadas, o mesmo, com o motivo "bloqueadas neste aparelho"');
+  // ativo (simulado): os interruptores voltam a mostrar a escolha guardada
+  await av('window.__estadoReal = CC.estadoNotificacoes; CC.estadoNotificacoes = async () => ({ situacao: "ativo", dados: await CC.carregarNotificacoes() }); true');
+  await irPara('#/config'); await irPara('#/config/notificacoes');
+  ok(await esperar('!!document.querySelector("[data-testar]")', 15000) && await av('!document.querySelector("[data-motivo-prefs]") && ' + prefs + '.every((b) => b.hasAttribute("data-pref") && b.getAttribute("aria-checked") === "true")'),
+    'UX4.5: ativadas, os três mostram a escolha guardada (ligados) e mudam como antes');
+  await av('CC.estadoNotificacoes = window.__estadoReal; delete Notification.permission; true');
+}
 await irPara('#/config/textos');
 ok(await esperar('document.querySelectorAll(".credito-biblia").length === 2'), 'os créditos das traduções estão em Textos bíblicos');
 await irPara('#/passos');

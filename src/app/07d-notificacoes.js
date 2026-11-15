@@ -75,7 +75,10 @@
   CC.resumoNotificacoes = () => {
     if (!suportado()) return '';
     if (Notification.permission === 'denied') return 'bloqueadas';
-    return Notification.permission === 'granted' && cache && (cache.aparelhos || []).length ? 'ativadas' : '';
+    // sem aparelho ativo, a linha de Configurações diz "desligadas" em vez de nada (C11)
+    if (Notification.permission === 'default') return 'desligadas';
+    // permitidas: só com o estado do servidor dá para dizer (antes dele, nada, para não mentir)
+    return !cache ? '' : (cache.aparelhos || []).length ? 'ativadas' : 'desligadas';
   };
 
   // ---------- a tela ----------
@@ -87,7 +90,10 @@
     + '<div><b>' + CC.esc(titulo) + '</b><p>' + CC.esc(texto) + '</p></div></div>'
     + (acoes ? '<div class="acoes">' + acoes + '</div>' : '') + '</div>';
 
-  const interruptor = (chave, rotulo, dica, ligado) => '<button class="linha-config" role="switch" data-pref="' + chave + '" aria-checked="' + !!ligado + '">'
+  // Sem notificação neste aparelho (desligadas, bloqueadas), o interruptor mostra a verdade: desligado
+  // e indisponível (C11). A escolha guardada no servidor não muda, e volta a aparecer ao ativar.
+  const interruptor = (chave, rotulo, dica, ligado, recebe = true) => '<button class="linha-config' + (recebe ? '' : ' apagada') + '" role="switch" '
+    + (recebe ? 'data-pref="' + chave + '" aria-checked="' + !!ligado + '"' : 'data-pref-off="' + chave + '" aria-checked="false" aria-disabled="true"') + '>'
     + '<span>' + CC.esc(rotulo) + '<small class="dica-config">' + CC.esc(dica) + '</small></span>'
     + '<span class="interruptor" aria-hidden="true"><i></i></span></button>';
 
@@ -120,14 +126,21 @@
       'sem-servidor': cartao('info', 'Notificações indisponíveis', 'Tente de novo mais tarde.', ''),
     })[e.situacao];
 
+    // Só o aparelho ativo recebe: fora dele, os interruptores aparecem desligados, com o motivo
+    const recebe = e.situacao === 'ativo';
+    const motivo = recebe ? '' : e.situacao === 'bloqueado' ? 'Nada chega enquanto as notificações estiverem bloqueadas neste aparelho.'
+      : 'Nada chega enquanto as notificações estiverem desligadas. Ative acima para receber.';
+    const lembrete = recebe && p.lembrete;
     const preferencias = e.dados
-      ? '<section class="grupo-config"><h2 class="etiqueta">O que chega</h2><div class="caixa-config">'
-        + interruptor('lembrete', 'Lembrete da leitura', 'Só se você ainda não leu no dia', p.lembrete)
-        + '<label class="linha-config sem-toque' + (p.lembrete ? '' : ' apagada') + '" for="hora-lembrete"><span>Horário do lembrete</span>'
-        + '<select id="hora-lembrete" class="seletor-config"' + (p.lembrete ? '' : ' disabled') + '>'
+      ? '<section class="grupo-config"><h2 class="etiqueta">O que chega</h2>'
+        + (motivo ? '<p class="passo-dica pequena" data-motivo-prefs>' + CC.esc(motivo) + '</p>' : '')
+        + '<div class="caixa-config">'
+        + interruptor('lembrete', 'Lembrete da leitura', 'Só se você ainda não leu no dia', p.lembrete, recebe)
+        + '<label class="linha-config sem-toque' + (lembrete ? '' : ' apagada') + '" for="hora-lembrete"><span>Horário do lembrete</span>'
+        + '<select id="hora-lembrete" class="seletor-config"' + (lembrete ? '' : ' disabled') + '>'
         + HORAS.map((h) => '<option' + (h === p.hora ? ' selected' : '') + '>' + h + '</option>').join('') + '</select></label>'
-        + interruptor('ofensiva', 'Ofensiva em risco', 'Às 21h, se a sua chama ainda não foi acesa', p.ofensiva)
-        + interruptor('amigos', 'Amigos', 'Toques, pedidos e convites aceitos', p.amigos)
+        + interruptor('ofensiva', 'Ofensiva em risco', 'Às 21h, se a sua chama ainda não foi acesa', p.ofensiva, recebe)
+        + interruptor('amigos', 'Amigos', 'Toques, pedidos e convites aceitos', p.amigos, recebe)
         + '</div></section>'
       : '';
 
@@ -151,6 +164,8 @@
       CC.avisar('Desativadas neste aparelho');
       CC.vistaNotificacoes(raiz);
     });
+    // indisponível: o toque só repete o motivo (a ativação continua no botão do cartão de cima)
+    raiz.querySelectorAll('[data-pref-off]').forEach((b) => { b.onclick = () => CC.avisar(motivo); });
     raiz.querySelectorAll('[data-pref]').forEach((b) => {
       b.onclick = async () => {
         const novo = b.getAttribute('aria-checked') !== 'true';
