@@ -233,8 +233,11 @@ try {
     await av('document.querySelector(".dia-lido [data-semana-completa]").scrollIntoView({ block: "center" }); 1');
     await capturar('r1.2-dia-lido-' + tema);
     // o círculo de "Amanhã" (e o de "Você voltou!", com a mesma regra) no tamanho cheio, 48px:
-    // a regra antiga ".arte-destaque > span" o encolhia a 45%
-    const amanha = await av('(() => { const el = document.querySelector(".dia-lido .arte-destaque > .arte-amanha"); if (!el) return 0; el.scrollIntoView({ block: "center" }); return Math.round(el.getBoundingClientRect().width); })()');
+    // a regra antiga ".arte-destaque > span" o encolhia a 45%. Cada linha do resumo entra com a
+    // animação "pop" (de scale(.5) a 1, com atraso): medida no meio dela, a caixa dá 24px. Espera a
+    // entrada da linha terminar antes de medir o tamanho que fica na tela.
+    const amanha = await av('(async () => { const el = document.querySelector(".dia-lido .arte-destaque > .arte-amanha"); if (!el) return 0; el.scrollIntoView({ block: "center" });'
+      + ' await Promise.all(el.closest(".destaque-dia").getAnimations().map((a) => a.finished)); return Math.round(el.getBoundingClientRect().width); })()');
     ok(amanha >= 46, 'o ícone de "Amanhã" no Dia lido tem o tamanho cheio (' + amanha + 'px)');
     await capturar('icone-dia-lido-' + tema);
     await av('location.hash = "#/"; 1');
