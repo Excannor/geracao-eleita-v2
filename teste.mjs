@@ -399,6 +399,9 @@ secao('peças sob demanda');
     checar(codigo.includes('data-primeiro-dia') && codigo.includes('Seu primeiro dia com a Palavra!') && !html.includes('Seu primeiro dia com a Palavra!')
       && /\[data-voltar-trilha\]'\)\.onclick = \(\) => \{[\s\S]{0,300}depoisDoPrimeiroDia\(\)/.test(codigo),
     'o primeiro Dia lido festeja na peça do Dia lido, e os pedidos vêm só no "Voltar à trilha"');
+    // R2.3: a preferência de pular a festa mora na peça, e a festa curta tira só o que é festa
+    checar(codigo.includes('Mostrar a comemoração completa') && codigo.includes("'cc.diaLido.festa'") && !html.includes('Mostrar a comemoração completa')
+      && /if \(festa\) CC\.arte\.confete/.test(codigo), 'pular a festa: a preferência e o Dia lido sóbrio moram na peça do Dia lido');
   }
   // As peças do estudo juntam mais de um arquivo: as regras puras vão com a tela, e o leitor de
   // marcas (o mesmo do servidor) vai com o preparo. O estudo antigo saiu do index.

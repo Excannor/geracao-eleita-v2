@@ -144,3 +144,33 @@ O guia de leitura do dia 1 já pula a lista de nomes de Mateus 1 para a parte qu
 `ferramentas/teste-volta.mjs` (PARTES=R2.2; claro e escuro): conta nova sem nada por cima do
 Início, o leitor do dia 1 direto, a festa no alto sem rolar, nada por cima do Dia lido, o tutorial
 de instalar só depois do "Voltar à trilha", e o dia 2 sem a festa.
+
+## R2.3 · Dia lido com opção de pular a festa
+
+**Como era.** Todo Dia lido abria com a festa inteira: faíscas em volta da chama, confete, o número
+da chama subindo, a frase sorteada e cada item do que o dia trouxe entrando animado. Só quem pede
+menos movimento no sistema ficava sem o confete.
+
+**O que mudou.** Quem já é veterano, com 7 dias com a Palavra ou mais (`CC.VETERANO_FESTA`), vê no pé
+do Dia lido, logo acima do "Voltar à trilha", a preferência "Mostrar a comemoração completa ·
+Desligada, o Dia lido abre sem confete nem animação.", ligada por padrão. Desligada ("Pronto: daqui
+para a frente, o Dia lido abre sem a festa."), o Dia lido abre sóbrio: sem faíscas, confete, número
+subindo, frase sorteada nem animação de entrada. Tudo o que informa fica: "Dia N lido", a chama com o
+número certo, a semana, o versículo, Pensar e Orar, o que o dia trouxe (semana completa, unidade,
+amanhã, desafios), o baú e os amigos. Ligada de novo, a festa volta.
+
+**Decisões.**
+- "Pular a festa" é o Dia lido sóbrio, e não pular a tela: o Dia lido também é onde ficam o versículo
+  para guardar, Pensar e Orar.
+- A preferência fica neste aparelho (`cc.diaLido.festa`, como o tema e os cartões abertos do Dia
+  lido), não na conta.
+- Ela só aparece e só vale para veteranos: quem está começando sempre tem a festa (inclusive o
+  primeiro Dia lido da R2.2), mesmo com a marca no aparelho.
+- Fica só no Dia lido, sem entrada nas Configurações: é a preferência discreta que o roadmap pede, e
+  não gasta a folga do index.html. Mora na peça `dia-lido.js`.
+
+**Testes.** `teste.mjs` (a preferência e o Dia lido sóbrio na peça, fora do index) e
+`ferramentas/teste-volta.mjs` (PARTES=R2.3; claro e escuro): a festa completa por padrão, a
+preferência ligada no pé, desligar e o aviso, o dia seguinte sem faíscas, confete, frase e
+animação e com o número certo e tudo o que informa, ligar de novo e a festa de volta, e quem
+ainda não é veterano sem a preferência e com a festa.

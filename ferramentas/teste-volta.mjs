@@ -11,6 +11,9 @@
 // R2.2, o primeiro dia: numa conta nova nada cobre o Início antes de ler; o primeiro Dia lido festeja
 // no alto ("Seu primeiro dia com a Palavra!"), nada abre por cima dele, e o primeiro pedido (instalar)
 // só vem depois do "Voltar à trilha"; o dia 2 não repete a festa.
+// R2.3, pular a festa: a veterana (7 dias com a Palavra) vê "Mostrar a comemoração completa" no pé do
+// Dia lido; desligada, o dia seguinte abre sem faíscas, confete, frase sorteada nem animação, com tudo
+// o que informa; ligada de novo, a festa volta. Quem ainda não é veterano não vê a preferência.
 // Uso: node ferramentas/teste-volta.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R2.1, R2.2...; PARTES=R2.1,R2.2 escolhe as partes)
 import { spawn } from 'node:child_process';
@@ -70,13 +73,13 @@ const pedir = (rota, corpo, cookie, metodo) => fetch(base + rota, {
 });
 // Uma conta (com o fuso do navegador do teste: o "hoje" do servidor é o do fuso da conta) e, se
 // vier, o progresso: os dias lidos, todos na data dada.
-async function conta(usuario, nome, { celula = '', lidos = [], data = atras(1) } = {}) {
+async function conta(usuario, nome, { celula = '', lidos = [], data = atras(1), datas = null } = {}) {
   const r = await pedir('/api/criar-conta', { usuario, nome, senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2008-04-05', consentimento: true,
     fuso: Intl.DateTimeFormat().resolvedOptions().timeZone, ...(celula ? { celula } : {}) });
   if (!r.ok) throw new Error('não criou a conta: ' + r.status + ' ' + await r.text());
   const cookie = (r.headers.get('set-cookie') || '').split(';')[0];
   if (lidos.length) {
-    const estado = { atualizadoEm: Date.now(), dia: Math.max(...lidos) + 1, lidos, marcadoEm: Object.fromEntries(lidos.map((n) => [n, data])), apelido: nome };
+    const estado = { atualizadoEm: Date.now(), dia: Math.max(...lidos) + 1, lidos, marcadoEm: Object.fromEntries(lidos.map((n, i) => [n, datas ? datas[i] : data])), apelido: nome };
     const p = await pedir('/api/estado', estado, cookie, 'PUT');
     if (!p.ok) throw new Error('não gravou o estado: ' + p.status);
   }
@@ -313,6 +316,69 @@ try {
     ok(await esperar(q('.dia-lido'), 10000) && !(await av(q('.dia-lido [data-primeiro-dia]'))), 'o dia 2 não repete a festa do primeiro dia');
     await av('location.hash = "#/"; 1');
     await fecharFolhas();
+  }
+
+  // ---------- R2.3: pular a festa ----------
+  // Lê o dia N no papel e espera o Dia lido.
+  const lerNoPapel = async (n) => {
+    await av('location.hash = "#/"; 1');
+    await esperar('!document.querySelector(".licao:not(.saindo)")', 4000);
+    await av('CC.lerHoje(' + n + '); 1');
+    await esperar(q('.leitor [data-papel-discreto]'), 10000);
+    await av(q('.leitor [data-papel-discreto]') + '.click(); 1');
+    await esperar(q('[data-papel-sim]'));
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    // o Dia lido deste dia (o do dia anterior pode ainda estar saindo da tela)
+    return esperar('[...document.querySelectorAll(".licao:not(.saindo) .dia-lido h1")].some((h) => h.textContent === "Dia ' + n + ' lido") && ' + q('[data-voltar-trilha]'), 10000);
+  };
+  const animacao = (sel) => av('(() => { const el = document.querySelector(' + JSON.stringify(sel) + '); return el ? getComputedStyle(el).animationName : "sem"; })()');
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R2.3')) break;
+    await temaDe(tema);
+    console.log('\n  R2.3 · Pular a festa\n');
+    const t = tema[0];
+    // a Vera leu os dias 1 a 7, um por dia, na última semana: 7 dias com a Palavra (veterana)
+    const veraC = await conta('vera' + t, 'Vera', { lidos: ate(7), datas: ate(7).map((n) => atras(8 - n)) });
+    await entrar(veraC);
+    ok(await noInicio(), 'a Vera abre o Início');
+    ok(await lerNoPapel(8), 'a Vera lê o dia 8: o Dia lido abre');
+    ok(!(await av(q('.dia-lido[data-festa-curta]'))) && await av('!!document.querySelector(".dia-lido .faiscas") && !!document.querySelector(".dia-lido .frase-cena")'),
+      'por padrão, a comemoração é completa (faíscas e a frase do dia)');
+    ok(await av(q('.dia-lido [data-festa-completa][aria-checked="true"]') + ' !== null') && /Mostrar a comemoração completa/.test(await texto('.dia-lido [data-festa-completa]')),
+      'a veterana vê, no pé, "Mostrar a comemoração completa", ligada');
+    await av(q('.dia-lido [data-festa-completa]') + '.scrollIntoView({ block: "center" }); 1');
+    await capturar('r2.3-preferencia-ligada-' + tema);
+    await av(q('.dia-lido [data-festa-completa]') + '.click(); 1');
+    ok(await av(q('.dia-lido [data-festa-completa]') + '.getAttribute("aria-checked") === "false" && localStorage.getItem("cc.diaLido.festa") === "curta"'),
+      'tocar desliga a preferência (guardada no aparelho)');
+    ok(await esperar('/sem a festa/.test(document.body.textContent)', 3000), 'e o app confirma: "daqui para a frente, o Dia lido abre sem a festa"');
+    await capturar('r2.3-preferencia-desligada-' + tema);
+    ok(await lerNoPapel(9), 'a Vera lê o dia 9');
+    ok(await av(q('.dia-lido[data-festa-curta]') + ' !== null'), 'o Dia lido abre sem a festa');
+    await dormir(200);
+    ok(await av('!document.querySelector(".dia-lido .faiscas") && !document.querySelector(".dia-lido .frase-cena") && !document.querySelector(".confete")'),
+      'sem faíscas, sem confete, sem a frase sorteada');
+    ok(await av('document.querySelector(".dia-lido .numero-ofensiva").textContent === String(CC.sequencia().atual) && !document.querySelector(".numero-ofensiva.subindo")'),
+      'o número da chama já aparece certo, sem subir');
+    ok((await animacao('.dia-lido .chama-palco .ico-chama')) === 'none' && (await animacao('.dia-lido .destaque-dia')) === 'none', 'nada entra animado (a chama e o que o dia trouxe)');
+    ok(await av('!!document.querySelector(".dia-lido .semana-ofensiva") && !!document.querySelector(".dia-lido .destaques") && !!document.querySelector(".dia-lido [data-cartao=pensar]") && /Dia 9 lido/.test(document.querySelector(".dia-lido h1").textContent)'),
+      'o que informa fica: "Dia 9 lido", a chama, a semana, o que o dia trouxe, Pensar e Orar');
+    await capturar('r2.3-dia-lido-sem-festa-' + tema);
+    await av(q('.dia-lido [data-festa-completa]') + '.click(); 1');
+    ok(await av('localStorage.getItem("cc.diaLido.festa") === null'), 'ligar de novo volta ao padrão');
+    // o Dia lido do dia 9 pode continuar no documento por baixo: confere o do dia 10 (o último)
+    ok(await lerNoPapel(10) && await av('(() => { const d = [...document.querySelectorAll(".dia-lido")].pop(); return /Dia 10 lido/.test(d.querySelector("h1").textContent) && !d.matches("[data-festa-curta]") && !!d.querySelector(".faiscas"); })()'),
+      'e o dia 10 tem a comemoração completa');
+    await av('location.hash = "#/"; 1');
+    // quem ainda não é veterano não vê a preferência, e a festa é sempre completa
+    const novoC = await conta('novo' + t, 'Davi', { lidos: [1], data: atras(1) });
+    await entrar(novoC);
+    ok(await noInicio(), 'o Davi (1 dia com a Palavra) abre o Início');
+    await av('localStorage.setItem("cc.diaLido.festa", "curta"); 1');
+    ok(await lerNoPapel(2), 'o Davi lê o dia 2');
+    ok(!(await av(q('.dia-lido [data-festa-completa]'))) && !(await av(q('.dia-lido[data-festa-curta]'))) && await av('!!document.querySelector(".dia-lido .faiscas")'),
+      'quem ainda não é veterano não vê a preferência, e a festa é completa (mesmo com a marca no aparelho)');
+    await av('localStorage.removeItem("cc.diaLido.festa"); location.hash = "#/"; 1');
   }
 } catch (e) {
   falhas++;

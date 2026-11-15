@@ -49,6 +49,16 @@
     try { const a = cartoesAbertos(); a[k] = aberto; localStorage.setItem(CHAVE_CARTOES, JSON.stringify(a)); } catch (e) { /* segue */ }
   };
 
+  // R2.3: pular a festa. Quem já é veterano (7 dias com a Palavra ou mais) vê, no pé do Dia lido, a
+  // preferência "Mostrar a comemoração completa" (ligada por padrão). Desligada, o Dia lido abre
+  // sóbrio: sem faíscas, confete, número subindo, frase sorteada nem animação de entrada, com tudo o
+  // que informa (a chama, a semana, o versículo, Pensar e Orar, o que o dia trouxe, o baú). Fica neste
+  // aparelho, como o tema, e vale para todas as contas dele.
+  const CHAVE_FESTA = 'cc.diaLido.festa';
+  CC.VETERANO_FESTA = 7;
+  const festaCurta = () => { try { return localStorage.getItem(CHAVE_FESTA) === 'curta'; } catch (e) { return false; } };
+  const guardarFesta = (completa) => { try { if (completa) localStorage.removeItem(CHAVE_FESTA); else localStorage.setItem(CHAVE_FESTA, 'curta'); } catch (e) { /* segue */ } };
+
   // R1.4: o pedido "Reacender lendo hoje" (chama.js) se cumpre aqui, com o dia de hoje lido. Vale
   // só no mesmo dia e na mesma conta; lido ou não, o pedido sai.
   let reacendeuAgora = false;
@@ -83,6 +93,11 @@
     // Palavra antes) ganha uma festa própria, no alto, antes de qualquer pedido: o tutorial de
     // instalar e o convite das notificações só vêm depois do "Voltar à trilha" (depoisDoPrimeiroDia)
     const primeiroDia = subiuHoje && CC.ler('lidos', []).length === 1 && CC.diasComAPalavra() === 1;
+    const veterano = CC.diasComAPalavra() >= CC.VETERANO_FESTA;
+    // a festa inteira só quando ganhou o dia e não pediu para pular (a preferência vale para veteranos)
+    const curta = ganhou && veterano && festaCurta();
+    const festa = ganhou && !curta;
+    const sobeNumero = subiuHoje && !curta;
     // guardados aqui: os temporizadores de baixo podem disparar depois de a lição fechar
     const ofensivaAntes = sessao.antes.ofensiva;
     const diaDaSessao = sessao.dia;
@@ -180,10 +195,10 @@
 
     return {
       semTopo: true,
-      corpo: '<div class="resumo-dia dia-lido"><div class="cabeca-licao">'
-        + '<div class="chama-palco">' + (ganhou ? CC.arte.faiscas() : '') + CC.icoChama(seq.atual) + '</div>'
+      corpo: '<div class="resumo-dia dia-lido' + (curta ? ' festa-curta" data-festa-curta' : '"') + '><div class="cabeca-licao">'
+        + '<div class="chama-palco">' + (festa ? CC.arte.faiscas() : '') + CC.icoChama(seq.atual) + '</div>'
         + '<h1 class="rotulo-ofensiva">' + (ganhou ? 'Dia ' + sessao.dia + ' lido' : 'Revisão do dia ' + sessao.dia) + '</h1>'
-        + '<p class="linha-chama"><b class="numero-ofensiva" data-de="' + (subiuHoje ? ofensivaAntes : seq.atual) + '">' + (subiuHoje ? ofensivaAntes : seq.atual) + '</b> '
+        + '<p class="linha-chama"><b class="numero-ofensiva" data-de="' + (sobeNumero ? ofensivaAntes : seq.atual) + '">' + (sobeNumero ? ofensivaAntes : seq.atual) + '</b> '
         + '<span>' + (seq.atual === 1 ? 'dia seguido com a chama acesa' : 'dias seguidos com a chama acesa') + '</span></p>'
         // R1.1: o total da vida, quando já passa da sequência de agora (quem voltou de uma falta)
         + (CC.diasComAPalavra() > seq.atual ? '<p class="linha-vida-dia" data-dias-palavra="' + CC.diasComAPalavra() + '">' + CC.esc(CC.textoDiasComAPalavra(CC.diasComAPalavra())) + '</p>' : '')
@@ -204,17 +219,20 @@
           + ' <button class="link-inline" data-nota-reflexao>Ler a nota</button></p>' : '')
         + '</section>'
         + pensar + orar
-        + (ganhou ? '<p class="frase-cena">' + CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '') + '</p>' : '')
+        + (festa ? '<p class="frase-cena">' + CC.esc(f.linhas.join(' ')) + (f.ref ? ' <span class="ref-frase">' + CC.esc(f.ref) + '</span>' : '') + '</p>' : '')
         + (destaques.length ? '<ul class="destaques">' + destaques.join('') + '</ul>' : '')
         + linhaDoMapa(dia)
         + '<div id="resumo-amigos"></div>'
         + (ganhou ? '<div class="progresso-plano"><span>' + lidos + ' de ' + D.plano.length + ' dias lidos</span>' + CC.barra(lidos / D.plano.length, 'fina') + '</div>' : '')
+        // R2.3: a preferência discreta, só para veteranos e só no dia lido agora
+        + (ganhou && veterano ? '<button type="button" class="linha-config preferencia-festa" role="switch" data-festa-completa aria-checked="' + !curta + '">'
+          + '<span>Mostrar a comemoração completa<small>Desligada, o Dia lido abre sem confete nem animação.</small></span><span class="interruptor" aria-hidden="true"><i></i></span></button>' : '')
         + '</div>',
       pe: botao(ganhou && nome ? 'Voltar à trilha' : 'Voltar à trilha', 'data-voltar-trilha'),
       ligar(el) {
-        if (ganhou) CC.arte.confete(el, 26);
+        if (festa) CC.arte.confete(el, 26);
         const numero = el.querySelector('.numero-ofensiva');
-        if (subiuHoje) setTimeout(() => {
+        if (sobeNumero) setTimeout(() => {
           if (!numero.isConnected) return;
           numero.classList.add('subindo');
           CC.contar(numero, ofensivaAntes, seq.atual, 500);
@@ -247,6 +265,13 @@
             ir('escrever');
           };
         });
+        const preferencia = el.querySelector('[data-festa-completa]');
+        if (preferencia) preferencia.onclick = () => {
+          const completa = preferencia.getAttribute('aria-checked') !== 'true';
+          preferencia.setAttribute('aria-checked', String(completa));
+          guardarFesta(completa);
+          CC.avisar(completa ? 'Pronto: o Dia lido volta a ter a comemoração completa.' : 'Pronto: daqui para a frente, o Dia lido abre sem a festa.');
+        };
         const notaReflexao = el.querySelector('[data-nota-reflexao]');
         if (notaReflexao) notaReflexao.onclick = () => CC.folhaNota(r.idNota);
         // a oração escrita aqui mesmo, guardada a cada letra no registro do dia
