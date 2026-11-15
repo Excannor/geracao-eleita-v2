@@ -115,6 +115,10 @@
 .trofeu { grid-template-rows: auto 1fr auto; gap: 6px; padding: 16px 6px 14px; border-radius: 26px; }
 .estante .trofeu b { align-self: start; text-wrap: balance; }
 .trofeu span { font-size: .75rem; }
+/* R3: o selo da temporada leva o nome da temporada embaixo do nome do selo, e o número no meio */
+.trofeu b small { display: block; margin-top: 2px; color: var(--tinta-fraca); font-size: .6875rem; font-weight: 600; }
+.arte-trofeu .numero-selo { fill: var(--tinta-fraca); font: 800 15px/1 var(--fonte-ui); }
+.arte-trofeu.ganho .numero-selo { fill: var(--salvia-tinta); }
 .trofeu .arte-trofeu { --cor: var(--salvia); --cor-3d: var(--salvia-texto); --trilho: color-mix(in srgb, var(--tinta-fraca) 30%, var(--cartao)); }
 .trofeu .detalhe { stroke: var(--cartao) !important; }
 

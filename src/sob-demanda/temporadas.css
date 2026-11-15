@@ -1,0 +1,38 @@
+/* As temporadas (temporadas.js). R3.1: o cartão da temporada na folha do alto da Trilha e a
+   folha da temporada. */
+.folha-topo .cartao-temporada {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0; padding: 12px 16px 12px 12px;
+  border: 0; border-radius: 26px; background: var(--folha-campo); color: var(--folha-tinta); font: inherit; text-align: left; cursor: pointer;
+}
+.folha-topo .cartao-temporada:active { transform: scale(.98); }
+.folha-topo .cartao-temporada > svg { flex: none; width: 20px; height: 20px; margin-left: auto; }
+.selo-temporada { flex: none; display: grid; place-items: center; width: 48px; }
+.selo-temporada .arte-trofeu { width: 44px; --cor: var(--salvia); --cor-3d: var(--salvia-texto); --trilho: color-mix(in srgb, var(--folha-tinta-fraca) 28%, var(--folha-campo)); }
+.selo-temporada.grande { width: 64px; }
+.selo-temporada.grande .arte-trofeu { width: 60px; }
+.selo-temporada .arte-trofeu .copa-parte { fill: color-mix(in srgb, var(--cor) 60%, var(--trilho)); }
+.selo-temporada .numero-selo { fill: var(--folha-tinta); font: 800 15px/1 var(--fonte-ui); }
+.selo-temporada .arte-trofeu.ganho .numero-selo { fill: var(--salvia-tinta); }
+.textos-temporada { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.textos-temporada small { color: var(--folha-tinta-fraca); font-size: .75rem; font-weight: 700; }
+.textos-temporada b { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+.barra-temporada { display: block; height: 8px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, var(--folha-tinta-fraca) 22%, transparent); }
+.barra-temporada i { display: block; height: 100%; min-width: 8px; border-radius: inherit; background: var(--salvia-texto); }
+.faltam-temporada { color: var(--folha-tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.abertura-temporada { margin-top: 4px; color: var(--folha-tinta); font-size: .875rem; font-weight: 500; line-height: 1.4; }
+@media (prefers-reduced-motion: reduce) { .folha-topo .cartao-temporada:active { transform: none; } }
+
+/* a folha da temporada */
+.folha-temporada { display: grid; gap: 10px; }
+.folha-temporada p { margin: 0; }
+.cabeca-temporada { display: flex; align-items: center; gap: 12px; }
+.cabeca-temporada small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.cabeca-temporada h2 { margin: 2px 0 0; }
+.folha-temporada .selo-temporada .arte-trofeu { --folha-tinta-fraca: var(--tinta-fraca); --folha-campo: var(--cartao); }
+.folha-temporada .arte-trofeu:not(.ganho) .numero-selo { fill: var(--tinta-forte); }
+.folha-temporada .barra-temporada { background: var(--campo); }
+.leitura-temporada { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; padding: 12px 14px; border-radius: 18px; background: var(--campo); font-size: .875rem; }
+.leitura-temporada dt { color: var(--tinta-fraca); font-weight: 700; }
+.leitura-temporada dd { margin: 0; color: var(--tinta-forte); }
+.conta-temporada { color: var(--tinta-forte); font-weight: 700; }
+.linha-selo-temporada b { color: var(--tinta-forte); }

@@ -38,3 +38,6 @@ button.bau-do-dia { cursor: pointer; }
 .dia-lido .preferencia-festa { width: 100%; margin: 20px 0 4px; border: 0; background: transparent; color: var(--tinta); font: inherit; text-align: left; }
 .dia-lido .preferencia-festa > span:first-child { display: grid; gap: 2px; font-size: .9375rem; font-weight: 700; }
 .dia-lido .preferencia-festa small { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 600; }
+/* R3: a chegada da temporada e o selo que vai para Conquistas */
+.selo-da-temporada { display: block; margin-top: 4px; color: var(--tinta); }
+.destaque-dia.temporada .arte-destaque > .arte-trofeu { width: 40px; transform: none; }

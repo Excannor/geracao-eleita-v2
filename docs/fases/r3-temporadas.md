@@ -65,3 +65,67 @@ do index não muda (66,0 KB).
 - o tom: toda abertura começa por "Nesta temporada você lê" e é uma frase só; toda chegada começa por
   "Você terminou" e tem no máximo duas frases; até 140 caracteres; sem travessão, sem exclamação e
   sem as palavras de exagero de `PALAVRAS_PROIBIDAS`.
+
+## R3.1 · Temporadas na Trilha
+
+**A conta** (`02b-jogo.js`, no index, que o servidor também carrega): `CC.temporadaDoDia(n)`,
+`CC.progressoTemporada(t, e)` (dias lidos dentro da temporada) e `CC.temporadaCompletaEm(numero,
+e)`. A temporada fecha quando **todos** os dias dela estão em `lidos`, como a unidade
+(`CC.unidadeCompletaEm`). Por isso:
+- **pular não fecha temporada** (R2.1): o pulo para a célula não põe nada em `lidos`, e os
+  pendentes que caem numa temporada continuam faltando nela;
+- ler o último pendente que faltava fecha a temporada, com a chegada, como qualquer dia;
+- "Li na minha Bíblia" vale, como vale para a unidade (o selo não é carta: não pede leitura no app);
+- **o dia 0** (R2.2b) não é dia do plano: não conta em nenhuma temporada.
+
+**O cartão na Trilha** (peça nova `src/sob-demanda/temporadas.js` e `temporadas.css`). Logo abaixo do
+"Ler hoje" e da chama, na folha do alto:
+- o selo pequeno (com o número da temporada, enchendo conforme a leitura), "Temporada 2 de 36", o
+  nome, a barra e "faltam 8 dias" ("falta 1 dia" no singular);
+- com pendentes dentro da temporada, "faltam 8 dias · 3 pendentes": eles contam no "faltam", porque a
+  temporada só fecha com eles, mas a palavra é a mesma da R2.1, sem cor de alerta;
+- **a abertura ao entrar:** enquanto nenhum dia da temporada foi lido, a frase de abertura vem dentro
+  do cartão. Lido o primeiro dia, ela sai. Não precisa de marca guardada: vale igual em todo
+  aparelho, e quem pula para o meio de uma temporada nova também a vê;
+- quem nunca leu nada vê o dia 0 e nenhum cartão (uma temporada a zero ao lado do "Comece aqui"
+  seria um segundo convite). Lido o dia 0 ou o dia 1, o cartão aparece.
+
+Tocar no cartão abre a folha da temporada: a abertura, os dias ("11 a 20 do plano, 10 dias"), o
+trecho do Antigo e do Novo Testamento, a barra com "4 de 10 dias lidos, faltam 6 dias.", a explicação
+dos pendentes quando há ("3 desses dias estão pendentes. A temporada fecha quando todos forem lidos,
+sem pressa."), "Selo ao terminar: Copo de prata" (ou "Selo conquistado") e "Depois: temporada 3, A
+saída do Egito.".
+
+O cartão mostra a temporada do dia em que a pessoa está (`CC.diaAtual`). Quem pulou e seguiu adiante
+vê a temporada nova; a de trás espera os pendentes, sem selo, e os pendentes continuam na linha da
+R2.1.
+
+**A chegada ao fechar** (Dia lido, peça `dia-lido.js`). `fotoDeAntes` (`04-licao.js`) guarda se a
+temporada do dia já estava fechada; se a leitura a fechou, a celebração leva a temporada e o Dia
+lido mostra o item "Temporada concluída: Jacó e José", com a frase de chegada e "Selo em Conquistas:
+Copo de prata". Na última temporada de uma unidade, vem antes do troféu da unidade, e a frase já
+diz "e a unidade N".
+
+**O selo em Conquistas** (tela única da UX4.4). `CC.trofeus()` ganha `temporadas`: um selo por
+temporada (`tipo: 'temporada'`, título = nome do selo, `sub` = nome da temporada). A tela tem a
+estante "Temporadas", logo depois de "Unidades do plano", com os 36 selos: cada um com o nome do
+selo, o da temporada embaixo e "Conquistado" ou "3 de 10". O número de "Conquistas" no Perfil
+passa a contar os selos também. A arte é uma forma nova do troféu (`selo` em `01c-arte.js`: medalha
+com duas fitas e o número da temporada no meio), na mesma regra de cor e de enchimento dos troféus.
+
+**Sem rede.** O cartão fica na Trilha, que abre sem rede: a peça das temporadas é guardada pelo
+service worker já na instalação (`PECAS_DE_ANTEMAO`), como a do Praticar.
+
+**Folga do index.html:** de 66,0 KB para 63,9 KB (a conta, o selo, a estante, o pedido da peça e a
+variável `window.TEMPORADAS`). O resto (6,7 KB) está na peça.
+
+**Testes.**
+- `teste.mjs`: a peça sai em arquivo próprio, fora do index e guardada de antemão (6 checagens
+  da lista de peças e a do `DE_ANTEMAO`); a conta das temporadas (7 checagens): o dia diz a
+  temporada, fecha só com todos os dias, o progresso, o pulo não fecha a temporada 4 e ler 40 a 46
+  fecha a 5, ler os pendentes fecha a 4, o dia 0 não conta, os troféus têm os 36 selos.
+- `ferramentas/teste-temporadas.mjs` (novo, 34 checagens por tema, claro e escuro): o cartão no meio
+  da temporada, a abertura ao entrar, a folha, "falta 1 dia", a chegada no Dia lido, a temporada
+  seguinte já com a abertura, a estante em Conquistas, os pendentes (o cartão, a folha, a temporada
+  que não fecha), o último pendente que fecha, o dia 0 sem cartão e depois com a temporada 1.
+- `teste-redesenho`: a conta dos troféus da tela única inclui os selos.

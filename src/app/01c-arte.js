@@ -358,8 +358,15 @@
       resto: '<rect class="haste" x="14" y="4" width="7" height="56" rx="3.5"/><path class="base" d="M4 66c0-6 6-10 13-10s13 4 13 10z"/>',
       reflexo: 'M25 11h8l-5 6h-3z',
     },
+    // R3: o selo da temporada, uma medalha com duas fitas e o número da temporada no meio
+    selo: {
+      corpo: 'M32 6a22 22 0 1 1 0 44a22 22 0 1 1 0-44z', de: 6, ate: 50,
+      resto: '<path class="haste" d="M21 42l-6 24 9-4 5 7 5-21zM43 42l6 24-9-4-5 7-5-21z"/>',
+      frente: '<circle class="detalhe" cx="32" cy="28" r="16" fill="none" stroke-width="2.5"/>',
+      reflexo: 'M17 22a16 16 0 0 1 8-10l2 3a13 13 0 0 0-6 8z',
+    },
   };
-  A.trofeu = (cor, ganho, fracao, forma) => {
+  A.trofeu = (cor, ganho, fracao, forma, rotulo) => {
     const F = FORMAS_TROFEU[forma] || FORMAS_TROFEU.taca;
     const f = !ganho && fracao > 0 ? Math.min(1, fracao) : 0;
     const g = f ? id('copa') : '';
@@ -370,6 +377,7 @@
     + '<path class="copa" d="' + F.corpo + '"/>'
     + (f ? '<path class="copa-parte" clip-path="url(#' + g + ')" d="' + F.corpo + '"/>' : '')
     + (F.frente || '')
+    + (rotulo ? '<text class="numero-selo" x="32" y="34" text-anchor="middle">' + rotulo + '</text>' : '')
     + '<path class="reflexo" d="' + F.reflexo + '" fill="#fff" opacity=".35"/></svg></span>';
   };
 

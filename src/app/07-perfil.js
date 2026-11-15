@@ -17,10 +17,10 @@
     + '<div class="barra-missao"><i style="width:' + (c.fracao * 100).toFixed(1) + '%"></i></div>'
     + '<span class="descricao-conquista">' + CC.esc(c.maximo ? 'Você chegou ao último nível!' : c.descricao) + '</span></div></div>';
 
-  const FORMA_DO_TIPO = { unidade: 'taca', colecao: 'livros', testamento: 'biblia', plano: 'calendario', desafio: 'bandeira' };
+  const FORMA_DO_TIPO = { unidade: 'taca', colecao: 'livros', testamento: 'biblia', plano: 'calendario', desafio: 'bandeira', temporada: 'selo' };
   const trofeuHtml = (t) => '<div class="trofeu' + (t.ganho ? ' ganho' : '') + '">'
-    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0, FORMA_DO_TIPO[t.tipo])
-    + '<b>' + CC.esc(t.titulo) + '</b>'
+    + CC.arte.trofeu(t.cor || 'amarelo', t.ganho, t.total ? t.feitos / t.total : 0, FORMA_DO_TIPO[t.tipo], t.tipo === 'temporada' ? t.numero : '')
+    + '<b>' + CC.esc(t.titulo) + (t.tipo === 'temporada' ? '<small>' + CC.esc(t.sub) + '</small>' : '') + '</b>'
     + '<span>' + (t.ganho ? 'Conquistado' : t.feitos + ' de ' + t.total) + '</span></div>';
 
   // ---------- Trilha do Semeador ----------
@@ -122,7 +122,7 @@
     const ritmo = CC.ritmo();
     const conquistas = CC.conquistasComNivel();
     const trofeus = CC.trofeus();
-    const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || []), ...(trofeus.albuns || [])];
+    const todos = [...trofeus.unidades, ...(trofeus.temporadas || []), ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || []), ...(trofeus.albuns || [])];
     const albuns = CC.albunsDeCartas();
     const ganhos = todos.filter((t) => t.ganho);
     const noAlto = (conquistas.filter((c) => c.nivel).length + ganhos.length) + ' de ' + (conquistas.length + todos.length);
@@ -247,7 +247,7 @@
     const conta = (lista) => lista.filter((x) => x.ganho).length + ' de ' + lista.length;
     const estante = (titulo, lista) => '<p class="etiqueta etiqueta-estante">' + CC.esc(titulo) + ' <span>' + conta(lista) + '</span></p>'
       + '<div class="estante">' + lista.map(trofeuHtml).join('') + '</div>';
-    const todos = [...t.testamentos, ...t.unidades, ...t.colecoes, ...t.desafios, ...t.albuns];
+    const todos = [...t.testamentos, ...t.unidades, ...t.temporadas, ...t.colecoes, ...t.desafios, ...t.albuns];
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1></div>'
       + CC.tituloSecao('Por nível', conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length)
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
@@ -257,7 +257,7 @@
           + '<div class="corpo-conquista"><b>' + CC.esc(c.titulo) + '</b><span class="descricao-conquista">' + CC.esc(c.descricao) + '</span></div></div>').join('') + '</div>'
         : '')
       + '<div id="trofeus" data-trofeus>' + CC.tituloSecao('Troféus', conta(todos)) + '</div>'
-      + estante('A Bíblia toda', t.testamentos) + estante('Unidades do plano', t.unidades) + estante('Partes da Bíblia', t.colecoes)
+      + estante('A Bíblia toda', t.testamentos) + estante('Unidades do plano', t.unidades) + estante('Temporadas', t.temporadas) + estante('Partes da Bíblia', t.colecoes)
       + estante('Desafios', t.desafios) + (t.albuns.length ? estante('Álbuns de cartas', t.albuns) : '');
     if (irAosTrofeus) requestAnimationFrame(() => { const x = raiz.querySelector('[data-trofeus]'); if (x) x.scrollIntoView(); });
   };

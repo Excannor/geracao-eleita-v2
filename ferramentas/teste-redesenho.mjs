@@ -434,7 +434,7 @@ ok(await av('!document.querySelector("a[href=\\"#/perfil/trofeus\\"]") && /^Conq
   'UX4.4: o Perfil tem um atalho só, "Conquistas", que conta conquistas e troféus');
 await irPara('#/perfil/conquistas');
 ok(await esperar('document.querySelectorAll(".linha-conquista").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
-ok(await av('(() => { const t = CC.trofeus(); const n = t.testamentos.length + t.unidades.length + t.colecoes.length + t.desafios.length + t.albuns.length; return document.querySelectorAll(".estante .trofeu").length === n && !!document.querySelector("[data-trofeus]"); })()'),
+ok(await av('(() => { const t = CC.trofeus(); const n = t.testamentos.length + t.unidades.length + (t.temporadas || []).length + t.colecoes.length + t.desafios.length + t.albuns.length; return document.querySelectorAll(".estante .trofeu").length === n && !!document.querySelector("[data-trofeus]"); })()'),
   'UX4.4: a mesma tela tem todos os troféus, em estantes');
 await irPara('#/perfil/trofeus');
 ok(await esperar('document.querySelector("h1")?.textContent === "Conquistas" && !!document.querySelector("[data-trofeus]")'), 'UX4.4: o endereço antigo dos troféus abre Conquistas');

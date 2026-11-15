@@ -122,6 +122,9 @@
         item(CC.arte.medalha(q, false), (q.nivel === 1 ? 'Conquista nova: ' : 'Subiu de nível: ') + CC.esc(q.titulo), CC.esc(def.texto(def.niveis[q.nivel - 1])), 'conquista');
       }
       for (const l of c.livros.slice(0, 2)) item('<span class="arte-livro">' + CC.ico('livro') + '</span>', 'Você terminou ' + CC.esc(l) + '!', 'Fica marcado em Livros da Bíblia', 'livro');
+      // R3: a chegada da temporada (a frase dela) e o selo, que vai para Conquistas
+      if (c.temporada) item(CC.arte.trofeu(c.temporada.cor, true, 0, 'selo', c.temporada.numero), 'Temporada concluída: ' + CC.esc(c.temporada.titulo),
+        CC.esc(c.temporada.chegada) + '<span class="selo-da-temporada" data-selo-temporada="' + c.temporada.numero + '">Selo em Conquistas: ' + CC.esc(c.temporada.selo) + '</span>', 'temporada');
       if (c.unidade) item(CC.arte.trofeu(u.cor, true), 'Unidade ' + u.numero + ' concluída!', CC.esc(u.titulo), 'unidade');
       if (subiuHoje && seq.atual === 2) item('<span class="arte-volta">' + CC.ico('broto') + '</span>', 'Você voltou!', 'Voltar no dia seguinte é a parte mais difícil. Você voltou.', 'volta');
       // R1.4: a leitura de agora cumpriu o "Reacender lendo hoje": a sequência de antes voltou

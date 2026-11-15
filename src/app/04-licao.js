@@ -82,6 +82,7 @@
       missoes: Object.fromEntries(CC.missoesDoDia().map((m) => [m.id, m.valor])),
       livros: (dia.livros || []).filter((l) => CC.livroCompletoEm(l)),
       unidade: CC.unidadeCompletaEm(CC.unidadeDoDia(numero).numero),
+      temporada: !!(CC.temporadaDoDia(numero) && CC.temporadaCompletaEm(CC.temporadaDoDia(numero).numero)),
     };
   }
 
@@ -366,7 +367,10 @@
     const subiram = CC.conquistasComNivel().filter((c) => c.nivel > (sessao.antes.niveis[c.id] || 0));
     const livros = (dia.livros || []).filter((l) => CC.livroCompletoEm(l) && !sessao.antes.livros.includes(l));
     const unidade = !sessao.antes.unidade && CC.unidadeCompletaEm(u.numero);
-    sessao.celebracao = { seq, missoes, subiram, livros, unidade, amigos: undefined };
+    // R3: a temporada fecha quando o último dia dela que faltava é lido (pode ser um pendente)
+    const t = CC.temporadaDoDia(sessao.dia);
+    const temporada = t && !sessao.antes.temporada && CC.temporadaCompletaEm(t.numero) ? t : null;
+    sessao.celebracao = { seq, missoes, subiram, livros, unidade, temporada, amigos: undefined };
 
     if (CC.publicarNovidades) {
       CC.publicarNovidades({

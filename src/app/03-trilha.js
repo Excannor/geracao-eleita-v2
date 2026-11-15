@@ -449,6 +449,9 @@
     // chegar) ganha o dia 0, na mesma peça.
     const cel = CC.diaDaCelula();
     if (cel > atual + 1 || CC.ler('pulouPara') || (CC.quem && !CC.diasComAPalavra() && !CC.leu(1))) CC.pedirPeca(window.VOLTA, () => !!CC.volta).then(() => CC.volta.trilha(raiz, atual, cel), () => {});
+    // R3.1: a temporada em que a pessoa está (peça temporadas.js), depois da primeira leitura: quem
+    // nunca leu nada vê o dia 0, e não uma temporada a zero
+    if (CC.temporadaDoDia(atual) && (CC.diasComAPalavra() || CC.leu(1))) CC.pedirPeca(window.TEMPORADAS, () => !!CC.temporadas).then(() => CC.temporadas.trilha(raiz, atual), () => {});
 
     raiz.querySelectorAll('[data-dia]').forEach((el) => {
       el.onclick = (ev) => { ev.stopPropagation(); abrirPop(Number(el.dataset.dia), el); };

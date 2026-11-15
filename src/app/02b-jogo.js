@@ -35,6 +35,23 @@
     return true;
   };
 
+  // R3: as temporadas (conteudo.json, temporadas[]). Fecha quando todos os dias dela foram lidos:
+  // pular para a célula não fecha temporada, como não fecha unidade.
+  const TEMPORADAS = D.temporadas || [];
+  CC.temporadaDoDia = (n) => TEMPORADAS.find((t) => n >= t.de && n <= t.ate) || null;
+  CC.progressoTemporada = (t, e) => {
+    const lidos = new Set(est(e).lidos);
+    let feitos = 0;
+    for (let n = t.de; n <= t.ate; n++) if (lidos.has(n)) feitos++;
+    return { feitos, total: t.ate - t.de + 1 };
+  };
+  CC.temporadaCompletaEm = (numero, e) => {
+    const t = TEMPORADAS.find((x) => x.numero === Number(numero));
+    if (!t) return false;
+    const p = CC.progressoTemporada(t, e);
+    return p.feitos === p.total;
+  };
+
   // ---------- diário ----------
   // Cada dia guarda contadores do que a pessoa fez: rodadas e acertos no Praticar,
   // leituras terminadas no leitor, notas abertas. É daqui que as missões leem.
@@ -393,7 +410,12 @@
     ];
     // Álbuns de cartas: um troféu por álbum completo (as 13, em qualquer versão).
     const albuns = CC.albunsDeCartas(e).map((a) => ({ tipo: 'album', cor: 'amarelo', titulo: a.nome, feitos: a.feitos, total: a.total, ganho: a.completo }));
-    return { colecoes, unidades, desafios, testamentos, albuns };
+    // R3: um selo por temporada fechada
+    const temporadas = TEMPORADAS.map((t) => {
+      const p = CC.progressoTemporada(t, e);
+      return { tipo: 'temporada', numero: t.numero, titulo: t.selo, sub: t.titulo, cor: t.cor, feitos: p.feitos, total: p.total, ganho: p.feitos === p.total };
+    });
+    return { colecoes, unidades, desafios, testamentos, albuns, temporadas };
   };
 
   // ---------- novidades: o que o servidor confere ----------

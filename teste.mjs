@@ -402,6 +402,8 @@ secao('peças sob demanda');
     ['volta', 'VOLTA', 'Os dias que ficaram para trás', '', 'o ficar em dia e os pendentes'],
     // o quiz do Praticar (a casca fica em 09-praticar.js); o service worker a guarda na instalação
     ['praticar', 'PRATICAR', 'para guardar versículos na memória', '', 'o Praticar'],
+    // R3.1: o cartão e a folha da temporada (a conta e o selo ficam em 02b-jogo.js e 07-perfil.js)
+    ['temporadas', 'TEMPORADAS', 'A temporada fecha quando todos forem lidos', '', 'as temporadas na Trilha'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -420,9 +422,11 @@ secao('peças sob demanda');
   // na instalação do service worker (DE_ANTEMAO), e as outras continuam guardadas quando pedidas
   {
     const praticar = (html.match(/window\.PRATICAR="([^"]*)"/) || [])[1] || '';
+    // R3.1: o cartão da temporada fica na Trilha, que abre sem rede: a peça também vem de antemão
+    const temporadas = (html.match(/window\.TEMPORADAS="([^"]*)"/) || [])[1] || '';
     const antemao = JSON.parse((sw.match(/const DE_ANTEMAO = (\[[^\]]*\]);/) || [])[1] || '[]');
-    checar(!!praticar && JSON.stringify(antemao) === JSON.stringify([praticar]) && /caches\.open\(CACHE_TELAS\)\)\s*\.then\(\(c\) => Promise\.all\(DE_ANTEMAO/.test(sw),
-      'o service worker guarda a peça do Praticar já na instalação (' + JSON.stringify(antemao) + ')');
+    checar(!!praticar && !!temporadas && JSON.stringify(antemao) === JSON.stringify([praticar, temporadas]) && /caches\.open\(CACHE_TELAS\)\)\s*\.then\(\(c\) => Promise\.all\(DE_ANTEMAO/.test(sw),
+      'o service worker guarda as peças do Praticar e das temporadas já na instalação (' + JSON.stringify(antemao) + ')');
     checar(html.includes('CC.vistaPraticar') && html.includes('CC.fecharPratica') && !html.includes('CC.praticarTela =') && !html.includes('cartao-pratica c-'),
       'no index fica só a casca do Praticar');
   }
@@ -1939,6 +1943,30 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
     && CC.normalizarEstado({ pulouPara: 40 }).pulouPara === 40, 'ficar em dia: o estado guarda só um dia do plano inteiro como pulo');
   checar(CC.PROGRESSO_DA_TRILHA.includes('pulouPara'), 'ficar em dia: o "Zerar" recomeça do dia 1, sem pulo');
   checar(CC.fundir({ ...base({ pulouPara: 40, atualizadoEm: 1 }) }, { ...base({ pulouPara: 0 }), atualizadoEm: 5, zeradoEm: 5 }).pulouPara === 0, 'ficar em dia: o Zerar que chega de outro aparelho tira o pulo');
+}
+
+// --- R3.1: as temporadas (a conta mora em 02b-jogo.js; o selo vai para os troféus) ---
+{
+  const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
+  const ate = (n) => Array.from({ length: n }, (_, i) => i + 1);
+  const de = (a, b) => Array.from({ length: b - a + 1 }, (_, i) => a + i);
+  checar(CC.temporadaDoDia(1).numero === 1 && CC.temporadaDoDia(10).numero === 1 && CC.temporadaDoDia(11).numero === 2
+    && CC.temporadaDoDia(365).numero === 36 && CC.temporadaDoDia(0) === null, 'temporadas: o dia diz a temporada (1 a 10 é a 1, 11 é a 2, 365 é a 36, o dia 0 não tem)');
+  checar(CC.temporadaCompletaEm(1, base({ lidos: ate(10) })) && !CC.temporadaCompletaEm(1, base({ lidos: ate(9) })) && !CC.temporadaCompletaEm(2, base({ lidos: ate(10) })),
+    'temporadas: fecha com todos os dias dela lidos, e só ela');
+  const t2 = CC.temporadaDoDia(11);
+  const p = CC.progressoTemporada(t2, base({ lidos: [...ate(10), 11, 12, 15] }));
+  checar(p.feitos === 3 && p.total === 10, 'temporadas: o progresso conta os dias lidos dentro da temporada (3 de 10, faltam 7)');
+  // R2.1: pular para a célula não fecha temporada; ler os dias dela, sim
+  const pulou = base({ lidos: ate(30), dia: 40, pulouPara: 40 });
+  checar(!CC.temporadaCompletaEm(4, pulou) && !CC.temporadaCompletaEm(4, { ...pulou, lidos: [...ate(30), ...de(40, 46)] }) && CC.temporadaCompletaEm(5, { ...pulou, lidos: [...ate(30), ...de(40, 46)] }),
+    'temporadas: o pulo para o dia 40 não fecha a temporada 4 (os dias 32 a 39 ficam pendentes); ler 40 a 46 fecha a 5');
+  checar(CC.temporadaCompletaEm(4, { ...pulou, lidos: [...ate(46)] }), 'temporadas: lidos os pendentes, a temporada 4 fecha também');
+  // o dia 0 conta como dia com a Palavra, mas não é dia do plano: não fecha nem começa temporada
+  checar(!CC.trofeus(base({ diaZero: '2026-11-01' })).temporadas.some((t) => t.ganho || t.feitos), 'temporadas: o dia 0 não conta dia de nenhuma temporada');
+  const tr = CC.trofeus(base({ lidos: ate(20) })).temporadas;
+  checar(tr.length === 36 && tr.filter((t) => t.ganho).map((t) => t.numero).join() === '1,2' && tr[0].titulo === D.temporadas[0].selo && tr[0].sub === D.temporadas[0].titulo && tr[0].tipo === 'temporada',
+    'temporadas: os troféus têm um selo por temporada, com o nome do selo e o da temporada (dias 1 a 20 lidos: selos 1 e 2)');
 }
 
 // --- R2.2b: o dia 0 (a primeira leitura curta, antes do dia 1 do plano) ---
