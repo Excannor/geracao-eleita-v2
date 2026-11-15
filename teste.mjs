@@ -365,6 +365,8 @@ secao('peças sob demanda');
     ['toque', 'TOQUE', 'Junto vai este versículo', '', 'o toque com versículo'],
     // R2: quem atrasou volta sem culpa (ficar em dia com a célula, os dias pendentes)
     ['volta', 'VOLTA', 'Os dias que ficaram para trás', '', 'o ficar em dia e os pendentes'],
+    // o quiz do Praticar (a casca fica em 09-praticar.js); o service worker a guarda na instalação
+    ['praticar', 'PRATICAR', 'para guardar versículos na memória', '', 'o Praticar'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -378,6 +380,16 @@ secao('peças sob demanda');
       rotulo + ' leva o próprio código (e o estilo, quando tem)');
     // como todo .js do app: só com sessão (não é público como os mapas e as fontes)
     checar(!servidorTexto.match(/const PUBLICO_COM_RESUMO = .*/)[0].includes(nome.toUpperCase()), rotulo + ' só sai do servidor com sessão');
+  }
+  // O Praticar abria sem rede mesmo nunca aberto quando morava no index: a peça dele é guardada já
+  // na instalação do service worker (DE_ANTEMAO), e as outras continuam guardadas quando pedidas
+  {
+    const praticar = (html.match(/window\.PRATICAR="([^"]*)"/) || [])[1] || '';
+    const antemao = JSON.parse((sw.match(/const DE_ANTEMAO = (\[[^\]]*\]);/) || [])[1] || '[]');
+    checar(!!praticar && JSON.stringify(antemao) === JSON.stringify([praticar]) && /caches\.open\(CACHE_TELAS\)\)\s*\.then\(\(c\) => Promise\.all\(DE_ANTEMAO/.test(sw),
+      'o service worker guarda a peça do Praticar já na instalação (' + JSON.stringify(antemao) + ')');
+    checar(html.includes('CC.vistaPraticar') && html.includes('CC.fecharPratica') && !html.includes('CC.praticarTela =') && !html.includes('cartao-pratica c-'),
+      'no index fica só a casca do Praticar');
   }
   // As peças do estudo juntam mais de um arquivo: as regras puras vão com a tela, e o leitor de
   // marcas (o mesmo do servidor) vai com o preparo. O estudo antigo saiu do index.

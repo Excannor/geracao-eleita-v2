@@ -70,7 +70,7 @@ A versão publicada (`/api/versao`) é o hash do `index.html`. O app compara a v
 | `06-explorar.js` · `06b-mapas.js` | Explorar: seções, busca, notas, "Comece por aqui", o cartão dos mapas e a casca da tela de cada mapa |
 | `07-perfil.js` · `07b-conta.js` · `07c-instalar.js` · `07d-notificacoes.js` · `07e-painel.js` · `07f-avisos.js` | perfil, configurações e conta, tutorial de instalar, notificações, painel do administrador, caixa do sino |
 | `08-amigos.js` · `08b-propositos.js` · `08c-discipulado.js` | Juntos: amigos, feed, convites, célula, propósitos; discipulado |
-| `09-praticar.js` · `09b-missoes.js` · `09c-desafios.js` | Praticar, a tela de Desafios e os desafios de vários dias |
+| `09-praticar.js` · `09b-missoes.js` · `09c-desafios.js` | Praticar (a casca; o quiz mora na peça `src/sob-demanda/praticar.js`, guardada pelo service worker já na instalação), a tela de Desafios e os desafios de vários dias |
 | `09d-apoiar.js` | Apoiar o app (doação opcional pelo Pix) |
 | `10-roteador.js` | rotas por `#`, barra de abas, topo, avisos do dia |
 

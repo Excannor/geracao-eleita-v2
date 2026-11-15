@@ -387,7 +387,10 @@ console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'apoiar', 'historia', 'dia-lido', 'chama', 'toque', 'volta'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'apoiar', 'historia', 'dia-lido', 'chama', 'toque', 'volta', 'praticar'];
+// As peças que o service worker guarda já na instalação (DE_ANTEMAO, no sw.js): telas que saíram do
+// index.html para a folga, mas que precisam continuar abrindo sem rede mesmo nunca abertas.
+const PECAS_DE_ANTEMAO = ['praticar'];
 const PARTES_PECA = { 'estudo-celula': ['estudo-regras.js', 'estudo-celula.js', 'celula-conduz.js'], 'estudo-preparo': ['estudo-marcas.js', 'estudo-preparo.js'] };
 for (const velho of readdirSync(dist()).filter((f) => /^[a-z-]+\.[0-9a-f]{10}\.js(\.gz)?$/.test(f) && NOMES_PECAS.includes(f.split('.')[0]))) rmSync(dist(velho));
 const pecas = Object.fromEntries(NOMES_PECAS.map((nome) => {
@@ -516,6 +519,7 @@ const html = molde
     + 'window.CHAMA=' + JSON.stringify(pecas.chama) + ';'
     + 'window.TOQUE=' + JSON.stringify(pecas.toque) + ';'
     + 'window.VOLTA=' + JSON.stringify(pecas.volta) + ';'
+    + 'window.PRATICAR=' + JSON.stringify(pecas.praticar) + ';'
     + 'window.CARTAS_INDICE=' + JSON.stringify(esqueletoCartas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
@@ -602,6 +606,10 @@ const MAPAS = ${JSON.stringify(mapas.map((m) => m.arquivo).concat(fontesOriginai
 // na primeira vez que o app as pede: a tela abre sem rede daí em diante.
 const CACHE_TELAS = 'caminho-telas';
 const TELAS = ${JSON.stringify(Object.values(pecas))};
+// As peças de telas que antes moravam no index.html e abriam sem rede mesmo nunca abertas (o
+// Praticar): guardadas já na instalação, para continuarem assim. Só entra o que é script (sem
+// sessão o servidor responde com a tela de entrada), e uma falha não impede a instalação.
+const DE_ANTEMAO = ${JSON.stringify(PECAS_DE_ANTEMAO.map((n) => pecas[n]))};
 const STORY = ${JSON.stringify((arquivoArtesStory ? [arquivoArtesStory] : []).concat(Object.values(fotosStory)))};
 const PARABOLAS = ${JSON.stringify(parabolas.itens.map((p) => p.arquivo).concat(parabolas.desenhos ? [parabolas.desenhos, parabolas.tela] : []))};
 const ATLAS = ${JSON.stringify(atlas.itens.flatMap((m) => [m.arquivo, m.imagem]))};
@@ -610,6 +618,9 @@ const GUARDADOS = [[CACHE_BIBLIAS, BIBLIAS], [CACHE_MAPAS, MAPAS], [CACHE_PARABO
 self.addEventListener('install', (ev) => {
   ev.waitUntil(caches.open(CACHE)
     .then((c) => c.addAll(ARQUIVOS.concat(AVULSAS.map((a) => './' + a)).map((u) => new Request(u, { cache: 'reload' }))))
+    .then(() => caches.open(CACHE_TELAS))
+    .then((c) => Promise.all(DE_ANTEMAO.map((a) => fetch(new Request('./' + a, { cache: 'reload' }))
+      .then((r) => (r.ok && /javascript/.test(r.headers.get('content-type') || '') ? c.put('./' + a, r) : null)).catch(() => null))))
     .then(() => self.skipWaiting()));
 });
 
