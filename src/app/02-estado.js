@@ -685,13 +685,29 @@
   // minha Bíblia", primeiro passo ou dia do Conhecer Jesus (as mesmas datas da chama). Ler três
   // dias do plano na mesma data conta um dia. Não cai com falta, e nem o "Zerar" o apaga: as
   // datas de antes ficam em diasComPalavra.
-  CC.diasComAPalavra = (estado) => {
-    const e = estado || E;
+  const datasDaVida = (e) => {
     const s = CC.datasFeitas(e);
     for (const d of e.diasComPalavra || []) s.add(d);
-    return s.size;
+    return s;
   };
+  CC.diasComAPalavra = (estado) => datasDaVida(estado || E).size;
   CC.textoDiasComAPalavra = (n) => (n === 1 ? '1 dia com a Palavra' : n + ' dias com a Palavra');
+
+  // Semanas completas (R1.2): semanas com 5 dias ou mais com a Palavra. A semana é a do calendário,
+  // de segunda a domingo pela data local, a mesma do baú "Lendo junto na semana" (09b-missoes.js) e
+  // da conquista "Semanas na Palavra" (02b-jogo.js), e é chamada pela data da segunda-feira. Contam
+  // as mesmas datas dos dias com a Palavra, então o número só cresce: nenhuma data sai, nem com o
+  // "Zerar". A semana de agora já conta no dia em que chega a 5, sem esperar o domingo.
+  CC.DIAS_DA_SEMANA_COMPLETA = 5;
+  CC.segundaDaSemana = (iso) => CC.somaDias(iso, -((new Date(iso + 'T12:00:00Z').getUTCDay() + 6) % 7));
+  const diasPorSemana = (e) => {
+    const porSemana = new Map();
+    for (const d of datasDaVida(e)) { const s = CC.segundaDaSemana(d); porSemana.set(s, (porSemana.get(s) || 0) + 1); }
+    return porSemana;
+  };
+  CC.semanasCompletas = (estado) => [...diasPorSemana(estado || E).values()].filter((n) => n >= CC.DIAS_DA_SEMANA_COMPLETA).length;
+  // Quantos dias com a Palavra a semana de uma data (hoje, sem data) já tem.
+  CC.diasNaSemana = (estado, hoje) => diasPorSemana(estado || E).get(CC.segundaDaSemana(hoje || CC.hojeIso())) || 0;
 
   // Recebe as datas por parâmetro para poder ser exercitada por teste.
   CC.sequencia = function (marcadas, referencia) {
@@ -871,7 +887,7 @@
     L.push('## Progresso', '');
     L.push('- Dias lidos: ' + E.lidos.length + ' de ' + D.plano.length);
     L.push('- Ofensiva atual: ' + seq.atual + ' · recorde: ' + seq.recorde);
-    L.push('- Dias com a Palavra: ' + CC.diasComAPalavra());
+    L.push('- Dias com a Palavra: ' + CC.diasComAPalavra() + ' · semanas completas: ' + CC.semanasCompletas());
     L.push('- Primeiros passos: ' + E.licoes.length + ' de ' + D.licoes.length);
     L.push('- Livros concluídos: ' + CC.livrosCompletos() + ' de ' + CC.totalLivros, '');
 

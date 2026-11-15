@@ -90,6 +90,12 @@
       for (const l of c.livros.slice(0, 2)) item('<span class="arte-livro">' + CC.ico('livro') + '</span>', 'Você terminou ' + CC.esc(l) + '!', 'Fica marcado em Livros da Bíblia', 'livro');
       if (c.unidade) item(CC.arte.trofeu(u.cor, true), 'Unidade ' + u.numero + ' concluída!', CC.esc(u.titulo), 'unidade');
       if (subiuHoje && seq.atual === 2) item('<span class="arte-volta">' + CC.ico('broto') + '</span>', 'Você voltou!', 'Voltar no dia seguinte é a parte mais difícil. Você voltou.', 'volta');
+      // R1.2: a semana (segunda a domingo) chegou a 5 dias com a Palavra hoje
+      if (subiuHoje && CC.diasNaSemana() === CC.DIAS_DA_SEMANA_COMPLETA) {
+        const semanas = CC.semanasCompletas();
+        item('<span class="arte-livro" data-semana-completa>' + CC.ico('semana') + '</span>', 'Semana completa!',
+          semanas === 1 ? 'Sua primeira: ' + CC.DIAS_DA_SEMANA_COMPLETA + ' dias com a Palavra nesta semana.' : 'Já são ' + semanas + ' semanas completas.', 'semana');
+      }
       const proximoDia = D.plano[sessao.dia];
       if (proximoDia && !CC.leu(proximoDia.numero)) {
         const ctxHoje = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;

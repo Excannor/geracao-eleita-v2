@@ -3,8 +3,11 @@
 // depois de uma falta (no lugar de qualquer zero), no cartão da chama do Início e na folha da
 // chama; ler hoje soma, ler no papel na mesma data não conta duas vezes, e o "Zerar" não o apaga
 // (nem no aparelho, nem no servidor).
+// R1.2, semanas completas: com o "hoje" do app numa sexta-feira e três semanas de 5 dias atrás, a
+// folha da chama diz "3" e "Esta semana: 4 de 5 dias", o Perfil mostra os dois números que nunca
+// caem ao lado da ofensiva, e ler o 5º dia da semana (no papel) festeja a semana completa no Dia lido.
 // Uso: node ferramentas/teste-chama.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
-// CAPTURAS=<pasta> guarda as capturas, nos temas claro e escuro)
+// CAPTURAS=<pasta> guarda as capturas, nos temas claro e escuro, uma subpasta por parte: R1.1, R1.2...)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -55,11 +58,12 @@ async function alvo() {
 // Uma conta com 4 dias seguidos (6 dias do plano, dois deles no papel) que acabaram há 4 dias: três
 // dias em branco passam do escudo, a chama apagou e a falta está dentro da janela da folha de
 // volta. O servidor só aceita leitura com até 7 dias de atraso (servidor.mjs, conferirProgresso).
-async function contaComFalta(usuario) {
+async function contaComFalta(usuario, semEstado) {
   const r = await fetch(base + '/api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ usuario, nome: 'Joana', senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2008-04-05', consentimento: true }) });
   const cookie = (r.headers.get('set-cookie') || '').split(';')[0];
   if (!r.ok) throw new Error('não criou a conta: ' + r.status + ' ' + await r.text());
+  if (semEstado) return cookie;
   const marcadoEm = {};
   for (let n = 1; n <= 4; n++) marcadoEm[n] = atras(8 - n);
   marcadoEm[5] = marcadoEm[6] = atras(4);
@@ -87,17 +91,21 @@ try {
     // o Início rola até o nó de hoje: a captura do cartão da chama é do alto da tela
     if (nome.includes('inicio')) { await av('(CC.rolarPara ? CC.rolarPara(0) : scrollTo(0, 0)), 1'); await dormir(400); }
     const { data } = await cmd('Page.captureScreenshot', { format: 'png' });
-    writeFileSync(join(CAPTURAS, nome + '.png'), Buffer.from(data, 'base64'));
+    // cada parte da fase na sua pasta: r1.2-folha-claro vai para CAPTURAS/R1.2/
+    const pastaDaParte = join(CAPTURAS, nome.split('-')[0].toUpperCase());
+    mkdirSync(pastaDaParte, { recursive: true });
+    writeFileSync(join(pastaDaParte, nome + '.png'), Buffer.from(data, 'base64'));
   };
   if (CAPTURAS) mkdirSync(CAPTURAS, { recursive: true });
 
   await cmd('Emulation.setDeviceMetricsOverride', { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
   await cmd('Network.enable');
 
-  for (const tema of ['claro', 'escuro']) {
-    console.log('\n  tema ' + tema);
-    await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: tema === 'escuro' ? 'dark' : 'light' }] });
-    const cookie = await contaComFalta('joana' + tema);
+  const temaDe = async (nome) => {
+    console.log('\n  tema ' + nome);
+    await cmd('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-color-scheme', value: nome === 'escuro' ? 'dark' : 'light' }] });
+  };
+  const entrar = async (cookie) => {
     const [nome, valor] = cookie.split('=');
     await cmd('Network.clearBrowserCookies');
     await cmd('Network.setCookie', { name: nome, value: valor, url: base });
@@ -106,6 +114,11 @@ try {
     await cmd('Page.navigate', { url: 'about:blank' });
     await dormir(300);
     await cmd('Page.navigate', { url: base + '/#/' });
+  };
+
+  for (const tema of ['claro', 'escuro']) {
+    await temaDe(tema);
+    await entrar(await contaComFalta('joana' + tema));
 
     // ---------- a folha de volta, depois da falta ----------
     ok(await esperar(q('.recomeco .vida-grande'), 20000), 'depois da falta, a folha de volta abre com os dias com a Palavra em destaque');
@@ -125,7 +138,7 @@ try {
     // ---------- a folha da chama ----------
     await av(q('.folha-topo .cartao-salvia[data-ofensiva]') + '.click(); 1');
     ok(await esperar(q('.folha-ofensiva .chama-grande[data-dias-palavra="4"]')), 'com a chama em zero, o número grande da folha é o dos dias com a Palavra');
-    ok(!(await av('!!' + q('.folha-ofensiva .linha-vida'))), 'e a linha de baixo não repete o número');
+    ok(!(await av('!!' + q('.folha-ofensiva .linha-vida[data-dias-palavra]'))), 'e a linha de baixo não repete o número');
     await capturar('r1.1-folha-apagada-' + tema);
     await fecharFolhas();
 
@@ -164,6 +177,65 @@ try {
   await av('localStorage.clear(); 1');
   await cmd('Page.reload', { ignoreCache: true });
   ok(await esperar(q('.folha-topo .cartao-salvia[data-dias-palavra="5"]'), 20000), 'outro aparelho (sem nada guardado) recebe os 5 dias do servidor');
+
+  // ---------- R1.2: semanas completas ----------
+  // O "hoje" do app vira a sexta 13/11/2026; as leituras ficam nas semanas de 19/10, 26/10 e 2/11
+  // (5 dias cada, de segunda a sexta) e de segunda a quinta desta semana (4 dias).
+  const HOJE = '2026-11-13';
+  const SEMANAS = ['2026-10-19', '2026-10-26', '2026-11-02'];
+  const seMarca = [];
+  for (const seg of SEMANAS) for (let i = 0; i < 5; i++) seMarca.push(new Date(Date.parse(seg + 'T12:00:00Z') + i * 864e5).toISOString().slice(0, 10));
+  for (let i = 0; i < 4; i++) seMarca.push(new Date(Date.parse('2026-11-09T12:00:00Z') + i * 864e5).toISOString().slice(0, 10));
+  const marcado = Object.fromEntries(seMarca.map((d, i) => [i + 1, d]));
+  for (const tema of ['claro', 'escuro']) {
+    await temaDe(tema);
+    await entrar(await contaComFalta('semana' + tema, true));
+    ok(await esperar(q('.folha-topo'), 20000), 'conta nova abre o Início');
+    await esperar('!document.getElementById("abertura")', 15000);
+    await dormir(600);
+    await fecharFolhas();
+    await av('CC.hojeIso = () => ' + JSON.stringify(HOJE) + '; CC.gravar("marcadoEm", ' + JSON.stringify(marcado) + '); CC.gravar("lidos", ' + JSON.stringify(Object.keys(marcado).map(Number)) + '); CC.gravar("dia", 20); CC.redesenhar(); 1');
+    ok(await av('CC.semanasCompletas() === 3 && CC.diasNaSemana() === 4 && CC.diasComAPalavra() === 19'), 'três semanas de 5 dias e 4 dias nesta semana: 3 semanas completas, 19 dias com a Palavra');
+    await av('CC.folhaOfensiva(); 1');
+    ok(await esperar(q('.folha-ofensiva .linha-vida[data-semanas-completas="3"]')), 'a folha da chama mostra "Semanas completas: 3"');
+    ok(/Esta semana: 4 de 5 dias\./.test(await texto('.folha-ofensiva [data-semanas-completas]')), 'com a semana de agora: "Esta semana: 4 de 5 dias."');
+    await av('document.querySelector(".folha-ofensiva [data-semanas-completas]").scrollIntoView({ block: "center" }); 1');
+    await capturar('r1.2-folha-' + tema);
+    await fecharFolhas();
+
+    // o Perfil: os números que nunca caem ao lado da ofensiva
+    await av('location.hash = "#/perfil"; 1');
+    ok(await esperar(q('.visao-item[data-semanas-completas="3"]')) && await av('!!' + q('.visao-item[data-dias-palavra="19"]')), 'o Perfil mostra 19 dias com a Palavra e 3 semanas completas ao lado da ofensiva');
+    ok(/3semanas completas/.test((await texto('.visao-item[data-semanas-completas]')).replace(/\s+/g, '')
+      .replace('semanascompletas', 'semanas completas')), 'com o rótulo "semanas completas"');
+    await av('(CC.rolarPara ? CC.rolarPara(document.querySelector(".visao-geral").getBoundingClientRect().top + scrollY - 120) : 0), 1');
+    await capturar('r1.2-perfil-' + tema);
+    await av(q('.visao-item[data-semanas-completas]') + '.click(); 1');
+    ok(await esperar(q('.folha-ofensiva')), 'tocar no número abre a folha da chama');
+    await fecharFolhas();
+
+    // o 5º dia da semana, lido no papel, festeja a semana completa
+    await av('location.hash = "#/"; 1');
+    await esperar(q('.folha-topo'));
+    await av('CC.lerHoje(20); 1');
+    ok(await esperar(q('.leitor [data-papel-discreto]'), 10000), 'o leitor do dia 20 abre');
+    await av(q('.leitor [data-papel-discreto]') + '.click(); 1');
+    ok(await esperar(q('[data-papel-sim]')), '"Li na minha Bíblia" pede a confirmação');
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    ok(await esperar(q('.dia-lido [data-semana-completa]'), 10000), 'o Dia lido festeja a semana completa');
+    const festa = await texto('.dia-lido .destaque-dia:has([data-semana-completa])');
+    ok(/Semana completa!/.test(festa) && /Já são 4 semanas completas\./.test(festa), 'com "Semana completa!" e "Já são 4 semanas completas." (' + festa + ')');
+    await av('document.querySelector(".dia-lido [data-semana-completa]").scrollIntoView({ block: "center" }); 1');
+    await capturar('r1.2-dia-lido-' + tema);
+    await av('location.hash = "#/"; 1');
+    await esperar('!document.querySelector(".licao:not(.saindo)")');
+    await av('CC.folhaOfensiva(); 1');
+    ok(await esperar(q('.folha-ofensiva .linha-vida[data-semanas-completas="4"]')) && /Esta semana já está completa!/.test(await texto('.folha-ofensiva [data-semanas-completas]')),
+      'depois, a folha diz 4 semanas e "Esta semana já está completa!"');
+    await fecharFolhas();
+    await av('CC.marcarLido(21); 1');
+    ok(await av('CC.semanasCompletas() === 4 && CC.diasNaSemana() === 5'), 'ler de novo no mesmo dia não conta outra semana');
+  }
 } catch (e) {
   falhas++;
   console.log('  FALHA ' + (e && e.stack || e));

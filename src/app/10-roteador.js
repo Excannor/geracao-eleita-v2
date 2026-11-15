@@ -181,6 +181,8 @@
     const lema = CC.fraseDaOfensiva();
     // R1.1: com a chama em zero, o número grande é o dos dias com a Palavra, que nunca cai
     const vida = CC.diasComAPalavra();
+    const semanas = CC.semanasCompletas();
+    const naSemana = CC.diasNaSemana();
     const grande = seq.atual === 0 && vida > 0
       ? '<div class="chama-grande apagada" data-dias-palavra="' + vida + '">' + CC.icoChama(0) + '<b>' + vida + '</b>'
         + '<span>' + (vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra') + '</span></div>'
@@ -203,6 +205,9 @@
       + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
       + (vida && seq.atual ? '<p class="linha-recorde linha-vida" data-dias-palavra="' + vida + '"><span>Dias com a Palavra<small>No app ou na sua Bíblia. Nunca volta a zero.</small></span><b>' + CC.plural(vida, 'dia', 'dias') + '</b></p>' : '')
+      // R1.2: as semanas (segunda a domingo) com 5 dias ou mais; o número só cresce
+      + (vida ? '<p class="linha-recorde linha-vida" data-semanas-completas="' + semanas + '"><span>Semanas completas<small>' + (naSemana >= CC.DIAS_DA_SEMANA_COMPLETA ? 'Esta semana já está completa!'
+        : 'Esta semana: ' + naSemana + ' de ' + CC.DIAS_DA_SEMANA_COMPLETA + ' dias.') + '</small></span><b>' + semanas + '</b></p>' : '')
       + (seq.recorde >= 7 ? '<p class="passo-dica pequena marcas-barro">Seu recorde guarda até onde você já chegou. Até aqui o Senhor nos ajudou! (1Sm 7.12)</p>' : '')
       + (amigos.length
         ? '<span class="etiqueta">Lendo junto</span><div class="lista-proposito">'

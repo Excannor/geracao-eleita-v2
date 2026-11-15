@@ -835,6 +835,26 @@ checar(s.atual === 2, 'ler dois dias do plano de uma vez não infla a ofensiva')
   checar(!z.lidos.length && JSON.stringify(z.diasComPalavra) === '["2026-01-02","2026-01-03"]', 'dias com a Palavra: a fusão com um aparelho zerado zera a trilha e mantém as datas guardadas');
 }
 
+// --- R1.2: semanas completas (segunda a domingo, 5 dias ou mais com a Palavra) ---
+{
+  // 2 de março de 2026 é uma segunda-feira
+  const comDatas = (datas, extra = {}) => ({ marcadoEm: Object.fromEntries(datas.map((d, i) => [i + 1, d])), ...extra });
+  checar(CC.segundaDaSemana('2026-03-02') === '2026-03-02' && CC.segundaDaSemana('2026-03-08') === '2026-03-02' && CC.segundaDaSemana('2026-03-09') === '2026-03-09',
+    'semanas completas: a semana vai de segunda a domingo (o domingo fecha a semana que começou na segunda)');
+  checar(CC.semanasCompletas(comDatas(dias('2026-03-02', 5))) === 1, 'semanas completas: 5 dias na mesma semana completam a semana');
+  checar(CC.semanasCompletas(comDatas(dias('2026-03-02', 4))) === 0 && CC.diasNaSemana(comDatas(dias('2026-03-02', 4)), '2026-03-08') === 4,
+    'semanas completas: 4 dias ainda não completam (esta semana: 4 de 5)');
+  checar(CC.semanasCompletas(comDatas(dias('2026-03-05', 5))) === 0, 'semanas completas: 5 dias seguidos que atravessam o domingo não completam nenhuma das duas semanas');
+  checar(CC.semanasCompletas(comDatas(dias('2026-03-02', 7))) === 1 && CC.semanasCompletas(comDatas(dias('2026-03-02', 14))) === 2, 'semanas completas: 7 dias contam uma semana, 14 dias contam duas');
+  const comPapel = comDatas(['2026-03-02', '2026-03-02', '2026-03-03', '2026-03-04', '2026-03-05'], { origens: { 3: 'papel', 4: 'papel' } });
+  checar(CC.semanasCompletas(comPapel) === 0 && CC.diasNaSemana(comPapel, '2026-03-05') === 4, 'semanas completas: dois dias do plano na mesma data contam um dia; o papel conta');
+  checar(CC.semanasCompletas({ ...comPapel, licoesEm: { a: '2026-03-07' } }) === 1, 'semanas completas: primeiro passo também é dia com a Palavra');
+  checar(CC.semanasCompletas(comDatas([...dias('2026-03-02', 5), ...dias('2026-03-23', 2)])) === 1, 'semanas completas: a falta depois não tira a semana que já completou');
+  checar(CC.semanasCompletas({ diasComPalavra: dias('2026-03-02', 5) }) === 1, 'semanas completas: as datas guardadas no Zerar continuam contando');
+  checar(CC.semanasCompletas(comDatas(dias('2026-03-02', 5))) === CC.semanasCompletas({ marcadoEm: {}, diasComPalavra: dias('2026-03-02', 5) }), 'semanas completas: só crescem (zerar não muda o número)');
+  checar(CC.DIAS_DA_SEMANA_COMPLETA === 5, 'semanas completas: a régua é de 5 dias');
+}
+
 // --- XP ---
 checar(CC.XP_REGISTRO === undefined, 'escrever não tem valor em XP');
 checar(typeof CC.trechosDaTrilha === 'function', 'o leitor separa as trilhas');

@@ -113,6 +113,8 @@
 
   CC.vistaPerfil = function (raiz) {
     const seq = CC.sequencia();
+    const vida = CC.diasComAPalavra();
+    const semanas = CC.semanasCompletas();
     const lidos = CC.ler('lidos', []).length;
     const semNada = !lidos && !CC.ler('licoes', []).length;
     const foto = CC.foto();
@@ -156,6 +158,9 @@
       + '<h2 class="titulo-perfil">Visão geral</h2>'
       + '<div class="visao-geral">'
       + numero(CC.icoChama(seq.atual), seq.atual, seq.atual === 1 ? 'dia de ofensiva' : 'dias de ofensiva', '', 'data-ofensiva-perfil')
+      // R1.1 e R1.2: os números que nunca caem, logo ao lado da chama (abrem a mesma folha)
+      + numero(CC.ico('dia-visto'), vida, vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra', '', 'data-ofensiva-perfil data-dias-palavra="' + vida + '"')
+      + numero(CC.ico('semana'), semanas, semanas === 1 ? 'semana completa' : 'semanas completas', '', 'data-ofensiva-perfil data-semanas-completas="' + semanas + '"')
       + numero(CC.ico('trilha'), lidos + ' de ' + D.plano.length, 'dias do plano')
       + numero(CC.ico('livro'), CC.livrosCompletos() + ' de ' + CC.totalLivros, 'livros terminados', '#/perfil/livros')
       + numero(CC.ico('medalha'), conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length, 'conquistas', '#/perfil/conquistas')
@@ -223,8 +228,7 @@
       if (cabe) CC.guardarApelido(campoNome.value);
     });
     raiz.querySelector('[data-instalar]').onclick = () => CC.tutorialInstalar();
-    const ofensiva = raiz.querySelector('[data-ofensiva-perfil]');
-    if (ofensiva) ofensiva.onclick = CC.folhaOfensiva;
+    raiz.querySelectorAll('[data-ofensiva-perfil]').forEach((b) => { b.onclick = CC.folhaOfensiva; });
     ligarSemeador(raiz);
   };
 

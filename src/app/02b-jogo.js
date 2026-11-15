@@ -314,11 +314,8 @@
         + Object.entries(e.anotacoes || {}).filter(([k, t]) => k.startsWith('verso:') && String(t || '').trim()).length },
   ];
 
-  // Semana de segunda a domingo, pela data da segunda-feira.
-  function segundaDe(iso) {
-    const d = new Date(iso + 'T12:00:00Z');
-    return CC.somaDias(iso, -((d.getUTCDay() + 6) % 7));
-  }
+  // Semana de segunda a domingo, pela data da segunda-feira (a mesma das semanas completas).
+  const segundaDe = (iso) => CC.segundaDaSemana(iso);
   function semanasNaPalavra(e) {
     const porSemana = new Map();
     for (const d of CC.datasFeitas(e)) { const s = segundaDe(d); porSemana.set(s, (porSemana.get(s) || 0) + 1); }
