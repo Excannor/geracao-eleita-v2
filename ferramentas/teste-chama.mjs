@@ -227,6 +227,11 @@ try {
     ok(/Semana completa!/.test(festa) && /Já são 4 semanas completas\./.test(festa), 'com "Semana completa!" e "Já são 4 semanas completas." (' + festa + ')');
     await av('document.querySelector(".dia-lido [data-semana-completa]").scrollIntoView({ block: "center" }); 1');
     await capturar('r1.2-dia-lido-' + tema);
+    // o círculo de "Amanhã" (e o de "Você voltou!", com a mesma regra) no tamanho cheio, 48px:
+    // a regra antiga ".arte-destaque > span" o encolhia a 45%
+    const amanha = await av('(() => { const el = document.querySelector(".dia-lido .arte-destaque > .arte-amanha"); if (!el) return 0; el.scrollIntoView({ block: "center" }); return Math.round(el.getBoundingClientRect().width); })()');
+    ok(amanha >= 46, 'o ícone de "Amanhã" no Dia lido tem o tamanho cheio (' + amanha + 'px)');
+    await capturar('icone-dia-lido-' + tema);
     await av('location.hash = "#/"; 1');
     await esperar('!document.querySelector(".licao:not(.saindo)")');
     await av('CC.folhaOfensiva(); 1');
