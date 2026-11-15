@@ -271,3 +271,25 @@ reacender aceito (sem o mês forjado) e o painel passa o reacender à simulaçã
 o caso depende de não haver virada de mês entre o reacender e hoje (a virada dá escudo para os
 dois cálculos), e o servidor não tem relógio de teste. O cálculo está coberto pelo teste da
 simulação e a ligação pelo teste do servidor.
+
+## UX4.8 · As duas falhas antigas do teste-conta
+
+As duas eram **teste desatualizado**, não defeito no cadastro. Os dois testes foram ajustados
+mantendo a intenção.
+
+**"ja-conheco: sem data: Confira a data de nascimento."** Falhava desde 25/10. No commit d8a01b6, a
+data de nascimento passou a ser digitada (dd/mm/aaaa, com teclado numérico, em vez do calendário do
+Android), e a mensagem mudou de propósito para "Confira a data no formato DD/MM/AAAA.", que diz o
+que a pessoa tem de digitar. O cadastro sem data continua recusado, com o campo marcado. O teste
+agora espera a mensagem nova e também o campo marcado (`aria-invalid`).
+
+**"ja-conheco: abre no alto, com a saudação, e o dia 1 à vista acima da barra".** Falhava desde a
+R2.2b (6675319, 15/11). Rodado o mesmo teste na R2.3 (c1ff1a3), o nó do dia 1 terminava a 620 px
+(abaixo de 692, o topo da barra a 360x800); na R2.2b, a 767 px. A diferença (147 px) é o cartão
+"Comece aqui" (o dia 0), que a R2.2b pôs de propósito acima do "Ler hoje" para a conta nova. A tela
+continua abrindo no alto (rolagem 0), sem folha na frente e sem cortar cartão: o que desceu foi só o
+nó da trilha. O teste agora confere o que a intenção pedia, com o começo de hoje: rolagem 0, a
+saudação, o "Comece aqui" e o "Ler hoje" inteiros acima da barra (a 360x800: 119, 334 e 450 px). A
+mensagem leva os números medidos, para a próxima falha dizer o porquê.
+
+**Testes.** `teste-conta`: 91 ok e 0 falhas (eram 89 e 2).

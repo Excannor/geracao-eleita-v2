@@ -274,7 +274,9 @@ try {
       ok(await t.av('!document.getElementById("nome").hasAttribute("aria-invalid") && document.getElementById("erro-cadastro").textContent === ""'), nome + ': ao digitar, o campo deixa de estar marcado');
       await t.tela(800);
       await t.tocar('#botao-cadastro');
-      ok(await t.erroCadastro() === 'Confira a data de nascimento.', nome + ': sem data: "Confira a data de nascimento."');
+      // a data passou a ser digitada (dd/mm/aaaa, d8a01b6), e a mensagem diz o formato
+      ok(await t.erroCadastro() === 'Confira a data no formato DD/MM/AAAA.' && await t.av('document.getElementById("nascimento").getAttribute("aria-invalid") === "true"'),
+        nome + ': sem data: "Confira a data no formato DD/MM/AAAA." e o campo marcado');
       await t.foto('erro-data-vazia');
       await t.data('2020-03-03');
       await t.tocar('#botao-cadastro');
@@ -331,10 +333,16 @@ try {
       await t.tocar('#botao-cadastro');
       ok(await t.appPronto(), nome + ': "Criar minha conta" entra no app');
       await dormir(1500);
+      // O que tem de estar à vista na primeira tela: a saudação no alto, sem rolar, e o começo, acima
+      // da barra. Desde a R2.2b o começo de uma conta nova é o cartão "Comece aqui" (o dia 0) e o
+      // "Ler hoje" logo abaixo; o nó do dia 1 na trilha fica mais abaixo (a 360x800, já sob a barra).
+      const baixo = (sel) => `(document.querySelector('${sel}') ? Math.round(document.querySelector('${sel}').getBoundingClientRect().bottom) : -1)`;
+      await t.ate('!!document.querySelector("[data-dia-zero]")', 5000);
       const primeira = await t.av(`({ trilha: !!document.querySelector('[data-ler-hoje]'), conhecer: !!document.querySelector('.tela-conhecer-lista'),
-        folhas: document.querySelectorAll('.cortina').length, y: CC.rolagemY(), hoje: (document.querySelector('.no.atual') || {}).getBoundingClientRect ? Math.round(document.querySelector('.no.atual').getBoundingClientRect().bottom) : -1 })`);
+        folhas: document.querySelectorAll('.cortina').length, y: CC.rolagemY(), saudacao: ${baixo('.saudacao')}, zero: ${baixo('[data-dia-zero]')}, lerHoje: ${baixo('.ler-hoje')} })`);
       ok(primeira.trilha && !primeira.conhecer && primeira.folhas === 0, nome + ': primeira tela: a trilha do plano, sem nada do Conhecer Jesus e sem folha na frente');
-      ok(primeira.y === 0 && primeira.hoje > 0 && primeira.hoje < 800 - 108, nome + ': abre no alto, com a saudação, e o dia 1 à vista acima da barra (antes rolava e cortava os cartões)');
+      ok(primeira.y === 0 && primeira.saudacao > 0 && primeira.zero > 0 && primeira.lerHoje > primeira.zero && primeira.lerHoje < 800 - 108,
+        nome + ': abre no alto, com a saudação, e o começo à vista acima da barra: "Comece aqui" (o dia 0) e "Ler hoje" inteiros (antes rolava e cortava os cartões) ' + JSON.stringify(primeira));
       await t.foto('primeira-tela');
       await t.cmd('Page.reload');
       ok(await t.appPronto() && await t.ate('!!document.querySelector("[data-ler-hoje]")'), nome + ': recarregar mantém a conta e a trilha');
