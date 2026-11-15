@@ -7,13 +7,12 @@
   const AMPLITUDE = 70;
 
   // O dia em que a pessoa está: o primeiro não lido, a menos que ela tenha
-  // escolhido outro. Sem isto, quem pula um dia fica preso nele para sempre.
-  CC.diaAtual = function () {
-    const escolhido = Number(CC.ler('dia', 1)) || 1;
-    if (!CC.leu(escolhido)) return Math.min(Math.max(1, escolhido), D.plano.length);
-    for (let n = 1; n <= D.plano.length; n++) if (!CC.leu(n)) return n;
-    return D.plano.length;
-  };
+  // escolhido outro. Sem isto, quem pula um dia fica preso nele para sempre. A conta mora em
+  // 02-estado.js (CC.diaDoPlano), com a regra do pulo para a célula (R2.1).
+  CC.diaAtual = () => CC.diaDoPlano();
+  // R2.1: o dia que a célula está lendo (diaDaCelula, servidor.mjs, pelo líder); com mais de uma
+  // célula, o mais adiantado. 0 sem célula.
+  CC.diaDaCelula = () => (CC.minhasCelulas ? CC.minhasCelulas() : []).reduce((m, p) => Math.max(m, p.diaDaCelula || 0), 0);
 
   const unidadeDoDia = (n) => D.unidades.find((u) => n >= u.de && n <= u.ate) || D.unidades[0];
   CC.unidadeDoDia = unidadeDoDia;
@@ -82,10 +81,11 @@
 
   // "Dia N" vai do lado onde sobra estrada
   const ladoDoRotulo = (x, passo) => (x > 0 || (x === 0 && passo % 8 === 0) ? 'esq' : 'dir');
+  // R2.1: um pendente lido hoje não conta aqui: o dia da célula continua sendo a leitura de hoje
   const diaLidoHoje = () => {
     const hoje = CC.hojeIso();
     const marcados = CC.ler('marcadoEm', {});
-    return Object.keys(marcados).filter((k) => marcados[k] === hoje).map(Number).sort((a, b) => b - a)[0];
+    return Object.keys(marcados).filter((k) => marcados[k] === hoje && k >= CC.ler('pulouPara', 0)).map(Number).sort((a, b) => b - a)[0];
   };
 
   // Ao lado de cada nó vai o "Dia N" e a passagem. Com as duas trilhas no mesmo dia, os
@@ -443,6 +443,10 @@
       + '<div class="trilha-caminho">' + corpo + '</div></div>'
       + '<button class="ir-atual" data-ir-atual hidden aria-label="Voltar ao dia de hoje">' + CC.ico('baixo') + '</button>';
     ligarLetreiro(raiz);
+    // R2.1: quem está 2 dias ou mais atrás da célula, ou tem dias pendentes, ganha o "Ficar em dia"
+    // e os pendentes (peça volta.js, que pinta por cima da trilha já desenhada)
+    const cel = CC.diaDaCelula();
+    if (cel > atual + 1 || CC.ler('pulouPara')) CC.pedirPeca(window.VOLTA, () => !!CC.volta).then(() => CC.volta.trilha(raiz, atual, cel), () => {});
 
     raiz.querySelectorAll('[data-dia]').forEach((el) => {
       el.onclick = (ev) => { ev.stopPropagation(); abrirPop(Number(el.dataset.dia), el); };

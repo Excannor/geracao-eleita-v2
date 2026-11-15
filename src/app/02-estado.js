@@ -71,6 +71,12 @@
     // uma por mês do calendário. Fica fora do PROGRESSO_DA_TRILHA; a fusão guarda, de cada mês, a
     // data mais antiga, e o servidor confere a data (conferirProgresso).
     reacesoEm: {},
+    // Ficar em dia com a célula (R2.1, docs/fases/r2-volta-sem-culpa.md): o dia do plano para onde a
+    // pessoa pulou para ler junto com a célula (0: nunca pulou). Os dias antes dele que ainda não
+    // foram lidos são os "pendentes": sem cobrança, não contam como lidos e podem ser lidos depois.
+    // Só muda o dia em que a pessoa está (CC.diaDoPlano), nunca lidos, datas ou recompensas. Fica
+    // no PROGRESSO_DA_TRILHA (o "Zerar" recomeça do dia 1), e a fusão fica com o maior.
+    pulouPara: 0,
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -287,7 +293,7 @@
   // escreveu, marcou ou é dela (reflexões, anotações, notas, marca-texto, Minha história, foto,
   // nome, orações marcadas, desafios de vários dias, último capítulo) fica.
   const PROGRESSO_DA_TRILHA = ['dia', 'lidos', 'licoes', 'marcadoEm', 'origens', 'licoesEm', 'conhecidos', 'pratica', 'xpLegado',
-    'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos'];
+    'conquistasGanhas', 'maiorProposito', 'diario', 'bausAbertos', 'notasVistas', 'acertosTotal', 'missoesTotal', 'semanasJuntos', 'pulouPara'];
   CC.PROGRESSO_DA_TRILHA = PROGRESSO_DA_TRILHA;
 
   // A data de cada dia lido: vale a mais antiga dos dois lados. Uma leitura não se desmarca, e a
@@ -377,6 +383,8 @@
       cartas: fundirCartas(a.cartas, b.cartas),
       diasComPalavra: limparDatas(uniao(a.diasComPalavra, b.diasComPalavra)),
       reacesoEm: fundirReacesos(a.reacesoEm, b.reacesoEm),
+      // R2.1: pular para a célula não se desfaz entre aparelhos (o maior dos dois)
+      pulouPara: Math.max(a.pulouPara || 0, b.pulouPara || 0),
     };
   }
   function fundirPratica(a, b) {
@@ -438,6 +446,7 @@
     e.cartas = limparCartas(e.cartas);
     e.diasComPalavra = limparDatas(e.diasComPalavra);
     e.reacesoEm = limparReacesos(e.reacesoEm);
+    e.pulouPara = Number.isInteger(e.pulouPara) && e.pulouPara > 1 && e.pulouPara <= D.plano.length ? e.pulouPara : 0;
     return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
@@ -604,6 +613,19 @@
     E.marcadoEm[n] ||= CC.hojeIso();
     E.origens[n] = o;
     CC.gravar('lidos', E.lidos);
+  };
+
+  // O dia em que a pessoa está no plano (CC.diaAtual, 03-trilha.js; o servidor tem o espelho em
+  // notificacoes.mjs, leituraDoDia): o escolhido, se ainda não foi lido, ou o primeiro não lido.
+  // R2.1: quem pulou para o dia da célula segue dali: o escolhido antes do pulo (um pendente aberto)
+  // e os pendentes não puxam a pessoa de volta. Lido tudo dali para a frente, sobram os pendentes.
+  CC.diaDoPlano = (e) => {
+    e = e || E;
+    const L = D.plano.length, de = e.pulouPara || 1, n = Number(e.dia) || 1, lido = (x) => (e.lidos || []).includes(x);
+    if (!lido(n) && n >= de) return Math.min(Math.max(1, n), L);
+    for (let i = de; i <= L; i++) if (!lido(i)) return i;
+    for (let i = 1; i < de; i++) if (!lido(i)) return i;
+    return L;
   };
 
   CC.fezLicao = (id) => E.licoes.includes(id);

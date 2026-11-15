@@ -1,0 +1,49 @@
+/* Quem atrasou volta sem culpa (volta.js). R2.1: o cartão "Ficar em dia", a linha dos pendentes,
+   a folha dos dois caminhos, a lista dos pendentes e a marca dos nós pendentes na Trilha. */
+.folha-topo .cartao-ficar-em-dia {
+  display: flex; align-items: center; gap: 12px; width: 100%; margin: 0 0 10px; padding: 12px 16px 12px 12px;
+  border: 0; border-radius: 26px; background: var(--folha-campo); color: var(--folha-tinta); font: inherit; text-align: left; cursor: pointer;
+}
+.folha-topo .cartao-ficar-em-dia:active { transform: scale(.98); }
+.folha-topo .cartao-ficar-em-dia > svg { flex: none; width: 20px; height: 20px; margin-left: auto; }
+.redondo-volta { display: grid; flex: none; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--salvia); color: var(--salvia-tinta); }
+.redondo-volta svg { width: 22px; height: 22px; }
+.textos-volta { display: grid; gap: 2px; min-width: 0; }
+.textos-volta b { font-size: 1rem; font-weight: 800; line-height: 1.2; }
+.textos-volta span { color: var(--folha-tinta-fraca); font-size: .8125rem; font-weight: 600; line-height: 1.35; }
+.folha-topo .linha-pendentes {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; margin: 0 0 10px; padding: 8px 14px;
+  border: 0; border-radius: 18px; background: transparent; color: var(--folha-tinta); font: inherit; font-size: .875rem; text-align: left; cursor: pointer;
+  box-shadow: inset 0 0 0 1.5px var(--folha-campo);
+}
+.folha-topo .linha-pendentes > svg { flex: none; width: 18px; height: 18px; }
+.folha-topo .linha-pendentes > svg:last-child { margin-left: auto; }
+.folha-topo .linha-pendentes span { color: var(--folha-tinta-fraca); font-weight: 600; }
+.folha-topo .linha-pendentes b { color: var(--folha-tinta); }
+@media (prefers-reduced-motion: reduce) { .folha-topo .cartao-ficar-em-dia:active { transform: none; } }
+
+/* a folha dos dois caminhos: dois cartões de escolha, "Com a célula" já marcado */
+.ficar-em-dia h2, .pendentes h2 { margin: 0 0 6px; }
+.ficar-em-dia .sem-culpa { margin: 0 0 14px; font-weight: 700; }
+.caminhos { display: grid; gap: 10px; margin: 0 0 12px; }
+.caminho { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 20px; background: var(--campo); cursor: pointer; box-shadow: inset 0 0 0 1.5px transparent; }
+.caminho:has(input:checked) { background: var(--salvia-palido); box-shadow: inset 0 0 0 2px var(--salvia-texto); }
+.caminho input { flex: none; width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--salvia-texto); }
+.textos-caminho { display: grid; gap: 4px; min-width: 0; }
+.textos-caminho b { color: var(--tinta-forte); font-size: 1rem; }
+.textos-caminho > span { color: var(--tinta); font-size: .875rem; line-height: 1.4; }
+.selo-padrao { display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 99px; background: var(--salvia); color: var(--salvia-tinta); font-size: .6875rem; font-weight: 800; vertical-align: 2px; }
+.ficar-em-dia .passo-dica { margin: 0; }
+
+/* a lista dos pendentes */
+.pendentes p { margin: 0 0 12px; }
+.lista-pendentes { display: grid; gap: 8px; margin: 0 0 8px; padding: 0; list-style: none; }
+.pendente-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 56px; padding: 10px 14px; border: 0; border-radius: 18px; background: var(--campo); color: var(--tinta); font: inherit; text-align: left; cursor: pointer; }
+.pendente-item > small { flex: none; margin-left: auto; color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.pendente-item > svg { flex: none; width: 18px; height: 18px; }
+.textos-pendente { display: grid; gap: 2px; min-width: 0; }
+.textos-pendente b { color: var(--tinta-forte); }
+.textos-pendente span { color: var(--tinta-fraca); font-size: .8125rem; }
+
+/* o nó pendente na Trilha: tracejado, sem cadeado nem alerta (sem cobrança) */
+.no.travado.pendente, .no.travado.pendente:active, .no.travado.pendente.aberto { background: var(--salvia-palido); color: var(--salvia-texto); box-shadow: none; outline: 2px dashed var(--salvia-texto); outline-offset: -2px; }

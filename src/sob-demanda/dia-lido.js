@@ -116,13 +116,17 @@
         item('<span class="arte-livro" data-semana-completa>' + CC.ico('semana') + '</span>', 'Semana completa!',
           semanas === 1 ? 'Sua primeira: ' + CC.DIAS_DA_SEMANA_COMPLETA + ' dias com a Palavra nesta semana.' : 'Já são ' + semanas + ' semanas completas.', 'semana');
       }
-      const proximoDia = D.plano[sessao.dia];
+      // R2.1: lido um pendente, o que vem a seguir é o dia em que a pessoa está com a célula (e
+      // não o pendente seguinte); se esse dia ainda não foi lido hoje, ele é "Com a célula", não amanhã
+      const pendente = sessao.dia < (CC.ler('pulouPara', 0) || 0);
+      const proximoDia = pendente ? D.plano[CC.diaAtual() - 1] : D.plano[sessao.dia];
+      const comACelula = pendente && !Object.entries(CC.ler('marcadoEm', {})).some(([k, d]) => d === CC.hojeIso() && Number(k) >= CC.ler('pulouPara', 0));
       if (proximoDia && !CC.leu(proximoDia.numero)) {
         const ctxHoje = CC.contextoDoDia ? CC.contextoDoDia(sessao.dia) : null;
         const escritaAmanha = CC.reflexaoEscrita ? CC.reflexaoEscrita(proximoDia.numero) : null;
-        const gancho = (ctxHoje && ctxHoje.amanha) || (escritaAmanha && escritaAmanha.titulo ? escritaAmanha.titulo + '.' : '');
+        const gancho = (!pendente && ctxHoje && ctxHoje.amanha) || (escritaAmanha && escritaAmanha.titulo ? escritaAmanha.titulo + '.' : '');
         item('<span class="arte-amanha">' + CC.ico('avancar') + '</span>',
-          'Amanhã: ' + CC.esc(CC.colarRef(CC.passagemDe(proximoDia))) + ', uns ' + CC.minutosDoDia(proximoDia) + ' min', CC.esc(gancho), 'amanha');
+          (comACelula ? 'Hoje, com a célula (dia ' + proximoDia.numero + '): ' : 'Amanhã: ') + CC.esc(CC.colarRef(CC.passagemDe(proximoDia))) + ', uns ' + CC.minutosDoDia(proximoDia) + ' min', CC.esc(gancho), 'amanha');
       }
       const feitas = c.missoes.lista.filter((m) => m.feita).length;
       item(CC.arte.bau(feitas === c.missoes.lista.length ? 'aberto' : 'travado', feitas === c.missoes.lista.length ? 'madeira' : ''),

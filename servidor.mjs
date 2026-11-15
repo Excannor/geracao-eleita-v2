@@ -102,7 +102,7 @@ function versoDoToque(ref, hoje) {
 }
 // A semana que o roteiro "Leitura da semana" cobre: os 7 dias do plano até onde o líder já leu (é
 // ele quem conduz o encontro).
-const { semanaDoLider } = APP;
+const { semanaDoLider, diaDaCelula } = APP;
 
 // ---------- cabeçalhos de segurança ----------
 // O app é uma página só, com os scripts dentro do HTML. A CSP libera exatamente esses
@@ -861,6 +861,8 @@ function filaNoRetrato(p, info) {
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
   const semanaAte = semanaDoLider(lider && lider.estado);
+  // R2.1: o dia que a célula lê hoje (pelo líder, no fuso dele), para o "Ficar em dia" de quem está atrás
+  const diaDaCelulaHoje = diaDaCelula(lider && lider.estado, hojeDe(p.criadoPor));
   const conduzo = podeConduzir(p, eu);
   // Só o líder prepara, muda ou tira o estudo; o auxiliar o vê como membro. A tela decide por
   // isto, nunca por euConduzo.
@@ -886,6 +888,8 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     // a hora e o lugar do encontro, para todos da célula (B12)
     encontroHora: p.encontroHora || '', encontroLugar: p.encontroLugar || '',
     recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
+    // só para quem é da célula, como o estudo: quem só foi convidado não recebe
+    diaDaCelula: convidado ? 0 : diaDaCelulaHoje,
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.

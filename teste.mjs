@@ -363,6 +363,8 @@ secao('peças sob demanda');
     ['chama', 'CHAMA', 'Seus escudos cuidaram da chama', '', 'as folhas da chama que perdoa'],
     // R1.5: o toque com versículo (a escolha, a folha rápida e o que chega para quem recebe)
     ['toque', 'TOQUE', 'Junto vai este versículo', '', 'o toque com versículo'],
+    // R2: quem atrasou volta sem culpa (ficar em dia com a célula, os dias pendentes)
+    ['volta', 'VOLTA', 'Os dias que ficaram para trás', '', 'o ficar em dia e os pendentes'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -1838,6 +1840,48 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   checar(Object.keys(CC.fundir(e1, antigo).cartas.eventos).length === 2, 'um aparelho com a versão antiga, que manda o estado sem cartas, não as apaga');
 }
 
+// --- R2.1: ficar em dia com a célula (o pulo e os dias pendentes) ---
+{
+  const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
+  const ate = (n) => Array.from({ length: n }, (_, i) => i + 1);
+  checar(CC.diaDoPlano(base({ lidos: ate(30), dia: 30 })) === 31 && CC.diaDoPlano(base({ lidos: ate(30), dia: 50 })) === 50,
+    'ficar em dia: sem pulo, o dia é o primeiro não lido, ou o escolhido ainda não lido (como antes)');
+  checar(CC.diaDoPlano(base({ lidos: [1, 2, 4], dia: 4 })) === 3, 'ficar em dia: sem pulo, um dia para trás não lido puxa a pessoa de volta (como antes)');
+  const pulou = base({ lidos: ate(30), dia: 40, pulouPara: 40 });
+  checar(CC.diaDoPlano(pulou) === 40, 'ficar em dia: quem pulou para o dia 40 da célula está no dia 40, com os dias 31 a 39 sem ler');
+  checar(CC.diaDoPlano({ ...pulou, dia: 33 }) === 40 && CC.diaDoPlano({ ...pulou, dia: 30 }) === 40,
+    'ficar em dia: abrir um pendente (o dia escolhido antes do pulo) não tira a pessoa do dia da célula');
+  checar(CC.diaDoPlano({ ...pulou, lidos: [...ate(30), 40, 41], dia: 41 }) === 42, 'ficar em dia: lido o dia da célula, segue para o seguinte');
+  checar(CC.diaDoPlano({ ...pulou, lidos: [...ate(30), ...ate(365).filter((n) => n >= 40)], dia: 365 }) === 31, 'ficar em dia: lido tudo dali para a frente, sobram os pendentes');
+  // o pulo não marca nada: nem lido, nem data, nem chama, nem dias com a Palavra, nem baú
+  const antes = base({ lidos: ate(30), dia: 31, marcadoEm: Object.fromEntries(ate(30).map((n) => [n, CC.somaDias('2026-03-01', n - 1)])) });
+  const depois = { ...antes, dia: 40, pulouPara: 40 };
+  checar(JSON.stringify(depois.lidos) === JSON.stringify(antes.lidos) && CC.datasFeitas(depois).size === CC.datasFeitas(antes).size
+    && CC.diasComAPalavra(depois) === CC.diasComAPalavra(antes) && CC.semanasCompletas(depois) === CC.semanasCompletas(antes),
+  'ficar em dia: pular não conta leitura (os mesmos lidos, as mesmas datas, os mesmos dias com a Palavra e semanas completas)');
+  checar(!CC.bauLiberado(35, depois) && !CC.bauLiberado(42, { ...depois, lidos: [...depois.lidos, 40, 41, 42] }),
+    'ficar em dia: pular não abre baú (o 35, todo pendente, nem o 42, com 3 dos 7 dias lidos)');
+  checar(RC.FONTES.unidade.detectar(depois).length === RC.FONTES.unidade.detectar(antes).length && RC.FONTES.dias.detectar(depois).length === RC.FONTES.dias.detectar(antes).length,
+    'ficar em dia: pular não paga carta de unidade nem de dias');
+  // os pendentes (a peça volta.js): os dias antes do pulo que não foram lidos
+  const doc = contexto.document;
+  contexto.document = { ...doc, querySelector: () => ({}) };
+  runInContext(readFileSync(join(AQUI, 'src', 'sob-demanda', 'volta.js'), 'utf8'), contexto, { filename: 'volta.js' });
+  contexto.document = doc;
+  const V = CC.volta;
+  checar(V.pendentes(depois).join() === ate(39).filter((n) => n > 30).join() && !V.pendentes(antes).length, 'ficar em dia: os pendentes são os dias 31 a 39; sem pulo, nenhum');
+  checar(V.pendentes({ ...depois, lidos: [...depois.lidos, 33, 40] }).join() === '31,32,34,35,36,37,38,39', 'ficar em dia: lido um pendente, ele sai da lista');
+  checar(V.atrasado(31, 33) && !V.atrasado(31, 32) && !V.atrasado(31, 0) && !V.atrasado(40, 40), 'ficar em dia: o convite é para quem está 2 dias ou mais atrás da célula');
+  // entre aparelhos, na normalização e no Zerar
+  checar(CC.fundir(base({ atualizadoEm: 2, pulouPara: 0, dia: 31 }), base({ atualizadoEm: 1, pulouPara: 40 })).pulouPara === 40
+    && CC.fundir(base({ atualizadoEm: 1, pulouPara: 60 }), base({ atualizadoEm: 2, pulouPara: 40 })).pulouPara === 60,
+  'ficar em dia: entre aparelhos vale o maior pulo (o aparelho antigo não traz a pessoa de volta)');
+  checar(CC.normalizarEstado({ pulouPara: 400 }).pulouPara === 0 && CC.normalizarEstado({ pulouPara: '40' }).pulouPara === 0 && CC.normalizarEstado({ pulouPara: 2.5 }).pulouPara === 0
+    && CC.normalizarEstado({ pulouPara: 40 }).pulouPara === 40, 'ficar em dia: o estado guarda só um dia do plano inteiro como pulo');
+  checar(CC.PROGRESSO_DA_TRILHA.includes('pulouPara'), 'ficar em dia: o "Zerar" recomeça do dia 1, sem pulo');
+  checar(CC.fundir({ ...base({ pulouPara: 40, atualizadoEm: 1 }) }, { ...base({ pulouPara: 0 }), atualizadoEm: 5, zeradoEm: 5 }).pulouPara === 0, 'ficar em dia: o Zerar que chega de outro aparelho tira o pulo');
+}
+
 // --- em dia: baús antigos, fontes, Zerar, Semeadores, álbum novo ---
 {
   const estado = (extra) => ({ ...CC.normalizarEstado({}), dono: 'ana', ...extra });
@@ -3215,6 +3259,10 @@ secao('colocar um estudo na célula direto no banco (ferramentas/colocar-estudo.
     checar(o.planoAte === 250 && o.refSemana === D.reflexoes['247'][0].ref && A.opcoesDoEstudo(null).planoAte === 7 && o.capitulos.Efésios === capitulosDoPlano.Efésios
       && o.livros.length === 66 && o.versiculos('nbv')('Efésios', 6) === 24 && o.versiculos('nao-existe') === null,
     'opcoesDoEstudo: a semana do líder pelo que ele leu, a referência dela, os capítulos e a contagem de versículos por tradução');
+    // R2.1: o dia que a célula lê hoje sai do líder (o maior dia lido; o seguinte, se não foi hoje)
+    checar(A.diaDaCelula({ lidos: [1, 2, 40], marcadoEm: { 40: '2026-03-10' } }, '2026-03-10') === 40 && A.diaDaCelula({ lidos: [1, 2, 40], marcadoEm: { 40: '2026-03-09' } }, '2026-03-10') === 41
+      && A.diaDaCelula({ lidos: [] }, '2026-03-10') === 0 && A.diaDaCelula(null, '2026-03-10') === 0 && A.diaDaCelula({ lidos: [365], marcadoEm: {} }, '2026-03-10') === 365,
+    'diaDaCelula: o dia de hoje do líder (lido hoje, ou o próximo), 0 sem leitura, nunca depois do 365');
     const ferramenta = readFileSync(join(AQUI, 'ferramentas', 'colocar-estudo.mjs'), 'utf8');
     const copia = new Set(((readFileSync(join(AQUI, 'Dockerfile'), 'utf8').match(/^COPY (.*\.mjs.*) \.\/$/m) || [])[1] || '').split(/\s+/));
     const faltam = [...ferramenta.matchAll(/from '\.\.\/([\w-]+\.mjs)'/g)].map((m) => m[1]).filter((m) => !copia.has(m));
@@ -3546,6 +3594,16 @@ secao('notificações: as frases');
   checar(lido([1, 2], 40).leitura === passagem(40), 'ou o dia escolhido, se ainda não foi lido');
   checar(lido([], undefined).tema === D.reflexoes[1][0].titulo, 'o tema é o título da reflexão daquele dia');
   checar(!lido(D.plano.map((d) => d.numero), 365).leitura, 'quem leu tudo não recebe leitura inventada');
+  // R2.1: quem pulou para o dia da célula recebe a leitura dali, como o app (CC.diaDoPlano)
+  {
+    const L = (e) => N.leituraDoDia(D.plano, D.reflexoes, e).leitura;
+    const ate30 = Array.from({ length: 30 }, (_, i) => i + 1);
+    const casos = [{ lidos: ate30, dia: 40, pulouPara: 40 }, { lidos: ate30, dia: 33, pulouPara: 40 }, { lidos: [...ate30, 40], dia: 40, pulouPara: 40 },
+      { lidos: ate30, dia: 31 }, { lidos: [1, 2, 4], dia: 4 }, { lidos: ate30, dia: 40, pulouPara: 999 }];
+    checar(L(casos[0]) === passagem(40) && L(casos[1]) === passagem(40) && L(casos[2]) === passagem(41),
+      'ficar em dia: o aviso fala do dia da célula para quem pulou, e não de um pendente');
+    checar(casos.every((e) => L(e) === passagem(CC.diaDoPlano(CC.normalizarEstado(e)))), 'ficar em dia: o servidor e o app dizem o mesmo dia');
+  }
   // Quem está no Conhecer Jesus: o dia de lá (o primeiro não feito), sem o tema do plano.
   {
     const C = JSON.parse(readFileSync(join(AQUI, 'conteudo', 'conhecer.json'), 'utf8'));

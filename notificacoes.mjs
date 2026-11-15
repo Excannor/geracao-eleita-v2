@@ -595,12 +595,17 @@ export function escolherFrase(chaveDaLista, lista, d, usuario, data) {
 // O que a pessoa vai ler hoje, para o aviso falar da leitura de verdade: o mesmo dia que o
 // app abre (CC.diaAtual em 03-trilha.js), isto é, o dia escolhido se ainda não foi lido, ou
 // o primeiro não lido. Quem já leu tudo não recebe {leitura} nem {tema}.
+// R2.1: quem pulou para o dia da célula (estado.pulouPara) segue dali, como no app (CC.diaDoPlano,
+// 02-estado.js): o escolhido antes do pulo e os dias pendentes não puxam a pessoa de volta.
 export function leituraDoDia(plano, reflexoes, estado = {}) {
   const lidos = new Set(((estado && estado.lidos) || []).map(Number));
+  const pulou = Number(estado && estado.pulouPara);
+  const de = Number.isInteger(pulou) && pulou > 1 && pulou <= plano.length ? pulou : 1;
   let n = Number(estado && estado.dia) || 1;
-  if (n < 1 || n > plano.length || lidos.has(n)) {
+  if (n < de || n > plano.length || lidos.has(n)) {
     n = 0;
-    for (let i = 1; i <= plano.length; i++) if (!lidos.has(i)) { n = i; break; }
+    for (let i = de; i <= plano.length; i++) if (!lidos.has(i)) { n = i; break; }
+    for (let i = 1; !n && i < de; i++) if (!lidos.has(i)) n = i;
   }
   if (!n) return {};
   const dia = plano[n - 1];

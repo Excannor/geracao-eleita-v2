@@ -57,6 +57,15 @@ export function carregarRegrasDoApp(raiz, { extras = [] } = {}) {
     const lidos = ((estadoDoLider && estadoDoLider.lidos) || []).map(Number).filter((n) => n >= 1 && n <= plano.length);
     return Math.min(plano.length, Math.max(7, lidos.length ? Math.max(...lidos) : 0));
   }
+  // R2.1 (docs/fases/r2-volta-sem-culpa.md): o dia que a célula está lendo hoje, pelo líder (o
+  // mesmo de semanaDoLider): o maior dia lido por ele, se foi lido hoje no fuso dele; senão, o
+  // seguinte. 0 quando o líder ainda não leu nada (aí ninguém está "atrás da célula").
+  function diaDaCelula(estadoDoLider, hoje) {
+    const lidos = ((estadoDoLider && estadoDoLider.lidos) || []).map(Number).filter((n) => Number.isInteger(n) && n >= 1 && n <= plano.length);
+    if (!lidos.length) return 0;
+    const maior = Math.max(...lidos);
+    return Math.min(plano.length, ((estadoDoLider.marcadoEm || {})[maior] === hoje ? maior : maior + 1));
+  }
   const refDaSemana = (ate) => (((reflexoes[ate - 3] || [])[0] || {}).ref) || '';
   // As opções de Contas.salvarEstudo para quem prepara, a partir do progresso dele (o que o banco
   // guarda em estados): a leitura da semana congela até que dia do plano ela vai.
@@ -65,5 +74,5 @@ export function carregarRegrasDoApp(raiz, { extras = [] } = {}) {
     return { regras, livros, capitulos, versiculos: versiculosDa, planoAte: ate, refSemana: refDaSemana(ate) };
   };
 
-  return { conteudo: D, plano, reflexoes, regras, livros, capitulos, versiculosDa, semanaDoLider, refDaSemana, opcoesDoEstudo };
+  return { conteudo: D, plano, reflexoes, regras, livros, capitulos, versiculosDa, semanaDoLider, diaDaCelula, refDaSemana, opcoesDoEstudo };
 }
