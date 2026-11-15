@@ -125,6 +125,7 @@
     const todos = [...trofeus.unidades, ...trofeus.colecoes, ...(trofeus.desafios || []), ...(trofeus.testamentos || []), ...(trofeus.albuns || [])];
     const albuns = CC.albunsDeCartas();
     const ganhos = todos.filter((t) => t.ganho);
+    const noAlto = (conquistas.filter((c) => c.nivel).length + ganhos.length) + ' de ' + (conquistas.length + todos.length);
 
     // Visão geral: quatro números em grade simples, sem cartão colorido em volta de cada um
     const numero = (icone, valor, rotulo, href, dado) => (href ? '<a class="visao-item" href="' + href + '">'
@@ -163,7 +164,8 @@
       + numero(CC.ico('semana'), semanas, semanas === 1 ? 'semana completa' : 'semanas completas', '', 'data-ofensiva-perfil data-semanas-completas="' + semanas + '"')
       + numero(CC.ico('trilha'), lidos + ' de ' + D.plano.length, 'dias do plano')
       + numero(CC.ico('livro'), CC.livrosCompletos() + ' de ' + CC.totalLivros, 'livros terminados', '#/perfil/livros')
-      + numero(CC.ico('medalha'), conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length, 'conquistas', '#/perfil/conquistas')
+      // conquistas e troféus são uma coisa só, numa tela só (UX4.4): o número conta os dois
+      + numero(CC.ico('medalha'), noAlto, 'conquistas', '#/perfil/conquistas')
       + '</div>'
       // A previsão só aparece quando anima: em até um ano e três meses. Mais longe que isso, a
       // data vira cobrança para quem está lendo devagar.
@@ -175,8 +177,7 @@
       + '<div class="titulo-secao"><h2>Coleção</h2></div>'
       + '<div class="caixa-lista">' + vitrine.map(CC.linhaConquista).join('') + '</div>'
       + '<div class="colecao-atalhos">'
-      + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length + '</small></a>'
-      + '<a href="#/perfil/trofeus">' + CC.ico('trofeu') + '<b>Troféus</b><small>' + ganhos.length + ' de ' + todos.length + '</small></a>'
+      + '<a href="#/perfil/conquistas">' + CC.ico('medalha') + '<b>Conquistas</b><small>' + noAlto + '</small></a>'
       + (albuns.length ? '<a href="#/perfil/album" data-album-cartas>' + CC.ico('cartoes') + '<b>Cartas</b><small>' + albuns.reduce((n, a) => n + a.feitos, 0)
         + ' de ' + albuns.reduce((n, a) => n + a.total, 0) + '</small></a>' : '')
       + '</div>'
@@ -235,34 +236,32 @@
   const atalho = (href, icone, texto) => '<a class="atalho" href="' + href + '">' + CC.ico(icone)
     + '<span>' + CC.esc(texto) + '</span>' + CC.ico('avancar') + '</a>';
 
-  // ---------- conquistas ----------
-  CC.vistaConquistas = function (raiz) {
+  // ---------- conquistas (e troféus) ----------
+  // Uma tela só (UX4.4, achado C12): as conquistas com nível, as conquistas antigas e as estantes
+  // de troféus, com tudo o que a pessoa já ganhou. "#/perfil/trofeus" (links antigos) abre a mesma
+  // tela, já nos troféus.
+  CC.vistaConquistas = function (raiz, irAosTrofeus) {
     const conquistas = CC.conquistasComNivel();
     const legado = CC.conquistasLegado();
+    const t = CC.trofeus();
+    const conta = (lista) => lista.filter((x) => x.ganho).length + ' de ' + lista.length;
+    const estante = (titulo, lista) => '<p class="etiqueta etiqueta-estante">' + CC.esc(titulo) + ' <span>' + conta(lista) + '</span></p>'
+      + '<div class="estante">' + lista.map(trofeuHtml).join('') + '</div>';
+    const todos = [...t.testamentos, ...t.unidades, ...t.colecoes, ...t.desafios, ...t.albuns];
     raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Conquistas</h1></div>'
+      + CC.tituloSecao('Por nível', conquistas.filter((c) => c.nivel).length + ' de ' + conquistas.length)
       + '<div class="caixa-lista">' + conquistas.map(CC.linhaConquista).join('') + '</div>'
       + (legado.length
         ? CC.tituloSecao('Mais conquistas') + '<div class="caixa-lista">' + legado.map((c) => '<div class="linha-conquista ganha">'
           + '<span class="arte-medalha c-amarelo"><span class="escudo">' + CC.ico(c.icone) + '</span></span>'
           + '<div class="corpo-conquista"><b>' + CC.esc(c.titulo) + '</b><span class="descricao-conquista">' + CC.esc(c.descricao) + '</span></div></div>').join('') + '</div>'
-        : '');
+        : '')
+      + '<div id="trofeus" data-trofeus>' + CC.tituloSecao('Troféus', conta(todos)) + '</div>'
+      + estante('A Bíblia toda', t.testamentos) + estante('Unidades do plano', t.unidades) + estante('Partes da Bíblia', t.colecoes)
+      + estante('Desafios', t.desafios) + (t.albuns.length ? estante('Álbuns de cartas', t.albuns) : '');
+    if (irAosTrofeus) requestAnimationFrame(() => { const x = raiz.querySelector('[data-trofeus]'); if (x) x.scrollIntoView(); });
   };
-
-  // ---------- troféus ----------
-  CC.vistaTrofeus = function (raiz) {
-    const t = CC.trofeus();
-    raiz.innerHTML = '<div class="folha-perfil">' + CC.botaoVoltar('Perfil') + '<h1>Troféus</h1></div>'
-      + CC.tituloSecao('A Bíblia toda', t.testamentos.filter((x) => x.ganho).length + ' de ' + t.testamentos.length)
-      + '<div class="estante">' + t.testamentos.map(trofeuHtml).join('') + '</div>'
-      + CC.tituloSecao('Unidades do plano', t.unidades.filter((x) => x.ganho).length + ' de ' + t.unidades.length)
-      + '<div class="estante">' + t.unidades.map(trofeuHtml).join('') + '</div>'
-      + CC.tituloSecao('Partes da Bíblia', t.colecoes.filter((x) => x.ganho).length + ' de ' + t.colecoes.length)
-      + '<div class="estante">' + t.colecoes.map(trofeuHtml).join('') + '</div>'
-      + CC.tituloSecao('Desafios', t.desafios.filter((x) => x.ganho).length + ' de ' + t.desafios.length)
-      + '<div class="estante">' + t.desafios.map(trofeuHtml).join('') + '</div>'
-      + (t.albuns.length ? CC.tituloSecao('Álbuns de cartas', t.albuns.filter((x) => x.ganho).length + ' de ' + t.albuns.length)
-        + '<div class="estante">' + t.albuns.map(trofeuHtml).join('') + '</div>' : '');
-  };
+  CC.vistaTrofeus = (raiz) => CC.vistaConquistas(raiz, true);
 
   // ---------- cartas ----------
   // A tela do álbum vem da peça "album" (src/sob-demanda/album.js, docs/cartas.md seção 9): na

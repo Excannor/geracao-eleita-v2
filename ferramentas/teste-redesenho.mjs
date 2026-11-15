@@ -414,8 +414,8 @@ await foto('5b-missoes');
 
 // ---------- perfil e configurações ----------
 await irPara('#/perfil');
-ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 3 && !!document.querySelector(".colecao-atalhos [data-album-cartas]") && document.querySelectorAll(".visao-geral .visao-item").length === 6'),
-  'o perfil mostra a visão geral (com dias com a Palavra e semanas completas, R1.2), conquistas com nível e a coleção (Conquistas, Troféus e Cartas)');
+ok(await esperar('document.querySelectorAll(".selo-conquista").length === 3 && document.querySelectorAll(".colecao-atalhos a").length === 2 && !!document.querySelector(".colecao-atalhos [data-album-cartas]") && document.querySelectorAll(".visao-geral .visao-item").length === 6'),
+  'o perfil mostra a visão geral (com dias com a Palavra e semanas completas, R1.2), conquistas com nível e a coleção (Conquistas, com os troféus dentro, e Cartas: UX4.4)');
 // O nome no Perfil: teto de 20, contador só perto dele; o que passa não é guardado (nem cortado).
 ok(await av(q('#apelido') + '.maxLength') === 20 && await av(q('.rotulo-apelido .contagem') + '.hidden'), 'o nome curto no Perfil não mostra o contador');
 await preencher('#apelido', 'Ana Clara de Souza');
@@ -430,8 +430,14 @@ ok(await av('/188/.test(' + q('.linha-ajuda') + '.innerText) && !/XP/.test(' +
   'o perfil tem a linha do CVV e não mostra XP');
 await dormir(400);
 await foto('7-perfil');
+ok(await av('!document.querySelector("a[href=\\"#/perfil/trofeus\\"]") && /^Conquistas\\d+ de \\d+$/.test(document.querySelector(".colecao-atalhos a[href=\\"#/perfil/conquistas\\"]").textContent)'),
+  'UX4.4: o Perfil tem um atalho só, "Conquistas", que conta conquistas e troféus');
 await irPara('#/perfil/conquistas');
 ok(await esperar('document.querySelectorAll(".linha-conquista").length === CC.CONQUISTAS.length'), 'todas as conquistas aparecem com o nível');
+ok(await av('(() => { const t = CC.trofeus(); const n = t.testamentos.length + t.unidades.length + t.colecoes.length + t.desafios.length + t.albuns.length; return document.querySelectorAll(".estante .trofeu").length === n && !!document.querySelector("[data-trofeus]"); })()'),
+  'UX4.4: a mesma tela tem todos os troféus, em estantes');
+await irPara('#/perfil/trofeus');
+ok(await esperar('document.querySelector("h1")?.textContent === "Conquistas" && !!document.querySelector("[data-trofeus]")'), 'UX4.4: o endereço antigo dos troféus abre Conquistas');
 await irPara('#/perfil/escritos');
 ok(await esperar('/oração de teste/.test(document.body.innerText)'), 'Meus escritos reúne o que foi escrito');
 await irPara('#/config');

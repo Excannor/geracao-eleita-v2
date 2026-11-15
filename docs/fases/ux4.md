@@ -136,3 +136,34 @@ o aviso de salvo dizem a data.
 
 **O que ficou de fora.** Se a fila mudar em outro aparelho entre a prévia e o salvar, a data dita
 antes pode não ser a gravada; o aviso de salvo diz sempre a do servidor.
+
+## UX4.4 · Conquistas e Troféus numa tela só
+
+**Como era.** O Perfil tinha quatro sistemas de prêmio (C12 da avaliação): a seção Coleção, com
+três atalhos (Conquistas, Troféus e Cartas), mais o número "conquistas" na Visão geral. Conquistas
+e Troféus eram duas telas (`#/perfil/conquistas` e `#/perfil/trofeus`) para a mesma ideia: o que a
+pessoa já ganhou lendo.
+
+**Agora.** Uma tela só, "Conquistas" (`CC.vistaConquistas`, `07-perfil.js`), com tudo o que havia
+nas duas:
+- "Por nível": as conquistas com nível (as mesmas linhas, com barra e nível);
+- "Mais conquistas": as conquistas antigas (legado), quando a pessoa tem;
+- "Troféus" com a conta geral, e as mesmas estantes de antes, cada uma com nome e conta: A Bíblia
+  toda, Unidades do plano, Partes da Bíblia, Desafios e Álbuns de cartas (quando há álbuns).
+Nada do que a pessoa ganhou sai: os dados são os mesmos (`CC.conquistasComNivel`,
+`CC.conquistasLegado`, `CC.trofeus`), só mudou onde aparecem.
+
+No Perfil, a Coleção fica com dois atalhos, "Conquistas" e "Cartas". O número de "Conquistas" (no
+atalho e na Visão geral) passa a contar as conquistas com nível e os troféus ganhos, sobre o total
+dos dois ("1 de 48"): é a mesma tela. As Cartas continuam à parte: têm álbum, revelação e regras
+próprias.
+
+**O endereço antigo.** `#/perfil/trofeus` (links guardados, o histórico do navegador) abre a mesma
+tela, já rolada até "Troféus" (`scroll-margin-top` para não ficar embaixo da folha do alto).
+
+**Testes.** `teste-redesenho`: o Perfil tem um atalho só, "Conquistas", com a conta (a checagem antiga da Coleção passa a esperar 2 atalhos); a tela tem
+todas as conquistas e todos os troféus de `CC.trofeus()`; o endereço antigo abre "Conquistas".
+`teste-bau`: a estante "Álbuns de cartas" continua lá pelo endereço antigo.
+
+**O que ficou de fora.** O resto do C12 (Configurações, anotações e instalar com vários acessos)
+já tinha sido tratado na Fase 3; as Cartas não entram na tela de Conquistas.

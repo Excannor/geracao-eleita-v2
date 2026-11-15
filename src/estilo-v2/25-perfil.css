@@ -351,3 +351,7 @@ a.painel-celula-linha { color: inherit; text-decoration: none; }
 /* A tabela da ficha do livro vem do material com um cabeçalho vazio: some (revisão, C19). */
 .nota-corpo thead:not(:has(th:not(:empty))) { display: none; }
 .busca-na-lista { margin: 0 0 14px; }
+/* UX4.4: as estantes de troféus dentro de Conquistas, cada uma com o nome e a conta */
+.etiqueta-estante { display: flex; justify-content: space-between; gap: 8px; margin: 18px 4px 8px; }
+.etiqueta-estante span { font-variant-numeric: tabular-nums; }
+#trofeus { scroll-margin-top: 96px; }
