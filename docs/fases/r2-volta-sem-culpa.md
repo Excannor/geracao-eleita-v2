@@ -103,3 +103,44 @@ líder.
 - Desfazer o pulo: não há botão. Os pendentes ficam abertos para ler a qualquer hora, e o "Zerar"
   recomeça tudo.
 - A medida do roadmap ("atrasados que voltam a ler em 7 dias") não entrou no painel.
+
+## Antes da R2.2 · Folga do index.html
+
+Com a R2.1 a folga do index.html tinha caído para 60,4 KB (piso de 60). Num commit à parte, o quiz
+do Praticar (`09-praticar.js`, 9,8 KB) virou a peça `src/sob-demanda/praticar.js`; no index ficou a
+casca (`CC.vistaPraticar` com `CC.cascaDaPeca`, e `CC.fecharPratica`). O Praticar abria sem rede
+mesmo nunca aberto (o `teste-offline` abre o quiz sem rede), e as peças só são guardadas quando
+pedidas: para não mudar isso, o service worker guarda esta peça já na instalação
+(`PECAS_DE_ANTEMAO` no `build.mjs`, `DE_ANTEMAO` no `sw.js`; só entra o que vem como script). A
+folga foi para 69,9 KB. Com rede, na primeira abertura do Praticar, o título e o esqueleto aparecem
+por um instante enquanto a peça chega.
+
+## R2.2 · Primeiro dia de 5 minutos
+
+**Como era (auditado numa conta nova, com a marca `cc.instalar` da página de entrada).** Nada cobre
+o Início antes da primeira leitura: o tutorial de instalar e o convite das notificações já vinham
+só depois do primeiro "Voltar à trilha" (`CC.depoisDoPrimeiroDia`, desde a correção de retenção de
+02/10), e o convite das notificações nunca aparece antes de um dia feito. O Dia lido do dia 1 era
+igual ao de qualquer dia ("Dia 1 lido", a chama, a semana): nada dizia que era o primeiro.
+
+**O que mudou.** O primeiro Dia lido da vida da pessoa (o primeiro dia do plano lido, sem outra data
+com a Palavra antes: quem já fez um primeiro passo ou um dia do Conhecer Jesus noutro dia não ganha esta festa)
+ganha, no alto, "Seu primeiro dia com a Palavra! · Foi o começo. Agora é um dia de cada vez, Nina."
+Mora na peça `dia-lido.js` (nada no index). Nada abre por cima do Dia lido; os pedidos continuam só
+depois do "Voltar à trilha".
+
+**A passagem curta: não feita, para decisão do dono.** O dia 1 do plano é Gênesis 1-3 · Mateus 1
+(2.362 palavras, uns 12 minutos). Cinco minutos são umas 1.000 palavras. Não há como encurtar o dia
+1 sem mexer no plano de 365 dias, que a correção de retenção lista entre o que não muda, e todo
+caminho custa em outro lugar:
+- dia 1 = Gênesis 1-2 (6 min) e o resto (Gênesis 3 e Mateus 1) no dia 2, que passa de 5 para 11
+  minutos: pesa justo no dia 2, o que mais decide;
+- um "dia 0" antes do plano (Gênesis 1, uns 3 minutos), que acende a chama e conta como dia com a
+  Palavra, mas não é dia do plano;
+- dar o dia 1 por lido com uma parte só: quebra a regra de leitura (fim do texto e 1/3 do tempo).
+O guia de leitura do dia 1 já pula a lista de nomes de Mateus 1 para a parte que importa.
+
+**Testes.** `teste.mjs` (a festa na peça, fora do index, e os pedidos só no "Voltar à trilha") e
+`ferramentas/teste-volta.mjs` (PARTES=R2.2; claro e escuro): conta nova sem nada por cima do
+Início, o leitor do dia 1 direto, a festa no alto sem rolar, nada por cima do Dia lido, o tutorial
+de instalar só depois do "Voltar à trilha", e o dia 2 sem a festa.

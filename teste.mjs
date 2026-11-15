@@ -391,6 +391,15 @@ secao('peças sob demanda');
     checar(html.includes('CC.vistaPraticar') && html.includes('CC.fecharPratica') && !html.includes('CC.praticarTela =') && !html.includes('cartao-pratica c-'),
       'no index fica só a casca do Praticar');
   }
+  // R2.2: a festa do primeiro Dia lido mora na peça do Dia lido, e os pedidos continuam depois
+  // do "Voltar à trilha" (depoisDoPrimeiroDia), nunca antes da primeira leitura
+  {
+    const diaLido = (html.match(/window\.DIA_LIDO="([^"]*)"/) || [])[1] || '';
+    const codigo = diaLido ? readFileSync(dist(diaLido), 'utf8') : '';
+    checar(codigo.includes('data-primeiro-dia') && codigo.includes('Seu primeiro dia com a Palavra!') && !html.includes('Seu primeiro dia com a Palavra!')
+      && /\[data-voltar-trilha\]'\)\.onclick = \(\) => \{[\s\S]{0,300}depoisDoPrimeiroDia\(\)/.test(codigo),
+    'o primeiro Dia lido festeja na peça do Dia lido, e os pedidos vêm só no "Voltar à trilha"');
+  }
   // As peças do estudo juntam mais de um arquivo: as regras puras vão com a tela, e o leitor de
   // marcas (o mesmo do servidor) vai com o preparo. O estudo antigo saiu do index.
   {

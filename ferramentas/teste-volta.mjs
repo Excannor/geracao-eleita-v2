@@ -8,8 +8,11 @@
 // hoje, com a célula, é o dia 40, e outro aparelho (sem nada guardado) abre igual. No meu ritmo: o
 // Bruno segue do dia 31, e o convite não volta por 7 dias. Quem não tem célula e o líder não veem
 // o convite.
+// R2.2, o primeiro dia: numa conta nova nada cobre o Início antes de ler; o primeiro Dia lido festeja
+// no alto ("Seu primeiro dia com a Palavra!"), nada abre por cima dele, e o primeiro pedido (instalar)
+// só vem depois do "Voltar à trilha"; o dia 2 não repete a festa.
 // Uso: node ferramentas/teste-volta.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
-// CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R2.1...)
+// CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R2.1, R2.2...; PARTES=R2.1,R2.2 escolhe as partes)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -22,6 +25,9 @@ const PORTA = Number(process.env.PORTA) || await portaLivre();
 const DEPURACAO = await portaLivre();
 const CHROME = process.env.CHROME || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const CAPTURAS = process.env.CAPTURAS || '';
+// PARTES=R2.1,R2.2 roda só essas partes (todas, sem a variável)
+const PARTES = (process.env.PARTES || '').split(',').filter(Boolean);
+const quer = (parte) => !PARTES.length || PARTES.includes(parte);
 const dormir = (ms) => new Promise((r) => setTimeout(r, ms));
 
 let falhas = 0;
@@ -139,6 +145,7 @@ try {
   };
 
   for (const tema of ['claro', 'escuro']) {
+    if (!quer('R2.1')) break;
     await temaDe(tema);
     console.log('\n  R2.1 · Ficar em dia com a célula\n');
     // o líder leu até o dia 40, hoje: a célula está no dia 40
@@ -255,6 +262,57 @@ try {
     ok(await noInicio(), 'o líder abre o Início');
     await dormir(800);
     ok(!(await av(q('.folha-topo [data-ficar-em-dia]'))), 'o líder, que é o dia da célula, não vê o convite');
+  }
+
+  // ---------- R2.2: o primeiro dia ----------
+  // Uma conta nova (como a página de entrada deixa: cc.instalar) abre o app e lê o dia 1. Tudo o
+  // que cobre a tela (folhas e telas cheias) é anotado, do começo ao fim, para saber o que vem antes
+  // e o que vem depois do primeiro Dia lido.
+  const vigiar = () => av('(() => { window.__cobriu = []; const anotar = () => { for (const el of document.querySelectorAll(".cortina .folha, .tela-cheia")) {'
+    + ' const nome = el.getAttribute("aria-label") || el.className; if (!window.__cobriu.includes(nome)) window.__cobriu.push(nome); } };'
+    + ' anotar(); new MutationObserver(anotar).observe(document.body, { childList: true, subtree: true }); return 1; })()');
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R2.2')) break;
+    await temaDe(tema);
+    console.log('\n  R2.2 · O primeiro dia\n');
+    const t = tema[0];
+    const novaC = await conta('nova' + t, 'Nina');
+    await cmd('Page.navigate', { url: base + '/entrar.html' });
+    await dormir(300);
+    await av('localStorage.clear(); sessionStorage.clear(); localStorage.setItem("cc.instalar", "1"); 1');
+    await entrar(novaC, { limpar: false });
+    await esperar(q('.folha-topo'), 20000);
+    await vigiar();
+    await dormir(4000);
+    ok(await av('window.__cobriu.length === 0'), 'conta nova: nada cobre o Início antes da primeira leitura (' + await av('JSON.stringify(window.__cobriu)') + ')');
+    await capturar('r2.2-inicio-conta-nova-' + tema, true);
+    await av('CC.lerHoje(CC.diaAtual()); 1');
+    ok(await esperar(q('.leitor [data-papel-discreto]'), 10000), 'o leitor do dia 1 abre direto');
+    await av(q('.leitor [data-papel-discreto]') + '.click(); 1');
+    await esperar(q('[data-papel-sim]'));
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    ok(await esperar(q('.dia-lido [data-primeiro-dia]'), 10000), 'o primeiro Dia lido abre com a festa do primeiro dia');
+    const festa = await texto('.dia-lido [data-primeiro-dia]');
+    ok(/Seu primeiro dia com a Palavra!/.test(festa) && /um dia de cada vez, Nina\./.test(festa), 'com "Seu primeiro dia com a Palavra!" (' + festa + ')');
+    ok(await av('document.querySelector(".dia-lido [data-primeiro-dia]").getBoundingClientRect().bottom < innerHeight'), 'a festa fica no alto, sem rolar');
+    await esperar('!document.querySelector(".cortina")', 3000);
+    await vigiar();
+    await dormir(3000);
+    ok(await av('window.__cobriu.length === 0'), 'nada abre por cima do Dia lido: nem conta, nem instalar, nem notificações (' + await av('JSON.stringify(window.__cobriu)') + ')');
+    await capturar('r2.2-dia-lido-' + tema);
+    await av(q('[data-voltar-trilha]') + '.click(); 1');
+    await vigiar();
+    ok(await esperar('window.__cobriu.includes("Instalar no celular")', 5000), 'só depois do "Voltar à trilha" vem o primeiro pedido (instalar no celular)');
+    await fecharFolhas();
+    // o dia seguinte do plano, lido depois, não festeja como o primeiro
+    await av('CC.lerHoje(2); 1');
+    await esperar(q('.leitor [data-papel-discreto]'), 10000);
+    await av(q('.leitor [data-papel-discreto]') + '.click(); 1');
+    await esperar(q('[data-papel-sim]'));
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    ok(await esperar(q('.dia-lido'), 10000) && !(await av(q('.dia-lido [data-primeiro-dia]'))), 'o dia 2 não repete a festa do primeiro dia');
+    await av('location.hash = "#/"; 1');
+    await fecharFolhas();
   }
 } catch (e) {
   falhas++;

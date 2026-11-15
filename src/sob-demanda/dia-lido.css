@@ -29,3 +29,7 @@ button.bau-do-dia { cursor: pointer; }
 .pergunta-leitura small { display: block; color: var(--tinta-fraca); font-size: .75rem; font-weight: 700; }
 .pergunta-leitura svg { flex: none; width: 18px; height: 18px; margin-left: auto; color: var(--tinta-fraca); }
 @media (prefers-reduced-motion: reduce) { .cartao-opcional > summary > svg { transition: none; } }
+/* R2.2: a festa do primeiro Dia lido da vida, no alto */
+.dia-lido .primeiro-dia { display: grid; gap: 2px; margin: 10px 0 4px; padding: 10px 16px; border-radius: 20px; background: var(--salvia-palido); color: var(--tinta); text-align: center; }
+.dia-lido .primeiro-dia b { color: var(--tinta-forte); font-size: 1rem; }
+.dia-lido .primeiro-dia span { font-size: .875rem; }

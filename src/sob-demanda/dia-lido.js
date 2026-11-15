@@ -79,6 +79,10 @@
     const escolhida = Number.isInteger(sessao.pergunta) ? sessao.pergunta : -1;
     const registro = CC.registro(sessao.dia);
     const subiuHoje = ganhou && !sessao.antes.feitoHoje && seq.feitoHoje;
+    // R2.2: o primeiro Dia lido da vida da pessoa (nenhum outro dia do plano nem outra data com a
+    // Palavra antes) ganha uma festa própria, no alto, antes de qualquer pedido: o tutorial de
+    // instalar e o convite das notificações só vêm depois do "Voltar à trilha" (depoisDoPrimeiroDia)
+    const primeiroDia = subiuHoje && CC.ler('lidos', []).length === 1 && CC.diasComAPalavra() === 1;
     // guardados aqui: os temporizadores de baixo podem disparar depois de a lição fechar
     const ofensivaAntes = sessao.antes.ofensiva;
     const diaDaSessao = sessao.dia;
@@ -184,6 +188,7 @@
         // R1.1: o total da vida, quando já passa da sequência de agora (quem voltou de uma falta)
         + (CC.diasComAPalavra() > seq.atual ? '<p class="linha-vida-dia" data-dias-palavra="' + CC.diasComAPalavra() + '">' + CC.esc(CC.textoDiasComAPalavra(CC.diasComAPalavra())) + '</p>' : '')
         + '<p class="passo-dica">' + nb(CC.esc(CC.passagemDe(dia))) + (papel ? ' · lido na sua Bíblia' : '') + '</p>'
+        + (primeiroDia ? '<p class="primeiro-dia" data-primeiro-dia><b>Seu primeiro dia com a Palavra!</b><span>Foi o começo. Agora é um dia de cada vez' + (nome ? ', ' + CC.esc(nome) : '') + '.</span></p>' : '')
         + (ganhou ? faixaDaSemana() : '')
         + '<button class="botao contorno pequeno compartilhar-chama" data-compartilhar>' + CC.ico('compartilhar') + 'Story da chama</button>'
         + '</div>'
