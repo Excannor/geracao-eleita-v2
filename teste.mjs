@@ -860,6 +860,38 @@ checar(s.atual === 2, 'ler dois dias do plano de uma vez não infla a ofensiva')
   checar(q.atual === 0 && CC.escudoParaAvisar(q, '2026-03-06', '') === null, 'escudo sozinho: com a chama apagada não há aviso de escudo (fala a folha de volta)');
 }
 
+// --- R1.4: reacender a chama (1 vez por mês, 7 dias ou mais, até 3 dias depois de apagar) ---
+{
+  const sem = (datas, hoje, re) => CC.simularOfensiva(datas, hoje, re);
+  // 10 dias (1 a 10/3), 3 dias em branco (11 a 13), 2 escudos: a chama apaga; lido o dia 14
+  const dez = dias('2026-03-01', 10);
+  let q = sem([...dez, '2026-03-14'], '2026-03-14');
+  checar(q.atual === 1 && q.perda && q.perda.antes === 10 && q.perda.fim === '2026-03-14' && q.perda.tamanho === 3 && q.perda.escudos === 2,
+    'reacender: a perda guarda a sequência de antes (10), o buraco (3) e os escudos de então (2)');
+  const estado = (datas, extra = {}) => ({ marcadoEm: Object.fromEntries(datas.map((d, i) => [i + 1, d])), ...extra });
+  checar(CC.reacenderPossivel(estado([...dez, '2026-03-14']), '2026-03-14') === 10, 'reacender: quem tinha 10 dias e já leu hoje pode reacender');
+  checar(CC.reacenderPossivel(estado(dez), '2026-03-14') === 10, 'reacender: quem ainda não leu hoje também pode (reacende lendo hoje)');
+  q = sem([...dez, '2026-03-14'], '2026-03-14', ['2026-03-14']);
+  checar(q.atual === 11 && q.reacendeu === '2026-03-14' && q.reacesos.join() === '2026-03-11,2026-03-12,2026-03-13' && q.escudos === 2 && !q.zerouEm,
+    'reacender: lido hoje, a sequência de antes volta (11 dias), o buraco fica coberto e os escudos não são gastos');
+  checar(CC.reacenderPossivel(estado([...dez, '2026-03-14'], { reacesoEm: { '2026-03': '2026-03-14' } }), '2026-03-14') === 0, 'reacender: depois de reacender, não oferece de novo');
+  checar(sem(dez, '2026-03-14', ['2026-03-14']).atual === 0, 'reacender: o pedido sem a leitura de hoje não reacende nada');
+  checar(CC.reacenderPossivel(estado(dias('2026-03-05', 6)), '2026-03-14') === 0 && sem([...dias('2026-03-05', 6), '2026-03-14'], '2026-03-14', ['2026-03-14']).atual === 1,
+    'reacender: com menos de 7 dias seguidos, não vale (nem com um registro forjado)');
+  checar(CC.reacenderPossivel(estado(dez), '2026-03-16') === 10 && CC.reacenderPossivel(estado(dez), '2026-03-17') === 0,
+    'reacender: vale até 3 dias depois de a chama apagar (5 dias em branco com 2 escudos sim, 6 não)');
+  checar(sem([...dez, '2026-03-20'], '2026-03-20', ['2026-03-20']).atual === 1, 'reacender: um registro fora da janela não cobre o buraco');
+  checar(CC.reacenderPossivel(estado(dez, { reacesoEm: { '2026-03': '2026-03-02' } }), '2026-03-14') === 0, 'reacender: uma vez por mês (março já teve)');
+  checar(CC.reacenderPossivel(estado(dez, { reacesoEm: { '2026-02': '2026-02-10' } }), '2026-03-14') === 10, 'reacender: o mês anterior não conta para este');
+  checar(JSON.stringify(CC.limparReacesos({ '2026-03': '2026-04-01', '2026-04': '2026-04-02', x: '2026-04-03', '2026-05': 7 })) === '{"2026-04":"2026-04-02"}',
+    'reacender: o estado guarda só um registro por mês, com a data dentro do próprio mês');
+  const f = CC.fundir({ atualizadoEm: 1, reacesoEm: { '2026-03': '2026-03-14', '2026-01': '2026-01-09' } }, { atualizadoEm: 2, reacesoEm: { '2026-03': '2026-03-05' } });
+  checar(JSON.stringify(f.reacesoEm) === JSON.stringify({ '2026-03': '2026-03-05', '2026-01': '2026-01-09' }), 'reacender: entre aparelhos, de cada mês vale a data mais antiga, sem duplicar');
+  q = sem([...dez, '2026-03-14'], '2026-03-14', ['2026-03-14']);
+  checar(CC.escudoParaAvisar(q, '2026-03-14', '') === null, 'reacender: os dias reacesos não viram aviso de escudo');
+  checar(!CC.PROGRESSO_DA_TRILHA.includes('reacesoEm'), 'reacender: o registro fica fora do que o Zerar apaga (o limite do mês não recomeça)');
+}
+
 // --- R1.2: semanas completas (segunda a domingo, 5 dias ou mais com a Palavra) ---
 {
   // 2 de março de 2026 é uma segunda-feira
@@ -3743,6 +3775,19 @@ secao('cofre das anotações (cofre.mjs e servidor)');
     const agoraZ = Date.now() + 4000;
     const zeradoSrv = { ...cheio, atualizadoEm: agoraZ, zeradoEm: agoraZ };
     for (const campo of CC.PROGRESSO_DA_TRILHA) zeradoSrv[campo] = { ...CC.normalizarEstado({}), xpLegado: 0 }[campo];
+    // R1.4: o servidor só aceita reacender com a data na janela de atraso, e o de um mês que ele já
+    // tem não muda
+    {
+      const hojeR = CC.hojeIso();
+      const mesR = hojeR.slice(0, 7);
+      await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3100, reacesoEm: { [mesR]: hojeR, '2020-01': '2020-01-05' } }, ana, 'PUT');
+      const r1 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};
+      checar(r1[mesR] === hojeR && !r1['2020-01'], 'no servidor, reacender entra com a data de hoje e um mês antigo forjado fica de fora (' + JSON.stringify(r1) + ')');
+      const outroDia = CC.somaDias(hojeR, hojeR.slice(8) === '01' ? 1 : -1);
+      await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3200, reacesoEm: { [mesR]: outroDia.slice(0, 7) === mesR ? outroDia : hojeR } }, ana, 'PUT');
+      const r2 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};
+      checar(r2[mesR] === hojeR && Object.keys(r2).length === 1, 'no servidor, o reacender do mês não muda nem duplica');
+    }
     // R1.1: o aparelho que zera guarda as datas lidas em diasComPalavra; uma data que o servidor
     // nunca viu, fora da janela de atraso, não entra (ninguém inventa anos de leitura assim)
     const datasCheio = [...CC.datasFeitas(cheio)];

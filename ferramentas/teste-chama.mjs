@@ -8,6 +8,9 @@
 // caem ao lado da ofensiva, e ler o 5º dia da semana (no papel) festeja a semana completa no Dia lido.
 // R1.3, escudo usado sozinho: quem faltou ontem e tem escudo abre o app com a chama acesa e um aviso
 // gentil (uma vez só), sem fazer nada; o escudo do iniciante avisa como tal.
+// R1.4, reacender a chama: quem tinha 10 dias e perdeu (3 dias em branco, 2 escudos) vê o convite
+// na folha de volta, reacende lendo hoje (no papel) e os 10 dias voltam; o servidor guarda o mês, e
+// não há segunda vez no mesmo mês. Quem já leu hoje reacende pela folha da chama, na hora.
 // Uso: node ferramentas/teste-chama.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, nos temas claro e escuro, uma subpasta por parte: R1.1, R1.2...)
 import { spawn } from 'node:child_process';
@@ -303,6 +306,71 @@ try {
     && /3 dias seguidos/.test(doIniciante) && /Ainda resta 1 escudo\./.test(doIniciante), 'com o texto do escudo do iniciante (' + doIniciante.replace(/\s+/g, ' ') + ')');
   await capturar('r1.3-iniciante-claro');
   await fecharFolhas();
+
+  // ---------- R1.4: reacender a chama ----------
+  // 10 dias seguidos até 4 dias atrás e 3 dias em branco: com 2 escudos, a chama apagou anteontem.
+  // As datas velhas entram pelo aparelho, como na R1.3.
+  const dezDias = Object.fromEntries(Array.from({ length: 10 }, (_, i) => [i + 1, atras(13 - i)]));
+  const mes = iso(new Date()).slice(0, 7);
+  const semearDez = async (usuario) => {
+    await entrar(await contaComFalta(usuario, true));
+    await esperar(q('.folha-topo'), 20000);
+    await esperar('!document.getElementById("abertura")', 15000);
+    await dormir(600);
+    await fecharFolhas();
+    await av('CC.gravar("marcadoEm", ' + JSON.stringify(dezDias) + '); CC.gravar("lidos", ' + JSON.stringify(Object.keys(dezDias).map(Number)) + '); CC.gravar("dia", 11); CC.salvarNoServidor().then(() => 1)');
+    await voltarAoApp();
+  };
+  for (const tema of ['claro', 'escuro']) {
+    await temaDe(tema);
+    await semearDez('reacende' + tema);
+    ok(await esperar(q('.recomeco [data-pode-reacender="10"]'), 20000), 'perdeu 10 dias há pouco: a folha de volta oferece reacender');
+    const volta = await texto('.recomeco');
+    ok(/Você pode reacender a chama/.test(volta) && /Leia hoje e os seus 10 dias seguidos voltam\. Vale uma vez por mês\./.test(volta) && /Perder um dia não é perder a Palavra/.test(volta),
+      'o convite: "Leia hoje e os seus 10 dias seguidos voltam. Vale uma vez por mês."');
+    ok((await texto('.folha [data-reacender]')) === 'Reacender lendo hoje', 'o botão de cima é "Reacender lendo hoje"');
+    await capturar('r1.4-volta-' + tema);
+    await av(q('.folha [data-reacender]') + '.click(); 1');
+    ok(await esperar(q('.licao [data-papel]'), 10000), 'o botão abre a leitura de hoje');
+    ok(await av('CC.sequencia().atual === 0 && !CC.ler("reacesoEm", {})[' + JSON.stringify(mes) + ']'), 'antes de ler, nada muda');
+    await av(q('.licao [data-papel]') + '.click(); 1');
+    await esperar(q('[data-papel-sim]'));
+    await av(q('[data-papel-sim]') + '.click(); 1');
+    ok(await esperar(q('.dia-lido'), 10000), 'lido hoje (no papel), o Dia lido abre');
+    ok(await esperar('CC.sequencia().atual === 11 && CC.sequencia().reacendeu === ' + JSON.stringify(iso(new Date())), 8000), 'a sequência de antes voltou: 10 + hoje = 11 dias');
+    ok(/A chama voltou!/.test(await texto('.dia-lido')) && /Seus 11 dias seguidos estão de volta\./.test(await texto('.dia-lido')), 'o Dia lido festeja: "A chama voltou! Seus 11 dias seguidos estão de volta."');
+    await av('(() => { const t = [...document.querySelectorAll(".dia-lido .destaque-dia")].find((x) => /A chama voltou/.test(x.textContent)); if (t) t.scrollIntoView({ block: "center" }); return 1; })()');
+    await capturar('r1.4-dia-lido-' + tema);
+    await av('CC.salvarNoServidor().then(() => 1)');
+    const doServidor = await av('fetch("api/estado", { cache: "no-store" }).then((r) => r.json()).then((e) => JSON.stringify(e.reacesoEm || {}))');
+    ok(doServidor === JSON.stringify({ [mes]: iso(new Date()) }), 'o servidor guardou o reacender do mês (' + doServidor + ')');
+    ok(await av('CC.reacenderPossivel() === 0'), 'no mesmo mês, não dá para reacender de novo');
+    await av('location.hash = "#/"; 1');
+    await esperar('!document.querySelector(".licao:not(.saindo)")');
+    await av('CC.folhaOfensiva(); 1');
+    ok(await esperar(q('.folha-ofensiva .chama-grande')) && !(await av('!!' + q('.folha-ofensiva [data-reacender]'))) && (await texto('.folha-ofensiva .chama-grande b')) === '11',
+      'a folha da chama mostra 11 dias e já não oferece reacender');
+    ok(await av('document.querySelectorAll(".folha-ofensiva .bolinha.escudo .ico-chama").length === 3'), 'na semana, os 3 dias reacesos aparecem cobertos, com a chama');
+    await capturar('r1.4-folha-depois-' + tema);
+    await fecharFolhas();
+  }
+
+  // quem já leu hoje reacende pela folha da chama, na hora
+  await temaDe('claro');
+  await semearDez('reacendeja');
+  ok(await esperar(q('.recomeco [data-pode-reacender]'), 20000), 'a folha de volta abre');
+  await av(q('.folha [data-fechar]') + '.click(); 1');
+  await av('CC.marcarLido(11); CC.redesenhar(); 1');
+  ok(await av('CC.sequencia().atual === 1 && CC.reacenderPossivel() === 10'), 'leu hoje sem reacender: a chama recomeça em 1, e ainda dá para reacender');
+  await av('CC.folhaOfensiva(); 1');
+  ok(await esperar(q('.folha-ofensiva [data-reacender="10"]')) && /Leia hoje e os seus 10 dias seguidos voltam\. Uma vez por mês\./.test(await texto('.folha-ofensiva [data-reacender]')),
+    'a folha da chama oferece "Reacender a chama"');
+  await av('document.querySelector(".folha-ofensiva [data-reacender]").scrollIntoView({ block: "center" }); 1');
+  await capturar('r1.4-folha-claro');
+  await av(q('.folha-ofensiva [data-reacender]') + '.click(); 1');
+  ok(await esperar('CC.sequencia().atual === 11', 8000), 'já lido hoje: reacende na hora, 11 dias');
+  ok(await esperar('/A chama voltou: 11 dias seguidos!/.test(document.body.textContent)', 4000), 'com o recado "A chama voltou: 11 dias seguidos!"');
+  ok(await av('JSON.stringify(CC.ler("reacesoEm", {})) === ' + JSON.stringify(JSON.stringify({ [mes]: iso(new Date()) }))), 'um registro só, do mês');
 } catch (e) {
   falhas++;
   console.log('  FALHA ' + (e && e.stack || e));

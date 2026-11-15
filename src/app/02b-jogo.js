@@ -276,7 +276,7 @@
   CC.CONQUISTAS = [
     { id: 'chama', titulo: 'Chama acesa', icone: 'chama', cor: 'vermelho', niveis: [3, 7, 30, 100, 365],
       texto: (n) => 'Chegue a ' + n + ' dias seguidos de chama acesa',
-      valor: (e, hoje) => CC.simularOfensiva(CC.datasFeitas(e), hoje).recorde },
+      valor: (e, hoje) => CC.simularOfensiva(CC.datasFeitas(e), hoje, CC.reacesosDe(e)).recorde },
     { id: 'leitor', titulo: 'Todo dia na Palavra', icone: 'dia-visto', cor: 'verde', niveis: [10, 50, 100, 200, 365],
       texto: (n) => 'Leia ' + n + ' dias do plano', valor: (e) => e.lidos.length },
     { id: 'capitulos', titulo: 'Página a página', icone: 'folha', cor: 'azul', niveis: [50, 200, 500, 900, 1189],
@@ -403,7 +403,7 @@
     if (!e) return null;
     if (tipo === 'ofensiva') {
       const dias = Number(dados.dias);
-      const sim = CC.simularOfensiva(CC.datasFeitas(e), hoje);
+      const sim = CC.simularOfensiva(CC.datasFeitas(e), hoje, CC.reacesosDe(e));
       if (!CC.MARCOS_OFENSIVA.includes(dias) || sim.atual < dias) return null;
       return 'ofensiva:' + dias + ':' + (sim.zerouEm || 'inicio');
     }

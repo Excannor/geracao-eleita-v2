@@ -122,3 +122,58 @@ servidor. O aviso é de cada aparelho: quem abre outro aparelho até 3 dias depo
 **Testes.** `teste.mjs` (1 dia, dia já avisado, outro aparelho, mais de 3 dias, dois escudos,
 iniciante, chama apagada) e `ferramentas/teste-chama.mjs` (o aviso na abertura nos dois temas,
 uma vez só, nada por cima, a folha da chama, e o escudo do iniciante).
+
+## R1.4 · Reacender a chama
+
+Uma vez por mês, quem tinha 7 dias seguidos ou mais e perdeu a sequência reacende lendo o dia de
+hoje, e a sequência de antes volta.
+
+**A regra (na simulação, `CC.simularOfensiva`, igual no aparelho e no servidor).** O registro é
+`reacesoEm: { "AAAA-MM": "AAAA-MM-DD" }`, a data em que a pessoa reacendeu, uma por mês do
+calendário. Um buraco de dias em branco que os escudos não cobriam é coberto inteiro, sem gastar
+escudo, quando:
+- acaba numa data de `reacesoEm` que tem leitura (o dia de hoje lido, no app ou no papel);
+- a sequência de antes tinha `CC.REACENDER_MINIMO` (7) dias ou mais;
+- o buraco passou dos escudos de então por no máximo `CC.REACENDER_JANELA` (3) dias: a janela é
+  de até 3 dias depois de a chama apagar.
+
+Um registro que não cumpre isso não cobre nada. Os dias cobertos entram em `protegidos` (contam
+como escudo para os amigos, a célula, os propósitos e as notificações) e em `reacesos` (a folha da
+chama os mostra com a chama, e não viram aviso de escudo). A simulação também devolve `perda`, o
+último buraco que apagou a chama, e `CC.reacenderPossivel()` diz quantos dias voltam (0 se não dá:
+mês já usado, menos de 7 dias, fora da janela ou leitura depois da perda).
+
+**Sem abuso e sem duplicar.**
+- Uma vez por mês: a chave é o mês, e o mês já usado não oferece de novo.
+- Fusão entre aparelhos (`fundir`): de cada mês vale a data mais antiga. Dois aparelhos que
+  reacendem no mesmo mês ficam com um registro só.
+- `normalizarEstado` guarda só registros com a data dentro do próprio mês.
+- O servidor (`conferirProgresso`): o mês que ele já tem não muda; um mês novo só entra com a
+  data na janela de 7 dias de atraso (ninguém reacende um mês antigo). O resto da regra está na
+  simulação, que o servidor roda (`diaDe` passa os `reacesos` do estado).
+- Fica fora do `PROGRESSO_DA_TRILHA`: o "Zerar" não devolve o reacender do mês.
+
+**Como a pessoa reacende.**
+- A folha de volta ("Ainda tem brasa", agora na peça `chama.js`) mostra "Você pode reacender a
+  chama · Leia hoje e os seus N dias seguidos voltam. Vale uma vez por mês." e o botão
+  "Reacender lendo hoje".
+- A folha da chama mostra "Reacender a chama" enquanto der (até 3 dias depois de apagar), também
+  para quem fechou a folha de volta ou já leu hoje.
+- Quem já leu hoje reacende na hora ("A chama voltou: N dias seguidos!"). Quem não leu deixa o
+  pedido neste aparelho (`cc.reacender.pedido`, `dono:hoje`) e vai para a leitura de hoje; o Dia
+  lido (`dia-lido.js`) cumpre o pedido e festeja "A chama voltou! Seus N dias seguidos estão de
+  volta." O pedido vale só no mesmo dia e na mesma conta.
+
+**Limite conhecido.** O painel da igreja (administrador) conta a chama de cada membro pela cópia
+achatada das datas (`leitura_dias`), sem o estado: lá, um mês reacendido aparece como chama que
+apagou e recomeçou. O Início, os amigos, a célula, os propósitos e as notificações usam o estado.
+
+**Privacidade.** Só a data do reacender, junto do progresso de leitura que a política já
+descreve; nada novo para outras pessoas.
+
+**Testes.** `teste.mjs` (perda, já leu e não leu hoje, sequência volta sem gastar escudo, pedido
+sem leitura, menos de 7 dias e registro forjado, janela de 3 dias, um por mês, mês anterior,
+normalização, fusão, aviso de escudo, Zerar; no servidor: mês antigo forjado recusado e mês que
+não muda) e `ferramentas/teste-chama.mjs` (o convite na folha de volta, reacender lendo no papel,
+a festa no Dia lido, o mês no servidor, sem segunda vez, os dias reacesos na semana, e reacender
+na hora pela folha da chama).

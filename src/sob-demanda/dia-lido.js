@@ -49,7 +49,22 @@
     try { const a = cartoesAbertos(); a[k] = aberto; localStorage.setItem(CHAVE_CARTOES, JSON.stringify(a)); } catch (e) { /* segue */ }
   };
 
+  // R1.4: o pedido "Reacender lendo hoje" (chama.js) se cumpre aqui, com o dia de hoje lido. Vale
+  // só no mesmo dia e na mesma conta; lido ou não, o pedido sai.
+  let reacendeuAgora = false;
+  function cumprirReacender() {
+    let pedido = '';
+    try { pedido = localStorage.getItem('cc.reacender.pedido') || ''; } catch (e) { return; }
+    if (!pedido) return;
+    try { localStorage.removeItem('cc.reacender.pedido'); } catch (e) { /* segue */ }
+    const hoje = CC.hojeIso();
+    if (pedido !== (CC.estado().dono || '') + ':' + hoje || !CC.datasFeitas().has(hoje) || !CC.reacenderPossivel()) return;
+    CC.gravar('reacesoEm', { ...CC.ler('reacesoEm', {}), [hoje.slice(0, 7)]: hoje });
+    reacendeuAgora = true;
+  }
+
   CC.telaDiaLido = function (L, dia, u) {
+    cumprirReacender();
     const sessao = L.sessao();
     const { ir, sair, botao, nb, primeiroNome, totalApoio, pintarVersiculo } = L;
     const lido = CC.leu(sessao.dia);
@@ -90,6 +105,11 @@
       for (const l of c.livros.slice(0, 2)) item('<span class="arte-livro">' + CC.ico('livro') + '</span>', 'Você terminou ' + CC.esc(l) + '!', 'Fica marcado em Livros da Bíblia', 'livro');
       if (c.unidade) item(CC.arte.trofeu(u.cor, true), 'Unidade ' + u.numero + ' concluída!', CC.esc(u.titulo), 'unidade');
       if (subiuHoje && seq.atual === 2) item('<span class="arte-volta">' + CC.ico('broto') + '</span>', 'Você voltou!', 'Voltar no dia seguinte é a parte mais difícil. Você voltou.', 'volta');
+      // R1.4: a leitura de agora cumpriu o "Reacender lendo hoje": a sequência de antes voltou
+      if (reacendeuAgora && seq.reacendeu === CC.hojeIso()) {
+        reacendeuAgora = false;
+        item(CC.icoChama(seq.atual), 'A chama voltou!', 'Seus ' + seq.atual + ' dias seguidos estão de volta.', 'chama');
+      }
       // R1.2: a semana (segunda a domingo) chegou a 5 dias com a Palavra hoje
       if (subiuHoje && CC.diasNaSemana() === CC.DIAS_DA_SEMANA_COMPLETA) {
         const semanas = CC.semanasCompletas();

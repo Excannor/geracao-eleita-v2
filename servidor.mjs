@@ -197,6 +197,16 @@ function conferirProgresso(atual, junto, hoje) {
   }
   const conhecidas = new Set([...(atual ? datasFeitas(atual) : []), ...((atual && atual.diasComPalavra) || [])]);
   junto.diasComPalavra = (junto.diasComPalavra || []).filter((d) => conhecidas.has(d) || (d >= limite && d <= amanha));
+  // R1.4: o reacender de um mês que o servidor já tinha não muda; um novo só entra com a data dentro
+  // da janela de atraso (ninguém reacende um mês antigo). As outras regras (7 dias antes, até 3
+  // dias depois de apagar, dia lido) estão na própria simulação, que ignora um registro que não vale.
+  const reacesosAntes = (atual && atual.reacesoEm) || {};
+  const reacesos = {};
+  for (const [m, d] of Object.entries(junto.reacesoEm || {})) {
+    if (reacesosAntes[m]) reacesos[m] = reacesosAntes[m];
+    else if (d >= limite && d <= amanha) reacesos[m] = d;
+  }
+  junto.reacesoEm = reacesos;
   // "Zerar progresso" que acabou de chegar: os contadores recomeçam do zero com a trilha.
   const zerouAgora = !!atual && (junto.zeradoEm || 0) > (atual.zeradoEm || 0);
   for (const [campo, maximo] of Object.entries(SUBIDA_MAXIMA)) {
@@ -609,7 +619,7 @@ const hojeDe = (usuario) => hojeNoFuso((CONTAS.achar(usuario) || {}).fuso);
 async function diaDe(usuario, hoje) {
   const estado = await lerEstado(arquivoDe(usuario));
   const feitas = datasFeitas(estado);
-  const simulacao = REGRAS.simularOfensiva([...feitas], hoje);
+  const simulacao = REGRAS.simularOfensiva([...feitas], hoje, REGRAS.reacesosDe(estado || {}));
   // A simulação inteira vai junto: a chama da célula e a ofensiva perdida (inteligencia.mjs)
   // saem dela, sem refazer a conta.
   return { estado, feitas, protegidos: new Set(simulacao.protegidos), simulacao };
@@ -1030,7 +1040,7 @@ async function rodadaDeLembretes(agora = new Date()) {
       await enviarPara(usuario, m, { semCaixa: true, ttl: 12 * 3600 });
       saiu.push({ usuario, tipo: 'aviso', titulo: m.titulo });
     }
-    const { estado, feitas, protegidos } = await diaDe(usuario, data);
+    const { estado, feitas, protegidos, simulacao } = await diaDe(usuario, data);
     const ontem = somaDias(data, -1);
     let ofensiva = 0;
     for (let d = ontem; (feitas.has(d) || protegidos.has(d)) && ofensiva < 5000; d = somaDias(d, -1)) ofensiva++;
@@ -1042,7 +1052,7 @@ async function rodadaDeLembretes(agora = new Date()) {
         leuHoje: feitas.has(data),
         ofensiva,
         ultimaLeitura: [...feitas].filter((d) => d <= data).sort().pop() || null,
-        escudoOntem: protegidos.has(ontem) && !feitas.has(ontem),
+        escudoOntem: protegidos.has(ontem) && !feitas.has(ontem) && !(simulacao.reacesos || []).includes(ontem),
         criadaEm: conta.criadaEm,
       },
     });

@@ -173,7 +173,7 @@
       else if (seq.protegidos.includes(d)) estado = 'escudo';
       else if (atras === 0) estado = 'hoje';
       return '<span class="bolinha ' + estado + '"><i>'
-        + (estado === 'feito' ? CC.ico('certo') : (estado === 'escudo' ? CC.ico('escudo') : '')) + '</i>'
+        + (estado === 'feito' ? CC.ico('certo') : (estado === 'escudo' ? (seq.reacesos.includes(d) ? CC.icoChama(1) : CC.ico('escudo')) : '')) + '</i>'
         + '<b>' + CC.diaDaSemana(d) + '</b></span>';
     }).join('');
     const amigos = (CC.amigosEmCache() || {}).amigos || [];
@@ -183,6 +183,7 @@
     const vida = CC.diasComAPalavra();
     const semanas = CC.semanasCompletas();
     const naSemana = CC.diasNaSemana();
+    const reacender = CC.reacenderPossivel();
     const grande = seq.atual === 0 && vida > 0
       ? '<div class="chama-grande apagada" data-dias-palavra="' + vida + '">' + CC.icoChama(0) + '<b>' + vida + '</b>'
         + '<span>' + (vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra') + '</span></div>'
@@ -203,6 +204,9 @@
       + '<div class="semana-bolinhas">' + semana + '</div>'
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
       + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Se um dia ficar em branco, o app usa um sozinho. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
+      // R1.4: quem perdeu uma sequência de 7 dias ou mais pode reacender lendo hoje
+      + (reacender ? '<button class="linha-recorde linha-vida linha-reacender" data-reacender="' + reacender + '"><span>Reacender a chama<small>Leia hoje e os seus '
+        + reacender + ' dias seguidos voltam. Uma vez por mês.</small></span>' + CC.icoChama(reacender) + '</button>' : '')
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
       + (vida && seq.atual ? '<p class="linha-recorde linha-vida" data-dias-palavra="' + vida + '"><span>Dias com a Palavra<small>No app ou na sua Bíblia. Nunca volta a zero.</small></span><b>' + CC.plural(vida, 'dia', 'dias') + '</b></p>' : '')
       // R1.2: as semanas (segunda a domingo) com 5 dias ou mais; o número só cresce
@@ -222,6 +226,8 @@
       rotulo: 'Sua chama',
       ligar: (folha, fechar) => {
         folha.querySelector('[data-ver-amigos]').onclick = () => { fechar(); location.hash = '#/novidades'; };
+        const reacenderBt = folha.querySelector('[data-reacender]');
+        if (reacenderBt) reacenderBt.onclick = () => { fechar(); CC.pedirPeca(window.CHAMA, () => !!CC.chama).then(() => CC.chama.reacender(), () => CC.avisar('Sem conexão agora. Tente de novo daqui a pouco.')); };
         // A imagem leva exatamente a frase sorteada para esta abertura (lema), não outra; e
         // fica pronta logo depois que a folha assenta, para o toque abrir direto o
         // compartilhamento do sistema.
@@ -677,22 +683,10 @@
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
       gravarLocal('cc.aviso.zerou', dono + ':' + seq.zerouEm);
-      // R1.1: o número em destaque é o dos dias com a Palavra (o total da vida), nunca um zero
-      const vida = CC.diasComAPalavra();
-      CC.folha('<div class="recomeco">' + CC.icoChama(0) + '<h2>Ainda tem brasa</h2>'
-        + (vida ? '<p class="vida-grande" data-dias-palavra="' + vida + '"><b>' + vida + '</b><span>' + (vida === 1 ? 'dia com a Palavra' : 'dias com a Palavra') + '</span></p>' : '')
-        + '<p>Perder um dia não é perder a Palavra. Tudo o que você leu continua aqui, e o seu recorde de '
-        + CC.plural(seq.recorde, 'dia', 'dias') + ' também. Hoje é um bom dia para acender de novo.</p></div>'
-        + '<div class="acoes"><button class="botao" data-ler>Reavivar hoje</button>'
-        + '<button class="botao plano" data-fechar>Agora não</button></div>',
-      {
-        rotulo: 'Recomeçar',
-        ligar: (folha, fechar) => {
-          folha.querySelector('[data-fechar]').onclick = fechar;
-          folha.querySelector('[data-ler]').onclick = () => { fechar(); CC.abrirLicao(CC.diaAtual()); };
-        },
-      });
-      return;
+      // a folha de volta (R1.1, R1.4) mora na peça chama.js; sem ela, um recado curto
+      CC.pedirPeca(window.CHAMA, () => !!CC.chama).then(() => CC.chama.folhaDeVolta(seq),
+        () => CC.avisar('Perder um dia não é perder a Palavra. Hoje é um bom dia para acender de novo.'));
+      return 'esperando';
     }
     const toques = ((CC.amigosEmCache() || {}).toques || []);
     const vistos = lerLocal('cc.aviso.toques') || '';

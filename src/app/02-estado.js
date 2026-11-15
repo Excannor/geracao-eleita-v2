@@ -67,6 +67,10 @@
     // O contador soma estas com as datas de agora (CC.diasComAPalavra) e nunca volta a zero.
     // Fica fora do PROGRESSO_DA_TRILHA, e a fusão une os dois lados.
     diasComPalavra: [],
+    // Reacender a chama (R1.4): { "AAAA-MM": "AAAA-MM-DD" }, a data em que a pessoa reacendeu,
+    // uma por mês do calendário. Fica fora do PROGRESSO_DA_TRILHA; a fusão guarda, de cada mês, a
+    // data mais antiga, e o servidor confere a data (conferirProgresso).
+    reacesoEm: {},
   });
 
   // O diário só precisa do mês corrente e do anterior: é o que as missões leem.
@@ -372,6 +376,7 @@
       notas: fundirNotas(a.notas, b.notas),
       cartas: fundirCartas(a.cartas, b.cartas),
       diasComPalavra: limparDatas(uniao(a.diasComPalavra, b.diasComPalavra)),
+      reacesoEm: fundirReacesos(a.reacesoEm, b.reacesoEm),
     };
   }
   function fundirPratica(a, b) {
@@ -405,6 +410,21 @@
     return [...new Set(x.filter((d) => typeof d === 'string' && DATA_ISO.test(d)))].sort().slice(-20000);
   }
 
+  // Um reacender por mês: a chave é o mês da própria data. Na fusão, de cada mês vale a data mais
+  // antiga dos dois aparelhos: nunca dois no mesmo mês, e o que já valeu não muda.
+  function limparReacesos(x) {
+    const saida = {};
+    if (!x || typeof x !== 'object' || Array.isArray(x)) return saida;
+    for (const [m, d] of Object.entries(x).slice(0, 600)) if (/^\d{4}-\d{2}$/.test(m) && typeof d === 'string' && DATA_ISO.test(d) && d.slice(0, 7) === m) saida[m] = d;
+    return saida;
+  }
+  function fundirReacesos(a, b) {
+    const saida = limparReacesos(a);
+    for (const [m, d] of Object.entries(limparReacesos(b))) if (!saida[m] || d < saida[m]) saida[m] = d;
+    return saida;
+  }
+  CC.limparReacesos = limparReacesos;
+
   // Estados gravados num formato antigo guardavam as lições em "trilha" e tinham meta e protetor.
   function normalizar(bruto) {
     if (!bruto || typeof bruto !== 'object' || bruto.vazio) return null;
@@ -417,6 +437,7 @@
     e.origens = limparOrigens(e.origens, e.lidos);
     e.cartas = limparCartas(e.cartas);
     e.diasComPalavra = limparDatas(e.diasComPalavra);
+    e.reacesoEm = limparReacesos(e.reacesoEm);
     return migrarNotas(e);
   }
   CC.normalizarEstado = normalizar;
@@ -629,9 +650,19 @@
   // do primeiro dia lido, um buraco de até 2 dias é coberto uma vez sem gastar os escudos de
   // sempre. O fim de semana é o buraco mais comum, e chega quando o hábito ainda não existe.
   CC.ESCUDO_INICIANTE = 2;
-  CC.simularOfensiva = function (datas, hoje) {
+  // Reacender a chama (R1.4, docs/fases/r1-chama-que-perdoa.md): uma vez por mês, quem tinha 7 dias
+  // seguidos ou mais e perdeu a sequência reacende lendo hoje, e a sequência de antes volta. O
+  // buraco que acaba numa data de "reacesos" (lida) é coberto inteiro, sem gastar escudo, se a
+  // sequência de antes tinha REACENDER_MINIMO dias e o buraco passou dos escudos por no máximo
+  // REACENDER_JANELA dias (até 3 dias depois de a chama apagar). Os dias cobertos entram em
+  // protegidos (contam como escudo para o servidor, os amigos e a célula) e em reacesos.
+  // perda: o último buraco que apagou a chama, para saber se ainda dá para reacender.
+  CC.REACENDER_MINIMO = 7;
+  CC.REACENDER_JANELA = 3;
+  CC.simularOfensiva = function (datas, hoje, reacesos) {
     const feitas = new Set(datas);
-    const r = { atual: 0, recorde: 0, escudos: 1, protegidos: [], feitoHoje: feitas.has(hoje), zerouEm: null, recomeco: false, iniciante: null };
+    const reacender = new Set(reacesos || []);
+    const r = { atual: 0, recorde: 0, escudos: 1, protegidos: [], feitoHoje: feitas.has(hoje), zerouEm: null, recomeco: false, iniciante: null, reacesos: [], reacendeu: null, perda: null };
     const ordenadas = [...feitas].filter((d) => d <= hoje).sort();
     if (!ordenadas.length) return r;
     const fimDaPrimeiraSemana = CC.somaDias(ordenadas[0], 7);
@@ -670,8 +701,11 @@
       } else if (corrida > 0 && tamanho <= r.escudos) {
         r.escudos -= tamanho;
         for (let i = 0, c = d; i < tamanho; i++, c = CC.somaDias(c, 1)) r.protegidos.push(c);
+      } else if (corrida >= CC.REACENDER_MINIMO && reacender.has(fim) && feitas.has(fim) && tamanho - r.escudos <= CC.REACENDER_JANELA) {
+        r.reacendeu = fim;
+        for (let i = 0, c = d; i < tamanho; i++, c = CC.somaDias(c, 1)) { r.protegidos.push(c); r.reacesos.push(c); }
       } else {
-        if (corrida > 0) { zerou = true; r.zerouEm = d; }
+        if (corrida > 0) { zerou = true; r.zerouEm = d; r.perda = { inicio: d, fim, tamanho, antes: corrida, escudos: r.escudos }; }
         corrida = 0;
       }
       d = fim;
@@ -714,7 +748,7 @@
   // ainda não avisou (depois de "ultimoAvisado"), e se foi o escudo do iniciante. Nada a avisar
   // quando a chama já apagou: aí quem fala é a folha de volta.
   CC.escudoParaAvisar = (seq, hoje, ultimoAvisado) => {
-    const dias = seq.protegidos.filter((d) => d < hoje && d >= CC.somaDias(hoje, -3) && (!ultimoAvisado || d > ultimoAvisado)).sort();
+    const dias = seq.protegidos.filter((d) => !(seq.reacesos || []).includes(d) && d < hoje && d >= CC.somaDias(hoje, -3) && (!ultimoAvisado || d > ultimoAvisado)).sort();
     if (!dias.length || !seq.atual) return null;
     return { dias, ultimo: dias[dias.length - 1], iniciante: !!seq.iniciante && dias.includes(seq.iniciante) };
   };
@@ -722,9 +756,24 @@
   // Recebe as datas por parâmetro para poder ser exercitada por teste.
   CC.sequencia = function (marcadas, referencia) {
     const datas = marcadas ? new Set(Object.values(marcadas)) : CC.datasFeitas();
-    const s = CC.simularOfensiva(datas, referencia || CC.hojeIso());
+    const s = CC.simularOfensiva(datas, referencia || CC.hojeIso(), marcadas ? [] : CC.reacesosDe());
     return { ...s, recorde: Math.max(s.recorde, s.atual), total: datas.size };
   };
+
+  // As datas em que a pessoa reacendeu (para CC.simularOfensiva), de um estado ou deste aparelho.
+  CC.reacesosDe = (estado) => Object.values((estado || E).reacesoEm || {});
+  // Dá para reacender hoje? A última perda acabou hoje (nada lido entre ela e hoje, além de hoje),
+  // a sequência de antes tinha 7 dias ou mais, a chama apagou há no máximo 3 dias e o mês ainda
+  // não teve reacender. Devolve os dias que voltam, ou 0.
+  CC.reacenderPossivel = (estado, hoje) => {
+    const e = estado || E;
+    hoje = hoje || CC.hojeIso();
+    if ((e.reacesoEm || {})[hoje.slice(0, 7)]) return 0;
+    const p = CC.simularOfensiva(CC.datasFeitas(e), hoje, CC.reacesosDe(e)).perda;
+    return p && p.fim === hoje && p.antes >= CC.REACENDER_MINIMO && p.tamanho - p.escudos <= CC.REACENDER_JANELA ? p.antes : 0;
+  };
+  // Gravar o reacender e o pedido "Reacender lendo hoje" moram nas peças (chama.js e dia-lido.js),
+  // para a folga do index.html.
 
   // ---------- prática ----------
   CC.praticaDe = (unidade) => (E.pratica || {})[unidade] || { melhor: 0, total: 0, feitoEm: null };
