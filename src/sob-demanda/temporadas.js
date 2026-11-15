@@ -3,7 +3,8 @@
    nome, a barra e "faltam N dias"), com a frase de abertura enquanto nenhum dia dela foi lido, e a
    folha da temporada. A conta (CC.temporadaDoDia, CC.progressoTemporada, CC.temporadaCompletaEm) e
    o selo em Conquistas ficam no index (02b-jogo.js, 07-perfil.js); a chegada fica no Dia lido.
-   R3.2: em Conquistas, as barras de "faltam N dias para fechar" (temporada, livros e semana). */
+   R3.2: em Conquistas, as barras de "faltam N dias para fechar" (temporada, livros e semana).
+   R3.3: no Juntos, o calendário sazonal da célula (os números vêm somados do servidor). */
 (function (CC) {
   'use strict';
 
@@ -146,5 +147,45 @@
     if (linhas.length) lugar.innerHTML = CC.tituloSecao('Perto de fechar') + '<div class="caixa-lista">' + linhas.join('') + '</div>';
   }
 
-  CC.temporadas = { trilha, folha: folhaTemporada, pendentesDe, pertoDeFechar, conquistas };
+  // ---------- R3.3: o calendário sazonal da célula (Juntos) ----------
+  // O servidor manda, em cada célula, o momento do ano (desafios-grupo.mjs, momentoDaCelula) com os
+  // números já somados: a tela só escreve. Nada de lista de quem leu, nada de ranking, nada de
+  // sequência nova: a leitura é o próprio plano de cada um.
+  const MESES = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+  const diaMes = (iso) => { const d = Number(iso.slice(8, 10)); return (d === 1 ? '1º' : d) + ' de ' + MESES[Number(iso.slice(5, 7)) - 1]; };
+  const periodo = (a, b) => (a.slice(5, 7) === b.slice(5, 7) ? (Number(a.slice(8, 10)) === 1 ? '1º' : Number(a.slice(8, 10))) + ' a ' + diaMes(b) : diaMes(a) + ' a ' + diaMes(b));
+  function contaDoMomento(c) {
+    if (c.tipo === 'soma') return c.total + ' de ' + c.meta + ' dias lidos';
+    if (c.tipo === 'dias') return c.total + ' de ' + c.meta + ' dias';
+    return c.total + ' de ' + CC.plural(c.meta, 'pessoa', 'pessoas');
+  }
+  function cartaoCalendario(cel) {
+    const c = cel.calendario;
+    const cabeca = (c.fase === 'antes' ? 'Começa em ' + diaMes(c.inicio) : periodo(c.inicio, c.fim) + (c.fase === 'durante' ? ' · dia ' + c.diaDaJanela + ' de ' + c.diasDaJanela : ' · terminou'));
+    let situacao = '';
+    if (c.fase !== 'antes') {
+      situacao = '<span class="barra-temporada"><i style="width:' + (c.meta ? Math.min(1, c.total / c.meta) * 100 : 0).toFixed(1) + '%"></i></span>'
+        + '<p class="conta-calendario" data-conta-calendario="' + c.total + '/' + c.meta + '">' + CC.esc(contaDoMomento(c))
+        + (c.tipo === 'temporadas' ? ' terminaram uma temporada' : '') + '</p>';
+      if (c.chegou) situacao += '<p class="chegou-calendario" data-chegou-calendario>A célula chegou à meta. Selo da célula: ' + CC.esc(c.selo) + '.</p>';
+      else if (c.fase === 'depois') situacao += '<p class="passo-dica pequena">' + (c.id === 'semana-santa' ? 'A semana' : 'O mês') + ' terminou com ' + CC.esc(contaDoMomento(c)) + '.</p>';
+    }
+    const nota = c.tipo === 'temporadas' ? 'Vale qualquer temporada, a que cada um estiver lendo.'
+      : c.tipo === 'dias' ? 'Vale qualquer dia do plano, inclusive um pendente.'
+        : 'Dias pendentes lidos nestas datas também contam.';
+    return '<section class="cartao-calendario" data-calendario-momento="' + CC.esc(c.id) + '" data-celula-calendario="' + CC.esc(cel.id) + '">'
+      + '<small class="cabeca-calendario">' + CC.esc(cabeca) + ' · ' + CC.esc(cel.titulo) + '</small>'
+      + '<h3>' + CC.esc(c.titulo) + '</h3>'
+      + '<p>' + CC.esc(c.texto) + '</p>' + situacao
+      + '<p class="passo-dica pequena">' + nota + '</p></section>';
+  }
+  function calendario(raiz) {
+    const lugar = raiz.querySelector('[data-calendario]');
+    if (!lugar || lugar.childElementCount) return;
+    const cels = (CC.minhasCelulas ? CC.minhasCelulas() : []).filter((c) => c.calendario);
+    if (!cels.length) return;
+    lugar.innerHTML = CC.tituloSecao('Calendário da célula') + cels.map(cartaoCalendario).join('');
+  }
+
+  CC.temporadas = { trilha, folha: folhaTemporada, pendentesDe, pertoDeFechar, conquistas, calendario };
 })(window.CC);

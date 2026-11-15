@@ -1969,6 +1969,52 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
     'temporadas: os troféus têm um selo por temporada, com o nome do selo e o da temporada (dias 1 a 20 lidos: selos 1 e 2)');
 }
 
+// --- R3.3: o calendário sazonal da célula (desafios-grupo.mjs, só números somados) ---
+{
+  const { pascoa, momentoDe, momentoDaCelula, MOMENTOS, janelaDoMomento } = await import('./desafios-grupo.mjs');
+  const ate = (n) => Array.from({ length: n }, (_, i) => i + 1);
+  // um estado com os dias lidos e a data de cada um
+  const est = (pares) => ({ lidos: pares.map(([n]) => n), marcadoEm: Object.fromEntries(pares) });
+  const em = (dias, data) => dias.map((n) => [n, data]);
+  checar(pascoa(2026) === '2026-04-05' && pascoa(2027) === '2027-03-28' && pascoa(2028) === '2028-04-16' && pascoa(2029) === '2029-04-01',
+    'calendário: a Páscoa de 2026 a 2029 (5/4, 28/3, 16/4, 1/4)');
+  const sem = janelaDoMomento('semana-santa', 2027);
+  checar(sem.inicio === '2027-03-21' && sem.fim === '2027-03-28' && janelaDoMomento('fevereiro', 2028).fim === '2028-02-29' && janelaDoMomento('fevereiro', 2027).fim === '2027-02-28',
+    'calendário: a Semana Santa vai do Domingo de Ramos à Páscoa (8 dias), e fevereiro tem 28 ou 29 dias');
+  const qual = (h) => (momentoDe(h) || { m: { id: '' } }).m.id;
+  checar(qual('2027-01-10') === 'janeiro' && qual('2027-02-03') === 'fevereiro' && qual('2027-03-25') === 'semana-santa' && qual('2027-09-15') === 'setembro'
+    && qual('2026-11-15') === 'novembro' && qual('2027-05-20') === '' && qual('2027-08-28') === 'setembro' && qual('2026-12-03') === 'novembro' && qual('2026-12-10') === '',
+  'calendário: o momento do dia (o que corre; o que terminou há até 5 dias; o que começa em até 7; nada em maio)');
+  checar(MOMENTOS.length === 5 && MOMENTOS.every((m) => m.titulo && m.texto && m.selo && !/[—–!]|jornada|mergulh|poderos|incrível|transforma/i.test(m.titulo + m.texto + m.selo)),
+    'calendário: os 5 momentos têm nome, texto e selo, sem exagero');
+  // novembro (soma): cada um conta até 30 dias lidos no mês, pendentes inclusive; fora do mês não conta
+  const nov = momentoDaCelula({ hoje: '2026-11-15', temporadas: D.temporadas, estados: [
+    est(em(ate(40), '2026-11-10')), est(em(ate(5), '2026-11-02')), est(em(ate(10), '2026-10-20')), est([...em(ate(20), '2026-11-14'), [21, '2026-11-16']]),
+  ] });
+  checar(nov.id === 'novembro' && nov.fase === 'durante' && nov.pessoas === 4 && nov.meta === 120 && nov.total === 55 && nov.diaDaJanela === 15 && nov.diasDaJanela === 30 && !nov.chegou,
+    'calendário: novembro soma até 30 dias por pessoa dentro do mês (30 + 5 + 0 + 20 = 55 de 120), sem contar outubro nem depois de hoje');
+  checar(momentoDaCelula({ hoje: '2026-11-15', temporadas: D.temporadas, estados: [{ lidos: [], marcadoEm: { 1: '2026-11-03' } }] }).total === 0,
+    'calendário: uma data que ficou de um dia que não está mais lido (zerado) não conta');
+  // fevereiro (dias): um dia conta quando metade da célula leu um dia do plano nele
+  const fev = momentoDaCelula({ hoje: '2027-02-03', temporadas: D.temporadas, estados: [
+    est([[1, '2027-02-01'], [2, '2027-02-02']]), est([[1, '2027-02-01']]), est([]), est([[5, '2027-01-31']]),
+  ] });
+  checar(fev.id === 'fevereiro' && fev.total === 1 && fev.meta === 21, 'calendário: fevereiro conta o dia 1 (2 de 4 leram), não o dia 2 (1 de 4) nem janeiro');
+  // setembro (temporadas): quem fechou uma temporada com o último dia dela marcado no mês
+  const set = momentoDaCelula({ hoje: '2027-09-10', temporadas: D.temporadas, estados: [
+    est([...em(ate(9), '2027-08-20'), [10, '2027-09-05']]), est(em(ate(10), '2027-08-30')), est(em(ate(9), '2027-09-02')),
+  ] });
+  checar(set.id === 'setembro' && set.meta === 2 && set.total === 1 && !set.chegou, 'calendário: setembro conta quem fechou uma temporada no mês (1 de 2: fechar em agosto ou ficar a 1 dia não conta)');
+  // antes e depois
+  const antes = momentoDaCelula({ hoje: '2027-08-28', temporadas: D.temporadas, estados: [est(em(ate(10), '2027-08-27'))] });
+  const depois = momentoDaCelula({ hoje: '2026-12-03', temporadas: D.temporadas, estados: [est(em(ate(30), '2026-11-20'))] });
+  checar(antes.fase === 'antes' && antes.total === 0 && depois.fase === 'depois' && depois.total === 30 && depois.chegou, 'calendário: antes do começo nada conta; depois do fim, o resultado fica (e a meta batida aparece)');
+  // só números: nada de quem leu
+  checar(Object.keys(nov).sort().join() === 'chegou,diaDaJanela,diasDaJanela,fase,fim,id,inicio,meta,pessoas,selo,texto,tipo,titulo,total',
+    'calendário: o que vai para a célula são só números somados, sem nomes nem dados de cada pessoa');
+  checar(momentoDaCelula({ hoje: '2027-05-20', estados: [] }) === null, 'calendário: fora dos momentos, a célula não recebe nada');
+}
+
 // --- R2.2b: o dia 0 (a primeira leitura curta, antes do dia 1 do plano) ---
 {
   const base = (extra) => ({ ...CC.normalizarEstado({}), ...extra });
@@ -3025,6 +3071,10 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
     && historico.indexOf('<b>Versão 7,') < historico.indexOf('<b>Ajuste da versão 6,'), 'a política está na versão 7 (15 de novembro, o "leu hoje" que a pessoa tira da célula), a mais nova no histórico');
   checar(/<tr><td>Se leu hoje<\/td><td>[^<]*"Mostrar na célula se eu li hoje"[^<]*quem conduz a célula continua vendo/.test(pol),
     'o quadro de quem vê: o "leu hoje" sai da célula se a pessoa desligar, e quem conduz continua vendo');
+  // R3.3: o calendário da célula, só números somados, no quadro de quem vê e no histórico
+  checar(/<tr><td>Calendário da célula[^<]*<\/td><td>[^<]*só números somados da célula, sem nomes[^<]*Ninguém vê quanto você leu/.test(pol)
+    && historico.indexOf('<b>Ajuste da versão 7, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 7,') < historico.indexOf('<b>Versão 7,'),
+  'a política conta o calendário da célula (números somados, sem nomes), num ajuste da versão 7');
   checar(historico.indexOf('<b>Versão 6, 9 de novembro de 2026.</b>') > -1
     && historico.indexOf('<b>Ajuste da versão 6, 15 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 6,') < historico.indexOf('<b>Versão 6,')
     && historico.indexOf('<b>Versão 6,') < historico.indexOf('<b>Ajuste da versão 5,'), 'a versão 6 e o ajuste de 15 de novembro (dias com a Palavra) seguem no histórico, abaixo da 7');

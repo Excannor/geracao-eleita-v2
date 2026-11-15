@@ -18,6 +18,9 @@
 // R3.2, perto de fechar: em Conquistas, no alto, a temporada ("faltam 8 dias para fechar a temporada"),
 // os livros começados ("faltam 8 dias para fechar Gênesis", do que falta menos ao que falta mais) e a
 // semana ("faltam 4 dias para completar esta semana"), cada um com a barra; um livro terminado sai.
+// R3.3, calendário sazonal: com o servidor contando como se fosse 15 de novembro de 2026, a célula
+// (o líder e 3 membros) recebe o momento de novembro só com números somados (55 de 120 dias lidos),
+// sem nome de ninguém; o Juntos mostra o cartão com as datas, a meta e a barra; sem célula, nada.
 // Uso: node ferramentas/teste-temporadas.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R3.1...; PARTES=R3.1 escolhe as partes)
 import { spawn } from 'node:child_process';
@@ -47,9 +50,13 @@ const iso = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, 
 const atras = (n) => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return iso(d); };
 const ate = (n) => Array.from({ length: n }, (_, i) => i + 1);
 
+// quantos dias faltam (ou sobram) de hoje até 15/11/2026, no fuso desta máquina (o mesmo das contas)
+const DESLOCAR = Math.round((Date.parse('2026-11-15T12:00:00Z') - Date.parse(atras(0) + 'T12:00:00Z')) / 864e5);
 const pasta = mkdtempSync(join(tmpdir(), 'cc-temporadas-'));
 const servidor = spawn(process.execPath, [join(AQUI, 'servidor.mjs'), String(PORTA)], {
-  env: { ...process.env, CAMINHO_ESTADO: join(pasta, 'estado.json') }, stdio: 'ignore',
+  // R3.3: o calendário da célula conta como se hoje fosse 15 de novembro de 2026 (só com CAMINHO_TESTE=1):
+  // o servidor desloca o "hoje" e as datas de leitura pelos mesmos dias
+  env: { ...process.env, CAMINHO_ESTADO: join(pasta, 'estado.json'), CAMINHO_TESTE: '1', CAMINHO_DESLOCAR_CALENDARIO: String(DESLOCAR) }, stdio: 'ignore',
 });
 const base = 'http://127.0.0.1:' + PORTA;
 for (let i = 0; i < 100; i++) { try { await fetch(base + '/api/existe-conta'); break; } catch { await dormir(150); } }
@@ -325,6 +332,69 @@ try {
     ok(await esperar('document.querySelector("h1")?.textContent === "Conquistas"', 8000), 'Conquistas abre');
     await dormir(1500);
     ok(await av('!document.querySelector("' + perto + ' .linha-perto") && !document.querySelector("' + perto + ' h2")'), 'sem leitura nenhuma, a seção não aparece');
+  }
+
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R3.3')) break;
+    await temaDe(tema);
+    console.log('\n  R3.3 · Calendário sazonal no Juntos (15 de novembro de 2026)\n');
+    const t = tema[0];
+    // o líder e três membros: cada um com os dias do plano lidos em datas de novembro ou de outubro
+    // (as datas são de dias atrás, contados de hoje: o servidor as leva para antes de 15 de novembro)
+    const liderC = await conta('lu' + t, 'Lucas', { lidos: ate(20), data: atras(1) });
+    const criada = await (await pedir('/api/celula', { acao: 'criar', titulo: 'Célula Videira' }, liderC)).json();
+    const id = criada.proposito.id;
+    const { link } = await (await pedir('/api/celula', { acao: 'link', id }, liderC)).json();
+    const token = new URL(link).searchParams.get('celula');
+    const anaC = await conta('an' + t, 'Ana', { celula: token, lidos: ate(40), data: atras(5) });
+    await conta('bru' + t, 'Bruno', { celula: token, lidos: ate(5), data: atras(6) });
+    await conta('car' + t, 'Carla', { celula: token });
+    const daAna = ((await (await pedir('/api/propositos', null, anaC)).json()).propositos || []).find((p) => p.id === id);
+    const cal = daAna && daAna.calendario;
+    ok(cal && cal.id === 'novembro' && cal.fase === 'durante' && cal.pessoas === 4 && cal.meta === 120 && cal.total === 55 && cal.diaDaJanela === 15,
+      'o servidor manda à Ana o momento de novembro, somado: 30 (de 40) + 5 + 0 (Carla não leu) + 20 = 55 de 120 (' + JSON.stringify(cal) + ')');
+    ok(cal && !/"usuario"|@|Ana|Bruno|Carla|Lucas|"(an|bru|car|lu)[ce]"/.test(JSON.stringify(cal)), 'o momento não leva nome nem @ de ninguém');
+    await entrar(anaC);
+    ok(await noInicio(), 'a Ana abre o app');
+    await av('location.hash = "#/novidades"; 1');
+    ok(await esperar(q('[data-calendario] [data-calendario-momento="novembro"]'), 12000), 'o Juntos mostra o calendário da célula, no alto');
+    const c = (await texto('[data-calendario-momento="novembro"]')).replace(/\u00a0/g, ' ');
+    ok(/1º a 30 de novembro · dia 15 de 30 · Célula Videira/.test(c) && /30 dias/.test(c) && /Em novembro, cada um lê o próprio plano\. A meta da célula é de 30 dias lidos por pessoa\./.test(c)
+      && /55 de 120 dias lidos/.test(c) && /Dias pendentes lidos nestas datas também contam\./.test(c) && !/Cada um segue/.test(c) && semExagero(c),
+    'o cartão traz as datas, o nome, a meta e a barra somada (' + c + ')');
+    ok(await av('(() => { const i = document.querySelector("[data-calendario-momento] .barra-temporada i"); return Math.abs(parseFloat(i.style.width) - 55 / 120 * 100) < 0.2; })()'), 'a barra está em 55 de 120');
+    ok(await av('!document.querySelector("[data-calendario-momento] .retrato-amigo, [data-calendario-momento] [data-amigo]") && !/Bruno|Carla|Lucas/.test(document.querySelector("[data-calendario]").textContent)'),
+      'sem lista de quem leu, sem ranking: nenhum nome no cartão');
+    ok(await av('document.documentElement.scrollWidth <= 390'), 'nada passa da largura da tela');
+    await av('document.querySelector("[data-calendario]").scrollIntoView({ block: "start" }); scrollBy(0, -90); 1');
+    await capturar('r3.3-juntos-calendario-' + tema);
+    // os outros momentos, na mesma tela (os textos vêm de desafios-grupo.mjs, os números são de exemplo)
+    const { MOMENTOS, janelaDoMomento } = await import('../desafios-grupo.mjs');
+    const exemplo = (id, ano, extra) => { const m = MOMENTOS.find((x) => x.id === id); return { id, titulo: m.titulo, tipo: m.tipo, texto: m.texto, selo: m.selo, ...janelaDoMomento(id, ano), pessoas: 8, ...extra }; };
+    const casos = [
+      ['janeiro', exemplo('janeiro', 2027, { fase: 'durante', diaDaJanela: 20, diasDaJanela: 31, total: 80, meta: 80, chegou: true }), /1º a 31 de janeiro · dia 20 de 31/, /80 de 80 dias lidos/, /A célula chegou à meta\. Selo da célula: Pegada\./],
+      ['fevereiro', exemplo('fevereiro', 2027, { fase: 'durante', diaDaJanela: 10, diasDaJanela: 28, total: 7, meta: 21, chegou: false }), /1º a 28 de fevereiro · dia 10 de 28/, /7 de 21 dias/, /Vale qualquer dia do plano, inclusive um pendente\./],
+      ['semana-santa', exemplo('semana-santa', 2027, { fase: 'antes', diaDaJanela: 0, diasDaJanela: 8, total: 0, meta: 8, chegou: false }), /Começa em 21 de março/, /Do Domingo de Ramos à Páscoa/, /^(?![\s\S]*de 8 dias)/],
+      ['setembro', exemplo('setembro', 2027, { fase: 'durante', diaDaJanela: 12, diasDaJanela: 30, total: 2, meta: 4, chegou: false }), /1º a 30 de setembro · dia 12 de 30/, /2 de 4 pessoas terminaram uma temporada/, /Vale qualquer temporada/],
+      ['novembro', exemplo('novembro', 2026, { fase: 'depois', diaDaJanela: 0, diasDaJanela: 30, total: 180, meta: 240, chegou: false }), /1º a 30 de novembro · terminou/, /O mês terminou com 180 de 240 dias lidos\./, /Dias pendentes/],
+    ];
+    for (const [id, cal2, ...esperado] of casos) {
+      await av('(() => { const c = CC.minhasCelulas()[0]; CC.__celulas = CC.__celulas || CC.minhasCelulas; CC.minhasCelulas = () => [{ ...c, calendario: ' + JSON.stringify(cal2) + ' }];'
+        + ' const l = document.querySelector("[data-calendario]"); l.innerHTML = ""; CC.temporadas.calendario(document); return 1; })()');
+      const tx = (await texto('[data-calendario-momento="' + id + '"]')).replace(/\u00a0/g, ' ');
+      ok(esperado.every((r) => r.test(tx)) && semExagero(tx), 'o momento ' + id + ' (' + tx + ')');
+      await av('document.querySelector("[data-calendario]").scrollIntoView({ block: "start" }); scrollBy(0, -90); 1');
+      await capturar('r3.3-momento-' + id + '-' + tema);
+    }
+    await av('CC.minhasCelulas = CC.__celulas; 1');
+    // quem não tem célula não vê o calendário
+    const soloC = await conta('so' + t, 'Sol', { lidos: ate(5), data: '2026-11-05' });
+    await entrar(soloC);
+    ok(await noInicio(), 'a Sol (sem célula) abre o app');
+    await av('location.hash = "#/novidades"; 1');
+    ok(await esperar('document.querySelector("h1")?.textContent === "Juntos"', 8000), 'o Juntos abre');
+    await dormir(1500);
+    ok(!(await av('!!document.querySelector("[data-calendario-momento]")')), 'sem célula, não há calendário');
   }
 } catch (e) {
   falhas++;

@@ -719,7 +719,8 @@
             + '<span><b>Propósitos</b><small>Duplas e grupos de leitura e oração</small></span>'
             + (d.convitesProposito ? '<i class="selo-numero" aria-label="' + CC.plural(d.convitesProposito, 'convite', 'convites') + '">' + d.convitesProposito + '</i>' : '')
             + CC.ico('avancar') + '</button>';
-        corpo = CC.blocoPedidosConversa(d.pedidosConversa || [])
+        // R3.3: o calendário sazonal da célula (peça das temporadas), só com números da célula
+        corpo = '<div data-calendario></div>' + CC.blocoPedidosConversa(d.pedidosConversa || [])
           + blocoAcompanhando(d.acompanhando || [])
           + (recebidos.length
             ? CC.tituloSecao('Pedidos', String(recebidos.length))
@@ -749,6 +750,7 @@
         + corpo;
 
       const ligar = (sel, fn) => raiz.querySelectorAll(sel).forEach((el) => { el.onclick = () => fn(el); });
+      if (CC.minhasCelulas && CC.minhasCelulas().some((c) => c.calendario)) CC.pedirPeca(window.TEMPORADAS, () => !!CC.temporadas).then(() => CC.temporadas.calendario(raiz), () => {});
       ligar('[data-convidar]', () => CC.convidar());
       ligar('[data-propositos]', () => { location.hash = '#/novidades/propositos'; });
       ligar('[data-completar]', () => CC.completarCadastro(CC.quem || {}));

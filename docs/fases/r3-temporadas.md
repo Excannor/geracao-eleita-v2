@@ -166,3 +166,60 @@ nível"; a temporada com "faltam 8 dias para fechar a temporada"; os livros em o
 largura da barra conferidos contra `CC.progressoDoLivro`; Gênesis 12 de 20; a semana nos dois textos
 (conforme o dia da semana em que o teste roda) e completa; Gênesis sai quando termina, e a temporada
 passa para a 3; sem leitura, sem seção.
+
+## R3.3 · Calendário sazonal no Juntos
+
+**O que é.** Cinco momentos do ano, cada um com uma meta coletiva da célula numa barra só
+(recomendação 10). Nenhum cria leitura nova, sequência nova ou ranking: cada um conta, dentro das
+datas, os dias do **próprio plano** que cada pessoa leu (a data em que marcou cada dia, no fuso dela;
+pendentes e "Li na minha Bíblia" valem). A chama e os dias com a Palavra continuam os únicos
+contadores da pessoa.
+
+| Momento | Datas | Como conta | Meta | Selo da célula |
+|---|---|---|---|---|
+| Comece o ano | 1º a 31 de janeiro | soma: cada pessoa conta até 10 dias lidos | 10 × pessoas | Pegada |
+| 21 dias | fevereiro inteiro (28 ou 29) | um dia conta quando metade da célula leu um dia do plano nele | 21 dias | Três elos |
+| Semana Santa | Domingo de Ramos à Páscoa (8 dias) | igual a fevereiro | os 8 dias | Ramo de palmeira |
+| Mês da Bíblia | setembro | quem fechou uma temporada com o último dia dela marcado no mês | metade da célula | Bíblia aberta |
+| 30 dias | novembro | soma: cada pessoa conta até 30 dias lidos | 30 × pessoas | Folha de calendário |
+
+- O teto por pessoa nas somas faz a meta ser de todos: uma pessoa que leu muito não enche a barra
+  sozinha, e quem leu pouco não aparece em lugar nenhum.
+- A Páscoa sai do cálculo gregoriano (`pascoa(ano)`: 28/3/2027, 16/4/2028).
+- O momento aparece uma semana antes ("Começa em 21 de março", só o convite, sem barra), corre nas
+  datas e fica 5 dias depois do fim com o resultado: "A célula chegou à meta. Selo da célula:
+  Pegada." ou, sem culpa, "O mês terminou com 180 de 240 dias lidos.". Fora disso, nada aparece.
+- Quem conta: os membros ativos da célula, o líder inclusive, sem visitante (a mesma regra da meta
+  do dia da célula).
+
+**Privacidade.** O servidor (`momentoDaCelula`, em `desafios-grupo.mjs`, com as outras regras de
+grupo) calcula a partir das datas de leitura que já guarda e manda para a célula só números somados:
+`{ id, titulo, tipo, texto, selo, inicio, fim, fase, diaDaJanela, diasDaJanela, pessoas, total, meta,
+chegou }`. Nenhum nome, nenhum @, nenhum número de uma pessoa. Quem só foi convidado não recebe.
+Todos da célula veem, visitantes inclusive (só números). Nada novo é guardado, então não há
+migração. `privacidade.html`: linha nova no quadro de quem vê e "Ajuste da versão 7" no histórico.
+
+**Na tela** (peça das temporadas, `calendario`). No Juntos, no alto, "Calendário da célula", um
+cartão por célula que tem momento: o período e o dia ("1º a 30 de novembro · dia 15 de 30 · Célula
+Videira"), o nome, a frase do momento, a barra, a conta ("55 de 120 dias lidos", "7 de 21 dias", "2
+de 4 pessoas terminaram uma temporada") e uma nota curta ("Dias pendentes lidos nestas datas também
+contam."). O `08-amigos.js` só guarda o lugar e pede a peça quando alguma célula tem momento.
+
+**O que não entrou.** O cartão "A Páscoa no seu plano" da proposta (os dias dos Evangelhos com a
+semana de Jesus, como leitura livre) e o versículo da semana de setembro: os dois pedem uma leitura
+fora do dia do plano, e o pedido desta fase era só contar o próprio plano. O selo da célula aparece
+no cartão enquanto o momento está à vista; não fica guardado numa estante da célula (isso pediria
+guardar dado novo).
+
+**Testes.**
+- `teste.mjs` (12 checagens): a Páscoa de 2026 a 2029; a Semana Santa de 8 dias e fevereiro de 28 ou
+  29; o momento de cada data (antes, durante, depois, nada em maio); os textos sem exagero; novembro
+  soma com teto por pessoa e sem contar outubro nem o futuro; data de dia não lido não conta;
+  fevereiro conta o dia com metade da célula; setembro conta quem fechou temporada no mês; antes e
+  depois; o resultado só tem números (a lista exata das chaves); fora dos momentos, nada; a política
+  de privacidade conta o calendário.
+- `teste-temporadas`, parte R3.3: o servidor, com as datas deslocadas para 15 de novembro de 2026
+  (`CAMINHO_DESLOCAR_CALENDARIO`, só com `CAMINHO_TESTE=1`: o servidor só aceita leituras com até 7
+  dias de atraso, então o teste não tem como gravar datas de outro mês), manda à célula 55 de 120,
+  sem nome de ninguém; o Juntos mostra o cartão e a barra; os outros quatro momentos e as fases antes
+  e depois na mesma tela; sem célula, nada.

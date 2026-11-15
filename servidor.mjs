@@ -18,7 +18,7 @@ import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
 import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou, membroDeVerdade } from './cuidado.mjs';
-import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel } from './desafios-grupo.mjs';
+import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel, momentoDaCelula } from './desafios-grupo.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
   backupDoDia, fazerBackup, apagarPessoaDosBackups, guardarLegado, cifrarBackupsAbertos,
@@ -879,6 +879,18 @@ function filaNoRetrato(p, info) {
   return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira, filaLimite: f.limite, filaDepoisDoAtual: f.depoisDoAtual };
 }
 
+// R3.3: o calendário sazonal. Só as ferramentas de teste (CAMINHO_TESTE=1) deslocam as datas
+// (CAMINHO_DESLOCAR_CALENDARIO, em dias: o "hoje" e as datas de leitura andam juntos), para o teste
+// de navegador cair sempre no mesmo momento do ano, qualquer que seja o mês em que roda. O servidor
+// só aceita leituras com até 7 dias de atraso, então o teste não tem como gravar datas antigas.
+const DESLOCAR_CALENDARIO = process.env.CAMINHO_TESTE === '1' ? Math.trunc(Number(process.env.CAMINHO_DESLOCAR_CALENDARIO) || 0) : 0;
+function calendarioDaCelula(referencia, estados) {
+  const mover = (d) => (DESLOCAR_CALENDARIO && DATA_VALIDA.test(d || '') ? somaDias(d, DESLOCAR_CALENDARIO) : d);
+  const movidos = DESLOCAR_CALENDARIO
+    ? estados.map((e) => ({ ...e, marcadoEm: Object.fromEntries(Object.entries(e.marcadoEm || {}).map(([k, d]) => [k, mover(d)])) })) : estados;
+  return momentoDaCelula({ hoje: mover(referencia), estados: movidos, temporadas: APP.conteudo.temporadas || [], totalDias: PLANO_DO_CONTEUDO.length });
+}
+
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
   const lider = info.get(p.criadoPor);
   const semanaAte = semanaDoLider(lider && lider.estado);
@@ -911,6 +923,9 @@ function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
     recado: p.recado || '', recadoEm: p.recadoEm || '', recadoQuando: (p.recado && p.recadoQuando) || '', semanaAte,
     // só para quem é da célula, como o estudo: quem só foi convidado não recebe
     diaDaCelula: convidado ? 0 : diaDaCelulaHoje,
+    // R3.3: o momento do calendário sazonal (janeiro, fevereiro, Semana Santa, setembro, novembro),
+    // só com números somados da célula (os ativos, sem visitante): nunca quem leu ou quem faltou
+    calendario: convidado ? null : calendarioDaCelula(referencia, ativos.map((m) => info.get(m.usuario).estado || {})),
     // O estudo atual vai para todos da célula, visitantes inclusive; a fonte do estudo escrito, só
     // para quem prepara (estudos.mjs, estudoNoRetrato). Quem só foi convidado e ainda não aceitou
     // não é da célula (privacidade, seção 7): não recebe o estudo nem o roteiro dele.

@@ -43,3 +43,11 @@
 .linha-perto .arte-perto svg { width: 24px; height: 24px; }
 .linha-perto .selo-perto { width: 60px; }
 .linha-perto .selo-perto .arte-trofeu { --folha-tinta: var(--tinta-forte); --folha-tinta-fraca: var(--tinta-fraca); --folha-campo: var(--cartao); }
+
+/* R3.3: o calendário sazonal da célula, no Juntos */
+.cartao-calendario { display: grid; gap: 8px; margin: 0 0 12px; padding: 16px 18px; border-radius: 26px; background: var(--cartao); color: var(--tinta); }
+.cartao-calendario p { margin: 0; }
+.cartao-calendario h3 { margin: 0; color: var(--tinta-forte); font-size: 1.125rem; }
+.cabeca-calendario { color: var(--tinta-fraca); font-size: .8125rem; font-weight: 700; }
+.cartao-calendario .barra-temporada { background: var(--campo); }
+.conta-calendario, .chegou-calendario { color: var(--tinta-forte); font-weight: 700; }
