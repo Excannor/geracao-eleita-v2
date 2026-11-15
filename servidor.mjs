@@ -873,7 +873,7 @@ async function nomesDosAutores(estudos) {
 // sem escolha, a primeira data livre (a de "Ajustar as datas") e o limite da promoção.
 function filaNoRetrato(p, info) {
   const f = CONTAS.dadosDaFila(p);
-  return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira, filaLimite: f.limite };
+  return { fila: f.itens.map((e) => itemDaFila(e, { nomeDe: (u, desde) => nomeNaCelula(info, u, desde) })), filaProxima: f.proxima, filaPrimeira: f.primeira, filaLimite: f.limite, filaDepoisDoAtual: f.depoisDoAtual };
 }
 
 function celulaNoRetrato(p, eu, info, ativos, referencia, verTudo = false) {
@@ -2066,6 +2066,7 @@ const servidor = createServer(async (req, res) => {
           return {
             estudo: estudoNoRetrato(r.estudo, { souQuemPrepara: true, nomeDe, usado: !r.agendado && CONTAS.estudoJaUsado(r.p, r.estudo) }),
             agendado: r.agendado ? { data: r.agendado } : null,
+            partes: r.datasDasPartes.map((data) => ({ data })),
             fila: CONTAS.filaDe(r.p.id).map((e) => itemDaFila(e, { nomeDe })),
             promovido: resumoDoEstudo(r.promovido),
           };

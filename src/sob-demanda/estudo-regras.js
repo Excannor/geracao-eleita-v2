@@ -502,6 +502,21 @@
   // "quinta, 30/10" e "qui 30/10"
   const dataLonga = (iso) => (eDia(iso) ? DIAS_DA_SEMANA[semanaDe(iso)] + ', ' + ddmm(iso) : '');
   const dataCurta = (iso) => (eDia(iso) ? DIAS_DA_SEMANA[semanaDe(iso)].slice(0, 3) + ' ' + ddmm(iso) : '');
+  // O primeiro dia de encontro depois de d (o dia da semana da célula, 0 a 6; sem dia, uma semana
+  // depois): a mesma conta de encontroDepois (estudos.mjs). E as datas das partes seguintes de um
+  // estudo dividido, uma por encontro a partir da primeira (UX4.3).
+  const somaDia = (iso, n) => new Date(Date.parse(iso + 'T12:00:00Z') + n * 86400000).toISOString().slice(0, 10);
+  function encontroDepois(d, encontro) {
+    if (!eDia(d)) return '';
+    if (!(Number.isInteger(encontro) && encontro >= 0 && encontro <= 6)) return somaDia(d, 7);
+    for (let i = 1; i <= 7; i++) if (semanaDe(somaDia(d, i)) === encontro) return somaDia(d, i);
+    return '';
+  }
+  const datasDasPartes = (primeira, n, encontro) => {
+    const datas = [];
+    for (let d = primeira, i = 0; i < n && eDia(d); i++, d = encontroDepois(d, encontro)) datas.push(d);
+    return datas.length === n ? datas : [];
+  };
   const tituloDaFila = (x) => titulo(x) || 'Estudo do encontro';
   // O que o cartão do líder diz da fila: "Próximo: Batalha espiritual · qui 30/10".
   const linhaDoProximo = (fila) => ((fila || [])[0] ? 'Próximo: ' + tituloDaFila(fila[0]) + PONTO + dataCurta(fila[0].data) : '');
@@ -601,6 +616,6 @@
     TETOS_DO_ESTUDO, pontoDeCorte, tituloDaParte, dividirEmEncontros,
     noPlano, parabolaDoEstudo, gruposDePerguntas, blocoEmHtml, negrito,
     lembrarCombinado, refsCurtas, dataDaLista, paraImprimir,
-    dataLonga, dataCurta, linhaDoProximo, quandoNaFila, moverNaFila, datasPedemAjuste, escolhaDoPreparo, partesDoCelular,
+    dataLonga, dataCurta, encontroDepois, datasDasPartes, linhaDoProximo, quandoNaFila, moverNaFila, datasPedemAjuste, escolhaDoPreparo, partesDoCelular,
   };
 })(window.CC);

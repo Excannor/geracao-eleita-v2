@@ -54,6 +54,7 @@ const HOJE = hojeEm();
 const somaDias = (texto, n) => { const d = new Date(texto + 'T12:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
 // sem dia de encontro marcado, o encontro seguinte é uma semana depois de hoje (docs/a-mesa-fila.md)
 const D7 = somaDias(HOJE, 7);
+const longa = (d) => ['domingo', 'segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado'][new Date(d + 'T12:00:00Z').getUTCDay()] + ', ' + d.slice(8, 10) + '/' + d.slice(5, 7);
 const curta = (d) => ['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'][new Date(d + 'T12:00:00Z').getUTCDay()] + ' ' + d.slice(8, 10) + '/' + d.slice(5, 7);
 
 // ---------- o servidor e o navegador ----------
@@ -259,6 +260,8 @@ const previa = await na(() => [...document.querySelectorAll('.cortina .mesa-enco
 ok(previa.length === 2 && previa[0].includes(TITULO + ' (parte 1)') && previa[0].includes('Do começo do estudo') && previa[0].includes('50 partes') && previa[0].includes('7 versículos')
   && previa[1].includes(TITULO + ' (parte 2)') && previa[1].includes('Começa no Tópico 5') && previa[1].includes('51 partes') && previa[1].includes('8 versículos'),
 '2. a prévia mostra os dois encontros: título, onde começa, partes e versículos (' + previa.join(' / ') + ')');
+ok(previa[1].includes('Encontro 2 · ' + longa(D7)) && (await texto('.cortina [data-quando-partes]')).includes('Você segue com a parte 1. A parte 2 fica para ' + longa(D7) + ', nos próximos estudos.'),
+  'UX4.3: a prévia já diz a data da parte 2 (' + longa(D7) + ')');
 ok(await fila() === null && !(await rascunho()).divisao, '2. a prévia ainda não muda nada');
 await emTodosOsTamanhos('2. a prévia da divisão');
 await foto('03-previa-divisao-390-claro', true);
@@ -269,7 +272,7 @@ ok(r1 && r1.divisao && r1.divisao.total === 2 && JSON.stringify(r1.divisao.parte
   '2. a parte 2 fica no rascunho, inteira, para ir com a parte 1 (nada fica guardado à parte no celular)');
 ok(await av('JSON.parse(localStorage.getItem("cc.rascunho.estudo.' + ID + '")).fonte') === PARTE_1 && await av(q('[data-continuar]') + '.disabled === false'),
   '2. o rascunho agora é a parte 1, e Continuar liga');
-ok((await texto('.mesa-dividido')).includes('Estudo dividido em 2 encontros. Esta é a parte 1; ao salvar, a parte 2 entra nos próximos estudos.'), '2. a nota diz o que aconteceu');
+ok((await texto('.mesa-dividido')).includes('Estudo dividido em 2 encontros. Esta é a parte 1; ao salvar, a parte 2 fica para ' + longa(D7) + ', nos próximos estudos.'), '2. a nota diz o que aconteceu, com a data da parte 2 (UX4.3)');
 await emTodosOsTamanhos('2. depois de dividir');
 await foto('04-depois-de-dividir-390-claro', true);
 await tema(true);
@@ -286,6 +289,9 @@ ok(await esperar(existe('.mesa-dividido'), 15000), '2. dividido de novo');
 // ---------- 3. a parte 1 é o estudo da célula ----------
 await clicar('[data-continuar]');
 ok(await esperar(existe('[data-salvar]'), 15000), '3. o passo 3 abre');
+ok(await esperar('[...document.querySelectorAll(".mesa-nota")].some((n) => n.textContent.includes("Ao salvar, a célula vê a parte 1 na aba Estudo. A parte 2 fica para ' + longa(D7) + ', nos próximos estudos."))'),
+  'UX4.3: o passo 3 diz quando entra a parte 2');
+await av('window.__avisos = []; const o = CC.avisar; CC.avisar = (t, x) => { window.__avisos.push(t); return o(t, x); }; true');
 await clicar('[data-salvar]');
 ok(await esperar('/\\/estudo$/.test(location.hash) && !!document.querySelector("[data-imprimir]")', 20000), '3. "Salvar o estudo" volta para a aba');
 let cel = await celulaDe(lider, ID);
@@ -294,6 +300,7 @@ ok(cel.estudo.titulo === TITULO + ' (parte 1)' && cel.estudo.blocos.length === 5
 ok((cel.fila || []).length === 1 && cel.fila[0].titulo === TITULO + ' (parte 2)' && cel.fila[0].data === D7,
   '3. no mesmo pedido, a parte 2 entrou nos próximos estudos, na fila do servidor, para o encontro seguinte (' + D7 + ')');
 ok(await fila() === null && await rascunho() === null, '3. e nada fica guardado à parte no celular');
+ok((await av('JSON.stringify(window.__avisos || [])')).includes('Estudo salvo. A parte 2 fica para ' + longa(D7) + ', nos próximos estudos.'), 'UX4.3: o aviso de salvo diz a data que o servidor deu à parte 2');
 ok(await esperar(existe('.mesa-lider .mesa-fila'), 10000) && (await texto('.mesa-lider .mesa-fila')) === 'Próximo: ' + TITULO + ' (parte 2) · ' + curta(D7), '3. o cartão do líder diz o que vem: a parte 2');
 ok(await esperar(existe('[data-lista-proximos]'), 10000) && (await texto('[data-lista-proximos]')).includes(TITULO + ' (parte 2)'), '3. e a seção "Próximos estudos" a mostra');
 await emTodosOsTamanhos('3. a aba com a parte 1');

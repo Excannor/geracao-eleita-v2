@@ -98,3 +98,41 @@ que todos leram hoje).
 
 **O que ficou de fora.** O painel da igreja e o relatório continuam com a porcentagem da chama por
 célula (é a comparação entre células, e o texto de ajuda de lá já diz o que é).
+
+## UX4.3 · A data da parte 2 de um estudo dividido
+
+**Como era.** Desde os próximos estudos (schema v23, `agendado_para`), a parte 2 de um estudo
+dividido (`dividirEmEncontros`) já entrava na fila do servidor com data, no mesmo pedido da parte
+1 (`salvarEstudo`, `seguintes`). Mas a tela nunca dizia qual: a prévia falava em "o próximo", a nota
+em "ao salvar, a parte 2 entra nos próximos estudos", o passo 3 em "para o encontro seguinte" e o
+aviso de salvo em "A parte 2 está nos próximos estudos." (B13 da avaliação: "no passo 3, dizer 'A
+parte 2 fica agendada para quarta, 18/11'").
+
+**Agora a data aparece em todos os passos:**
+- a prévia "Dividir em 2 encontros": "Encontro 2 · quarta, 25/11" e "Você segue com a parte 1. A
+  parte 2 fica para quarta, 25/11, nos próximos estudos.";
+- a nota depois de dividir: "Esta é a parte 1; ao salvar, a parte 2 fica para quarta, 25/11, nos
+  próximos estudos.";
+- o passo 3: "Ao salvar, a célula vê a parte 1 na aba Estudo. A parte 2 fica para quarta, 25/11,
+  nos próximos estudos." Agendado (ou mudando um estudo da fila), a linha fica logo abaixo da data
+  e acompanha a data escolhida ("Para o encontro de 02/12" → "A parte 2 fica para quarta, 09/12");
+- o aviso de salvo: "Estudo salvo. A parte 2 fica para quarta, 25/11, nos próximos estudos.", com
+  a data que o servidor gravou.
+Com 3 partes ou mais: "as partes 2 a 3 ficam para quarta, 25/11 e quarta, 02/12".
+
+**Como a tela sabe a data antes de salvar.** A mesma conta do servidor, sem adivinhar:
+- usada agora: o retrato de quem conduz leva `filaDepoisDoAtual` (`dadosDaFila().depoisDoAtual`,
+  `primeiraDataDaFila` com `atualEspera`, exatamente o que `salvarEstudo` usa para a parte 2);
+- agendada: o encontro depois da data dela (`R.encontroDepois`, a mesma regra de `estudos.mjs`);
+- as seguintes, uma por encontro (`R.datasDasPartes`).
+Sem a data (um retrato antigo, a data da fila vazia), a tela volta à frase sem dia. O salvar
+devolve `partes: [{ data }]` (`salvarEstudo` → `datasDasPartes`), e é essa a data do aviso.
+O código de tela fica nas peças `estudo-preparo` e `estudo-celula` (estudo-regras.js): o
+index.html não muda (folga de 67,2 KB). Sem migração: a data já era gravada.
+
+**Testes.** `teste.mjs`: `depoisDoAtual` dá a data da parte 2 antes de salvar e o salvar devolve a
+data de cada parte (usado agora e agendado). `teste-estudo-dividir`: a prévia, a nota, o passo 3 e
+o aviso de salvo dizem a data.
+
+**O que ficou de fora.** Se a fila mudar em outro aparelho entre a prévia e o salvar, a data dita
+antes pode não ser a gravada; o aviso de salvo diz sempre a do servidor.

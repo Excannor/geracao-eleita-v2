@@ -1772,6 +1772,8 @@ export class Contas {
     const encerrar = (estudoId) => db.prepare("UPDATE celula_estudos SET atual_ate = ? WHERE id = ? AND atual_ate = ''").run(quando, estudoId);
     let gravado = '';
     let agendado = '';
+    // a data de cada parte seguinte de um estudo dividido, na ordem (UX4.3: a tela diz quando)
+    const datasDasPartes = [];
     try {
       transacao(db, () => {
         const atual = p.estudoId ? this.estudo(p.estudoId) : null;
@@ -1823,6 +1825,7 @@ export class Contas {
             let data = naFila ? encontroDepois(naFila.data, p.encontro) : primeiraDataDaFila({ ...contexto, atualEspera: true });
             for (const x of partes) {
               const idParte = inserir(x, data);
+              datasDasPartes.push(data);
               lista = encaixarNaFila(lista, { id: idParte, data }, p.encontro);
               data = encontroDepois(data, p.encontro);
             }
@@ -1845,7 +1848,7 @@ export class Contas {
       throw falha;
     }
     const promovido = this.promoverDaFila(p, agora);
-    return { p, estudo: this.estudo(gravado || p.estudoId), agendado, promovido };
+    return { p, estudo: this.estudo(gravado || p.estudoId), agendado, promovido, datasDasPartes };
   }
 
   // ---------- os próximos estudos: a fila (docs/a-mesa-fila.md) ----------
@@ -1873,7 +1876,10 @@ export class Contas {
   dadosDaFila(p, agora = new Date()) {
     const itens = this.filaDe(p.id);
     const contexto = this.contextoDaFila(p, agora);
-    return { itens, proxima: proximaDataDaFila(itens, contexto), primeira: primeiraDataDaFila(contexto), limite: limiteDaFila(contexto) };
+    // depoisDoAtual: a data que a parte 2 de um estudo dividido recebe quando a parte 1 vira o
+    // estudo da semana agora (a mesma conta de salvarEstudo), para a tela dizer antes de salvar
+    return { itens, proxima: proximaDataDaFila(itens, contexto), primeira: primeiraDataDaFila(contexto), limite: limiteDaFila(contexto),
+      depoisDoAtual: primeiraDataDaFila({ ...contexto, atualEspera: true }) };
   }
 
   // Grava as datas novas da fila (só as que mudaram), dentro da transação de quem chama. Para não

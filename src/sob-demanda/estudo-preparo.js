@@ -277,11 +277,28 @@
     };
 
     // ---------- dividir o estudo comprido em encontros ----------
+    // As datas das partes 2 em diante, como o servidor vai dar ao salvar (UX4.3): logo depois da
+    // data da parte 1 na fila (agendada) ou, usada agora, a partir de filaDepoisDoAtual; uma por
+    // encontro. Sem a data (o retrato antigo, a data da fila vazia), [] e a tela não promete dia.
+    function datasDasSeguintes(n) {
+      const primeira = naFila() ? R.encontroDepois(st.dataFila, p.encontro) : p.filaDepoisDoAtual || '';
+      return R.datasDasPartes(primeira, n, p.encontro);
+    }
+    // "a parte 2 fica para quarta, 18/11" / "as partes 2 a 3 ficam para quarta, 18/11, e quarta, 25/11"
+    function quandoSeguintes(n) {
+      const datas = datasDasSeguintes(n);
+      if (!datas.length) return '';
+      const lista = datas.map(R.dataLonga);
+      return (n === 1 ? 'a parte 2 fica para ' : 'as partes 2 a ' + (n + 1) + ' ficam para ')
+        + (lista.length > 1 ? lista.slice(0, -1).join(', ') + ' e ' + lista[lista.length - 1] : lista[0]);
+    }
     // A nota de quem está preparando uma parte: a parte 1, logo depois de dividir (com "Desfazer a
     // divisão"), ou a parte que esperava o próximo encontro.
     function notaDaDivisao() {
       if (st.divisao) {
-        const seguintes = st.divisao.total === 2 ? 'ao salvar, a parte 2 entra nos próximos estudos' : 'ao salvar, as partes 2 a ' + st.divisao.total + ' entram nos próximos estudos';
+        const quando = quandoSeguintes(st.divisao.total - 1);
+        const seguintes = quando ? 'ao salvar, ' + quando + ', nos próximos estudos'
+          : st.divisao.total === 2 ? 'ao salvar, a parte 2 entra nos próximos estudos' : 'ao salvar, as partes 2 a ' + st.divisao.total + ' entram nos próximos estudos';
         return '<div class="mesa-nota mesa-de-base mesa-dividido" role="status">' + CC.ico('calendario')
           + '<span><b>Estudo dividido em ' + st.divisao.total + ' encontros.</b> Esta é a parte 1; ' + seguintes + '.</span>'
           + '<button type="button" class="botao pequeno contorno" data-desfazer-divisao>Desfazer a divisão</button></div>';
@@ -320,14 +337,17 @@
     // "Dividir" o rascunho muda: a parte 1 fica no preparo e as outras vão para a fila.
     function preverDivisao(r, partes) {
       const n = partes.length;
-      const encontro = (x, k) => '<section class="mesa-encontro-dividido"><span class="etiqueta">' + (k === 0 ? 'Encontro 1' + PONTO + 'agora' : 'Encontro ' + (k + 1) + PONTO + (k === 1 ? 'o próximo' : 'depois')) + '</span>'
+      const datas = datasDasSeguintes(n - 1);
+      const quando = quandoSeguintes(n - 1);
+      const encontro = (x, k) => '<section class="mesa-encontro-dividido"><span class="etiqueta">' + (k === 0 ? 'Encontro 1' + PONTO + (naFila() && st.dataFila ? R.dataLonga(st.dataFila) : 'agora')
+        : 'Encontro ' + (k + 1) + PONTO + (datas[k - 1] ? R.dataLonga(datas[k - 1]) : k === 1 ? 'o próximo' : 'depois')) + '</span>'
         + '<b>' + esc(x.titulo) + '</b>'
         + '<small>' + (k === 0 ? 'Do começo do estudo' : 'Começa ' + esc(ondeComeca(x))) + '</small>'
         + '<ul class="mesa-resumo"><li>' + plural(x.blocos, 'parte', 'partes') + '</li>' + (x.cartoes ? '<li>' + plural(x.cartoes, 'versículo', 'versículos') + '</li>' : '') + '</ul></section>';
       CC.folha('<h2>Dividir em ' + n + ' encontros</h2>'
         + partes.map(encontro).join('')
-        + '<p class="mesa-nota">' + CC.ico('info') + (n === 2 ? 'Você segue com a parte 1. A parte 2 entra nos próximos estudos, no encontro seguinte.'
-          : 'Você segue com a parte 1. As outras entram nos próximos estudos, uma em cada encontro seguinte.') + '</p>'
+        + '<p class="mesa-nota" data-quando-partes>' + CC.ico('info') + 'Você segue com a parte 1. ' + (quando ? quando.charAt(0).toUpperCase() + quando.slice(1) + ', nos próximos estudos.'
+          : n === 2 ? 'A parte 2 entra nos próximos estudos, no encontro seguinte.' : 'As outras entram nos próximos estudos, uma em cada encontro seguinte.') + '</p>'
         + '<div class="acoes"><button class="botao" data-confirmar-divisao>' + CC.ico('certo') + 'Dividir</button><button class="botao plano" data-fechar>Cancelar</button></div>',
       {
         rotulo: 'Dividir em ' + n + ' encontros',
@@ -915,8 +935,11 @@
         + quandoHtml()
         // escolhido "Agendar", a opção já diz quando ele entra: a nota não repete (B22)
         + (modo !== 'fila' && st.quando === 'agendar' ? '' : '<p class="mesa-nota">' + CC.ico(naFila() ? 'calendario' : 'pessoas') + (naFila() ? 'Ele entra na aba Estudo depois do encontro anterior.'
-          : st.divisao ? 'Ao salvar, a célula vê a parte 1 na aba Estudo. ' + (st.divisao.total === 2 ? 'A parte 2 fica' : 'As outras partes ficam') + ' nos próximos estudos, para ' + (st.divisao.total === 2 ? 'o encontro seguinte.' : 'os encontros seguintes.')
+          : st.divisao ? 'Ao salvar, a célula vê a parte 1 na aba Estudo. ' + (quandoSeguintes(st.divisao.total - 1) ? notaSeguintes()
+            : (st.divisao.total === 2 ? 'A parte 2 fica' : 'As outras partes ficam') + ' nos próximos estudos, para ' + (st.divisao.total === 2 ? 'o encontro seguinte.' : 'os encontros seguintes.'))
           : 'Ao salvar, a célula vê o estudo na aba Estudo.') + '</p>')
+        // agendado (ou da fila) e dividido: a data das outras partes também, que muda com a data dele
+        + (naFila() && st.divisao && quandoSeguintes(st.divisao.total - 1) ? '<p class="mesa-nota" data-quando-partes>' + CC.ico('calendario') + notaSeguintes() + '</p>' : '')
         + '<div data-erro role="alert" hidden></div>'
         + '<div class="acoes"><button class="botao" data-salvar>' + CC.ico(st.quando === 'agendar' ? 'calendario' : 'certo') + (st.quando === 'agendar' ? 'Agendar o estudo' : 'Salvar o estudo') + '</button>'
         + '<button class="botao plano" data-voltar-partes>Voltar às partes</button></div>';
@@ -1035,6 +1058,7 @@
     const naFila = () => modo === 'fila' || st.quando === 'agendar';
     const campoData = () => '<label class="campo-senha mesa-data-fila"><span>Para o encontro de</span>'
       + '<input type="date" data-data-fila min="' + esc(CC.hojeIso()) + '" value="' + esc(st.dataFila || '') + '"></label>';
+    const notaSeguintes = () => { const t = quandoSeguintes(st.divisao.total - 1); return t.charAt(0).toUpperCase() + t.slice(1) + ', nos próximos estudos.'; };
     function quandoHtml() {
       if (modo === 'fila') return '<div class="mesa-quando">' + campoData() + '</div>';
       if (!st.quando) return '';
@@ -1057,7 +1081,8 @@
         };
       });
       const data = painel.querySelector('[data-data-fila]');
-      if (data) data.onchange = () => { st.dataFila = data.value; guardar(); };
+      // dividido, a data das outras partes segue a data escolhida
+      if (data) data.onchange = () => { st.dataFila = data.value; guardar(); if (st.divisao) desenharPerguntas(painel); };
     }
 
     async function salvar(painel) {
@@ -1105,7 +1130,12 @@
       if (CC.estudoCelula && CC.estudoCelula.esquecer) CC.estudoCelula.esquecer(p.id);
       await apoio.carregar();
       CC.substituirRota(apoio.endereco(p.id, 'estudo'));
-      const dividido = !partes.length ? '' : partes.length === 1 ? 'A parte 2 está nos próximos estudos.' : 'As outras partes estão nos próximos estudos.';
+      // a data que o servidor deu a cada parte (UX4.3)
+      const datasDadas = ((r && r.partes) || []).map((x) => x.data).filter(Boolean);
+      const dividido = !partes.length ? ''
+        : datasDadas.length === 1 ? 'A parte 2 fica para ' + R.dataLonga(datasDadas[0]) + ', nos próximos estudos.'
+          : datasDadas.length ? 'As outras partes ficam para ' + datasDadas.map(R.dataLonga).join(', ') + ', nos próximos estudos.'
+            : partes.length === 1 ? 'A parte 2 está nos próximos estudos.' : 'As outras partes estão nos próximos estudos.';
       const agendado = r && r.agendado && modo !== 'fila';
       CC.avisar(agendado ? (dividido ? 'Estudo agendado. ' + dividido : 'Estudo agendado para ' + R.dataLonga(r.agendado.data))
         : dividido ? 'Estudo salvo. ' + dividido : 'Estudo salvo', { tipo: 'certo' });

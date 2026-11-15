@@ -3219,14 +3219,18 @@ secao('próximos estudos: a fila nas contas (agendar, mexer, promover, docs/a-me
   // --- dividir: as partes seguintes na fila ---
   const H = (await ce.salvarEstudo('lider', ID, estudo('Estudo H', { agendar: true }), opcoes, quando('11-13', 13))).estudo.id;
   checar(fila() === 'Estudo H@2026-11-26', 'H, agendado, vai para 26/11 (G espera o de 19/11)');
+  const antesDeDividir = ce.dadosDaFila(p(), quando('11-13', 14)).depoisDoAtual;
   const dividido = await ce.salvarEstudo('lider', ID, estudo('Longo (parte 1)', { seguintes: [texto('Longo (parte 2)'), texto('Longo (parte 3)', 'Romanos 8.28')] }), opcoes, quando('11-13', 14));
   checar(p().estudoId === dividido.estudo.id && fila() === 'Longo (parte 2)@2026-11-26 Longo (parte 3)@2026-12-03 Estudo H@2026-12-10',
     'dividido e usado agora: as partes 2 e 3 entram na fila logo depois, e H é empurrado');
+  checar(antesDeDividir === '2026-11-26' && dividido.datasDasPartes.join() === '2026-11-26,2026-12-03',
+    'UX4.3: antes de salvar, depoisDoAtual já dá a data da parte 2 (26/11), e o salvar devolve a data de cada parte');
   checar(await tentar(() => ce.salvarEstudo('lider', ID, estudo('Outro (parte 1)', { seguintes: [Array.from({ length: 17 }, (_, i) => (i ? 'Salmos 119.' + i : 'Outro (parte 2)')).join('\n')] }), opcoes, quando('11-13', 15)))
     === 'na parte 2: ' + MSG_ESTUDO.cartoes + '|400' && ce.estudo(p().estudoId).titulo === 'Longo (parte 1)', 'uma parte acima dos tetos recusa o pedido inteiro, e nada muda');
   const ag = await ce.salvarEstudo('lider', ID, estudo('Agendado (parte 1)', { agendar: true, data: '2026-12-03', seguintes: [texto('Agendado (parte 2)')] }), opcoes, quando('11-13', 16));
   checar(ag.agendado === '2026-12-03' && fila() === 'Longo (parte 2)@2026-11-26 Agendado (parte 1)@2026-12-03 Agendado (parte 2)@2026-12-10 Longo (parte 3)@2026-12-17 Estudo H@2026-12-24',
     'agendado e dividido: a parte 2 vai para o encontro seguinte ao da parte 1, empurrando o resto');
+  checar(ag.datasDasPartes.join() === '2026-12-10', 'UX4.3: agendado e dividido, o salvar devolve a data da parte 2 (10/12)');
 
   // --- as partes do celular ---
   const r5 = await ce.porPartesNaFila('lider', ID, [{ fonte: texto('Do celular (parte 2)'), traducao: 'blivre' }], opcoes, quando('11-13', 17));
