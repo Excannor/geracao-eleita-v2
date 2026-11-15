@@ -709,6 +709,16 @@
   // Quantos dias com a Palavra a semana de uma data (hoje, sem data) já tem.
   CC.diasNaSemana = (estado, hoje) => diasPorSemana(estado || E).get(CC.segundaDaSemana(hoje || CC.hojeIso())) || 0;
 
+  // Escudo usado sozinho (R1.3): a simulação acima já gasta o escudo sem a pessoa fazer nada. Isto
+  // só diz o que avisar na próxima abertura: os dias cobertos dos últimos 3 dias que este aparelho
+  // ainda não avisou (depois de "ultimoAvisado"), e se foi o escudo do iniciante. Nada a avisar
+  // quando a chama já apagou: aí quem fala é a folha de volta.
+  CC.escudoParaAvisar = (seq, hoje, ultimoAvisado) => {
+    const dias = seq.protegidos.filter((d) => d < hoje && d >= CC.somaDias(hoje, -3) && (!ultimoAvisado || d > ultimoAvisado)).sort();
+    if (!dias.length || !seq.atual) return null;
+    return { dias, ultimo: dias[dias.length - 1], iniciante: !!seq.iniciante && dias.includes(seq.iniciante) };
+  };
+
   // Recebe as datas por parâmetro para poder ser exercitada por teste.
   CC.sequencia = function (marcadas, referencia) {
     const datas = marcadas ? new Set(Object.values(marcadas)) : CC.datasFeitas();

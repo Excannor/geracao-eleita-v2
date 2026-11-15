@@ -6,6 +6,8 @@
 // R1.2, semanas completas: com o "hoje" do app numa sexta-feira e três semanas de 5 dias atrás, a
 // folha da chama diz "3" e "Esta semana: 4 de 5 dias", o Perfil mostra os dois números que nunca
 // caem ao lado da ofensiva, e ler o 5º dia da semana (no papel) festeja a semana completa no Dia lido.
+// R1.3, escudo usado sozinho: quem faltou ontem e tem escudo abre o app com a chama acesa e um aviso
+// gentil (uma vez só), sem fazer nada; o escudo do iniciante avisa como tal.
 // Uso: node ferramentas/teste-chama.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, nos temas claro e escuro, uma subpasta por parte: R1.1, R1.2...)
 import { spawn } from 'node:child_process';
@@ -58,16 +60,19 @@ async function alvo() {
 // Uma conta com 4 dias seguidos (6 dias do plano, dois deles no papel) que acabaram há 4 dias: três
 // dias em branco passam do escudo, a chama apagou e a falta está dentro da janela da folha de
 // volta. O servidor só aceita leitura com até 7 dias de atraso (servidor.mjs, conferirProgresso).
-async function contaComFalta(usuario, semEstado) {
+async function contaComFalta(usuario, semEstado, marcadoEm) {
   const r = await fetch(base + '/api/criar-conta', { method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ usuario, nome: 'Joana', senha: 'senha-' + usuario, email: usuario + '@teste.com', nascimento: '2008-04-05', consentimento: true }) });
   const cookie = (r.headers.get('set-cookie') || '').split(';')[0];
   if (!r.ok) throw new Error('não criou a conta: ' + r.status + ' ' + await r.text());
   if (semEstado) return cookie;
-  const marcadoEm = {};
-  for (let n = 1; n <= 4; n++) marcadoEm[n] = atras(8 - n);
-  marcadoEm[5] = marcadoEm[6] = atras(4);
-  const estado = { atualizadoEm: Date.now(), dia: 7, lidos: [1, 2, 3, 4, 5, 6], marcadoEm, origens: { 5: 'papel', 6: 'papel' }, apelido: 'Joana' };
+  if (!marcadoEm) {
+    marcadoEm = {};
+    for (let n = 1; n <= 4; n++) marcadoEm[n] = atras(8 - n);
+    marcadoEm[5] = marcadoEm[6] = atras(4);
+  }
+  const lidos = Object.keys(marcadoEm).map(Number);
+  const estado = { atualizadoEm: Date.now(), dia: lidos.length + 1, lidos, marcadoEm, origens: { 5: 'papel', 6: 'papel' }, apelido: 'Joana' };
   const p = await fetch(base + '/api/estado', { method: 'PUT', headers: { 'content-type': 'application/json', cookie }, body: JSON.stringify(estado) });
   if (!p.ok) throw new Error('não gravou o estado: ' + p.status);
   return cookie;
@@ -241,6 +246,60 @@ try {
     await av('CC.marcarLido(21); 1');
     ok(await av('CC.semanasCompletas() === 4 && CC.diasNaSemana() === 5'), 'ler de novo no mesmo dia não conta outra semana');
   }
+
+  // ---------- R1.3: o escudo usado sozinho ----------
+  // 11 dias seguidos até anteontem, ontem em branco, hoje ainda não lido. O servidor só aceita
+  // leitura com até 7 dias de atraso: as datas mais velhas entram pelo aparelho (CC.gravar), que
+  // fica com a data mais antiga na fusão, e a abertura seguinte é a de verdade.
+  const voltarAoApp = async () => {
+    await cmd('Page.navigate', { url: 'about:blank' });
+    await dormir(300);
+    await cmd('Page.navigate', { url: base + '/#/' });
+  };
+  const onzeDias = Object.fromEntries(Array.from({ length: 11 }, (_, i) => [i + 1, atras(12 - i)]));
+  for (const tema of ['claro', 'escuro']) {
+    await temaDe(tema);
+    await entrar(await contaComFalta('escudo' + tema, true));
+    ok(await esperar(q('.folha-topo'), 20000), 'conta nova abre o Início');
+    await esperar('!document.getElementById("abertura")', 15000);
+    await dormir(600);
+    await fecharFolhas();
+    await av('CC.gravar("marcadoEm", ' + JSON.stringify(onzeDias) + '); CC.gravar("lidos", ' + JSON.stringify(Object.keys(onzeDias).map(Number)) + '); CC.gravar("dia", 12); CC.salvarNoServidor().then(() => 1)');
+    await voltarAoApp();
+    ok(await esperar(q('[data-escudo-usado="1"]'), 20000), 'faltou ontem e tinha escudo: na abertura, o aviso do escudo, sem a pessoa fazer nada');
+    const aviso = await texto('[data-escudo-usado]');
+    ok(/Um escudo cuidou da sua chama/.test(aviso) && /Ontem ficou em branco, e o app usou um escudo por você\./.test(aviso) && /A chama segue acesa: 11 dias seguidos\./.test(aviso),
+      'o aviso é gentil: "Ontem ficou em branco, e o app usou um escudo por você. A chama segue acesa: 11 dias seguidos."');
+    ok(/Ainda resta 1 escudo\./.test(aviso) && await av('!!document.querySelector(".folha [data-ler]") && !!document.querySelector(".folha [data-fechar]")'), 'diz quantos escudos restam e oferece "Ler hoje" ou "Agora não"');
+    ok(await av('CC.sequencia().atual === 11 && CC.sequencia().protegidos.includes(' + JSON.stringify(atras(1)) + ')'), 'a chama segue com 11 dias, e ontem está coberto');
+    await dormir(1500);
+    const cortinas = await av('[...document.querySelectorAll(".cortina .folha")].map((f) => f.getAttribute("aria-label") || f.className).join(" + ")');
+    // o convite de notificações da partida (10-roteador.js, antes dos avisos do dia) pode estar por
+    // baixo, como já ficava com a folha de volta; por cima do aviso não abre nada
+    ok(cortinas.split(' + ').pop() === 'Escudo usado', 'nenhuma outra folha abre por cima do aviso (' + cortinas + ')');
+    await capturar('r1.3-escudo-' + tema);
+    await av(q('.folha [data-fechar]') + '.click(); 1');
+    await voltarAoApp();
+    await esperar(q('.folha-topo'), 20000);
+    await dormir(2500);
+    ok(!(await av('!!' + q('[data-escudo-usado]'))), 'o aviso aparece uma vez só');
+    await fecharFolhas();
+    await av('CC.folhaOfensiva(); 1');
+    ok(await esperar(q('.folha-ofensiva .bolinha.escudo')) && /o app usa um sozinho/.test(await texto('.folha-ofensiva .linha-escudos')),
+      'na folha da chama, ontem tem o escudo, e o texto diz que o app usa um sozinho');
+    await capturar('r1.3-folha-' + tema);
+    await fecharFolhas();
+  }
+
+  // o escudo do iniciante: leu 3 dias na primeira semana e faltou 2
+  await temaDe('claro');
+  await entrar(await contaComFalta('iniciante', false, { 1: atras(5), 2: atras(4), 3: atras(3) }));
+  ok(await esperar(q('[data-escudo-usado="2"]'), 20000), 'na primeira semana, dois dias em branco: o escudo do iniciante cobre e avisa');
+  const doIniciante = await texto('[data-escudo-usado]');
+  ok(/O escudo do iniciante cuidou da chama/.test(doIniciante) && /Dois dias ficaram em branco, e ele cobriu sem gastar os seus escudos\./.test(doIniciante)
+    && /3 dias seguidos/.test(doIniciante) && /Ainda resta 1 escudo\./.test(doIniciante), 'com o texto do escudo do iniciante (' + doIniciante.replace(/\s+/g, ' ') + ')');
+  await capturar('r1.3-iniciante-claro');
+  await fecharFolhas();
 } catch (e) {
   falhas++;
   console.log('  FALHA ' + (e && e.stack || e));

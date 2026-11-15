@@ -202,7 +202,7 @@
         : (seq.feitoHoje ? '' : '<p class="passo-dica">A lenha de hoje ainda não entrou. Leia para manter o fogo aceso!</p>'))
       + '<div class="semana-bolinhas">' + semana + '</div>'
       + '<p class="linha-escudos">' + [0, 1].map((i) => '<i class="' + (i < seq.escudos ? 'tem' : '') + '">' + CC.ico('escudo') + '</i>').join('')
-      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Um dia em branco usa um. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
+      + '<span><b>' + CC.plural(seq.escudos, 'escudo', 'escudos') + '.</b> Se um dia ficar em branco, o app usa um sozinho. Você ganha um todo mês e outro a cada 7 dias seguidos.</span></p>'
       + '<p class="linha-recorde"><span>Recorde</span><b>' + CC.plural(seq.recorde, 'dia', 'dias') + '</b></p>'
       + (vida && seq.atual ? '<p class="linha-recorde linha-vida" data-dias-palavra="' + vida + '"><span>Dias com a Palavra<small>No app ou na sua Bíblia. Nunca volta a zero.</small></span><b>' + CC.plural(vida, 'dia', 'dias') + '</b></p>' : '')
       // R1.2: as semanas (segunda a domingo) com 5 dias ou mais; o número só cresce
@@ -663,10 +663,17 @@
     // As marcas de "já avisei" são de cada conta: no aparelho de casa, o que uma pessoa já
     // viu não pode esconder o aviso de outra que entra depois.
     const dono = (CC.quem && CC.quem.usuario) || '';
-    if (seq.protegidos.includes(ontem) && lerLocal('cc.aviso.escudo') !== dono + ':' + ontem) {
-      gravarLocal('cc.aviso.escudo', dono + ':' + ontem);
-      CC.avisar('Seu escudo cobriu ontem. A chama segue acesa: ' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + '!');
-      return;
+    // R1.3: o escudo já foi usado sozinho (CC.simularOfensiva); aqui só o aviso gentil, uma vez
+    // por dia coberto neste aparelho. A marca guarda o último dia avisado, "dono:data".
+    const marcaEscudo = lerLocal('cc.aviso.escudo') || '';
+    const escudo = CC.escudoParaAvisar(seq, hoje, marcaEscudo.startsWith(dono + ':') ? marcaEscudo.slice(dono.length + 1) : '');
+    if (escudo) {
+      gravarLocal('cc.aviso.escudo', dono + ':' + escudo.ultimo);
+      // a folha mora na peça chama.js; sem ela (sem rede na primeira vez), um recado curto
+      CC.pedirPeca(window.CHAMA, () => !!CC.chama).then(() => CC.chama.avisoEscudo(escudo, seq),
+        () => CC.avisar('Um escudo cuidou da sua chama. Ela segue acesa: ' + CC.plural(seq.atual, 'dia seguido', 'dias seguidos') + '.'));
+      // a folha chega depois (a peça): quem chama não abre outra folha por cima enquanto isso
+      return 'esperando';
     }
     if (seq.zerouEm && !seq.feitoHoje && seq.zerouEm >= CC.somaDias(hoje, -14) && lerLocal('cc.aviso.zerou') !== dono + ':' + seq.zerouEm) {
       gravarLocal('cc.aviso.zerou', dono + ':' + seq.zerouEm);
@@ -858,7 +865,8 @@
       CC.completarCadastro(quem);
       return;
     }
-    avisosDoDia();
+    // a folha do escudo ainda vem da peça: nada mais abre agora (como quando há uma folha aberta)
+    if (avisosDoDia() === 'esperando') return;
     // O check-in do discípulo (uma vez por dia), só com a tela livre.
     if (CC.talvezCheckin) CC.talvezCheckin();
     // O convite para ativar notificações só aparece quando nada mais está aberto na tela.

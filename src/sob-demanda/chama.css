@@ -1,0 +1,3 @@
+/* A chama que perdoa (chama.js). R1.3: o aviso do escudo usado sozinho, no jeito da folha de volta. */
+.escudo-usado > svg { width: 72px; height: 72px; color: var(--salvia-texto); stroke-width: 1.6; }
+.escudo-usado p { margin: 0; }

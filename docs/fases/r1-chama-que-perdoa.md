@@ -86,3 +86,39 @@ Nada novo é guardado: o número sai das datas, igual no aparelho e no servidor.
 dias, papel e mesma data, primeiro passo, falta depois, datas do Zerar) e
 `ferramentas/teste-chama.mjs` (com o "hoje" do app numa sexta: folha, Perfil, o 5º dia no papel
 com a festa no Dia lido, a folha depois e a leitura repetida no mesmo dia).
+
+## R1.3 · Escudo usado sozinho
+
+**Como era.** Conferido antes de mudar: o escudo já era usado sem a pessoa fazer nada. A ofensiva
+é recontada do começo a cada abertura (`CC.simularOfensiva`, em `02-estado.js`, a mesma conta no
+aparelho e no servidor): um buraco de dias em branco é coberto inteiro se houver escudos para
+todos eles; se não houver, a chama zera e nenhum escudo é gasto à toa. Começa com 1, ganha 1 a
+cada mês e 1 a cada 7 dias seguidos, guarda no máximo 2. O escudo do iniciante (seção 8 de
+`docs/retencao-primeiros-dias.md`) cobre uma vez, na primeira semana contada do primeiro dia lido,
+um buraco de até 2 dias, sem gastar os de sempre. Hoje nunca é buraco. O servidor manda de manhã
+a notificação "Seu escudo cuidou de ontem" (`notificacoes.mjs`, que ficou como estava). O que
+faltava era o aviso no app: era um recado de rodapé, só quando o dia coberto era ontem e sem
+dizer quantos escudos restavam nem distinguir o do iniciante.
+
+**O que mudou.** Só o aviso, na próxima abertura:
+- `CC.escudoParaAvisar(seq, hoje, ultimoAvisado)` (`02-estado.js`) devolve os dias cobertos dos
+  últimos 3 dias que este aparelho ainda não avisou, e se foi o escudo do iniciante. Com a chama
+  apagada não devolve nada (aí fala a folha de volta). A marca `cc.aviso.escudo` guarda
+  `dono:último dia avisado`, no mesmo formato de antes.
+- A folha (peça sob demanda `src/sob-demanda/chama.js`, para a folga do index.html): "Um escudo
+  cuidou da sua chama" / "Ontem ficou em branco, e o app usou um escudo por você. A chama segue
+  acesa: N dias seguidos." / "Ainda resta 1 escudo." Dois dias: "Seus escudos cuidaram da chama".
+  Iniciante: "O escudo do iniciante cuidou da chama ... ele cobriu sem gastar os seus escudos."
+  Sem escudo sobrando: "O próximo escudo chega com 7 dias seguidos ou no mês que vem." Botões
+  "Ler hoje" e "Agora não" (ou "Que bom!", se já leu hoje). Sem a peça (sem rede na primeira
+  vez), um recado curto.
+- Enquanto a peça chega, a partida não abre outra folha por cima (`avisosDoDia` devolve
+  'esperando').
+- Folha da chama: "Se um dia ficar em branco, o app usa um sozinho."
+
+**Entre aparelhos.** O gasto do escudo sai das datas, então é o mesmo em todo aparelho e no
+servidor. O aviso é de cada aparelho: quem abre outro aparelho até 3 dias depois também é avisado.
+
+**Testes.** `teste.mjs` (1 dia, dia já avisado, outro aparelho, mais de 3 dias, dois escudos,
+iniciante, chama apagada) e `ferramentas/teste-chama.mjs` (o aviso na abertura nos dois temas,
+uma vez só, nada por cima, a folha da chama, e o escudo do iniciante).

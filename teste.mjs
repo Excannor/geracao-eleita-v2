@@ -359,6 +359,8 @@ secao('peças sob demanda');
     ['historia', 'HISTORIA_TELA', 'campo-historia-', '', 'Minha história com Deus'],
     // a tela do dia lido (depois de ler): a casca e a lição ficam em 04-licao.js
     ['dia-lido', 'DIA_LIDO', 'cc.diaLido.abertos', '', 'a tela do dia lido'],
+    // a chama que perdoa (R1): as folhas raras (o aviso do escudo usado sozinho); a conta fica em 02-estado.js
+    ['chama', 'CHAMA', 'Seus escudos cuidaram da chama', '', 'as folhas da chama que perdoa'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -833,6 +835,29 @@ checar(s.atual === 2, 'ler dois dias do plano de uma vez não infla a ofensiva')
   const z = CC.fundir({ atualizadoEm: 1, diasComPalavra: ['2026-01-02'], marcadoEm: { 1: '2026-01-03' }, lidos: [1] },
     { atualizadoEm: 9, zeradoEm: 9, diasComPalavra: ['2026-01-03'], marcadoEm: {}, lidos: [] });
   checar(!z.lidos.length && JSON.stringify(z.diasComPalavra) === '["2026-01-02","2026-01-03"]', 'dias com a Palavra: a fusão com um aparelho zerado zera a trilha e mantém as datas guardadas');
+}
+
+// --- R1.3: o escudo é usado sozinho, e o aviso vem na próxima abertura ---
+{
+  const sem = (datas, hoje) => CC.simularOfensiva(datas, hoje);
+  let q = sem(dias('2026-03-01', 10), '2026-03-12');
+  let a = CC.escudoParaAvisar(q, '2026-03-12', '');
+  checar(q.atual === 10 && q.protegidos.join() === '2026-03-11' && a && a.dias.join() === '2026-03-11' && !a.iniciante && a.ultimo === '2026-03-11',
+    'escudo sozinho: faltou ontem, a chama segue sem a pessoa fazer nada, e há um aviso de 1 dia');
+  checar(CC.escudoParaAvisar(q, '2026-03-12', '2026-03-11') === null, 'escudo sozinho: o dia já avisado não volta a avisar');
+  q = sem([...dias('2026-03-01', 10), '2026-03-12'], '2026-03-13');
+  checar(CC.escudoParaAvisar(q, '2026-03-13', '2026-03-11') === null && CC.escudoParaAvisar(q, '2026-03-13', '').dias.join() === '2026-03-11',
+    'escudo sozinho: noutro aparelho, que ainda não avisou, o aviso vem na próxima abertura');
+  q = sem([...dias('2026-03-01', 10), ...dias('2026-03-12', 4)], '2026-03-16');
+  checar(q.protegidos.includes('2026-03-11') && CC.escudoParaAvisar(q, '2026-03-16', '') === null, 'escudo sozinho: um escudo de mais de 3 dias atrás não vira aviso');
+  q = sem(dias('2026-03-01', 7), '2026-03-10');
+  a = CC.escudoParaAvisar(q, '2026-03-10', '2026-03-01');
+  checar(q.atual === 7 && q.escudos === 0 && a && a.dias.join() === '2026-03-08,2026-03-09', 'escudo sozinho: dois dias em branco gastam os dois escudos, num aviso só');
+  q = sem(['2026-03-01', '2026-03-04'], '2026-03-04');
+  a = CC.escudoParaAvisar(q, '2026-03-04', '');
+  checar(a && a.iniciante && a.dias.join() === '2026-03-02,2026-03-03' && q.escudos === 1, 'escudo sozinho: o escudo do iniciante avisa como tal e não gasta os de sempre');
+  q = sem(dias('2026-02-20', 11), '2026-03-06');
+  checar(q.atual === 0 && CC.escudoParaAvisar(q, '2026-03-06', '') === null, 'escudo sozinho: com a chama apagada não há aviso de escudo (fala a folha de volta)');
 }
 
 // --- R1.2: semanas completas (segunda a domingo, 5 dias ou mais com a Palavra) ---
