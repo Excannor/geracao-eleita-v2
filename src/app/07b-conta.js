@@ -147,10 +147,18 @@
       try { await CC.api('api/sair-dos-outros', {}); CC.avisar('Só este aparelho continua dentro'); } catch (e) { CC.avisar(e.message); }
     });
     ligar('[data-sair]', async () => {
-      const certo = await CC.confirmar({
+      // R2.4: o que ainda não chegou ao servidor vai antes de perguntar; sem conseguir, sair apagaria
+      // o que está só neste aparelho, e a pergunta avisa isso (uma folha só: duas seguidas, a primeira
+      // fechando pelo histórico levava a segunda junto)
+      const guardado = await CC.enviarAgora();
+      const certo = await CC.confirmar(guardado ? {
         titulo: 'Sair da conta?',
         texto: 'O que você escreveu continua guardado no servidor. É só entrar de novo.',
         acao: 'Sair',
+      } : {
+        titulo: 'Sem conexão agora',
+        texto: 'O que você leu ou escreveu neste aparelho ainda não chegou ao servidor. Se sair agora, isso se perde. Conecte-se e tente de novo.',
+        acao: 'Sair mesmo assim', perigo: true, cancelar: 'Cancelar',
       });
       if (!certo) return;
       await fetch('api/sair', { method: 'POST' }).catch(() => {});

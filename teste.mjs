@@ -1930,6 +1930,21 @@ const historia = (raridades, fonte = 'bau') => ({ eventos: Object.fromEntries(ra
   checar(!!D0 && D0.trechos.map((t) => t.livro + ' ' + t.cap).join() === 'Gênesis 1,Gênesis 2', 'dia 0: o trecho é o do dia 1 do Conhecer Jesus (Gênesis 1.1 a 2.3), reaproveitado');
 }
 
+// --- R2.4: a fila do aparelho (o que ainda não chegou ao servidor) ---
+{
+  const r1 = await CC.enviarAgora();
+  CC.gravar('apelido', CC.ler('apelido', '') || '');
+  const r2 = await CC.enviarAgora();
+  checar(r2 === false, 'fila: com uma mudança que ainda não chegou e sem servidor, enviar agora diz que não guardou (r1: ' + r1 + ')');
+  const entrar = readFileSync(join(AQUI, 'src', 'entrar.html'), 'utf8');
+  checar(/localStorage\.setItem\('cc\.app\.estado', JSON\.stringify\(\{ dono: usuario, atualizadoEm: 0 \}\)\)/.test(entrar),
+    'fila: entrar marca o aparelho como de quem entrou, para a primeira leitura sem servidor não ficar sem dono');
+  const roteador = readFileSync(join(AQUI, 'src', 'app', '10-roteador.js'), 'utf8');
+  checar(/addEventListener\('pagehide', \(\) => \{ CC\.enviarAgora\(true\); \}\)/.test(roteador) && /addEventListener\('online'/.test(roteador)
+    && /const guardado = await CC\.enviarAgora\(\);\s*const certo = await CC\.confirmar\(guardado \?/.test(readFileSync(join(AQUI, 'src', 'app', '07b-conta.js'), 'utf8')),
+  'fila: fechar o app e ir para o segundo plano mandam o que falta, a rede que volta sincroniza, e sair sem conseguir mandar pergunta antes');
+}
+
 // --- em dia: baús antigos, fontes, Zerar, Semeadores, álbum novo ---
 {
   const estado = (extra) => ({ ...CC.normalizarEstado({}), dono: 'ana', ...extra });
@@ -3912,6 +3927,14 @@ secao('cofre das anotações (cofre.mjs e servidor)');
       await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3200, reacesoEm: { [mesR]: outroDia.slice(0, 7) === mesR ? outroDia : hojeR } }, ana, 'PUT');
       const r2 = (await (await pedir('/api/estado', null, ana)).json()).reacesoEm || {};
       checar(r2[mesR] === hojeR && Object.keys(r2).length === 1, 'no servidor, o reacender do mês não muda nem duplica');
+    }
+    // R2.4: o progresso marcado com o dono de outra conta não entra (a página de quem saiu, que
+    // manda o que faltava com o cookie de quem entrou depois)
+    {
+      const antesO = JSON.stringify(((await (await pedir('/api/estado', null, ana)).json()).lidos || []));
+      const r = await pedir('/api/estado', { ...cheio, atualizadoEm: Date.now() + 3250, dono: 'outra-pessoa', lidos: [1, 2, 3, 300], marcadoEm: { 300: CC.hojeIso() } }, ana, 'PUT');
+      const depoisO = JSON.stringify(((await (await pedir('/api/estado', null, ana)).json()).lidos || []));
+      checar(r.status === 409 && antesO === depoisO, 'no servidor, o progresso de outra conta (dono diferente) é recusado e nada se mistura (' + r.status + ')');
     }
     // R2.2b: o dia 0 no servidor: uma data forjada fora da janela vira hoje, e a que já está gravada
     // não muda

@@ -481,19 +481,31 @@
     }
     return { corpo: JSON.stringify(E), foto };
   }
-  function enviar() {
+  // Devolve se o servidor guardou (R2.4: sair da conta só sem perguntar quando guardou). keepalive:
+  // o pedido segue mesmo com a página fechando (até uns 60 KB; acima disso, o navegador o recusaria).
+  let falta = false;
+  function enviar(fechando) {
     const { corpo, foto } = corpoDoEnvio();
-    return fetch('api/estado', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: corpo })
-      .then((r) => { if (r.ok) fotoNoServidor = foto; })
-      .catch(() => { servidorVivo = false; });
+    falta = false;
+    return fetch('api/estado', { method: 'PUT', headers: { 'content-type': 'application/json' }, body: corpo, keepalive: !!fechando && corpo.length < 60000 })
+      .then((r) => { if (r.ok) { fotoNoServidor = foto; servidorVivo = true; } else falta = true; return r.ok; })
+      .catch(() => { servidorVivo = false; falta = true; return false; });
   }
 
   let envioPendente;
   function enviarAoServidor() {
+    falta = true;
     if (!servidorVivo) return;
     clearTimeout(envioPendente);
     envioPendente = setTimeout(enviar, 600);
   }
+  // R2.4: a fila do aparelho. O que mudou e ainda não chegou ao servidor (falta) vai na hora: ao
+  // fechar o app ou ir para o segundo plano (antes, a pausa de 600 ms podia não chegar a rodar) e
+  // antes de sair da conta. Devolve se o servidor guardou.
+  CC.enviarAgora = (fechando) => {
+    clearTimeout(envioPendente);
+    return falta ? enviar(fechando) : Promise.resolve(true);
+  };
 
   // Grava agora, sem esperar a pausa: o servidor precisa saber que a pessoa leu antes
   // de aceitar o toque que ela vai dar num amigo.

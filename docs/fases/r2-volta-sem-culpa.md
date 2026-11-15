@@ -236,3 +236,70 @@ Por isso o conteúdo e a tela foram reaproveitados, mas o registro é próprio.
 - lido, a festa, o "amanhã", a chama em 1 e nenhum dia do plano lido, no aparelho e no servidor;
 - nada por cima da festa, e o pedido só depois de "Voltar à trilha";
 - o dia 1 depois do dia 0 sem a festa do primeiro dia, e quem já leu o dia 1 sem o convite.
+
+## R2.4 · Integridade do progresso
+
+**Auditoria: o que já estava certo.**
+- O progresso vive no aparelho (`localStorage`) e vai inteiro ao servidor a cada mudança. Por isso
+  a fila offline é o próprio estado guardado.
+- A fusão entre aparelhos não perde nem duplica leitura. Os dias lidos se juntam; de cada data fica
+  a mais antiga, e a origem `app` vence `papel`. As cartas são um livro-caixa por chave, e os
+  contadores ficam com o maior valor.
+- Um dia lido não se desmarca.
+- O servidor funde de novo o que chega (`api/estado`) e confere as datas (`conferirProgresso`).
+- Num celular novo, entrar traz tudo do servidor: o teste confirma (dias lidos, dia do plano,
+  chama e dias com a Palavra).
+
+**As falhas reais, cada uma com um teste que a reproduz** (`ferramentas/teste-volta.mjs`, PARTES=R2.4;
+os casos 1, 2 e 4 falhavam no código de antes):
+
+1. **A primeira abertura depois de entrar, sem alcançar o servidor, perdia a leitura.**
+   - Causa: o estado do aparelho ficava sem dono. Na sincronização seguinte, progresso sem dono é
+     tratado como de outra pessoa e é apagado.
+   - Correção: `entrar.html` (`entrarNoApp`) já marca o aparelho como de quem entrou quando não há
+     progresso guardado.
+2. **A rede que voltava com o app aberto não mandava nada.**
+   - Causa: depois de uma falha de envio, o app só voltava a falar com o servidor na próxima abertura
+     ou na volta para a tela.
+   - Correção: o evento `online` sincroniza e manda o que falta (`10-roteador.js`).
+3. **Fechar o app logo depois de marcar deixava a leitura para trás.**
+   - Causa: o envio espera uma pausa de 600 ms, e a página fechando não chegava a mandar. A leitura
+     ficava só no aparelho, e outro celular não a via.
+   - Correção: `pagehide` e o segundo plano mandam na hora, com `keepalive` (até uns 60 KB):
+     `CC.enviarAgora` em `02-estado.js`.
+4. **Sair da conta sem rede apagava o que não tinha chegado ao servidor.**
+   - Causa: "Sair" apagava o aparelho sem conferir nada.
+   - Correção: agora manda antes de perguntar. Sem conseguir, a pergunta de sair vira o aviso (uma
+     folha só): "Sem conexão agora · O que você leu ou
+     escreveu neste aparelho ainda não chegou ao servidor. Se sair agora, isso se perde. Conecte-se e
+     tente de novo." Os botões são "Sair mesmo assim" e "Cancelar". Com rede, a pergunta é a de antes ("Sair da conta?").
+
+5. **O progresso de uma conta podia entrar na de outra.**
+   - Causa: uma página aberta de quem saiu, que manda o que faltava (ao fechar, ou na pausa de 600
+     ms) já com o cookie de quem entrou depois, era fundida na conta nova. O servidor não conferia
+     o dono que o próprio estado leva.
+   - Como apareceu: com a correção 3, o `teste-chama` e o `teste-volta` (que trocam de conta no
+     mesmo navegador) passaram a mostrar o progresso de uma pessoa na conta da outra.
+   - Correção: `api/estado` recusa (409) o estado cujo `dono` não é quem está entrando; o aparelho,
+     na sincronização seguinte, fica com o progresso certo. Teste no `teste.mjs`.
+
+`enviar` passou a devolver se o servidor guardou. Um envio que dá certo também volta a dar o servidor
+por vivo.
+
+**Fica como está (decisões de antes, não falhas):**
+- Uma leitura feita sem rede que só chega ao servidor mais de 7 dias depois entra com a data de
+  hoje. É a trava contra datas inventadas (`conferirProgresso`).
+- O "Zerar" de um aparelho vence as leituras mais antigas que ele, de outro aparelho que estava sem
+  rede, pela hora do aparelho.
+- O contador `pratica.vezes` soma os dois lados a cada fusão e cresce sozinho. Não é leitura e não
+  aparece em nenhuma tela; ficou anotado para quando for usado.
+
+**Testes.** `teste.mjs`:
+- enviar agora diz que não guardou quando não alcança o servidor;
+- no servidor, o progresso de outra conta é recusado e nada se mistura;
+- a marca de dono na entrada;
+- os ouvintes de fechar, segundo plano e rede, e a pergunta ao sair.
+
+`ferramentas/teste-volta.mjs` (claro e escuro):
+- os quatro casos acima;
+- o celular novo.

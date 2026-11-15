@@ -867,7 +867,12 @@
     if (!document.querySelector('.cortina, .tela-cheia')) CC.talvezOferecerNotificacoes();
   });
 
+  // R2.4: fechar o app ou ir para o segundo plano manda o que ainda falta; a rede que volta com o
+  // app aberto sincroniza (antes, só a próxima abertura ou a volta para a tela)
+  addEventListener('pagehide', () => { CC.enviarAgora(true); });
+  addEventListener('online', () => { if (!CC.semSessao()) CC.sincronizar(false).then(() => CC.enviarAgora()); });
   addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') CC.enviarAgora(true);
     if (document.visibilityState !== 'visible') return;
     if (CC.semSessao()) { CC.irParaEntrada(); return; }
     CC.sincronizar(false)

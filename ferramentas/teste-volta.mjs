@@ -18,6 +18,9 @@
 // dia 1 do Conhecer Jesus; a regra de leitura vale; lido, festeja o primeiro dia (chama em 1, nada
 // por cima, o pedido só depois), sem dia do plano lido (no aparelho e no servidor); o dia 1 depois não
 // repete a festa; quem já leu o dia 1 não vê o dia 0.
+// R2.4, integridade do progresso: a primeira abertura depois de entrar sem alcançar o servidor não
+// perde a leitura; a rede que volta com o app aberto manda o que ficou; fechar logo depois de marcar
+// não deixa a leitura para trás; sair sem rede avisa antes de perder; e o celular novo traz tudo.
 // Uso: node ferramentas/teste-volta.mjs   (PORTA=<n> troca a porta; CHROME=<caminho>;
 // CAPTURAS=<pasta> guarda as capturas, uma subpasta por parte: R2.1, R2.2...; PARTES=R2.1,R2.2 escolhe as partes)
 import { spawn } from 'node:child_process';
@@ -90,12 +93,24 @@ async function conta(usuario, nome, { celula = '', lidos = [], data = atras(1), 
   return cookie;
 }
 const estadoDe = async (cookie) => (await pedir('/api/estado', null, cookie)).json();
+// os dias com a Palavra de um estado vindo do servidor (as datas da chama, sem repetir)
+const CC_DIAS = (e) => new Set([...Object.values(e.marcadoEm || {}), ...Object.values(e.licoesEm || {}), ...Object.values(e.conhecidos || {}), ...(e.diaZero ? [e.diaZero] : []), ...(e.diasComPalavra || [])].filter(Boolean)).size;
 
 try {
   const ws = new WebSocket(await alvo());
   let seq = 0;
   const pend = new Map();
-  ws.addEventListener('message', (e) => { const m = JSON.parse(e.data); if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result || {}); pend.delete(m.id); } });
+  // R2.4: as rotas da API que a página não alcança agora (o servidor "fora do ar" só para ela)
+  let bloqueadas = null;
+  ws.addEventListener('message', (e) => {
+    const m = JSON.parse(e.data);
+    if (m.id && pend.has(m.id)) { pend.get(m.id)(m.result || {}); pend.delete(m.id); }
+    if (m.method === 'Fetch.requestPaused') {
+      const corta = bloqueadas && bloqueadas.test(m.params.request.url);
+      ws.send(JSON.stringify({ id: 900000 + Math.floor(Math.random() * 90000), method: corta ? 'Fetch.failRequest' : 'Fetch.continueRequest',
+        params: corta ? { requestId: m.params.requestId, errorReason: 'InternetDisconnected' } : { requestId: m.params.requestId } }));
+    }
+  });
   await new Promise((r) => ws.addEventListener('open', r));
   const cmd = (m, p = {}) => new Promise((res) => { const id = ++seq; pend.set(id, res); ws.send(JSON.stringify({ id, method: m, params: p })); });
   const av = async (e) => (await cmd('Runtime.evaluate', { expression: e, returnByValue: true, awaitPromise: true })).result?.value;
@@ -452,6 +467,104 @@ try {
     ok(await noInicio(), 'quem já leu o dia 1 abre o Início');
     await dormir(800);
     ok(!(await av(q('.folha-topo [data-dia-zero]'))), 'e não vê o dia 0');
+  }
+
+  // ---------- R2.4: integridade do progresso ----------
+  const bloquear = async (re) => { bloqueadas = re; await cmd('Fetch.enable', { patterns: [{ urlPattern: '*/api/*' }] }); };
+  const desbloquear = async () => { bloqueadas = null; await cmd('Fetch.disable'); };
+  const semRede = (sim) => cmd('Network.emulateNetworkConditions', { offline: sim, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
+  const lidosNoServidor = async (cookie) => ((await estadoDe(cookie)).lidos || []).slice().sort((a, b) => a - b).join();
+  // entra pela página de entrada, como quem acabou de pegar um celular novo (nada guardado)
+  const entrarPeloFormulario = async (usuario) => {
+    await cmd('Network.clearBrowserCookies');
+    await cmd('Page.navigate', { url: base + '/entrar.html' });
+    await esperar(q('#form-entrar'), 10000);
+    await av('localStorage.clear(); sessionStorage.clear(); 1');
+    await av('document.getElementById("login").value = ' + JSON.stringify(usuario) + '; document.getElementById("senha-entrar").value = ' + JSON.stringify('senha-' + usuario)
+      + '; document.getElementById("form-entrar").requestSubmit(); 1');
+  };
+  for (const tema of ['claro', 'escuro']) {
+    if (!quer('R2.4')) break;
+    await temaDe(tema);
+    console.log('\n  R2.4 · Integridade do progresso\n');
+    const t = tema[0];
+
+    // 1. a primeira abertura depois de entrar, sem alcançar o servidor: o que se lê fica
+    const filaC = await conta('fila' + t, 'Fia');
+    await bloquear(/\/api\/(quem|estado)/);
+    await entrarPeloFormulario('fila' + t);
+    ok(await esperar(q('.folha-topo') + ' && typeof CC !== "undefined"', 20000), 'entra e o app abre sem alcançar o servidor');
+    await dormir(1500);
+    await av('CC.marcarLido(1, "papel"); 1');
+    ok(await av('CC.leu(1)'), 'lê o dia 1 sem servidor');
+    await desbloquear();
+    await abrir();
+    ok(await esperar(q('.folha-topo') + ' && CC.quem', 20000), 'o servidor volta e o app abre de novo');
+    await dormir(1500);
+    ok(await av('CC.leu(1)'), 'o dia lido sem servidor continua lá (antes, a primeira sincronização o apagava)');
+    await av('CC.salvarNoServidor()');
+    await dormir(500);
+    ok((await lidosNoServidor(filaC)) === '1', 'e chega ao servidor');
+
+    // 2. a rede volta com o app aberto: a leitura vai sem esperar a próxima abertura
+    await fecharFolhas();
+    await semRede(true);
+    await dormir(300);
+    await av('CC.marcarLido(2, "papel"); 1');
+    await dormir(1200);
+    ok((await lidosNoServidor(filaC)) === '1', 'sem rede, o dia 2 fica no aparelho');
+    await semRede(false);
+    ok(await esperar('true', 10) && await (async () => { for (let i = 0; i < 40; i++) { if ((await lidosNoServidor(filaC)) === '1,2') return true; await dormir(250); } return false; })(),
+      'a rede volta e o dia 2 chega ao servidor sozinho, com o app aberto');
+
+    // 3. fechar o app logo depois de marcar: a leitura não fica para trás
+    await av('CC.marcarLido(3, "papel"); 1');
+    await cmd('Page.navigate', { url: 'about:blank' });
+    let chegou = false;
+    for (let i = 0; i < 20 && !chegou; i++) { chegou = (await lidosNoServidor(filaC)) === '1,2,3'; if (!chegou) await dormir(250); }
+    ok(chegou, 'fechar o app logo depois de marcar não deixa a leitura para trás');
+
+    // 4. sair da conta sem rede: o app avisa antes de perder o que não chegou ao servidor
+    await abrir();
+    ok(await esperar(q('.folha-topo') + ' && CC.quem', 20000), 'abre de novo');
+    await dormir(1200);
+    await fecharFolhas();
+    await semRede(true);
+    await dormir(300);
+    await av('CC.marcarLido(4, "papel"); 1');
+    await av('location.hash = "#/config"; 1');
+    ok(await esperar(q('[data-sair]'), 8000), 'as Configurações abrem');
+    await av(q('[data-sair]') + '.click(); 1');
+    ok(await esperar('/ainda não chegou ao servidor/.test(document.body.textContent)', 6000), 'sem rede, sair avisa que o que foi lido ainda não chegou ao servidor');
+    await dormir(600);
+    ok(await av('document.querySelectorAll(".cortina:not(.saindo)").length === 1 && document.querySelector(".cortina:not(.saindo) h2").textContent === "Sem conexão agora" && /Sair mesmo assim/.test(document.querySelector(".cortina:not(.saindo)").textContent)'),
+      'numa folha só, que fica na tela: "Sem conexão agora", com "Sair mesmo assim" e "Cancelar"');
+    await capturar('r2.4-sair-sem-rede-' + tema);
+    await av('[...document.querySelectorAll(".cortina [data-nao]")].pop().click(); 1');
+    await dormir(600);
+    ok(await av('CC.leu(4) && location.hash === "#/config"'), '"Cancelar" fica na conta, com o dia 4 no aparelho');
+    await semRede(false);
+    let quatro = false;
+    for (let i = 0; i < 40 && !quatro; i++) { quatro = (await lidosNoServidor(filaC)) === '1,2,3,4'; if (!quatro) await dormir(250); }
+    ok(quatro, 'com a rede de volta, o dia 4 chega ao servidor');
+    // com rede, sair manda antes e não pergunta nada
+    await av('CC.marcarLido(5, "papel"); 1');
+    await av(q('[data-sair]') + '.click(); 1');
+    await esperar(q('.cortina [data-sim]'));
+    await av(q('.cortina [data-sim]') + '.click(); 1');
+    ok(await esperar('location.pathname.endsWith("entrar.html")', 10000), 'com rede, sair vai direto para a entrada');
+    ok((await lidosNoServidor(filaC)) === '1,2,3,4,5', 'e o dia 5, marcado logo antes, chegou ao servidor');
+
+    // 5. celular novo: entrar traz o progresso de volta sozinho
+    const antes = await estadoDe(filaC);
+    await entrarPeloFormulario('fila' + t);
+    ok(await esperar(q('.folha-topo') + ' && CC.quem', 20000), 'no celular novo, entrar abre o app');
+    // os cinco dias foram lidos hoje: o alto mostra o dia 5 lido, e o plano segue no dia 6
+    ok(await esperar(q('.folha-topo [data-rever-dia="5"]'), 10000) && await av('CC.ler("lidos").length === 5 && CC.diaAtual() === 6 && CC.diasComAPalavra() === ' + CC_DIAS(antes) + ' && CC.sequencia().atual === 1'),
+      'o progresso volta sozinho: os 5 dias lidos, o plano no dia 6, a chama e os dias com a Palavra');
+    await dormir(2500);
+    await fecharFolhas();
+    await capturar('r2.4-celular-novo-' + tema, true);
   }
 } catch (e) {
   falhas++;

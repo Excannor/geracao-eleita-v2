@@ -988,6 +988,9 @@
   }
 
   // O progresso guardado neste aparelho só segue se for de quem acabou de entrar.
+  // R2.4 (docs/fases/r2-volta-sem-culpa.md): sem progresso guardado, o aparelho já fica marcado como
+  // de quem entrou. Antes, se a primeira abertura do app não alcançava o servidor, o que a pessoa lia
+  // ficava sem dono, e a sincronização seguinte o apagava (progresso sem dono é de outra pessoa).
   function entrarNoApp(usuario) {
     try {
       ['cc.app.estado', 'cc.estado'].forEach(function (chave) {
@@ -995,6 +998,7 @@
         var dono = bruto ? (JSON.parse(bruto) || {}).dono : null;
         if (bruto && (!usuario || dono !== usuario)) localStorage.removeItem(chave);
       });
+      if (usuario && !localStorage.getItem('cc.app.estado')) localStorage.setItem('cc.app.estado', JSON.stringify({ dono: usuario, atualizadoEm: 0 }));
     } catch (e) { /* segue */ }
     abrirApp();
   }

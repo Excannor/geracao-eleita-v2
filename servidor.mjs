@@ -1806,6 +1806,10 @@ const servidor = createServer(async (req, res) => {
         try {
           const novo = REGRAS.normalizarEstado(JSON.parse(await corpoDaRequisicao(req, LIMITE_ESTADO)));
           if (!novo) throw new Error('formato inválido');
+          // R2.4: o progresso de outra conta não entra. Uma página aberta de quem saiu, que manda o
+          // que faltava ao fechar (ou na pausa de 600 ms) já com o cookie de quem entrou depois,
+          // somava o progresso de uma pessoa ao de outra.
+          if (conta && novo.dono && novo.dono !== eu) { json(res, 409, { erro: 'este progresso é de outra conta' }); return; }
           const atual = REGRAS.normalizarEstado(atualAberto);
           const junto = atual ? REGRAS.fundir(atual, novo) : novo;
           if (novo.dono) junto.dono = novo.dono;
