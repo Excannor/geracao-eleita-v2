@@ -3,7 +3,7 @@
 Fase R4 do roadmap de melhorias (`Roadmap de melhorias do GE.md`), com as recomendações 11, 12 e 15
 do estudo do YouVersion. Três partes, uma de cada vez, cada uma com o seu commit:
 
-- **R4.1 Conversa do dia da célula:** uma pergunta por dia de leitura, respostas curtas, só entre os
+- **R4.1 Conversa do dia da célula (adiada pelo dono em 16/11):** uma pergunta por dia de leitura, respostas curtas, só entre os
   membros, moderada por quem conduz.
 - **R4.2 Lista de oração da célula:** o pedido de oração que já existe (Fase 4, `cuidado.mjs`) ganha
   "Estou orando" com contagem, atualizações do autor e a lista "Respondidas".
@@ -14,6 +14,21 @@ Este documento vai do macro ao micro: o que vale (0), quem vê e quem escreve (1
 moderação (3), retenção (4), cuidados com menores (5), notificações (6), política de privacidade e
 termos (7), banco (8), API (9), telas (10), testes (11) e o que fica de fora (12). Nenhum código
 muda nesta etapa (R4.0).
+
+**Decisões do dono sobre esta especificação (16/11):**
+
+1. **A Conversa do dia (R4.1) está adiada.** O desenho dela fica neste documento, marcado como
+   adiado, para quando o dono decidir retomar. Nada dela é implementado agora: sem tabela, sem rota,
+   sem tela, sem mudança na política. A ordem passa a ser R4.2 e depois R4.3.
+2. **Aviso de perigo:** sim, quem conduz é avisado na hora pelo `denunciaPerigo` que já existe. Na
+   lista de oração isso já funciona assim e continua.
+3. **QR do encontro:** a entrada pelo QR **não conta** para Semeadores (D13 decidida).
+4. **Consentimento:** sem a conversa, a frase "o que eu escrevo" continua correta e não muda.
+   `CONSENTIMENTO_VERSAO` fica em 3. Só a política muda, na versão 8, se a R4.2 mudar o que alguém
+   vê.
+
+Com a conversa adiada, as migrações mudam de número: a lista de oração é a **v27**, o QR é a
+**v28**, e a conversa recebe a próxima versão livre quando voltar (seção 8).
 
 ## 0. O que vale e as decisões
 
@@ -32,30 +47,30 @@ muda nesta etapa (R4.0).
   (`docs/voz.md`). Paleta C, claro e escuro, 390 e 360 px, toque de 44 px.
 - Folga do index.html (hoje 63,2 KB, piso de 60): as telas novas moram em peças sob demanda.
 
-**Decisões deste plano** (as marcadas "conferir" vão para o dono):
+**Decisões deste plano** (as que dependiam do dono foram decididas em 16/11, no topo):
 
 | # | Decisão | Por quê |
 |---|---|---|
 | D1 | A conversa é por **dia do plano**, não por data do calendário. O dia aberto é o dia da célula (`diaDaCelula`, R2.1: o dia em que o líder está) e os 6 anteriores. | É "uma pergunta por dia de leitura". A célula já lê pelo dia do líder; quem está um ou dois dias atrás ainda responde. |
-| D2 | A pergunta é a **primeira do Pensar** daquele dia (`reflexoes[dia][0].perguntas[0]`). Quem conduz pode trocar pela outra pergunta do Pensar enquanto o dia não tem resposta. Conferir. | Algumas perguntas são pessoais demais para um grupo de adolescentes. Trocar só antes da primeira resposta evita que respostas fiquem soltas de outra pergunta. |
+| D2 | A pergunta é a **primeira do Pensar** daquele dia (`reflexoes[dia][0].perguntas[0]`). Quem conduz pode trocar pela outra pergunta do Pensar enquanto o dia não tem resposta. Adiada com a R4.1. | Algumas perguntas são pessoais demais para um grupo de adolescentes. Trocar só antes da primeira resposta evita que respostas fiquem soltas de outra pergunta. |
 | D3 | A pergunta fica guardada (`conversa_dias.pergunta`) na primeira resposta ou na troca. | Se a reflexão do dia for reescrita, as respostas continuam ao lado da pergunta que as pessoas leram. |
 | D4 | Resposta de até **280** caracteres, uma linha (espaços juntados), sem edição. O autor apaga quando quiser. | O mesmo tamanho do pedido de oração. Sem edição, ninguém muda o sentido depois que os outros leram. |
 | D5 | Texto com telefone, e-mail, link, @ de rede social ou endereço é **recusado**, com uma mensagem que diz o que tirar. Palavra da lista de bloqueio também. Nada é mascarado em silêncio. Vale para a conversa, o pedido de oração e de ajuda e as atualizações. | Mascarar ("[telefone]") deixa a pessoa sem saber o que aconteceu e ainda publica o resto. Recusar ensina a regra na hora. |
-| D6 | Moderação da conversa: quem conduz **oculta** (volta atrás quando quiser) ou **tira** (não volta). Membro **denuncia** para quem conduz. Com 2 denúncias, a resposta fica oculta até quem conduz decidir. Quem conduz também **fecha** a conversa de um dia. | O mesmo desenho que o pedido de oração já tem, mais o que faltava para uma conversa: ocultar sem apagar e fechar o dia. |
-| D7 | A resposta tirada por quem conduz some para todos na hora, mas o texto fica guardado, sem aparecer, até a limpeza de 30 dias. Resposta apagada pelo autor sai do banco na hora. Conferir. | Num caso de risco a um adolescente, a equipe precisa do texto que foi denunciado. Ninguém o vê pelo app. |
+| D6 | Moderação da conversa: quem conduz **oculta** (volta atrás quando quiser) ou **tira** (não volta). Membro **denuncia** para quem conduz. Com 2 denúncias, a resposta fica oculta até quem conduz decidir. Quem conduz também **fecha** a conversa de um dia. Adiada com a R4.1. | O mesmo desenho que o pedido de oração já tem, mais o que faltava para uma conversa: ocultar sem apagar e fechar o dia. |
+| D7 | A resposta tirada por quem conduz some para todos na hora, mas o texto fica guardado, sem aparecer, até a limpeza de 30 dias. Resposta apagada pelo autor sai do banco na hora. Adiada com a R4.1. | Num caso de risco a um adolescente, a equipe precisa do texto que foi denunciado. Ninguém o vê pelo app. |
 | D8 | As respostas da conversa ficam **30 dias** e são apagadas do banco. | Minimização. A conversa é sobre a leitura daquela semana. |
 | D9 | "Estou orando" é **um gesto por pessoa por pedido**, que se desfaz tocando de novo. Todos que veem o pedido veem **só quantos** estão orando. Ninguém vê quem, nem o autor. | Pedido do dono: "com contagem e sem lista de nomes, se isso proteger melhor". Sem nomes, ninguém é cobrado por não ter orado e ninguém compara quem orou. Hoje o autor vê os nomes de quem tocou em "Orei por você": isso sai. |
 | D10 | O pedido de oração marcado como respondido vai para **"Respondidas"**, visto por quem já via o pedido, até vencer. O pedido de ajuda resolvido continua sumindo como hoje. | É a parte da recomendação 12 que faltava. "Já resolvi" (carona, mudança) não é oração respondida. |
 | D11 | Atualizações: só o autor, até **5** por pedido, **200** caracteres cada. O texto do pedido continua sem edição. | Atualizar ("Fiz a prova hoje") sem mudar o que os outros já leram e oraram. |
 | D12 | O QR do encontro é o **link da célula com validade de 4 horas**, gerado só por quem conduz. Quem o lê cai no mesmo `/?celula=<token>` de hoje. | Reaproveita o fluxo de entrada inteiro. A validade curta evita que uma foto do código circule por 30 dias. |
-| D13 | Quem cria a conta pelo QR do encontro **não conta para os limiares de Semeadores** de quem mostrou o código. A pessoa nova continua recebendo a carta de Boas-vindas. A tela do QR mostra João 1.46 ("Venha e veja", a carta 3 de Semeadores) como legenda, sem prêmio. Conferir. | Pedido do dono: sem recompensa por volume de convites. Um líder que mostra o código para 40 pessoas num evento ganharia 4 cartas de uma vez. O convite pessoal (link) continua contando como hoje. |
+| D13 | Quem cria a conta pelo QR do encontro **não conta para os limiares de Semeadores** de quem mostrou o código. A pessoa nova continua recebendo a carta de Boas-vindas. A tela do QR mostra João 1.46 ("Venha e veja", a carta 3 de Semeadores) como legenda, sem prêmio. Decidida pelo dono (16/11). | Pedido do dono: sem recompensa por volume de convites. Um líder que mostra o código para 40 pessoas num evento ganharia 4 cartas de uma vez. O convite pessoal (link) continua contando como hoje. |
 | D14 | A tela da conversa vai para uma peça nova (`conversa`) e a aba Oração sai do index para outra peça (`oracao`). | Devolve folga ao index, que só fica com o cartão de entrada e as rotas. |
 
 ---
 
 ## 1. Quem vê e quem escreve
 
-### 1.1 Conversa do dia (R4.1)
+### 1.1 Conversa do dia (R4.1, adiada pelo dono)
 
 | Ação | Líder | Auxiliar | Membro | Visitante | Convidado | De fora (outra célula, administrador, quem saiu) |
 |---|---|---|---|---|---|---|
@@ -136,7 +151,7 @@ Contador de caracteres na tela só perto do limite (`CC.pertoDoLimite`), como no
 
 ## 3. Moderação
 
-### 3.1 Conversa: o que cada um pode fazer
+### 3.1 Conversa: o que cada um pode fazer (R4.1, adiada)
 
 - **Autor:** "Apagar" na própria resposta. Pergunta antes ("Apagar a resposta?"), e a linha sai do
   banco na hora, com as denúncias dela.
@@ -268,7 +283,7 @@ limites diários. O que sai:
 | Pedido de oração só para quem conduz | `pedidoConduz` | quem conduz | nada |
 | "Posso ajudar" num pedido de ajuda | `possoAjudar` | o autor | nada |
 | Denúncia de perigo num pedido | `denunciaPerigo` | quem conduz | nada |
-| Denúncia de perigo numa resposta da conversa | `denunciaPerigo`, com `onde: 'conversa'` | quem conduz | o texto e o endereço: "Uma resposta na conversa da célula precisa de atenção." / "Abra a conversa da célula para ver.", com o toque levando a `#/novidades/celula/<id>/conversa`. Mesmo tipo, mesma preferência, mesma regra de envio. Conferir. |
+| Denúncia de perigo numa resposta da conversa | `denunciaPerigo`, com `onde: 'conversa'` | quem conduz | o texto e o endereço: "Uma resposta na conversa da célula precisa de atenção." / "Abra a conversa da célula para ver.", com o toque levando a `#/novidades/celula/<id>/conversa`. Mesmo tipo, mesma preferência, mesma regra de envio. Adiado com a R4.1. |
 | Alguém entra na célula pelo QR | o aviso de entrada que já sai pelo link (`avisarEntradaNaCelula`) | como hoje | nada |
 
 Não sai aviso: a cada resposta, a cada pedido para a célula, a cada "Estou orando", a cada
@@ -284,15 +299,20 @@ da conversa não mandar push: quem conduz a vê em "Para rever" quando abre a c�
 
 A política sobe para a **versão 8**. Como responder, orar e entrar pelo QR são ações da própria
 pessoa, e nada passa a ser visto sem que ela escreva, a proposta é **avisar no app e não pedir um
-novo "sim"** (seção 15 da política). Conferir.
+novo "sim"** (seção 15 da política). Decidido pelo dono em 16/11: a política sobe para a versão 8
+só no que a R4.2 e a R4.3 mudam; as linhas da conversa ficam para quando ela voltar.
 
-Ponto para o dono decidir: o texto do consentimento diz que quem conduz a célula vê como a pessoa
+Decidido pelo dono em 16/11: o consentimento não muda. O que segue foi escrito para a conversa e só
+volta a valer com ela. O texto do consentimento diz que quem conduz a célula vê como a pessoa
 está caminhando, "nunca o que eu escrevo". Na conversa, quem conduz lê o que a pessoa escreve para a
 célula, como já lê o pedido de oração. A proposta é manter o texto e deixar claro na política que
 "o que eu escrevo" são as reflexões, orações e anotações pessoais. Se o dono quiser mudar a frase,
 `CONSENTIMENTO_VERSAO` sobe para 4 e todos concordam de novo.
 
 **Mudanças por seção:**
+
+As linhas abaixo que falam da conversa (seções 2, 3, 4, 5, 6 e 14) ficam adiadas com a R4.1. Na
+seção 2, "o app não tem chat" continua verdade e não muda.
 
 - **2. Idade mínima e adolescentes:** "o app não tem chat" passa a "o app não tem conversa privada
   entre pessoas. A conversa do dia da célula é só entre os membros, todos leem todas as respostas,
@@ -341,13 +361,15 @@ R4.2, o QR no R4.3. A versão 8 nasce no R4.1 e ganha "ajuste" nos seguintes.
 
 ## 8. Banco
 
-Três migrações, uma por item. Cada uma funciona num banco antigo (o `teste-db` sobe de um banco v8 e
+Uma migração por item. Com a conversa adiada (16/11), a ordem é: **v27** a lista de oração (8.2),
+**v28** o QR do encontro (8.3) e a conversa na próxima versão livre quando voltar (8.1). Cada uma
+funciona num banco antigo (o `teste-db` sobe de um banco v8 e
 de um v26) e usa `IF NOT EXISTS` nas tabelas novas, como a v25 e a v26.
 
-### 8.1 v27 (R4.1): a conversa
+### 8.1 A conversa (R4.1, adiada; ganha a próxima versão livre quando voltar)
 
 ```sql
--- v27: a conversa do dia da célula (docs/r4-celula.md). Uma pergunta por dia do plano, respostas
+-- vNN: a conversa do dia da célula (docs/r4-celula.md). Uma pergunta por dia do plano, respostas
 -- curtas dos membros. Fora da foto em memória, como celula_estudos: lida e gravada direto.
 -- conversa_dias guarda a pergunta que as pessoas leram e se quem conduz fechou o dia.
 CREATE TABLE IF NOT EXISTS conversa_dias (
@@ -382,10 +404,10 @@ CREATE TABLE IF NOT EXISTS conversa_denuncias (
   moderado_por = ?` e `UPDATE conversa_dias SET fechada_por = '' WHERE fechada_por = ?`. Cada passo
   só roda se a tabela existir (backup antigo).
 
-### 8.2 v28 (R4.2): a lista de oração
+### 8.2 v27 (R4.2): a lista de oração
 
 ```sql
--- v28: a lista de oração da célula (docs/r4-celula.md, R4.2). O pedido respondido guarda quando
+-- v27: a lista de oração da célula (docs/r4-celula.md, R4.2). O pedido respondido guarda quando
 -- foi respondido e passa a ficar em "Respondidas" até vencer. "Estou orando" é o gesto 'orando',
 -- um por pessoa por pedido, em pedido_gestos; os 'orei' de antes viram 'orando' (um por pessoa).
 -- As atualizações do autor ficam em tabela própria, na ordem em que foram escritas.
@@ -404,15 +426,15 @@ CREATE TABLE IF NOT EXISTS pedido_atualizacoes (
   `respondido_em` e as atualizações, senão a primeira gravação por outro motivo zera a coluna
   (`docs/aprendizados.md`, 2026-10-17 e 2026-10-18). O `teste.mjs` relê o banco depois de gravar
   outra coisa.
-- O respondido de antes da v28 tinha o vencimento encurtado para 7 dias depois da marca: a
+- O respondido de antes da v27 tinha o vencimento encurtado para 7 dias depois da marca: a
   `respondido_em` dele é deduzida daí, e ele fica em "Respondidas" até esse vencimento.
 - `apagarPessoaDoBanco` ganha `pedido_atualizacoes` dos pedidos da pessoa (antes de apagar os
   pedidos).
 
-### 8.3 v29 (R4.3): o QR do encontro
+### 8.3 v28 (R4.3): o QR do encontro
 
 ```sql
--- v29: quem entrou pelo QR do encontro (docs/r4-celula.md, R4.3). A conta nova continua sendo
+-- v28: quem entrou pelo QR do encontro (docs/r4-celula.md, R4.3). A conta nova continua sendo
 -- "convidada" (carta de Boas-vindas), mas não conta para os limiares de Semeadores de quem mostrou
 -- o código (D13).
 ALTER TABLE convites_aceites ADD COLUMN encontro INTEGER NOT NULL DEFAULT 0;
@@ -430,7 +452,7 @@ ALTER TABLE convites_aceites ADD COLUMN encontro INTEGER NOT NULL DEFAULT 0;
 As rotas de leitura ficam fora de `/api/celula/`, porque todo GET nesse prefixo é lido como link
 de convite (`docs/aprendizados.md`, 2026-10-18).
 
-### 9.1 R4.1: `GET /api/conversa?celula=<id>[&dia=<n>]`
+### 9.1 R4.1 (adiada): `GET /api/conversa?celula=<id>[&dia=<n>]`
 
 Sem `dia`, o dia da célula. Com `dia`, um dos 7 abertos ou um anterior que ainda tenha resposta.
 
@@ -464,7 +486,7 @@ Erros: 404 célula não encontrada (não existe, encerrada ou a pessoa não est�
 convidado; 400 dia fora do que existe; 404 dia sem pergunta (`diaDaCelula` 0: o líder ainda não leu
 nada).
 
-### 9.2 R4.1: `POST /api/conversa`
+### 9.2 R4.1 (adiada): `POST /api/conversa`
 
 | Ação | Corpo | O que faz | Erros |
 |---|---|---|---|
@@ -529,7 +551,7 @@ POST, ações novas e trocadas:
 
 `pedidoVisivelPara` muda uma linha: o respondido deixa de sumir para os outros.
 
-### 9.4 Painel da administração (R4.1 e R4.2)
+### 9.4 Painel da administração (R4.2; os números da conversa ficam com a R4.1)
 
 `painel.mjs`, bloco "Células e cuidado", só números: células com resposta na conversa nos últimos 7
 dias; respostas nos últimos 7 dias; respostas com denúncia aberta; pedidos de oração respondidos nos
@@ -561,7 +583,7 @@ Peças sob demanda novas: `conversa` (R4.1) e `oracao` (R4.2), em `NOMES_PECAS`,
 pelas folhas de quem conduz) e usa `CC.qr` (peça `qrcode`). No index ficam o cartão de entrada da
 conversa, as rotas e a troca da aba Oração por uma casca que pede a peça.
 
-### 10.1 R4.1: a conversa
+### 10.1 R4.1: a conversa (adiada pelo dono)
 
 **Rotas:** `#/novidades/celula/<id>/conversa` (o dia da célula) e `…/conversa/<dia>`. Tela própria,
 sem as abas, com "Voltar" para a aba Hoje (como o preparo do estudo). Visitante e convidado que
@@ -737,7 +759,7 @@ aba Hoje para membro e não para visitante, a conversa com respostas, oculta e "
 filtro na tela, a aba Oração com contagem, atualizações e Respondidas, a tela do QR com o código
 desenhado e a hora do vencimento.
 
-**`teste-db`:** sobe um banco v8 e um v26 até a v27, v28 e v29; confere tabelas, índices, colunas e a
+**`teste-db`:** sobe um banco v8 e um v26 até a v27 e a v28; confere tabelas, índices, colunas e a
 conversão dos `orei`; `apagarPessoaDoBanco` num backup v26 (sem as tabelas novas) não falha.
 
 **`teste-sob-demanda`:** as peças `conversa` e `oracao` fora do index; a folga do index continua acima
