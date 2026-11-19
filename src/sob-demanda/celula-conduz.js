@@ -390,6 +390,76 @@
     });
   }
 
-  return { toque: folhaToqueEmQuemFalta, multiplicar: folhaMultiplicar, recado: folhaRecado, encontro: folhaEncontro, registrar: folhaRegistrarEncontro };
+  // ---------- o QR do encontro (R4.3, docs/r4-celula.md) ----------
+  // Tela própria (…/qr), sem as abas, com fundo branco também no tema escuro: a câmera de quem está
+  // no encontro precisa de contraste. O código é o link da célula com validade de 4 horas, gerado
+  // pelo servidor só para quem conduz; quem o lê cai no fluxo de entrada de sempre. A legenda é João
+  // 1.46 ("Venha e veja", da carta 3 de Semeadores), com o texto da NBV tirado da Bíblia do app.
+  // Entrar pelo QR não conta para Semeadores (decisão do dono, 16/11), e a tela não mostra
+  // contagem de quem entrou.
+  const VERSO_QR = 'João 1.46';
+  const MEIA_HORA = 30 * 60 * 1000;
+  const horaDe = (iso) => { const d = new Date(iso); return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0'); };
+  const comoCelula = (t) => (/^c[ée]lula(\s|$)/i.test(t) ? t : 'célula ' + t);
+  function telaQr(raiz, p, aindaAqui, voltar) {
+    let travaTela = null;
+    let relogio = 0;
+    const soltar = () => {
+      clearInterval(relogio);
+      if (travaTela) { travaTela.release().catch(() => {}); travaTela = null; }
+    };
+    raiz.innerHTML = '<div class="qr-encontro" data-celula="' + CC.esc(p.id) + '">'
+      + '<h1>Entre na ' + CC.esc(comoCelula(p.titulo)) + '</h1>'
+      + '<div class="qr-encontro-codigo" data-qr-lugar>' + CC.esqueleto('cartoes') + '</div>'
+      + '<p class="qr-encontro-dica">Aponte a câmera do celular para o código.</p>'
+      + '<p class="qr-encontro-vale" data-qr-vale></p>'
+      + '<figure class="qr-encontro-verso" data-qr-verso hidden><blockquote></blockquote><figcaption>' + VERSO_QR + '</figcaption></figure>'
+      + '<div class="acoes"><button class="botao plano pequeno" data-qr-outro hidden>Gerar outro código</button>'
+      + '<button class="botao contorno" data-qr-fechar>Fechar</button></div></div>';
+    const el = (sel) => raiz.querySelector(sel);
+    el('[data-qr-fechar]').onclick = () => { soltar(); voltar(); };
+    CC.textoDoVersiculo(VERSO_QR, 'nbv').then((t) => {
+      if (!t || !aindaAqui()) return;
+      el('[data-qr-verso] blockquote').textContent = t;
+      el('[data-qr-verso]').hidden = false;
+    }, () => {});
+    // a tela do celular não apaga enquanto o código está à mostra, quando o navegador deixa
+    if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request('screen').then((t) => { travaTela = t; }, () => {});
+    let vence = 0;
+    const conferirHora = () => {
+      if (!aindaAqui() || !el('[data-qr-vale]')) { soltar(); return; }
+      const falta = vence - Date.now();
+      el('[data-qr-outro]').hidden = !(vence && falta < MEIA_HORA);
+      if (vence && falta <= 0) {
+        el('[data-qr-lugar]').classList.add('vencido');
+        el('[data-qr-vale]').textContent = 'Este código venceu.';
+      }
+    };
+    const gerar = async () => {
+      el('[data-qr-lugar]').classList.remove('vencido');
+      el('[data-qr-lugar]').innerHTML = CC.esqueleto('cartoes');
+      el('[data-qr-vale]').textContent = '';
+      let r;
+      try {
+        r = await CC.api('api/celula', { acao: 'qrEncontro', id: p.id });
+      } catch (e) {
+        if (!aindaAqui()) return;
+        el('[data-qr-lugar]').innerHTML = '<p class="erro-proposito">' + CC.esc(e.message) + '</p>';
+        el('[data-qr-outro]').hidden = false;
+        return;
+      }
+      if (!aindaAqui()) return;
+      vence = Date.parse(r.venceEm);
+      el('[data-qr-lugar]').innerHTML = CC.qr(r.link, 'QR Code de entrada na célula');
+      el('[data-qr-lugar]').dataset.link = r.link;
+      el('[data-qr-vale]').textContent = 'Vale até ' + horaDe(r.venceEm) + '.';
+      conferirHora();
+    };
+    el('[data-qr-outro]').onclick = gerar;
+    relogio = setInterval(conferirHora, 30000);
+    gerar();
+  }
+
+  return { toque: folhaToqueEmQuemFalta, multiplicar: folhaMultiplicar, recado: folhaRecado, encontro: folhaEncontro, registrar: folhaRegistrarEncontro, qr: telaQr };
   };
 })(window.CC);

@@ -102,3 +102,50 @@ Resultados (19/11): `teste.mjs` 1683 checagens, todas passaram; `teste-r4` 98 ok
 teste-barra-abas, teste-redesenho, teste-sob-demanda, teste-offline, teste-volta, teste-celula,
 teste-celula-botoes, teste-conta, teste-conta-gerir, teste-db, teste-cuidado e teste-rolagem sem
 falha.
+
+## R4.3 · QR do encontro
+
+**O que mudou para quem usa.**
+- Quem conduz (líder e auxiliar) tem, na aba Hoje, "Mostrar o QR do encontro". O botão abre uma
+  tela própria (`#/novidades/celula/<id>/qr`, sem as abas) com fundo branco também no tema escuro:
+  "Entre na <célula>", o código grande, "Aponte a câmera do celular para o código.", "Vale até
+  HH:MM." e a legenda de João 1.46 ("Venha e veja", a carta 3 de Semeadores), com o texto da NBV
+  tirado da Bíblia do app. "Gerar outro código" aparece quando falta menos de meia hora ou o código
+  venceu. A tela pede para o celular não apagar (`navigator.wakeLock`) e não se redesenha na
+  sincronização, para o código não piscar.
+- Quem aponta a câmera cai no fluxo de entrada de sempre (`/?celula=<token>`): entrar ou só
+  conhecer, criar conta ou entrar. A frase de abertura passa a dizer "<Nome> te chamou para a
+  <célula>, no encontro de hoje." O link vencido pede para mostrar o código de novo.
+- **Não conta para Semeadores** (decisão do dono): quem cria a conta pelo QR continua recebendo a
+  carta de Boas-vindas, mas não entra na conta de Semeadores de quem mostrou o código. O link
+  pessoal de 30 dias continua contando. A tela não mostra contagem de quem entrou.
+
+**Servidor.**
+- `contas.mjs`: `gerarQrEncontro` (o link da célula com `q: 1` e validade de 4 horas,
+  `VALIDADE_QR_ENCONTRO`; só quem conduz, célula com a liderança aprovada; quem não é da célula
+  recebe 404). `lerLinkCelula` devolve `encontro`; `entrarNaCelula` passa a marca para
+  `usarConvite`, que a grava no aceite; `semeadorDe` não conta o aceite marcado. "Cancelar meus
+  convites" também vence o QR (a assinatura usa o mesmo selo).
+- `servidor.mjs`: ação `qrEncontro` em `/api/celula` (10 por minuto) e `encontro` no
+  `GET /api/celula/<token>`.
+- `db.mjs`, **v28**: tabela `convites_encontro (de, para)`, e não coluna em `convites_aceites`, para
+  a migração valer num banco antigo de ensaio sem essa tabela. `apagarPessoaDoBanco` a limpa.
+
+**Diferenças em relação à especificação.** O botão fica na aba Hoje de quem conduz em qualquer dia
+(a especificação punha fora do dia do encontro numa folha "Mais", que a célula não tem). A marca do
+QR mora em tabela própria (acima).
+
+**Política.** Ajuste da versão 8: o QR do encontro em "de onde a conta veio" (seção 3) e em "Quem
+não tem conta" (seção 7, leva ao mesmo link e vale 4 horas).
+
+**Testes.** `teste.mjs`, seção "QR do encontro": só quem conduz gera, 4 horas, a marca no link,
+Semeadores sem o QR e com o link, Boas-vindas mantida, cancelar vence, o banco relido guarda a
+marca; a política. `teste-db`: a v28 num banco de ensaio sem `convites_aceites` e a limpeza.
+`teste-r4` ganhou a parte R4.3: segurança no servidor (membro e visitante 403, de fora 404), a
+página de entrada, o botão só para quem conduz, a tela com o código, a hora, o versículo e o fundo
+branco nos dois temas. Capturas em `r4-capturas/R4.3/`.
+
+Resultados (19/11): `teste.mjs` 1693 checagens, todas passaram; `teste-r4` 144 ok (R4.2 e R4.3);
+teste-navegacao, teste-barra-abas, teste-redesenho, teste-sob-demanda, teste-offline, teste-volta,
+teste-celula, teste-celula-botoes, teste-conta, teste-conta-gerir, teste-db, teste-cuidado,
+teste-rolagem, teste-convites e teste-fluxo-entrada sem falha. Folga do index: 73,7 KB.

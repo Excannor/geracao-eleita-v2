@@ -1451,7 +1451,7 @@ const servidor = createServer(async (req, res) => {
     if (rota.startsWith('/api/celula/') && req.method === 'GET') {
       const link = CONTAS.lerLinkCelula(rota.slice('/api/celula/'.length), assinar);
       if (!link) { json(res, 410, { erro: 'esse link de célula venceu ou foi cancelado' }); return; }
-      json(res, 200, { usuario: link.de, nome: link.nome, titulo: link.titulo, pessoas: link.pessoas, limite: link.limite, vagas: link.vagas });
+      json(res, 200, { usuario: link.de, nome: link.nome, titulo: link.titulo, pessoas: link.pessoas, limite: link.limite, vagas: link.vagas, encontro: !!link.encontro });
       return;
     }
 
@@ -2078,6 +2078,12 @@ const servidor = createServer(async (req, res) => {
           const gerado = CONTAS.gerarLinkCelula(eu, id, assinar);
           const origem = enderecoPublico(req);
           return { link: origem + '/?celula=' + gerado.token, venceEm: gerado.venceEm };
+        }
+        // R4.3: o QR do encontro, só para quem conduz, com validade de 4 horas
+        if (qual === 'qrEncontro') {
+          if (!dentroDoLimite('qr:' + eu, 10)) throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
+          const gerado = CONTAS.gerarQrEncontro(eu, id, assinar);
+          return { link: enderecoPublico(req) + '/?celula=' + gerado.token, venceEm: gerado.venceEm };
         }
         if (qual === 'entrar') {
           const r = await CONTAS.entrarNaCelula(eu, String(token || ''), assinar, hoje, Date.now(), { visitante: !!visitante });

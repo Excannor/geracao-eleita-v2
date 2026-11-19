@@ -1178,7 +1178,8 @@
     fetch('api/celula/' + encodeURIComponent(celula)).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
       if (!d) return;
       var nomeCelula = /^c[ée]lula(\s|$)/i.test(d.titulo) ? d.titulo : 'célula ' + d.titulo;
-      $('titulo-boas').textContent = d.nome + ' te chamou para a ' + nomeCelula + '!';
+      // R4.3: pelo QR do encontro, a frase diz que é o encontro de hoje
+      $('titulo-boas').textContent = d.nome + ' te chamou para a ' + nomeCelula + (d.encontro ? ', no encontro de hoje.' : '!');
       $('tela-boas').classList.add('lp-convidado');
       $('dica-boas').textContent = d.vagas > 0
         ? 'A Bíblia inteira em um ano, lendo junto com o grupo. Crie sua conta e você já entra na célula.'

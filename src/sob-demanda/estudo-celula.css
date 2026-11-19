@@ -267,3 +267,19 @@
 /* o botão da anotação é secundário: o principal da aba continua "Mandar no grupo" */
 .mesa-anotacao .escrever-contexto { background: var(--cartao); color: var(--tinta-forte); }
 .mesa-anotacao .escrever-contexto:hover { background: var(--campo); }
+
+/* O QR do encontro (R4.3, celula-conduz.js): tela própria, fundo branco nos dois temas para a câmera
+   ler, o código grande no meio e a legenda de João 1.46. */
+.qr-encontro { display: grid; justify-items: center; gap: 12px; min-height: 100vh; min-height: 100dvh; margin: 0 -16px; padding: 28px 16px 40px; background: #fff; color: #161616; text-align: center; }
+.qr-encontro h1 { margin: 0; font-size: 1.375rem; line-height: 1.25; color: #161616; }
+.qr-encontro-codigo { width: min(100%, 360px); }
+.qr-encontro-codigo .qr-convite { width: 100%; margin: 0; padding: 12px; box-shadow: 0 0 0 1px #d8d8d8; }
+.qr-encontro-codigo.vencido .qr-convite { opacity: .2; }
+.qr-encontro-dica { margin: 0; font-size: 1rem; font-weight: 700; color: #161616; }
+.qr-encontro-vale { margin: 0; min-height: 1.2em; font-size: .9375rem; font-weight: 700; color: #4d4d4d; }
+.qr-encontro-verso { max-width: 340px; margin: 6px 0 0; color: #4d4d4d; }
+.qr-encontro-verso blockquote { margin: 0; font-size: .9375rem; line-height: 1.45; }
+.qr-encontro-verso figcaption { margin-top: 4px; font-size: .8125rem; font-weight: 700; }
+.qr-encontro .acoes { width: min(100%, 360px); }
+.qr-encontro .botao.contorno { color: #161616; box-shadow: inset 0 0 0 2px #161616; background: transparent; }
+.qr-encontro .botao.plano { color: #161616; }

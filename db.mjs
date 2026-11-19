@@ -365,6 +365,14 @@ const ESQUEMA = [
   CREATE TABLE IF NOT EXISTS pedido_atualizacoes (pedido TEXT NOT NULL, ordem INTEGER NOT NULL, texto TEXT NOT NULL, em TEXT NOT NULL,
     PRIMARY KEY (pedido, ordem));
   `,
+  // v28: quem entrou pelo QR do encontro (R4.3, docs/r4-celula.md). A conta nova continua sendo
+  // "convidada" (carta de Boas-vindas), mas não conta para os limiares de Semeadores de quem mostrou
+  // o código (decisão do dono, 16/11): sem recompensa por volume de convites. Tabela própria, com a
+  // chave de convites_aceites (de, para), e não coluna nela: como a v25, a migração vale também num
+  // banco antigo de ensaio que não tem convites_aceites.
+  `
+  CREATE TABLE IF NOT EXISTS convites_encontro (de TEXT NOT NULL, para TEXT NOT NULL, PRIMARY KEY (de, para));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -528,6 +536,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['toques', 'DELETE FROM toques WHERE de = ? OR para = ?', [u, u]],
     ['toque_versos', 'DELETE FROM toque_versos WHERE de = ? OR para = ?', [u, u]],
     ['convites_aceites', 'DELETE FROM convites_aceites WHERE de = ? OR para = ?', [u, u]],
+    // a marca de quem entrou pelo QR do encontro (v28) anda com o aceite
+    ['convites_encontro', 'DELETE FROM convites_encontro WHERE de = ? OR para = ?', [u, u]],
     // a dupla (grupo = 0) é relação de duas pontas só: sai inteira, com os dias batidos; o grupo
     // e a célula ficam, só a pessoa sai deles (a mesma regra de Contas.apagar)
     ['proposito_dias', 'DELETE FROM proposito_dias WHERE proposito IN (SELECT p.id FROM propositos p JOIN proposito_membros m ON m.proposito = p.id WHERE p.grupo = 0 AND m.usuario = ?)', [u]],

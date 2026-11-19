@@ -137,6 +137,8 @@
     // guardado. Trocar de …/preparar/<base> para …/preparar (ou o contrário) é outro preparo, e
     // redesenha.
     if (pedida === 'preparar' && [...raiz.querySelectorAll('.mesa-preparo[data-celula]')].some((el) => el.dataset.celula === id && (el.dataset.deBase || '') === (alvo || ''))) return;
+    // O QR do encontro (R4.3) já na tela não se redesenha: o código não pode piscar diante da câmera.
+    if (pedida === 'qr' && [...raiz.querySelectorAll('.qr-encontro[data-celula]')].some((el) => el.dataset.celula === id)) return;
     const meu = ++desenhoCelula;
     const nestaTela = () => meu === desenhoCelula && location.hash.startsWith('#/novidades/celula/');
     // O preparo é montado uma vez por abertura: a resposta nova do servidor (ou a falha dela, sem
@@ -157,6 +159,14 @@
         if (preparoMontado) return;
         preparoMontado = true;
         abrirPreparo(raiz, p, () => meu === desenhoCelula, alvo || '');
+        return;
+      }
+      // O QR do encontro (R4.3) é tela própria, sem as abas, e só de quem conduz.
+      if (pedida === 'qr') {
+        if (!p.euConduzo || p.celulaAguardando) { CC.substituirRota(enderecoCelula(p.id)); return; }
+        if (raiz.querySelector('.qr-encontro[data-celula]')) return;
+        raiz.innerHTML = CC.esqueleto('cartoes');
+        conduzir('qr', raiz, p, () => meu === desenhoCelula && location.hash === enderecoCelula(p.id, 'qr'), () => CC.substituirRota(enderecoCelula(p.id)));
         return;
       }
       const souLider = p.criadoPor === euUsuario();
@@ -266,6 +276,8 @@
       + (eu.papel !== 'visitante' && eu.estado === 'ativo' && p.encontro >= 0 && !p.celulaAguardando
         ? '<button class="botao contorno" data-convidar-encontro>' + CC.ico('compartilhar') + 'Convidar para o encontro</button>' : '')
       + (podeChamar && eu.estado === 'ativo' && !p.celulaAguardando ? '<button class="botao contorno pequeno" data-link-celula>' + CC.ico('compartilhar') + 'Mandar o link da célula</button>' : '')
+      // R4.3: o QR do encontro, para quem conduz mostrar no encontro
+      + (podeChamar && conduzo && !p.celulaAguardando && !p.aguardandoAprovacao ? '<button class="botao contorno pequeno" data-qr-encontro>' + CC.ico('qr') + 'Mostrar o QR do encontro</button>' : '')
       + (conduzo ? '<div class="pe-duplo-plano"><button class="botao plano pequeno" data-recado>' + (p.recado ? 'Mudar o recado' : 'Escrever um recado') + '</button>'
         + '<button class="botao plano pequeno" data-encontro>Dia do encontro</button></div>' : '')
       + '</div>';
@@ -276,6 +288,7 @@
     ligar('[data-ir-estudo]', () => CC.substituirRota(enderecoCelula(p.id, 'estudo')));
     ligar('[data-ir-preparar]', () => { location.hash = enderecoCelula(p.id, 'preparar'); });
     ligar('[data-link-celula]', () => folhaLinkCelula(p));
+    ligar('[data-qr-encontro]', () => { location.hash = enderecoCelula(p.id, 'qr'); });
     ligar('[data-recado]', () => conduzir('recado', p));
     ligar('[data-encontro]', () => conduzir('encontro', p));
     ligar('[data-comeco-dia]', () => conduzir('encontro', p));
@@ -1285,13 +1298,13 @@
     try {
       info = await CC.api('api/celula/' + encodeURIComponent(token));
     } catch (e) {
-      CC.folha('<h2>Esse link de célula venceu</h2><p>Peça um novo para quem te chamou!</p>'
+      CC.folha('<h2>Esse link de célula venceu</h2><p>Peça um novo para quem te chamou. Se foi o código do encontro, peça para mostrar de novo.</p>'
         + '<div class="acoes"><button class="botao" data-fechar>Entendi</button></div>',
       { ligar: (folha, fechar) => { folha.querySelector('[data-fechar]').onclick = fechar; } });
       return;
     }
     const dentro = info.usuario === euUsuario();
-    CC.folha('<h2>' + (dentro ? 'Esse é o link da sua célula' : CC.esc(info.nome) + ' te chamou para a ' + CC.esc(comoCelula(info.titulo)) + '!') + '</h2>'
+    CC.folha('<h2>' + (dentro ? 'Esse é o link da sua célula' : CC.esc(info.nome) + ' te chamou para a ' + CC.esc(comoCelula(info.titulo)) + (info.encontro ? ', no encontro de hoje.' : '!')) + '</h2>'
       + '<p>' + CC.plural(info.pessoas, 'pessoa', 'pessoas') + ' lendo o plano juntos'
       + (info.vagas > 0 ? ' · ' + CC.plural(info.vagas, 'vaga', 'vagas') : ' · sem vagas') + '.</p>'
       + '<p class="recado-senha" id="recado" role="alert"></p>'

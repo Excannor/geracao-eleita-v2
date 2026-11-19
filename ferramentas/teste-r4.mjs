@@ -9,7 +9,9 @@
 // - a aba Oração (peça "oracao"): a contagem sem nomes, as atualizações, Respondidas, "Estou
 //   orando" que liga e desliga, o erro do filtro na folha, o "Tirar" de quem conduz, o texto
 //   escapado e nada passando da largura da tela.
-// Uso: node ferramentas/teste-r4.mjs   (PORTA=<n>; CHROME=<caminho>; CAPTURAS=<pasta>; PARTES=R4.2)
+// R4.3, o QR do encontro: só quem conduz gera; vale 4 horas; quem lê sem conta vê o nome da célula e
+// "no encontro de hoje"; a tela desenha o código em fundo branco, com a legenda de João 1.46 da NBV.
+// Uso: node ferramentas/teste-r4.mjs   (PORTA=<n>; CHROME=<caminho>; CAPTURAS=<pasta>; PARTES=R4.2,R4.3)
 import { spawn } from 'node:child_process';
 import { portaLivre, fecharArvore } from './navegador.mjs';
 import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -257,6 +259,70 @@ try {
       ok(await entrar(visita), 'o Vitor (visitante) abre o app');
       await av('location.hash = "#/novidades/celula/' + ID + '/oracao"; 1');
       ok(await esperar(q('.abas-celula'), 15000) && await av('!' + q('.abas-celula [data-aba="oracao"]') + ' && !' + q('.oracao-aba')), 'o visitante não tem a aba Oração, nem por link');
+    }
+  }
+
+  if (quer('R4.3')) {
+    for (const tema of ['claro', 'escuro']) {
+      await temaDe(tema);
+      const t = tema[0];
+      console.log('\n  R4.3 · QR do encontro: o servidor\n');
+      const lider = await conta('lq' + t, 'Lia', { nascimento: '1990-01-01' });
+      const ID = (await pedir('/api/celula', { acao: 'criar', titulo: 'Célula Oliveira' }, lider)).dado.proposito.id;
+      const link = (await pedir('/api/celula', { acao: 'link', id: ID }, lider)).dado.link;
+      const token = new URL(link).searchParams.get('celula');
+      const ana = await conta('aq' + t, 'Ana', { celula: token });
+      const visita = await conta('vq' + t, 'Vitor', { celula: token, visitante: true });
+      ok((await pedir('/api/celula', { acao: 'qrEncontro', id: ID }, ana)).status === 403, 'o membro não gera o QR do encontro (403)');
+      ok((await pedir('/api/celula', { acao: 'qrEncontro', id: ID }, visita)).status === 403, 'o visitante não gera o QR do encontro (403)');
+      const fora = await conta('fq' + t, 'Fábio', { nascimento: '1990-01-01' });
+      ok((await pedir('/api/celula', { acao: 'qrEncontro', id: ID }, fora)).status === 404, 'quem é de fora não gera o QR (404)');
+      const qr = (await pedir('/api/celula', { acao: 'qrEncontro', id: ID }, lider)).dado;
+      const tokenQr = qr.link ? new URL(qr.link).searchParams.get('celula') : '';
+      const horas = (Date.parse(qr.venceEm) - Date.now()) / 3600000;
+      ok(tokenQr && horas > 3.9 && horas <= 4, 'quem conduz gera o QR, que vale 4 horas (' + horas.toFixed(2) + ' h)');
+      const info = (await pedir('/api/celula/' + encodeURIComponent(tokenQr))).dado;
+      ok(info.encontro === true && info.titulo === 'Célula Oliveira' && !('membros' in info), 'quem abre o QR sem conta vê o nome da célula e a marca do encontro, sem os membros');
+      ok((await pedir('/api/celula/' + encodeURIComponent(token))).dado.encontro === false, 'o link de 30 dias continua sem a marca');
+      const nova = await conta('nq' + t, 'Nina', { celula: tokenQr });
+      const daNina = ((await pedir('/api/propositos', null, nova)).dado.propositos || []).find((x) => x.id === ID);
+      ok(daNina && !daNina.euConvidado, 'quem cria a conta pelo QR entra na célula pelo fluxo de sempre');
+
+      console.log('\n  R4.3 · a tela do QR\n');
+      // quem lê o código, sem conta: a página de entrada diz que é o encontro de hoje
+      await cmd('Network.clearBrowserCookies');
+      await cmd('Page.navigate', { url: base + '/entrar.html?celula=' + encodeURIComponent(tokenQr) });
+      ok(await esperar('/no encontro de hoje\\./.test((' + q('#titulo-boas') + ' || {}).textContent || "")', 10000), 'a página de entrada diz "Lia te chamou para a Célula Oliveira, no encontro de hoje."');
+      await capturar('r4.3-entrada-' + tema);
+      ok(await entrar(ana), 'a Ana (membro) abre o app');
+      await av('location.hash = "#/novidades/celula/' + ID + '"; 1');
+      ok(await esperar(q('.painel-celula [data-link-celula]'), 15000) && await av('!' + q('[data-qr-encontro]')), 'o membro não tem o botão do QR do encontro');
+      ok(await entrar(lider), 'a Lia (líder) abre o app');
+      await av('location.hash = "#/novidades/celula/' + ID + '"; 1');
+      ok(await esperar(q('.painel-celula [data-qr-encontro]'), 15000), 'quem conduz tem "Mostrar o QR do encontro" na aba Hoje');
+      await av(q('[data-qr-encontro]') + '.scrollIntoView({ block: "center" }); 1');
+      await capturar('r4.3-botao-' + tema);
+      await av(q('[data-qr-encontro]') + '.click(); 1');
+      ok(await esperar(q('.qr-encontro [data-qr-feito] svg'), 15000), 'a tela do QR desenha o código');
+      const tela = await texto('.qr-encontro');
+      ok(/Entre na Célula Oliveira/.test(tela) && /Aponte a câmera do celular para o código\./.test(tela) && /Vale até \d\d:\d\d\./.test(tela), 'a tela diz onde entra, o que fazer e até que horas vale (' + tela.replace(/\n/g, ' / ').slice(0, 160) + ')');
+      ok(await esperar('!' + q('[data-qr-verso]') + '.hidden && /João 1\\.46/.test(' + q('[data-qr-verso]') + '.innerText)', 8000)
+        && await av('(' + q('[data-qr-verso] blockquote') + '.textContent || "").length > 20'), 'a legenda de João 1.46 vem da Bíblia do app');
+      ok(await av('getComputedStyle(' + q('.qr-encontro') + ').backgroundColor === "rgb(255, 255, 255)"'), 'o fundo da tela é branco, também no tema ' + tema);
+      ok(await av('decodeURIComponent(' + q('.qr-encontro [data-qr-lugar]') + '.dataset.link).includes("?celula=")'), 'o código leva ao link da célula');
+      // o versículo é o texto da NBV, palavra por palavra ("Nazaré!"): o tom pedido vale para o resto da tela
+      const semVerso = await av('(() => { const c = ' + q('.qr-encontro') + '.cloneNode(true); c.querySelector("blockquote").remove(); return c.innerText; })()');
+      ok(semExagero(semVerso), 'os textos da tela, fora o versículo, não têm exclamação, travessão nem exagero');
+      ok(await av('document.documentElement.scrollWidth <= 390'), 'nada passa da largura da tela');
+      ok(!/Semead|amigos|convidou/i.test(tela), 'a tela não mostra contagem de quem entrou nem fala de Semeadores');
+      await capturar('r4.3-qr-' + tema, true);
+      await av(q('[data-qr-fechar]') + '.click(); 1');
+      ok(await esperar('location.hash === "#/novidades/celula/' + ID + '" && !' + q('.qr-encontro'), 8000), '"Fechar" volta para a célula');
+      await av('location.hash = "#/novidades/celula/' + ID + '/qr"; 1');
+      await esperar(q('.qr-encontro'), 8000);
+      ok(await entrar(ana), 'a Ana abre o app de novo');
+      await av('location.hash = "#/novidades/celula/' + ID + '/qr"; 1');
+      ok(await esperar('location.hash === "#/novidades/celula/' + ID + '"', 15000) && await av('!' + q('.qr-encontro')), 'o membro que abre o endereço do QR volta para a célula');
     }
   }
 } catch (e) {

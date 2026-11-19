@@ -43,6 +43,8 @@ const senhaLonga = (senha) => String(senha || '').length > SENHA_MAX;
 export const LIMITE_ACEITES_HORA = 30;
 export const LIMITE_TOQUES_DIA = 5;
 export const VALIDADE_CONVITE = 30 * 24 * 60 * 60 * 1000;
+// O QR do encontro (R4.3) vale 4 horas: o tempo de um encontro, sem a foto do código circular por um mês.
+export const VALIDADE_QR_ENCONTRO = 4 * 60 * 60 * 1000;
 
 // ---------- cartas que só o servidor confirma (docs/cartas.md, seções 2 e 3) ----------
 // Semeadores: uma carta por limiar de amigos que vieram pelo convite (conta nova pelo link e
@@ -247,6 +249,8 @@ function paraLinhas(d) {
     { tabela: 'convites_aceites', chaves: ['de', 'para'], linhas: (d.convitesAceites || []).map((x) => ({
       convite: x.convite, de: x.de, para: x.para, em: x.em, conta_nova: x.contaNova ? 1 : 0, ativado_em: x.ativadoEm || '',
     })) },
+    // quem entrou pelo QR do encontro (v28): a mesma chave do aceite
+    { tabela: 'convites_encontro', chaves: ['de', 'para'], linhas: (d.convitesAceites || []).filter((x) => x.encontro).map((x) => ({ de: x.de, para: x.para })) },
     { tabela: 'propositos', chaves: ['id'], linhas: Object.values(d.propositos || {}).map((p) => ({
       id: p.id, tipo: p.tipo, alvo: p.alvo || '', titulo: p.titulo || '', criado_por: p.criadoPor, criado_em: p.criadoEm,
       encerrado_em: p.encerradoEm || '', grupo: p.grupo ? 1 : 0, celula: p.celula ? 1 : 0,
@@ -313,6 +317,7 @@ function lerTabelas(db) {
     toqueVersos: lerTabela(db, 'toque_versos', ['de', 'para']),
     denuncias: lerTabela(db, 'denuncias', ['ordem'], 'ordem'),
     aceites: lerTabela(db, 'convites_aceites', ['de', 'para'], 'em'),
+    aceitesEncontro: lerTabela(db, 'convites_encontro', ['de', 'para']),
     propositos: lerTabela(db, 'propositos', ['id'], 'criado_em'),
     membros: lerTabela(db, 'proposito_membros', ['proposito', 'usuario']),
     liderancas: lerTabela(db, 'liderancas', ['proposito', 'usuario', 'papel'], 'pedido_em'),
@@ -351,6 +356,7 @@ function deLinhas(t, versao) {
   d.denuncias = t.denuncias.map((l) => ({ de: l.de, contra: l.contra, motivo: l.motivo, em: l.em }));
   d.convitesAceites = (t.aceites || []).map((l) => ({
     convite: l.convite, de: l.de, para: l.para, em: l.em, contaNova: !!l.conta_nova, ativadoEm: l.ativado_em || '',
+    encontro: (t.aceitesEncontro || []).some((e) => e.de === l.de && e.para === l.para),
   }));
   for (const l of t.propositos || []) {
     d.propositos[l.id] = {
@@ -982,7 +988,9 @@ export class Contas {
 
   // O link vale para quantas pessoas quiserem, por 30 dias, até quem convidou cancelar. Cada
   // aceite fica anotado, e é daí que sai a Trilha do Semeador.
-  async usarConvite(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false, semDupla = false } = {}) {
+  // encontro: a pessoa entrou pelo QR do encontro (R4.3); o aceite fica marcado e não conta para
+  // os limiares de Semeadores de quem mostrou o código.
+  async usarConvite(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false, semDupla = false, encontro = false } = {}) {
     const convite = this.lerConvite(token, assinar, agora);
     if (!convite) throw erro('esse convite venceu ou foi cancelado', 410);
     const a = this.exigirCompleto(eu);
@@ -994,7 +1002,7 @@ export class Contas {
     if (!aceites.some((x) => x.de === convite.de && x.para === a.usuario)) {
       // Conta como pessoa trazida para o app só quem criou a conta pelo link, e uma vez só.
       const nova = contaNova && !a.convidadoPor;
-      aceites.push({ convite: convite.nonce, de: convite.de, para: a.usuario, em: new Date(agora).toISOString(), contaNova: nova, ativadoEm: '' });
+      aceites.push({ convite: convite.nonce, de: convite.de, para: a.usuario, em: new Date(agora).toISOString(), contaNova: nova, ativadoEm: '', encontro: !!encontro });
       if (nova) a.convidadoPor = convite.de;
     }
     // Convite "conhecer" numa conta nova sem caminho ainda: ela entra nos 14 dias, e quem
@@ -1127,10 +1135,11 @@ export class Contas {
   }
 
   // Quantas pessoas vieram pelo convite desta conta: conta nova, primeira lição feita e conta
-  // que ainda existe. É o número da Trilha do Semeador.
+  // que ainda existe. É o número da Trilha do Semeador. Quem entrou pelo QR do encontro (R4.3) não
+  // conta: mostrar o código para muita gente de uma vez não dá carta.
   semeadorDe(usuario) {
     const u = limparNome(usuario);
-    return (this.dados.convitesAceites || []).filter((x) => x.de === u && x.contaNova && x.ativadoEm && this.achar(x.para)).length;
+    return (this.dados.convitesAceites || []).filter((x) => x.de === u && x.contaNova && x.ativadoEm && !x.encontro && this.achar(x.para)).length;
   }
 
   // As chaves das fontes de carta que só o servidor sabe: os limiares de Semeadores alcançados,
@@ -1312,6 +1321,20 @@ export class Contas {
     return { token: carga + '.' + assinar('celula.' + carga + '.' + a.seloConvite), venceEm: new Date(agora + VALIDADE_CONVITE).toISOString() };
   }
 
+  // O QR do encontro (R4.3, docs/r4-celula.md): o mesmo link da célula, com validade de 4 horas e a
+  // marca q = 1. Só quem conduz mostra; a célula precisa ter a liderança aprovada.
+  gerarQrEncontro(eu, id, assinar, agora = Date.now()) {
+    // quem não é da célula não descobre que ela existe (404)
+    const daCelula = this.proposito(id);
+    if (!daCelula || !this.ativosDe(daCelula).some((m) => m.usuario === limparNome(eu))) throw erro('célula não encontrada', 404);
+    const p = this.celulaDeQuemConduz(eu, id);
+    if (aprovacaoQueFalta(p, p.criadoPor, 'lider')) throw erro('a célula está aguardando aprovação da liderança', 403);
+    const a = this.achar(eu);
+    const vence = agora + VALIDADE_QR_ENCONTRO;
+    const carga = Buffer.from(JSON.stringify({ p: p.id, d: a.usuario, v: vence, q: 1 })).toString('base64url');
+    return { token: carga + '.' + assinar('celula.' + carga + '.' + a.seloConvite), venceEm: new Date(vence).toISOString() };
+  }
+
   lerLinkCelula(token, assinar, agora = Date.now()) {
     const [carga, firma, sobra] = String(token || '').split('.');
     if (!carga || !firma || sobra !== undefined) return null;
@@ -1325,7 +1348,7 @@ export class Contas {
     // Quem só está conhecendo (visitante) não ocupa vaga de membro: as vagas do link são só
     // as dos 20 lugares de membro, mesmo que a célula já tenha visitantes dentro.
     const pessoas = this.presentes(p).filter((m) => m.papel !== 'visitante').length;
-    return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, limite: limiteDo(p), vagas: Math.max(0, limiteDo(p) - pessoas) };
+    return { proposito: p, de: dono.usuario, nome: dono.nome, titulo: p.titulo, pessoas, limite: limiteDo(p), vagas: Math.max(0, limiteDo(p) - pessoas), encontro: dado.q === 1 };
   }
 
   async entrarNaCelula(eu, token, assinar, hoje, agora = Date.now(), { contaNova = false, visitante = false } = {}) {
@@ -1349,7 +1372,7 @@ export class Contas {
     let amizadeNova = false;
     if (link.de !== a.usuario && this.relacao(a.usuario, link.de) !== 'amigos') {
       const convite = this.gerarConvite(link.de, assinar, agora);
-      const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova, semDupla: true });
+      const usado = await this.usarConvite(a.usuario, convite.token, assinar, hoje, agora, { contaNova, semDupla: true, encontro: link.encontro });
       amizadeNova = !usado.ja;
     }
     const papel = visitante ? 'visitante' : '';

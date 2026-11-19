@@ -3115,6 +3115,8 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   checar(/<tr><td>Pedido de oração ou de ajuda<\/td><td>[^<]*só o número\. Ninguém vê quem está orando, nem você\.[^<]*Respondidas/.test(pol) && !/Quem orou e quem pode ajudar, só você vê/.test(pol),
     'o quadro de quem vê: "Estou orando" só como número, ninguém vê quem; o respondido em Respondidas');
   checar(/telefone, e-mail, link, @ de rede social, endereço/.test(pol) && /tirar um pedido sem esperar denúncia/.test(pol), 'a política conta o filtro dos pedidos e o "Tirar" de quem conduz');
+  checar(historico.indexOf('<b>Ajuste da versão 8, 19 de novembro de 2026.</b>') > -1 && historico.indexOf('<b>Ajuste da versão 8,') < historico.indexOf('<b>Versão 8,')
+    && /O QR do encontro, que só quem conduz a célula mostra, leva ao mesmo link e vale por 4 horas\./.test(pol), 'a política conta o QR do encontro, num ajuste da versão 8');
   checar(/<tr><td>Se leu hoje<\/td><td>[^<]*"Mostrar na célula se eu li hoje"[^<]*quem conduz a célula continua vendo/.test(pol),
     'o quadro de quem vê: o "leu hoje" sai da célula se a pessoa desligar, e quem conduz continua vendo');
   // R3.3: o calendário da célula, só números somados, no quadro de quem vê e no histórico
@@ -3717,6 +3719,48 @@ secao('lista de oração da célula (R4.2, docs/r4-celula.md)');
   await co.apagarAtualizacao('ana', r.id, 2);
   co = await new Contas(arq).carregar();
   checar(co.pedido(r.id).atualizacoes.map((u) => u.ordem).join() === '1,3', 'apagar uma atualização tira só ela do banco');
+  fecharBanco(arquivoDoBanco(pasta));
+  rmSync(pasta, { recursive: true, force: true });
+}
+
+// =========================================================================
+secao('QR do encontro (R4.3, docs/r4-celula.md)');
+// =========================================================================
+{
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-teste-qr-'));
+  const arq = join(pasta, 'contas.json');
+  let cq = await new Contas(arq).carregar();
+  for (const u of ['lider', 'aux', 'ana', 'vera']) await cq.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '1990-01-01', consentimento: true });
+  const ID = (await cq.criarCelula('lider', { titulo: 'Videira' }, '2026-03-01')).id;
+  const link = cq.gerarLinkCelula('lider', ID, assinar).token;
+  for (const u of ['aux', 'ana']) await cq.entrarNaCelula(u, link, assinar, '2026-03-01');
+  await cq.entrarNaCelula('vera', link, assinar, '2026-03-01', Date.now(), { visitante: true });
+  await cq.definirAuxiliar('lider', ID, 'aux', true);
+  const falha = (f) => { try { f(); return ''; } catch (e) { return e.message + '|' + e.codigo; } };
+  checar(falha(() => cq.gerarQrEncontro('ana', ID, assinar)).endsWith('|403') && falha(() => cq.gerarQrEncontro('vera', ID, assinar)).endsWith('|403'),
+    'o membro e o visitante não geram o QR do encontro (403)');
+  const agora = Date.parse('2026-03-05T22:00:00Z');
+  const qr = cq.gerarQrEncontro('lider', ID, assinar, agora);
+  const qrAux = cq.gerarQrEncontro('aux', ID, assinar, agora);
+  checar(qr.venceEm === '2026-03-06T02:00:00.000Z' && !!qrAux.token, 'quem conduz (líder e auxiliar) gera o QR, que vale 4 horas');
+  checar(cq.lerLinkCelula(qr.token, assinar, agora).encontro === true && cq.lerLinkCelula(link, assinar).encontro === false, 'o QR é lido como link da célula, com a marca do encontro');
+  checar(cq.lerLinkCelula(qr.token, assinar, agora + 4 * 3600000 - 1) && !cq.lerLinkCelula(qr.token, assinar, agora + 4 * 3600000), 'depois de 4 horas o QR vence');
+  // uma conta nova pelo QR e outra pelo link: só a do link conta para Semeadores
+  await cq.criar({ usuario: 'novo', senha: '12345678', nome: 'Novo', email: 'novo@x.com', nascimento: '2010-01-01', consentimento: true });
+  await cq.criar({ usuario: 'outro', senha: '12345678', nome: 'Outro', email: 'outro@x.com', nascimento: '2010-01-01', consentimento: true });
+  await cq.entrarNaCelula('novo', qr.token, assinar, '2026-03-05', agora, { contaNova: true });
+  await cq.entrarNaCelula('outro', link, assinar, '2026-03-05', agora, { contaNova: true });
+  await cq.ativarConvidado('novo');
+  await cq.ativarConvidado('outro');
+  checar(cq.proposito(ID).membros.some((m) => m.usuario === 'novo' && m.estado === 'ativo'), 'quem lê o QR entra na célula pelo fluxo de sempre');
+  checar(cq.semeadorDe('lider') === 1, 'para Semeadores, conta só quem veio pelo link (1), não quem entrou pelo QR do encontro');
+  checar(cq.cartasDoServidor('novo').chaves.includes('convidado'), 'quem entrou pelo QR continua recebendo a carta de Boas-vindas ("convidado")');
+  await cq.cancelarConvites('lider');
+  checar(!cq.lerLinkCelula(qr.token, assinar, agora), '"cancelar meus convites" também vence o QR');
+  await cq.definirRecado('lider', ID, 'Recado para gravar outra coisa', new Date(), { hoje: '2026-03-06' });
+  cq = await new Contas(arq).carregar();
+  checar(cq.semeadorDe('lider') === 1 && (cq.dados.convitesAceites || []).some((x) => x.para === 'novo' && x.encontro === true),
+    'o banco relido guarda a marca do QR (a armadilha do INSERT OR REPLACE)');
   fecharBanco(arquivoDoBanco(pasta));
   rmSync(pasta, { recursive: true, force: true });
 }

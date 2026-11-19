@@ -437,10 +437,14 @@ CREATE TABLE IF NOT EXISTS pedido_atualizacoes (
 -- v28: quem entrou pelo QR do encontro (docs/r4-celula.md, R4.3). A conta nova continua sendo
 -- "convidada" (carta de Boas-vindas), mas não conta para os limiares de Semeadores de quem mostrou
 -- o código (D13).
-ALTER TABLE convites_aceites ADD COLUMN encontro INTEGER NOT NULL DEFAULT 0;
+CREATE TABLE IF NOT EXISTS convites_encontro (de TEXT NOT NULL, para TEXT NOT NULL, PRIMARY KEY (de, para));
 ```
 
-- `convitesAceites` vive na foto em memória: `paraLinhas` e `deLinhas` levam `encontro`.
+- Feito (R4.3): tabela própria com a chave de `convites_aceites`, e não coluna nela. Como a v25, a
+  migração precisa valer num banco antigo de ensaio que não tem `convites_aceites` (o `teste-db`
+  quebrou com o `ALTER TABLE`).
+- `convitesAceites` vive na foto em memória: `paraLinhas` grava `convites_encontro` a partir do
+  campo `encontro` de cada aceite, e `deLinhas` o lê de volta.
 - `semeadorDe` passa a contar só `contaNova && ativadoEm && !encontro`.
 - O token do QR é o do link da célula com um campo a mais na carga (`q: 1`) e `v` de 4 horas,
   assinado do mesmo jeito. Nada guardado no banco para o token.

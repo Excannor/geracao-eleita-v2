@@ -482,7 +482,11 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
   dbV10.prepare("INSERT INTO pedido_atualizacoes (pedido, ordem, texto, em) VALUES ('r1', 1, 'fiz a prova', '2026-01-06')").run();
   dbV10.prepare("INSERT INTO pedidos (id, celula, autor, tipo, destino, texto, criado_em, vence_em) VALUES ('r3', 'p1', 'outra', 'oracao', 'celula', 'x', '2026-01-02', '2026-02-01')").run();
   dbV10.prepare("INSERT INTO pedido_atualizacoes (pedido, ordem, texto, em) VALUES ('r3', 1, 'da outra', '2026-01-06')").run();
+  // v28 (R4.3): a marca de quem entrou pelo QR do encontro, 0 em quem já estava
+  ok(B.versaoDoEsquema() >= 28 && colunasV27('convites_encontro').join() === 'de,para', 'a migração v28 cria convites_encontro (de, para), mesmo num banco de ensaio sem convites_aceites');
+  dbV10.prepare("INSERT INTO convites_encontro (de, para) VALUES ('duda', 'eli'), ('outra', 'eli')").run();
   B.apagarPessoaDoBanco(dbV10, 'duda');
+  ok(dbV10.prepare("SELECT group_concat(de) x FROM convites_encontro").get().x === 'outra', 'apagar a pessoa leva a marca do QR dela (v28)');
   ok(dbV10.prepare("SELECT group_concat(pedido) x FROM pedido_atualizacoes").get().x === 'r3', 'apagar a pessoa leva as atualizações dos pedidos dela (v27); as de outra pessoa ficam');
   B.fecharBanco(arquivoV9);
   try { rmSync(pastaV9, { recursive: true, force: true }); } catch { /* ok */ }
