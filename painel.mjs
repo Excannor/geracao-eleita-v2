@@ -108,6 +108,8 @@ export function montarPainel({
 
   const pedidosOracaoAtivos = pedidos.filter((r) => r.tipo === 'oracao' && r.estado === 'ativo' && r.venceEm >= hoje).length;
   const denunciasAbertas = pedidos.filter((r) => r.estado !== 'removido' && escondidoPorDenuncia(r)).length;
+  // R4.2: orações marcadas como respondidas nos últimos 30 dias (só o número)
+  const respondidas30 = pedidos.filter((r) => r.tipo === 'oracao' && r.estado === 'respondido' && r.respondidoEm && r.respondidoEm > desde(30) && r.respondidoEm <= hoje).length;
 
   const celulasECuidado = {
     celulasAtivas: celulasAtivas.length,
@@ -128,6 +130,7 @@ export function montarPainel({
     cuidado: {
       pedidosAtivos: mascarar(pedidosOracaoAtivos),
       denunciasAbertas: mascarar(denunciasAbertas),
+      respondidas: mascarar(respondidas30),
     },
   };
 

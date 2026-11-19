@@ -70,7 +70,8 @@
       + numero('Discipulado: relações ativas', c.discipulado.ativos)
       + numero('Discipulado: 2ª geração', c.discipulado.segundaGeracao)
       + numero('Cuidado: pedidos de oração ativos', c.cuidado.pedidosAtivos)
-      + numero('Cuidado: denúncias abertas', c.cuidado.denunciasAbertas);
+      + numero('Cuidado: denúncias abertas', c.cuidado.denunciasAbertas)
+      + (c.cuidado.respondidas !== undefined ? numero('Cuidado: orações respondidas em 30 dias', c.cuidado.respondidas) : '');
   }
 
   // ---------- a igreja de longe (api/painel/igreja, inteligencia.mjs) ----------

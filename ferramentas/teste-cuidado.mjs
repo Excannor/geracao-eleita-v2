@@ -1,6 +1,7 @@
 // Confere o cuidado mútuo (Atos 2.42, 2.44-45): visitante não vê nem pede; pedido só para
-// quem conduz fica invisível para membro comum; limite de 3 pedidos ativos; "orei" uma vez por
-// dia; o autor vê os gestos e os outros não; "posso ajudar" uma vez só; "Deus respondeu" e
+// quem conduz fica invisível para membro comum; limite de 3 pedidos ativos; "Estou orando" um por
+// pessoa, só como número, sem nomes (R4.2); "posso ajudar" uma vez só; "Deus respondeu" (a oração
+// vai para Respondidas) e
 // apagar; denúncia anônima para o autor; 2 denúncias escondem; só quem conduz decide; avisos
 // nunca no Feed; sair da célula e apagar a conta limpam os pedidos; limpeza de vencidos.
 // Uso: node ferramentas/teste-cuidado.mjs
@@ -42,7 +43,8 @@ console.log('\n  Cuidado mútuo: regras puras\n');
   ok(C.pedidoVisivelPara(p({ destino: 'conduz' }), { usuario: 'lider', hoje: '2026-03-10', conduz: true }), 'destino conduz: quem conduz vê');
   ok(C.pedidoVisivelPara(p({ destino: 'conduz' }), { usuario: 'ana', hoje: '2026-03-10', conduz: false }), 'destino conduz: o autor sempre vê o próprio pedido');
   ok(!C.pedidoVisivelPara(p(), { usuario: 'bia', hoje: '2026-03-21', conduz: false }), 'depois do vencimento, o pedido some para todo mundo');
-  ok(!C.pedidoVisivelPara(p({ estado: 'respondido' }), { usuario: 'bia', hoje: '2026-03-10', conduz: false }), 'respondido some da lista dos outros');
+  ok(C.pedidoVisivelPara(p({ estado: 'respondido', tipo: 'oracao' }), { usuario: 'bia', hoje: '2026-03-10', conduz: false }), 'oração respondida continua para os outros (Respondidas, R4.2)');
+  ok(!C.pedidoVisivelPara(p({ estado: 'respondido', tipo: 'necessidade' }), { usuario: 'bia', hoje: '2026-03-10', conduz: false }), 'pedido de ajuda resolvido some da lista dos outros');
   ok(C.pedidoVisivelPara(p({ estado: 'respondido' }), { usuario: 'ana', hoje: '2026-03-10', conduz: false }), 'respondido continua na lista do autor');
   ok(!C.pedidoVisivelPara(p({ estado: 'removido' }), { usuario: 'ana', hoje: '2026-03-10', conduz: false }), 'removido some até para o autor');
   const escondido = p({ denuncias: [{ usuario: 'x', motivo: 'a' }, { usuario: 'y', motivo: 'b' }] });
@@ -56,15 +58,14 @@ console.log('\n  Cuidado mútuo: regras puras\n');
   ok(!C.vencidoParaApagar({ venceEm: '2026-01-01' }, '2026-01-30'), '29 dias depois ainda não pode');
 
   const gestos = [
-    { usuario: 'bia', gesto: 'orei', data: '2026-03-01' },
-    { usuario: 'bia', gesto: 'orei', data: '2026-03-03' },
+    { usuario: 'bia', gesto: 'ajudo', data: '2026-03-01' },
+    { usuario: 'bia', gesto: 'orando', data: '2026-03-03' },
     { usuario: 'caio', gesto: 'ajudo', data: '2026-03-02' },
   ];
   const resumo = C.gestosParaAutor({ gestos });
-  const deBia = resumo.find((g) => g.usuario === 'bia');
-  ok(deBia && deBia.data === '2026-03-03', 'gestosParaAutor mostra a data mais recente de cada pessoa');
-  ok(C.jaOrouHoje({ gestos }, 'bia', '2026-03-03') && !C.jaOrouHoje({ gestos }, 'bia', '2026-03-04'), 'jaOrouHoje olha só a data pedida');
-  ok(C.jaAjudou({ gestos }, 'caio') && !C.jaAjudou({ gestos }, 'bia'), 'jaAjudou olha o gesto "ajudo"');
+  ok(resumo.filter((g) => g.usuario === 'bia').length === 2, 'gestosParaAutor dá um gesto por pessoa e por tipo');
+  ok(C.estaOrando({ gestos }, 'bia') && !C.estaOrando({ gestos }, 'caio') && C.quantosOrando({ gestos }) === 1, 'estaOrando e quantosOrando olham o gesto "orando"');
+  ok(C.jaAjudou({ gestos }, 'caio') && C.jaAjudou({ gestos }, 'bia') && !C.jaAjudou({ gestos: [] }, 'bia'), 'jaAjudou olha o gesto "ajudo"');
 }
 
 try { rmSync(PASTA, { recursive: true, force: true }); } catch { /* ok */ }
@@ -106,6 +107,8 @@ try {
   await entrar(ana.cookie);
   const bia = await criar('bia9');
   await entrar(bia.cookie);
+  const caio0 = await criar('caiz9');
+  await entrar(caio0.cookie);
   const visita = await criar('visita9');
   await entrar(visita.cookie, { visitante: true });
 
@@ -143,17 +146,18 @@ try {
   // Libera a vaga de volta para os testes seguintes (que também criam pedidos para ana).
   await cuidado({ acao: 'apagar', id: terceiro.corpo.id }, ana.cookie);
 
-  console.log('\n  "Orei por você": uma vez por dia\n');
-  ok((await cuidado({ acao: 'orei', id: idPedido }, ana.cookie)).status === 400, 'ana não pode orar pelo próprio pedido');
-  const primeiraOracao = await cuidado({ acao: 'orei', id: idPedido }, bia.cookie);
-  ok(primeiraOracao.status === 200, 'bia ora pelo pedido de ana');
-  await cuidado({ acao: 'orei', id: idPedido }, bia.cookie);
+  console.log('\n  "Estou orando": um por pessoa, só como número (R4.2)\n');
+  ok((await cuidado({ acao: 'orando', id: idPedido }, ana.cookie)).status === 400, 'ana não pode orar pelo próprio pedido');
+  ok((await cuidado({ acao: 'orando', id: idPedido, sim: true }, bia.cookie)).status === 200, 'bia marca "Estou orando" no pedido de ana');
+  await cuidado({ acao: 'orando', id: idPedido, sim: true }, bia.cookie);
+  await cuidado({ acao: 'orei', id: idPedido }, caio0.cookie);
   const paraAna = (await ver(idCelula, ana.cookie)).pedidos.find((p) => p.id === idPedido);
-  ok(paraAna.gestos.filter((g) => g.usuario === 'bia9' && g.gesto === 'orei').length === 1, 'orar de novo no mesmo dia não duplica o gesto');
-  ok(paraAna.gestos.find((g) => g.usuario === 'bia9').data === HOJE, 'ana vê a data em que bia orou');
+  ok(paraAna.orando === 2, 'ana vê 2 pessoas orando (bia duas vezes conta uma; o "orei" do app antigo vira "Estou orando")');
+  ok(!(paraAna.gestos || []).some((g) => g.gesto !== 'ajudo') && !JSON.stringify(paraAna).includes('bia9'), 'ana não recebe quem está orando, só o número');
   const paraBia = (await ver(idCelula, bia.cookie)).pedidos.find((p) => p.id === idPedido);
-  ok(paraBia.oreiHoje === true, 'bia vê que já orou hoje por esse pedido');
-  ok(!('gestos' in paraBia), 'bia (que não é a autora) não recebe a lista de quem mais orou');
+  ok(paraBia.euOro === true && paraBia.orando === 2 && !('gestos' in paraBia), 'bia vê que está orando e a contagem, sem a lista');
+  await cuidado({ acao: 'orando', id: idPedido, sim: false }, caio0.cookie);
+  ok((await ver(idCelula, ana.cookie)).pedidos.find((p) => p.id === idPedido).orando === 1, 'tocar de novo desfaz: 1 pessoa orando');
 
   console.log('\n  "Posso ajudar": só em necessidade, uma vez\n');
   const necessidade = await cuidado({ acao: 'criar', celula: idCelula, tipo: 'necessidade', destino: 'celula', texto: 'preciso de uma cesta básica', dias: 30 }, ana.cookie);
@@ -171,8 +175,9 @@ try {
   const outroPedido = (await cuidado({ acao: 'criar', celula: idCelula, tipo: 'oracao', destino: 'celula', texto: 'mais um pedido', dias: 7 }, bia.cookie)).corpo.id;
   ok((await cuidado({ acao: 'respondido', id: outroPedido }, ana.cookie)).status === 404, 'só o autor marca "Deus respondeu"');
   ok((await cuidado({ acao: 'respondido', id: outroPedido }, bia.cookie)).status === 200, 'bia marca "Deus respondeu" no próprio pedido');
-  ok(!(await ver(idCelula, ana.cookie)).pedidos.some((p) => p.id === outroPedido), 'some da lista de quem não é o autor');
-  ok((await ver(idCelula, bia.cookie)).pedidos.some((p) => p.id === outroPedido), 'continua na lista da própria bia');
+  const deAna = await ver(idCelula, ana.cookie);
+  ok(!deAna.pedidos.some((p) => p.id === outroPedido) && deAna.respondidas.some((p) => p.id === outroPedido && p.respondido), 'para os outros, sai dos pedidos e vai para Respondidas');
+  ok((await ver(idCelula, bia.cookie)).respondidas.some((p) => p.id === outroPedido && p.meu), 'bia também o vê em Respondidas');
   ok((await cuidado({ acao: 'apagar', id: idNecessidade }, ana.cookie)).status === 200, 'ana apaga o próprio pedido');
   ok(!(await ver(idCelula, ana.cookie)).pedidos.some((p) => p.id === idNecessidade), 'o pedido apagado some de vez');
   ok((await cuidado({ acao: 'apagar', id: idPedido }, bia.cookie)).status === 404, 'só o autor apaga o próprio pedido');
@@ -273,14 +278,18 @@ console.log('\n  Limpeza dos vencidos há mais de 30 dias\n');
     ok(!C.pedido(velho.id), 'o pedido vencido há mais de 30 dias é apagado do banco');
     ok(C.pedido(recente.id), 'o pedido que ainda não venceu continua de pé');
 
-    // "Deus respondeu" encurta o vencimento: a limpeza segue a data nova, não a original.
-    const paraResponder = await C.criarPedido('lideral', { celula: celula.id, tipo: 'oracao', destino: 'celula', texto: 'outro pedido', dias: 30 }, '2026-01-01');
+    // R4.2: a oração respondida guarda a data e mantém o vencimento (fica em Respondidas até lá)
+    const oracaoRespondida = await C.criarPedido('lideral', { celula: celula.id, tipo: 'oracao', destino: 'celula', texto: 'mais um pedido', dias: 30 }, '2026-01-01');
+    await C.marcarRespondido('lideral', oracaoRespondida.id, '2026-01-10');
+    ok(C.pedido(oracaoRespondida.id).venceEm === '2026-01-31' && C.pedido(oracaoRespondida.id).respondidoEm === '2026-01-10', 'a oração respondida mantém o vencimento e guarda a data da resposta');
+    // "Já resolvi" encurta o vencimento do pedido de ajuda: a limpeza segue a data nova, não a original.
+    const paraResponder = await C.criarPedido('lideral', { celula: celula.id, tipo: 'necessidade', destino: 'celula', texto: 'outro pedido', dias: 30 }, '2026-01-01');
     await C.marcarRespondido('lideral', paraResponder.id, '2026-01-10');
-    ok(C.pedido(paraResponder.id).venceEm === '2026-01-17', 'marcar "Deus respondeu" encurta o vencimento para 7 dias à frente');
+    ok(C.pedido(paraResponder.id).venceEm === '2026-01-17', 'marcar "Já resolvi" encurta o vencimento para 7 dias à frente');
     await C.limparPedidosVencidos('2026-02-16');
     ok(C.pedido(paraResponder.id), 'exatamente 30 dias depois do vencimento encurtado (2026-01-17), ainda não apaga');
     await C.limparPedidosVencidos('2026-02-17');
-    ok(!C.pedido(paraResponder.id), 'a limpeza usa o vencimento encurtado por "Deus respondeu" (2026-01-17), não o original (2026-01-31)');
+    ok(!C.pedido(paraResponder.id), 'a limpeza usa o vencimento encurtado por "Já resolvi" (2026-01-17), não o original (2026-01-31)');
   } finally {
     try { fecharBanco(arquivoDoBanco(pastaLimpeza)); } catch { /* ok */ }
     try { rmSync(pastaLimpeza, { recursive: true, force: true }); } catch { /* ok */ }

@@ -406,6 +406,8 @@ secao('peças sob demanda');
     ['temporadas', 'TEMPORADAS', 'A temporada fecha quando todos forem lidos', '', 'as temporadas na Trilha'],
     // R3.4: a retrospectiva de dezembro (a casca fica em 07-perfil.js)
     ['retrospectiva', 'RETROSPECTIVA', 'Só você vê esta parte', '', 'a retrospectiva de dezembro'],
+    // R4.2: a aba Oração da célula (a casca que pede a peça fica em 08b-propositos.js)
+    ['oracao', 'ORACAO', 'Pedidos para rever', '', 'a aba Oração da célula'],
   ];
   const servidorTexto = readFileSync(join(AQUI, 'servidor.mjs'), 'utf8');
   for (const [nome, variavel, marca, antigo, rotulo] of PECAS) {
@@ -3105,8 +3107,14 @@ secao('estudos da célula no servidor, Fase 2 (combinado, histórico, encontro l
   // a política de privacidade conta o que a Fase 2 guarda e quem vê (docs/a-mesa-fase2.md, seção 7)
   const pol = readFileSync(join(AQUI, 'src', 'privacidade.html'), 'utf8');
   const historico = pol.slice(pol.indexOf('<ul class="historico">'));
-  checar(/<p class="atualizada">Versão 7 · atualizada em 15 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 7, 15 de novembro de 2026.</b>') > -1
-    && historico.indexOf('<b>Versão 7,') < historico.indexOf('<b>Ajuste da versão 6,'), 'a política está na versão 7 (15 de novembro, o "leu hoje" que a pessoa tira da célula), a mais nova no histórico');
+  checar(historico.indexOf('<b>Versão 7, 15 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Versão 7,') < historico.indexOf('<b>Ajuste da versão 6,'), 'a versão 7 (15 de novembro, o "leu hoje" que a pessoa tira da célula) segue no histórico, acima da 6');
+  // R4.2: a lista de oração (docs/r4-celula.md): versão 8, a mais nova; contagem sem nomes, Respondidas, filtro
+  checar(/<p class="atualizada">Versão 8 · atualizada em 19 de novembro de 2026<\/p>/.test(pol) && historico.indexOf('<b>Versão 8, 19 de novembro de 2026.</b>') > -1
+    && historico.indexOf('<b>Versão 8,') < historico.indexOf('<b>Segundo ajuste da versão 7,'), 'a política está na versão 8 (19 de novembro, a lista de oração), a mais nova no histórico');
+  checar(/<tr><td>Pedido de oração ou de ajuda<\/td><td>[^<]*só o número\. Ninguém vê quem está orando, nem você\.[^<]*Respondidas/.test(pol) && !/Quem orou e quem pode ajudar, só você vê/.test(pol),
+    'o quadro de quem vê: "Estou orando" só como número, ninguém vê quem; o respondido em Respondidas');
+  checar(/telefone, e-mail, link, @ de rede social, endereço/.test(pol) && /tirar um pedido sem esperar denúncia/.test(pol), 'a política conta o filtro dos pedidos e o "Tirar" de quem conduz');
   checar(/<tr><td>Se leu hoje<\/td><td>[^<]*"Mostrar na célula se eu li hoje"[^<]*quem conduz a célula continua vendo/.test(pol),
     'o quadro de quem vê: o "leu hoje" sai da célula se a pessoa desligar, e quem conduz continua vendo');
   // R3.3: o calendário da célula, só números somados, no quadro de quem vê e no histórico
@@ -3639,6 +3647,78 @@ secao('painel pastoral agregado (Fase 5, seção 2)');
     checar(f.semana.base === 2 && f.semana.contas === 0, 'leram 3 ou mais dos 7 primeiros dias: nenhuma das duas com idade');
     checar(!/nova1|nova2|nova3|hoje1|@/.test(JSON.stringify(f)), 'o funil dos primeiros dias não leva nome nenhum');
   }
+}
+
+// =========================================================================
+secao('lista de oração da célula (R4.2, docs/r4-celula.md)');
+// =========================================================================
+{
+  const { conferirTexto, MENSAGEM_DO_FILTRO } = await import('./filtro-texto.mjs');
+  const Cu = await import('./cuidado.mjs');
+  const passa = ['Peço oração pela minha família', 'João 3.16 e Salmos 119.105', 'Gálatas 5.22-23, às 19h30, por 7 dias', 'dia 20/11/2026',
+    '2 Coríntios 5.17', 'Atos 2.42-47', 'Números 3 fala do povo', 'disputa na escola', 'nota 10 na prova'];
+  checar(passa.every((t) => conferirTexto(t) === ''), 'o filtro deixa passar referências bíblicas, datas, horas e números curtos');
+  const barra = [['me liga (11) 98765-4321', 'telefone'], ['+55 11 98765 4321', 'telefone'], ['11987654321', 'telefone'], ['meu email ana@gmail.com', 'email'],
+    ['www.site.com.br', 'link'], ['https://x.y', 'link'], ['olha insta.com/x', 'link'], ['wa.me/5511', 'link'], ['me segue @ana_b', 'arroba'],
+    ['Rua das Flores, 120', 'endereco'], ['av. Brasil 45', 'endereco'], ['moro no apto 302', 'endereco'], ['CEP 01310-100', 'endereco'],
+    ['que porra', 'palavra'], ['P0RR4 mano', 'palavra'], ['poooorra', 'palavra']];
+  const errados = barra.filter(([t, m]) => conferirTexto(t) !== m);
+  checar(!errados.length, 'o filtro recusa telefone, e-mail, link, @, endereço e palavra da lista, cada um com o seu motivo' + (errados.length ? ' (' + errados.map((x) => x[0] + ': ' + conferirTexto(x[0])).join('; ') + ')' : ''));
+  checar(Object.values(MENSAGEM_DO_FILTRO).every((m) => /antes de enviar$/.test(m) && !/[—–!]/.test(m)), 'as mensagens do filtro dizem o que fazer, sem exclamação nem travessão');
+
+  const pedido = (extra) => ({ autor: 'ana', tipo: 'oracao', destino: 'celula', estado: 'ativo', venceEm: '2026-03-20', denuncias: [], gestos: [], ...extra });
+  const olhar = { usuario: 'bia', hoje: '2026-03-10', conduz: false };
+  checar(Cu.pedidoVisivelPara(pedido({ estado: 'respondido' }), olhar), 'a oração respondida continua para quem a via (Respondidas)');
+  checar(!Cu.pedidoVisivelPara(pedido({ estado: 'respondido', tipo: 'necessidade' }), olhar), 'o pedido de ajuda resolvido some da lista dos outros, como antes');
+  checar(!Cu.pedidoVisivelPara(pedido({ estado: 'respondido', destino: 'conduz' }), olhar), 'a respondida só para quem conduz continua fora da lista do membro');
+  const gestos = [{ usuario: 'bia', gesto: 'orando', data: '2026-03-01' }, { usuario: 'caio', gesto: 'orando', data: '2026-03-02' }, { usuario: 'caio', gesto: 'ajudo', data: '2026-03-02' }];
+  checar(Cu.quantosOrando({ gestos }) === 2 && Cu.estaOrando({ gestos }, 'bia') && !Cu.estaOrando({ gestos }, 'ana'), '"Estou orando" conta uma vez por pessoa');
+  checar(Cu.atualizacaoValida('x'.repeat(200)) && !Cu.atualizacaoValida('x'.repeat(201)) && !Cu.atualizacaoValida('  '), 'a atualização tem de 1 a 200 caracteres');
+
+  // nas contas, com o banco relido (a armadilha do INSERT OR REPLACE: respondido_em e as atualizações)
+  const pasta = mkdtempSync(join(tmpdir(), 'cc-teste-oracao-'));
+  const arq = join(pasta, 'contas.json');
+  let co = await new Contas(arq).carregar();
+  for (const u of ['lid', 'ana', 'bia', 'vis']) await co.criar({ usuario: u, senha: '12345678', nome: u, email: u + '@x.com', nascimento: '1990-01-01', consentimento: true });
+  const ID = (await co.criarCelula('lid', { titulo: 'Oração' }, '2026-03-01')).id;
+  const tok = co.gerarLinkCelula('lid', ID, assinar).token;
+  for (const u of ['ana', 'bia']) await co.entrarNaCelula(u, tok, assinar, '2026-03-01');
+  await co.entrarNaCelula('vis', tok, assinar, '2026-03-01', Date.now(), { visitante: true });
+  const falha = async (f) => { try { await f(); return ''; } catch (e) { return e.message + '|' + (e.codigo || 400); } };
+  checar(await falha(() => co.criarPedido('ana', { celula: ID, tipo: 'oracao', destino: 'celula', texto: 'me liga 11 98765-4321', dias: 7 }, '2026-03-01')) === MENSAGEM_DO_FILTRO.telefone + '|400',
+    'o pedido com telefone é recusado, com a mensagem do filtro');
+  const r = await co.criarPedido('ana', { celula: ID, tipo: 'oracao', destino: 'celula', texto: 'Pela prova de sexta', dias: 30 }, '2026-03-01');
+  const soConduz = await co.criarPedido('ana', { celula: ID, tipo: 'oracao', destino: 'conduz', texto: 'Algo mais reservado', dias: 7 }, '2026-03-01');
+  await co.orarPorPedido('bia', r.id, '2026-03-02');
+  await co.orarPorPedido('bia', r.id, '2026-03-03');
+  await co.orarPorPedido('lid', r.id, '2026-03-03');
+  checar(Cu.quantosOrando(co.pedido(r.id)) === 2, '"Estou orando" de novo não soma: 2 pessoas');
+  await co.orarPorPedido('lid', r.id, '2026-03-03', false);
+  checar(Cu.quantosOrando(co.pedido(r.id)) === 1, 'tocar de novo desfaz o "Estou orando"');
+  checar((await falha(() => co.orarPorPedido('bia', soConduz.id, '2026-03-03'))).endsWith('|404'), 'o membro não ora pelo id num pedido só para quem conduz');
+  checar((await falha(() => co.orarPorPedido('vis', r.id, '2026-03-03'))).endsWith('|404'), 'o visitante não ora pelo id');
+  checar((await falha(() => co.atualizarPedido('bia', r.id, 'oi', '2026-03-03'))).endsWith('|403'), 'só o autor atualiza o pedido');
+  checar((await falha(() => co.atualizarPedido('ana', r.id, 'veja www.x.com', '2026-03-03'))) === MENSAGEM_DO_FILTRO.link + '|400', 'a atualização com link é recusada');
+  await co.atualizarPedido('ana', r.id, 'Estudei bastante.', '2026-03-03');
+  await co.atualizarPedido('ana', r.id, 'A prova é amanhã.', '2026-03-04');
+  await co.marcarRespondido('ana', r.id, '2026-03-06', 'Passei na prova.');
+  checar(co.pedido(r.id).estado === 'respondido' && co.pedido(r.id).respondidoEm === '2026-03-06' && co.pedido(r.id).venceEm === '2026-03-31',
+    'a oração respondida guarda a data e não encurta o vencimento');
+  checar((await falha(() => co.orarPorPedido('bia', r.id, '2026-03-07'))).endsWith('|409'), 'não se ora mais por uma oração já respondida');
+  checar((await falha(() => co.tirarPedido('bia', soConduz.id))).endsWith('|404') && (await falha(() => co.tirarPedido('ana', r.id))).endsWith('|403'),
+    'quem não conduz não tira pedido (não o vê ou não pode)');
+  await co.tirarPedido('lid', soConduz.id);
+  checar(co.pedido(soConduz.id).estado === 'removido' && co.pedido(soConduz.id).removidoPor === 'lid', 'quem conduz tira um pedido sem esperar denúncia');
+  await co.definirRecado('lid', ID, 'Recado para gravar outra coisa', new Date(), { hoje: '2026-03-07' });
+  co = await new Contas(arq).carregar();
+  const relido = co.pedido(r.id);
+  checar(relido && relido.respondidoEm === '2026-03-06' && relido.atualizacoes.map((u) => u.ordem + ':' + u.texto).join('|') === '1:Estudei bastante.|2:A prova é amanhã.|3:Passei na prova.'
+    && relido.gestos.filter((g) => g.gesto === 'orando').length === 1, 'o banco relido guarda a data da resposta, as 3 atualizações em ordem e o "Estou orando"');
+  await co.apagarAtualizacao('ana', r.id, 2);
+  co = await new Contas(arq).carregar();
+  checar(co.pedido(r.id).atualizacoes.map((u) => u.ordem).join() === '1,3', 'apagar uma atualização tira só ela do banco');
+  fecharBanco(arquivoDoBanco(pasta));
+  rmSync(pasta, { recursive: true, force: true });
 }
 
 // =========================================================================

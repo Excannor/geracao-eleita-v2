@@ -17,7 +17,7 @@ import { Novidades, MARCOS_PROPOSITO, DE_DUPLA, DE_GRUPO } from './novidades.mjs
 import { NIVEIS_SEMEADOR, trilhaDoSemeador } from './semeador.mjs';
 import { TIPOS as TIPOS_DE_PROPOSITO, LIMITE_GRUPO, LIMITE_CELULA, limiteDo, datasDoTipo, diasJuntos, extraNoDia, pontosDoDia, sequenciaDoGrupo } from './propositos.mjs';
 import { diasLidosNaSemana, resumoParaDiscipulador } from './discipulado.mjs';
-import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, jaOrouHoje, jaAjudou, membroDeVerdade } from './cuidado.mjs';
+import { MOTIVOS_DENUNCIA_PEDIDO, MOTIVO_PERIGO, pedidoVisivelPara, gestosParaAutor, estaOrando, quantosOrando, jaAjudou, membroDeVerdade } from './cuidado.mjs';
 import { DESAFIOS_GRUPO, TIPOS_GRUPO, progressoNoGrupo, diaDoGrupo, fimDoDesafio, desafioVisivel, momentoDaCelula, anoDaRetrospectiva, anoDaCelula } from './desafios-grupo.mjs';
 import {
   abrirBanco, arquivoDoBanco, lerMeta, gravarMeta, transacao, lerEstadoDoBanco, gravarEstadoNoBanco,
@@ -2237,28 +2237,40 @@ const servidor = createServer(async (req, res) => {
       const celulaId = url.searchParams.get('celula') || '';
       const p = CONTAS.proposito(celulaId);
       if (!p || p.encerradoEm || !p.celula) { json(res, 404, { erro: 'célula não encontrada' }); return; }
+      // R4.2: quem não é da célula (outra célula, quem saiu) não descobre que ela tem pedidos (404);
+      // o visitante e o convidado sabem que a célula existe e recebem 403
+      if (!p.membros.some((m) => m.usuario === eu && m.estado !== 'saiu')) { json(res, 404, { erro: 'célula não encontrada' }); return; }
       if (!CONTAS.membroDeCuidado(p, eu)) { json(res, 403, { erro: 'só quem participa da célula vê os pedidos' }); return; }
       const hoje = hojeDe(eu);
       await CONTAS.limparPedidosVencidos(hoje);
       const conduz = podeConduzir(p, eu);
       const todos = CONTAS.pedidosDaCelula(p.id);
       const nomeDe = (u) => { const c = CONTAS.achar(u); return (c && c.nome) || u; };
+      // R4.2: a contagem de quem está orando vai para todos que veem o pedido, sem nomes; as
+      // atualizações do autor e a data da resposta também. Ao autor, de quem reagiu, só os nomes de
+      // "posso ajudar" (a ajuda prática se combina fora do app). A oração respondida vai à parte,
+      // em "respondidas".
       const pedidos = [];
+      const respondidas = [];
       for (const r of todos) {
         if (!pedidoVisivelPara(r, { usuario: eu, hoje, conduz })) continue;
         const meu = r.autor === eu;
+        const euOro = estaOrando(r, eu);
         const item = {
           id: r.id, autor: { usuario: r.autor, nome: nomeDe(r.autor) }, tipo: r.tipo, destino: r.destino,
           texto: r.texto, criadoEm: r.criadoEm, venceEm: r.venceEm, meu,
-          oreiHoje: jaOrouHoje(r, eu, hoje), ajudei: jaAjudou(r, eu),
+          orando: quantosOrando(r), euOro, ajudei: jaAjudou(r, eu),
+          // o app de antes da R4.2 lê "oreiHoje" para o botão "Orei por você"
+          oreiHoje: euOro,
+          atualizacoes: (r.atualizacoes || []).slice().sort((x, y) => y.ordem - x.ordem).map((u) => ({ ordem: u.ordem, texto: u.texto, em: u.em })),
+          respondido: r.estado === 'respondido', respondidoEm: r.respondidoEm || '',
         };
-        // Só o autor vê o próprio pedido depois de "Deus respondeu": ele precisa saber que já marcou.
-        if (meu) item.respondido = r.estado === 'respondido';
-        if (meu) item.gestos = gestosParaAutor(r).map((g) => ({ usuario: g.usuario, nome: nomeDe(g.usuario), gesto: g.gesto, data: g.data }));
-        pedidos.push(item);
+        if (meu) item.gestos = gestosParaAutor(r).filter((g) => g.gesto === 'ajudo').map((g) => ({ usuario: g.usuario, nome: nomeDe(g.usuario), gesto: g.gesto, data: g.data }));
+        if (r.estado === 'respondido' && r.tipo === 'oracao') respondidas.push(item); else pedidos.push(item);
       }
       pedidos.sort((a, b) => (b.meu - a.meu) || b.criadoEm.localeCompare(a.criadoEm));
-      const resposta = { pedidos, motivos: MOTIVOS_DENUNCIA_PEDIDO };
+      respondidas.sort((a, b) => b.respondidoEm.localeCompare(a.respondidoEm) || b.criadoEm.localeCompare(a.criadoEm));
+      const resposta = { pedidos, respondidas, motivos: MOTIVOS_DENUNCIA_PEDIDO };
       if (conduz) {
         resposta.denuncias = todos.filter((r) => r.estado !== 'removido' && r.denuncias.length > 0).map((r) => ({
           pedido: r.id, texto: r.texto, autor: nomeDe(r.autor),
@@ -2315,8 +2327,12 @@ const servidor = createServer(async (req, res) => {
     }
 
     if (rota === '/api/cuidado') {
-      await acao(async ({ acao: qual, id, celula, tipo, destino, texto, dias, motivo, manter }) => {
+      await acao(async ({ acao: qual, id, celula, tipo, destino, texto, dias, motivo, manter, sim, ordem }) => {
         const hoje = hojeDe(eu);
+        // R4.2: o que grava texto tem limite por minuto, como o estudo
+        if (['criar', 'atualizar', 'respondido'].includes(qual) && !dentroDoLimite('cuidado:' + eu, 20)) {
+          throw Object.assign(new Error('muitas tentativas, espere um pouco'), { publico: true, codigo: 429 });
+        }
         if (qual === 'criar') {
           const r = await CONTAS.criarPedido(eu, { celula, tipo, destino, texto, dias }, hoje);
           // Só quem conduz é avisado, e só quando o pedido é reservado para eles: a célula
@@ -2336,7 +2352,11 @@ const servidor = createServer(async (req, res) => {
         }
         const r = CONTAS.pedido(id);
         if (!r) { const e = new Error('pedido não encontrado'); e.publico = true; e.codigo = 404; throw e; }
-        if (qual === 'orei') { await CONTAS.orarPorPedido(eu, id, hoje); return {}; }
+        // "Estou orando" liga e desliga; "orei" é o app de antes da R4.2, que só liga
+        if (qual === 'orando' || qual === 'orei') { await CONTAS.orarPorPedido(eu, id, hoje, qual === 'orei' || sim !== false); return {}; }
+        if (qual === 'atualizar') { await CONTAS.atualizarPedido(eu, id, texto, hoje); return {}; }
+        if (qual === 'apagarAtualizacao') { await CONTAS.apagarAtualizacao(eu, id, ordem); return {}; }
+        if (qual === 'tirar') { await CONTAS.tirarPedido(eu, id); return {}; }
         if (qual === 'ajudo') {
           // Só avisa na primeira vez: chamar de novo (idempotente) não pode reenviar o push.
           const jaTinhaAjudado = jaAjudou(r, eu);
@@ -2344,7 +2364,7 @@ const servidor = createServer(async (req, res) => {
           if (!jaTinhaAjudado) semEsperar(avisoSocial(r.autor, 'possoAjudar', { amigo: await nomeDeExibicao(eu), celula: r.celula }));
           return {};
         }
-        if (qual === 'respondido') { await CONTAS.marcarRespondido(eu, id, hoje); return {}; }
+        if (qual === 'respondido') { await CONTAS.marcarRespondido(eu, id, hoje, texto); return {}; }
         if (qual === 'apagar') { await CONTAS.apagarPedido(eu, id); return {}; }
         if (qual === 'denunciar') {
           // Idem: denunciar de novo (a mesma pessoa só denuncia uma vez) não reenvia o aviso.

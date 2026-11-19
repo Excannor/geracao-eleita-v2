@@ -349,6 +349,22 @@ const ESQUEMA = [
   `
   CREATE TABLE IF NOT EXISTS chama_reacesa (usuario TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (usuario, data)) WITHOUT ROWID;
   `,
+  // v27: a lista de oração da célula (R4.2, docs/r4-celula.md). O pedido respondido guarda quando
+  // foi respondido e a oração respondida passa a ficar em "Respondidas" até vencer. "Estou orando"
+  // é o gesto 'orando', um por pessoa por pedido, em pedido_gestos: os 'orei' de antes (um por dia)
+  // viram um 'orando' por pessoa, com a primeira data. As atualizações do autor ficam em tabela
+  // própria, na ordem em que foram escritas. O respondido de antes tinha o vencimento encurtado
+  // para 7 dias depois da marca: a data da resposta sai daí. (A conversa do dia, R4.1, foi adiada
+  // pelo dono e não tem migração.)
+  `
+  ALTER TABLE pedidos ADD COLUMN respondido_em TEXT NOT NULL DEFAULT '';
+  UPDATE pedidos SET respondido_em = date(vence_em, '-7 days') WHERE estado = 'respondido';
+  INSERT OR IGNORE INTO pedido_gestos (pedido, usuario, gesto, data)
+    SELECT pedido, usuario, 'orando', MIN(data) FROM pedido_gestos WHERE gesto = 'orei' GROUP BY pedido, usuario;
+  DELETE FROM pedido_gestos WHERE gesto = 'orei';
+  CREATE TABLE IF NOT EXISTS pedido_atualizacoes (pedido TEXT NOT NULL, ordem INTEGER NOT NULL, texto TEXT NOT NULL, em TEXT NOT NULL,
+    PRIMARY KEY (pedido, ordem));
+  `,
 ];
 
 function migrarEsquema(db) {
@@ -530,6 +546,8 @@ export function apagarPessoaDoBanco(db, usuario) {
     ['discipulados', 'DELETE FROM discipulados WHERE discipulador = ? OR discipulo = ?', [u, u]],
     // cuidado mútuo: os pedidos da pessoa somem inteiros; o gesto ou a denúncia que ela deixou
     // no pedido de outra pessoa também some, mas o pedido em si continua de pé
+    // as atualizações (v27) dos pedidos da pessoa saem com eles
+    ['pedido_atualizacoes', "DELETE FROM pedido_atualizacoes WHERE pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u]],
     ['pedido_gestos', "DELETE FROM pedido_gestos WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
     ['pedido_denuncias', "DELETE FROM pedido_denuncias WHERE usuario = ? OR pedido IN (SELECT id FROM pedidos WHERE autor = ?)", [u, u]],
     ['pedidos', 'DELETE FROM pedidos WHERE autor = ?', [u]],

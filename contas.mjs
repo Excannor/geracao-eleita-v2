@@ -17,7 +17,9 @@ import { LIMITE_DISCIPULOS, MARCOS, MOSTRAR_PADRAO, mostrarValido, dataEncontroV
 import {
   tipoValido, destinoValido, diasValido, textoValido, limparTexto, LIMITE_ATIVOS_POR_CELULA,
   motivoDenunciaValido, venceEmDe, vencidoParaApagar, membroDeVerdade,
+  atualizacaoValida, ATUALIZACOES_MAX, ATUALIZACOES_POR_DIA,
 } from './cuidado.mjs';
+import { conferirTexto, MENSAGEM_DO_FILTRO } from './filtro-texto.mjs';
 import {
   ESTUDO_MAX, ESTUDO_BRUTO_MAX, TIPOS_ESTUDO, TRADUCOES, MENSAGENS as MSG_ESTUDO, semVersiculo,
   limparPerguntas, limparFonte, validarLeitura, estudoDaLinha, estudoUsado, ESTUDOS_POR_CELULA,
@@ -287,7 +289,12 @@ function paraLinhas(d) {
     { tabela: 'pedidos', chaves: ['id'], linhas: Object.values(d.pedidos || {}).map((x) => ({
       id: x.id, celula: x.celula, autor: x.autor, tipo: x.tipo, destino: x.destino, texto: x.texto,
       criado_em: x.criadoEm, vence_em: x.venceEm, estado: x.estado, removido_por: x.removidoPor || '',
+      // a data da resposta (v27) tem de estar aqui: sem a coluna, o INSERT OR REPLACE da primeira
+      // gravação por outro motivo a zeraria em todos os pedidos (docs/aprendizados.md, 2026-10-17)
+      respondido_em: x.respondidoEm || '',
     })) },
+    { tabela: 'pedido_atualizacoes', chaves: ['pedido', 'ordem'], linhas: Object.values(d.pedidos || {})
+      .flatMap((x) => (x.atualizacoes || []).map((a) => ({ pedido: x.id, ordem: a.ordem, texto: a.texto, em: a.em }))) },
     { tabela: 'pedido_gestos', chaves: ['pedido', 'usuario', 'gesto', 'data'], linhas: Object.values(d.pedidos || {})
       .flatMap((x) => (x.gestos || []).map((g) => ({ pedido: x.id, usuario: g.usuario, gesto: g.gesto, data: g.data }))) },
     { tabela: 'pedido_denuncias', chaves: ['pedido', 'usuario'], linhas: Object.values(d.pedidos || {})
@@ -317,6 +324,7 @@ function lerTabelas(db) {
     pedidos: lerTabela(db, 'pedidos', ['id'], 'criado_em'),
     pedidoGestos: lerTabela(db, 'pedido_gestos', ['pedido', 'usuario', 'gesto', 'data'], 'data'),
     pedidoDenuncias: lerTabela(db, 'pedido_denuncias', ['pedido', 'usuario'], 'em'),
+    pedidoAtualizacoes: lerTabela(db, 'pedido_atualizacoes', ['pedido', 'ordem'], 'pedido, ordem'),
   };
 }
 
@@ -402,8 +410,12 @@ function deLinhas(t, versao) {
     d.pedidos[l.id] = {
       id: l.id, celula: l.celula, autor: l.autor, tipo: l.tipo, destino: l.destino, texto: l.texto,
       criadoEm: l.criado_em, venceEm: l.vence_em, estado: l.estado, removidoPor: l.removido_por || '',
-      gestos: [], denuncias: [],
+      respondidoEm: l.respondido_em || '', gestos: [], denuncias: [], atualizacoes: [],
     };
+  }
+  for (const l of t.pedidoAtualizacoes || []) {
+    const r = d.pedidos[l.pedido];
+    if (r) r.atualizacoes.push({ ordem: Number(l.ordem), texto: l.texto, em: l.em });
   }
   for (const l of t.pedidoGestos || []) {
     const r = d.pedidos[l.pedido];
@@ -2458,40 +2470,53 @@ export class Contas {
   async criarPedido(eu, { celula, tipo, destino, texto, dias } = {}, hoje) {
     const a = this.exigirCompleto(eu);
     const p = this.celulaDeCuidado(celula);
+    // quem não é da célula não descobre que ela existe (404); o visitante sabe, e ainda não pede (403)
+    if (!p.membros.some((m) => m.usuario === a.usuario && m.estado !== 'saiu')) throw erro('célula não encontrada', 404);
     if (!this.membroDeCuidado(p, a.usuario)) throw erro('quem só está conhecendo a célula ainda não pede', 403);
     if (!tipoValido(tipo)) throw erro('escolha se é um pedido de oração ou de ajuda');
     if (!destinoValido(tipo, destino)) throw erro('escolha para quem é o pedido');
     if (!diasValido(dias)) throw erro('escolha por quanto tempo o pedido fica de pé');
     if (!textoValido(tipo, texto)) throw erro('escreva o pedido, dentro do tamanho permitido');
+    // R4.2: telefone, e-mail, link, @, endereço e palavra da lista não vão para a célula
+    const barrado = conferirTexto(texto);
+    if (barrado) throw erro(MENSAGEM_DO_FILTRO[barrado]);
     const ativos = this.pedidosDaCelula(p.id).filter((r) => r.autor === a.usuario && r.estado === 'ativo');
     if (ativos.length >= LIMITE_ATIVOS_POR_CELULA) throw erro('você já tem ' + LIMITE_ATIVOS_POR_CELULA + ' pedidos ativos nessa célula', 409);
     const id = 'r' + randomBytes(6).toString('hex');
     this.dados.pedidos[id] = {
       id, celula: p.id, autor: a.usuario, tipo, destino, texto: limparTexto(texto),
-      criadoEm: hoje, venceEm: venceEmDe(hoje, dias), estado: 'ativo', removidoPor: '', gestos: [], denuncias: [],
+      criadoEm: hoje, venceEm: venceEmDe(hoje, dias), estado: 'ativo', removidoPor: '', respondidoEm: '',
+      gestos: [], denuncias: [], atualizacoes: [],
     };
     await this.salvar();
     return this.dados.pedidos[id];
   }
 
+  // O pedido ao alcance de quem pede: membro da célula, pedido não tirado e, no pedido só para quem
+  // conduz, o autor ou quem conduz. Quem não o vê na lista não age nele pelo id.
   pedidoVisivel(id, usuario) {
     const r = this.pedido(id);
-    if (!r) return null;
+    if (!r || r.estado === 'removido') return null;
     const p = this.proposito(r.celula);
     if (!p || !this.membroDeCuidado(p, usuario)) return null;
+    if (r.destino === 'conduz' && r.autor !== usuario && !podeConduzir(p, usuario)) return null;
     return { r, p };
   }
 
-  async orarPorPedido(eu, id, hoje) {
+  // "Estou orando" (R4.2): liga (sim) ou desliga o gesto da pessoa, um só por pedido. Só no pedido
+  // de oração ainda ativo, e nunca no próprio.
+  async orarPorPedido(eu, id, hoje, sim = true) {
     const a = this.exigirCompleto(eu);
     const achado = this.pedidoVisivel(id, a.usuario);
     if (!achado) throw erro('pedido não encontrado', 404);
     const { r } = achado;
     if (r.autor === a.usuario) throw erro('não dá para orar pelo próprio pedido', 400);
-    if (!r.gestos.some((g) => g.usuario === a.usuario && g.gesto === 'orei' && g.data === hoje)) {
-      r.gestos.push({ usuario: a.usuario, gesto: 'orei', data: hoje });
-      await this.salvar();
-    }
+    if (r.tipo !== 'oracao') throw erro('"estou orando" é só para pedido de oração', 400);
+    if (r.estado !== 'ativo') throw erro('esse pedido já foi respondido', 409);
+    const ja = r.gestos.some((g) => g.usuario === a.usuario && g.gesto === 'orando');
+    if (sim && !ja) r.gestos.push({ usuario: a.usuario, gesto: 'orando', data: hoje });
+    if (!sim && ja) r.gestos = r.gestos.filter((g) => !(g.usuario === a.usuario && g.gesto === 'orando'));
+    if (sim !== ja) await this.salvar();
     return r;
   }
 
@@ -2509,14 +2534,74 @@ export class Contas {
     return r;
   }
 
-  // Só o autor marca "Deus respondeu": some da lista dos outros e fica só 7 dias na dele
-  // (o vencimento é encurtado, sem precisar de um campo novo no banco).
-  async marcarRespondido(eu, id, hoje) {
+  // Só o autor marca "Deus respondeu". A oração respondida (R4.2) vai para "Respondidas" e fica
+  // para quem já a via até o vencimento que já tinha; com texto, ele entra como atualização ("como
+  // Deus respondeu"). O pedido de ajuda resolvido ("Já resolvi") some da lista dos outros e fica 7
+  // dias na do autor, como antes.
+  async marcarRespondido(eu, id, hoje, texto = '') {
     const a = this.exigirCompleto(eu);
     const r = this.pedido(id);
     if (!r || r.autor !== a.usuario || r.estado !== 'ativo') throw erro('pedido não encontrado', 404);
+    if (String(texto || '').trim()) this.conferirAtualizacao(r, texto, hoje);
     r.estado = 'respondido';
-    r.venceEm = somaDias(hoje, 7);
+    r.respondidoEm = hoje;
+    if (r.tipo === 'necessidade') r.venceEm = somaDias(hoje, 7);
+    if (String(texto || '').trim()) this.juntarAtualizacao(r, texto, hoje);
+    await this.salvar();
+    return r;
+  }
+
+  // As atualizações do autor (R4.2): até 5 por pedido, 3 por dia somando os pedidos dele, 200
+  // caracteres, com o mesmo filtro do pedido. O texto do pedido continua sem edição.
+  conferirAtualizacao(r, texto, hoje) {
+    if (!atualizacaoValida(texto)) throw erro('escreva a atualização, até 200 caracteres');
+    const barrado = conferirTexto(texto);
+    if (barrado) throw erro(MENSAGEM_DO_FILTRO[barrado]);
+    if ((r.atualizacoes || []).length >= ATUALIZACOES_MAX) throw erro('este pedido já tem ' + ATUALIZACOES_MAX + ' atualizações', 409);
+    const hojeDoAutor = Object.values(this.dados.pedidos || {}).filter((x) => x.autor === r.autor)
+      .reduce((n, x) => n + (x.atualizacoes || []).filter((u) => u.em === hoje).length, 0);
+    if (hojeDoAutor >= ATUALIZACOES_POR_DIA) throw erro('por hoje chega de atualizações', 409);
+  }
+
+  juntarAtualizacao(r, texto, hoje) {
+    r.atualizacoes = r.atualizacoes || [];
+    const ordem = r.atualizacoes.reduce((m, u) => Math.max(m, Number(u.ordem) || 0), 0) + 1;
+    r.atualizacoes.push({ ordem, texto: limparTexto(texto), em: hoje });
+  }
+
+  async atualizarPedido(eu, id, texto, hoje) {
+    const a = this.exigirCompleto(eu);
+    const r = this.pedido(id);
+    if (!r || r.estado === 'removido' || !this.membroDeCuidado(this.proposito(r.celula), a.usuario)) throw erro('pedido não encontrado', 404);
+    if (r.autor !== a.usuario) throw erro('só quem pediu atualiza o pedido', 403);
+    if (r.estado !== 'ativo') throw erro('esse pedido já foi respondido', 409);
+    this.conferirAtualizacao(r, texto, hoje);
+    this.juntarAtualizacao(r, texto, hoje);
+    await this.salvar();
+    return r;
+  }
+
+  async apagarAtualizacao(eu, id, ordem) {
+    const a = this.exigirCompleto(eu);
+    const r = this.pedido(id);
+    if (!r || r.autor !== a.usuario) throw erro('pedido não encontrado', 404);
+    const antes = (r.atualizacoes || []).length;
+    r.atualizacoes = (r.atualizacoes || []).filter((u) => Number(u.ordem) !== Number(ordem));
+    if (r.atualizacoes.length === antes) throw erro('atualização não encontrada', 404);
+    await this.salvar();
+    return r;
+  }
+
+  // Quem conduz tira um pedido que vê, sem esperar denúncia (R4.2). O próprio, o autor apaga.
+  async tirarPedido(eu, id) {
+    const a = this.exigirCompleto(eu);
+    const achado = this.pedidoVisivel(id, a.usuario);
+    if (!achado) throw erro('pedido não encontrado', 404);
+    const { r, p } = achado;
+    if (!podeConduzir(p, a.usuario)) throw erro('só quem conduz a célula pode fazer isso', 403);
+    if (r.autor === a.usuario) throw erro('para tirar o seu pedido, apague', 400);
+    r.estado = 'removido';
+    r.removidoPor = a.usuario;
     await this.salvar();
     return r;
   }

@@ -1,6 +1,8 @@
 // Cuidado mútuo (Atos 2.42, "perseveravam... nas orações"; 2.44-45, "repartiam com os que
 // tinham necessidade"). O pedido é só do autor: os outros nunca respondem em texto, só com um
-// gesto ("Orei por você" ou "Posso ajudar"). Nada disto vai para o Feed, e nada vale XP.
+// gesto ("Estou orando" ou "Posso ajudar"). Nada disto vai para o Feed, e nada vale XP.
+// R4.2 (docs/r4-celula.md): "Estou orando" é um gesto por pessoa, que todos veem só como número;
+// o autor escreve atualizações; o pedido de oração respondido vai para "Respondidas".
 //
 // Aqui moram só as regras puras, testadas sem servidor; quem guarda é contas.mjs e quem serve
 // é servidor.mjs.
@@ -29,6 +31,15 @@ export function textoValido(tipo, texto) {
   if (!t) return false;
   const max = TEXTO_MAX[tipo] || TEXTO_MAX.oracao;
   return t.length <= max;
+}
+
+// As atualizações do autor (R4.2): curtas, poucas por pedido e poucas por dia.
+export const ATUALIZACAO_MAX = 200;
+export const ATUALIZACOES_MAX = 5;
+export const ATUALIZACOES_POR_DIA = 3;
+export function atualizacaoValida(texto) {
+  const t = limparTexto(texto);
+  return !!t && t.length <= ATUALIZACAO_MAX;
 }
 
 // No máximo 3 pedidos ativos por pessoa em cada célula: pedir oração não pode virar um mural.
@@ -69,23 +80,26 @@ export function pedidoVisivelPara(pedido, { usuario, hoje, conduz }) {
   // vencido: some para todo mundo, mesmo para o autor (ele já viu "vence em" na tela).
   if (String(hoje) > String(pedido.venceEm)) return false;
   const souAutor = pedido.autor === usuario;
-  // "Deus respondeu": some da lista dos outros, fica só na do autor (o venceEm já foi
-  // encurtado para 7 dias à frente por quem marcou).
-  if (pedido.estado === 'respondido' && !souAutor) return false;
+  // "Deus respondeu" (R4.2): a oração respondida continua para quem já a via, na lista
+  // "Respondidas", até vencer. O pedido de ajuda resolvido ("Já resolvi") some da lista dos
+  // outros e fica só na do autor, como antes.
+  if (pedido.estado === 'respondido' && pedido.tipo === 'necessidade' && !souAutor) return false;
   // Só para quem conduz: autor, líder e auxiliares.
   if (pedido.destino === 'conduz' && !souAutor && !conduz) return false;
   if (escondidoPorDenuncia(pedido) && !souAutor && !conduz) return false;
   return true;
 }
 
-// Se já orou hoje, ou se já usou o "posso ajudar" (uma vez só) por esta pessoa.
-export const jaOrouHoje = (pedido, usuario, hoje) => (pedido.gestos || [])
-  .some((g) => g.usuario === usuario && g.gesto === 'orei' && g.data === hoje);
+// "Estou orando" (R4.2): um gesto 'orando' por pessoa. Quem vê o pedido vê só quantos estão
+// orando, nunca quem: sem nomes, ninguém é cobrado por não ter orado nem compara quem orou.
+export const estaOrando = (pedido, usuario) => (pedido.gestos || []).some((g) => g.usuario === usuario && g.gesto === 'orando');
+export const quantosOrando = (pedido) => new Set((pedido.gestos || []).filter((g) => g.gesto === 'orando').map((g) => g.usuario)).size;
+// Se já usou o "posso ajudar" (uma vez só) por esta pessoa.
 export const jaAjudou = (pedido, usuario) => (pedido.gestos || [])
   .some((g) => g.usuario === usuario && g.gesto === 'ajudo');
 
-// O que o autor vê de quem reagiu: um gesto por pessoa, a data mais recente (para "orei",
-// que pode repetir dia após dia).
+// O que o autor vê de quem reagiu: um gesto por pessoa, a data mais recente. Desde a R4.2 o
+// servidor só manda ao autor os de "posso ajudar": quem está orando vai só como número.
 export function gestosParaAutor(pedido) {
   const ultimos = new Map();
   for (const g of pedido.gestos || []) {
@@ -97,5 +111,5 @@ export function gestosParaAutor(pedido) {
 }
 
 // Se um pedido já pode ser apagado do banco de vez: 30 dias depois do próprio vencimento
-// (a data guardada, mesmo que "Deus respondeu" a tenha encurtado).
+// (a data guardada, mesmo que "Já resolvi" a tenha encurtado).
 export const vencidoParaApagar = (pedido, hoje, dias = DIAS_ATE_APAGAR) => String(hoje) > somaDias(pedido.venceEm, dias);

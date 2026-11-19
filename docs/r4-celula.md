@@ -140,7 +140,7 @@ chamou e quantas vagas restam. Ninguém de fora vê os membros.
 | Dias abertos para responder | o dia da célula e os 6 anteriores (dia 1 em diante) | `conversa.mjs`, `diaAberto` | "Esta conversa já fechou." |
 | Pedido de oração ou de ajuda | 280 ou 200 caracteres; 3 ativos por pessoa por célula (já existe) | `cuidado.mjs` | as de hoje |
 | Atualização de pedido | 1 a 200 caracteres; 5 por pedido; 3 por dia por pessoa | `cuidado.mjs`, `contas.mjs` | "Escreva a atualização, até 200 caracteres." / "Este pedido já tem 5 atualizações." |
-| Ritmo de gravação no cuidado | 10 por minuto por pessoa (`cuidado:<@>`) | `servidor.mjs` | 429 |
+| Ritmo de gravação no cuidado | 20 por minuto por pessoa (`cuidado:<@>`, em criar, atualizar e respondido) | `servidor.mjs` | 429 |
 | "Estou orando" | 1 por pessoa por pedido (liga e desliga) | `contas.mjs` | nenhuma |
 | QR do encontro | gerar: 10 por minuto por pessoa; vale 4 horas | `servidor.mjs`, `contas.mjs` | 429 |
 | Entrada pelo QR | as de hoje: vagas de membro (20) e teto de 10 visitantes | `entrarNaCelula` | as de hoje |

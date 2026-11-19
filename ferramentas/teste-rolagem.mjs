@@ -290,10 +290,11 @@ if (await av(existe('[data-checkin]'))) {
     await esperar('!' + existe('.folha-checkin'));
   }, { espera: 2500, minimo: 40 });
 }
-await ir('#/novidades/celula/' + ID_CELULA + '/oracao', 'document.querySelectorAll(".painel-celula [data-orei]").length >= 6', 20000);
-await av('(() => { const l = document.querySelectorAll(".painel-celula [data-orei]"); l[Math.floor(l.length / 2)].setAttribute("data-alvo-orei", ""); return true; })()');
-await conferir('"Orei por você" num pedido do meio da lista', '.painel-celula [data-alvo-orei]', { minimo: 40, espera: 1500,
-  pronto: 'document.querySelectorAll(".painel-celula [data-orei]").length < 8 && !' + existe('[data-alvo-orei]') });
+// R4.2: o "Estou orando" (peça "oracao") liga e fica no lugar, como "Você está orando"
+await ir('#/novidades/celula/' + ID_CELULA + '/oracao', 'document.querySelectorAll(".painel-celula [data-orando]").length >= 6', 20000);
+await av('(() => { const l = document.querySelectorAll(".painel-celula [data-orando]"); l[Math.floor(l.length / 2)].setAttribute("data-alvo-orei", ""); return true; })()');
+await conferir('"Estou orando" num pedido do meio da lista', '.painel-celula [data-alvo-orei]', { minimo: 40, espera: 1500,
+  pronto: 'document.querySelector(".painel-celula [data-orando][aria-pressed=\\"true\\"]") && !' + existe('[data-alvo-orei]') });
 if (await ir('#/novidades/celula/' + ID_CELULA + '/painel', existe('.painel-celula [data-registrar-encontro]'), 20000)) {
   await conferirFluxo('registrar o encontro com a presença de cada um (Painel)', '.painel-celula [data-registrar-encontro]', async () => {
     await esperar(existe('.folha .escolha-amigo input'));

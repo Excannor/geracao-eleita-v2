@@ -443,6 +443,17 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
     INSERT INTO propositos (id, tipo, titulo, criado_por, criado_em, grupo, celula)
       VALUES ('p1', 'plano', 'Célula da Duda', 'duda', '2026-01-01', 1, 1);
     INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel) VALUES ('p1', 'duda', 'ativo', '2026-01-01', '');
+    -- os pedidos da Fase 4 (v9), com o "orei" de um por dia e um respondido, para a v27 (R4.2) converter
+    CREATE TABLE pedidos (id TEXT PRIMARY KEY, celula TEXT NOT NULL, autor TEXT NOT NULL, tipo TEXT NOT NULL, destino TEXT NOT NULL,
+      texto TEXT NOT NULL, criado_em TEXT NOT NULL, vence_em TEXT NOT NULL, estado TEXT NOT NULL DEFAULT 'ativo', removido_por TEXT NOT NULL DEFAULT '');
+    CREATE INDEX pedidos_celula ON pedidos (celula);
+    CREATE TABLE pedido_gestos (pedido TEXT NOT NULL, usuario TEXT NOT NULL, gesto TEXT NOT NULL, data TEXT NOT NULL, PRIMARY KEY (pedido, usuario, gesto, data));
+    CREATE TABLE pedido_denuncias (pedido TEXT NOT NULL, usuario TEXT NOT NULL, motivo TEXT NOT NULL, em TEXT NOT NULL, PRIMARY KEY (pedido, usuario));
+    INSERT INTO pedidos (id, celula, autor, tipo, destino, texto, criado_em, vence_em, estado) VALUES
+      ('r1', 'p1', 'duda', 'oracao', 'celula', 'pela prova', '2026-01-02', '2026-02-01', 'ativo'),
+      ('r2', 'p1', 'duda', 'oracao', 'celula', 'pela família', '2026-01-02', '2026-01-17', 'respondido');
+    INSERT INTO pedido_gestos (pedido, usuario, gesto, data) VALUES
+      ('r1', 'bia', 'orei', '2026-01-03'), ('r1', 'bia', 'orei', '2026-01-04'), ('r1', 'caio', 'orei', '2026-01-05'), ('r1', 'caio', 'ajudo', '2026-01-05');
   `);
   ok(Number(brutoV9.prepare('SELECT versao FROM schema_versao').get().versao) === 9, 'o banco de ensaio nasce na versão 9, como um HML de antes da Fase 5');
   brutoV9.close();
@@ -458,6 +469,21 @@ Leiam Mateus 18.21-22.', '2026-01-05T12:00:00.000Z');
     'proposito_membros ganha tornou_membro_em, vazia para quem já estava lá');
   dbV10.prepare("INSERT INTO proposito_membros (proposito, usuario, estado, entrou_em, papel, tornou_membro_em) VALUES ('p1', 'nova', 'ativo', '2026-01-05', '', '2026-01-10')").run();
   ok(dbV10.prepare("SELECT tornou_membro_em FROM proposito_membros WHERE usuario = 'nova'").get().tornou_membro_em === '2026-01-10', 'a coluna nova de proposito_membros aceita uma linha de verdade');
+  // v27 (R4.2): a lista de oração. O "orei" de um por dia vira um "orando" por pessoa, com a primeira
+  // data; o respondido ganha a data da resposta (7 dias antes do vencimento encurtado); nasce a
+  // tabela das atualizações
+  const colunasV27 = (t) => dbV10.prepare('PRAGMA table_info(' + t + ')').all().map((c) => c.name);
+  ok(B.versaoDoEsquema() >= 27 && colunasV27('pedidos').includes('respondido_em') && colunasV27('pedido_atualizacoes').join() === 'pedido,ordem,texto,em',
+    'a migração v27 acrescenta pedidos.respondido_em e cria pedido_atualizacoes (pedido, ordem, texto, em)');
+  ok(dbV10.prepare("SELECT group_concat(usuario || ':' || gesto || ':' || data, ' ') x FROM (SELECT * FROM pedido_gestos WHERE pedido = 'r1' ORDER BY usuario, gesto)").get().x
+    === 'bia:orando:2026-01-03 caio:ajudo:2026-01-05 caio:orando:2026-01-05', 'os "orei" de antes viram um "orando" por pessoa, com a primeira data; o "ajudo" fica');
+  ok(dbV10.prepare("SELECT group_concat(id || ':' || respondido_em, ' ') x FROM (SELECT * FROM pedidos ORDER BY id)").get().x === 'r1: r2:2026-01-10',
+    'o respondido de antes ganha a data da resposta (vencimento menos 7 dias); o ativo fica vazio');
+  dbV10.prepare("INSERT INTO pedido_atualizacoes (pedido, ordem, texto, em) VALUES ('r1', 1, 'fiz a prova', '2026-01-06')").run();
+  dbV10.prepare("INSERT INTO pedidos (id, celula, autor, tipo, destino, texto, criado_em, vence_em) VALUES ('r3', 'p1', 'outra', 'oracao', 'celula', 'x', '2026-01-02', '2026-02-01')").run();
+  dbV10.prepare("INSERT INTO pedido_atualizacoes (pedido, ordem, texto, em) VALUES ('r3', 1, 'da outra', '2026-01-06')").run();
+  B.apagarPessoaDoBanco(dbV10, 'duda');
+  ok(dbV10.prepare("SELECT group_concat(pedido) x FROM pedido_atualizacoes").get().x === 'r3', 'apagar a pessoa leva as atualizações dos pedidos dela (v27); as de outra pessoa ficam');
   B.fecharBanco(arquivoV9);
   try { rmSync(pastaV9, { recursive: true, force: true }); } catch { /* ok */ }
 } catch (e) {

@@ -1,0 +1,14 @@
+/* A aba Oração da célula (oracao.js, R4.2): a contagem de "Estou orando", as atualizações do
+   autor e a lista Respondidas. O resto vem das classes de sempre (cartao-proposito, selo-status). */
+.oracao-aba .titulo-secao { margin-top: 20px; }
+.cartao-pedido > p { margin: 0; }
+.oracao-contagem { display: flex; align-items: center; gap: 6px; margin: 0; color: var(--tinta-fraca); font-size: .875rem; font-weight: 700; }
+.oracao-contagem svg { flex: none; width: 16px; height: 16px; }
+.oracao-atualizacoes { display: grid; gap: 6px; margin: 0; padding: 0 0 0 12px; list-style: none; border-left: 3px solid var(--borda); }
+.oracao-atualizacoes li { display: flex; align-items: flex-start; gap: 6px; font-size: .9375rem; line-height: 1.4; overflow-wrap: anywhere; }
+.oracao-atualizacoes li[hidden] { display: none; }
+.oracao-atualizacoes small { flex: none; padding-top: 2px; color: var(--tinta-fraca); font-weight: 700; }
+.oracao-atualizacoes .apagar-atualizacao { flex: none; width: 44px; height: 44px; margin: -12px -10px -12px auto; color: var(--tinta-fraca); }
+.oracao-atualizacoes .apagar-atualizacao svg { width: 16px; height: 16px; }
+.cartao-pedido.respondida { border-color: var(--verde-fraco); }
+.oracao-original { padding: 10px 12px; border-radius: var(--raio-p); background: var(--fundo-2); overflow-wrap: anywhere; }

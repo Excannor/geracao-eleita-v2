@@ -387,7 +387,7 @@ console.log('cartas:', catalogoCartas.cartas.length, 'em', catalogoCartas.albuns
 // Uma peça pode juntar vários arquivos (PARTES_PECA), na ordem: o estudo da célula leva as regras
 // puras (estudo-regras.js, que o teste.mjs roda sozinho) antes da tela, e o preparo leva o leitor
 // de marcas (estudo-marcas.js, que o servidor também carrega) antes do editor. O padrão é <nome>.js.
-const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'apoiar', 'historia', 'dia-lido', 'chama', 'toque', 'volta', 'praticar', 'temporadas', 'retrospectiva'];
+const NOMES_PECAS = ['qrcode', 'mapa-tela', 'painel-tela', 'atlas', 'estudo-celula', 'estudo-preparo', 'cartas', 'cartas-regras', 'album', 'apoiar', 'historia', 'dia-lido', 'chama', 'toque', 'volta', 'praticar', 'temporadas', 'retrospectiva', 'oracao'];
 // As peças que o service worker guarda já na instalação (DE_ANTEMAO, no sw.js): telas que saíram do
 // index.html para a folga, mas que precisam continuar abrindo sem rede mesmo nunca abertas.
 const PECAS_DE_ANTEMAO = ['praticar', 'temporadas'];
@@ -522,6 +522,7 @@ const html = molde
     + 'window.PRATICAR=' + JSON.stringify(pecas.praticar) + ';'
     + 'window.TEMPORADAS=' + JSON.stringify(pecas.temporadas) + ';'
     + 'window.RETROSPECTIVA=' + JSON.stringify(pecas.retrospectiva) + ';'
+    + 'window.ORACAO=' + JSON.stringify(pecas.oracao) + ';'
     + 'window.CARTAS_INDICE=' + JSON.stringify(esqueletoCartas).replace(/</g, '\\u003c') + ';'
     + 'window.PARABOLAS=' + JSON.stringify(parabolas).replace(/</g, '\\u003c') + ';'
     + 'window.MAPAS=' + JSON.stringify(mapas).replace(/</g, '\\u003c') + ';'
